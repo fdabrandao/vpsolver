@@ -1,0 +1,9 @@
+Arc-flow vector packing Solver (VPSolver)
+
+VPSolver is a vector packing solver based on an arc-flow formulation with graph 
+compression. VPSolver can generate .mps and .lp files that can be solved using 
+general-purpose mixed-integer programming solvers such as Gurobi and GLPK. 
+
+Requires Gurobi and/or GLPK to solve MIP models.
+
+For more details, please refer to the manual.
