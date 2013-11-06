@@ -1,5 +1,5 @@
 /**
-This code is part of the Arc-flow vector packing solver.
+This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
 Copyright (C) 2013, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -46,7 +46,7 @@ private:
     vector<int> stretch2;    
     vector<int> stretch3;     
     bool bstretch;
-    vector<vector<int> > st_mat;    
+    vector<vector<int> > ls_mat;    
     int lsize;
 protected:
     bool ready;
@@ -59,7 +59,7 @@ protected:
     vector<Arc> A;
     
     vector<int> max_rep(const vector<int> &u, int i0, int sub_i0) const;
-    void lift_node(vector<int> &u, int it, int ic) const;
+    void lift_state(vector<int> &u, int it, int ic) const;
     int knapsack(const vector<int> &b, int i0, int d, int C) const;
     bool is_valid(const vector<int> &u) const;
     bool is_compatible(const Item &a, const Item &b) const;

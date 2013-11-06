@@ -1,5 +1,5 @@
 /**
-This code is part of the Arc-flow vector packing solver.
+This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
 Copyright (C) 2013, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -42,14 +42,14 @@ Arcflow::Arcflow(const Instance &inst){
     binary = inst.binary;    
     int method = inst.method;        
     
-    st_mat.assign(m+1, vector<int>(ndims, 0));        
+    ls_mat.assign(m+1, vector<int>(ndims, 0));        
     const vector<int> &r = max_rep(vector<int>(ndims, 0), 0, 0);
     for(int i = 0; i < m; i++){        
         int next = binary ? i+1 : i;
         for(int j = next; j < m; j++){
             if(is_compatible(items[i], items[j])){
                 for(int d = 0; d < ndims; d++)
-                    st_mat[i][d] = min(st_mat[i][d]+r[j]*items[j][d], W[d]);                
+                    ls_mat[i][d] = min(ls_mat[i][d]+r[j]*items[j][d], W[d]);                
             }                        
         }
     }    
@@ -212,7 +212,7 @@ void Arcflow::build(){
                 for(int d = 0; d < ndims; d++) lv[d] += items[i][d];
                 if(binary) lv[ndims] = i;
                 if(!is_valid(lv)) break;                
-                lift_node(lv, i, c+1);                
+                lift_state(lv, i, c+1);                
                 int v = NS.get_index(lv);
                 assert(u != v);
                 A.push_back(Arc(u, v, i));
@@ -230,18 +230,18 @@ void Arcflow::build(){
     NS.sort();
 }
    
-void Arcflow::lift_node(vector<int> &u, int it, int ic) const{    
+void Arcflow::lift_state(vector<int> &u, int it, int ic) const{    
     for(int d = 0; d < ndims; d++){
-        // stretch 1        
+        // lift method 1        
         if(ic > 0)
-            u[d] = max(u[d], W[d]-st_mat[it][d]);
+            u[d] = max(u[d], W[d]-ls_mat[it][d]);
         else if(it > 0)
-            u[d] = max(u[d], W[d]-st_mat[it-1][d]);        
-    }    
+            u[d] = max(u[d], W[d]-ls_mat[it-1][d]);        
+    }
     const vector<int> &r = max_rep(u, it, ic);
     for(int d = 0; d < ndims; d++){
         if(u[d] < W[d]){ 
-            // stretch 2
+            // lift method 2
             int val = W[d];                
             for(int t = it; t < m && val >= u[d]; t++) 
                 val -= r[t]*items[t][d];
@@ -249,7 +249,7 @@ void Arcflow::lift_node(vector<int> &u, int it, int ic) const{
             if(val >= u[d]){
                 u[d] = val;
             }else if(W[d]-u[d] > 0){ 
-                // stretch 3
+                // lift method 3
                 u[d] = W[d]-knapsack(r, it, d, W[d]-u[d]); 
             }
         }
@@ -322,17 +322,17 @@ int Arcflow::go(const vector<int> &su){
             if(binary){              
                 sv[ndims] = it+1;            
                 if(it+1 < m) 
-                    lift_node(sv, it+1, 0);             
+                    lift_state(sv, it+1, 0);             
                 iv = go(sv);              
             }else{
                 if(ic+1 < dem){
                     sv[ndims] = it;
                     sv[ndims+1] = ic+1;
-                    lift_node(sv, it, ic+1); 
+                    lift_state(sv, it, ic+1); 
                 }else{
                     sv[ndims] = it+1;
                     sv[ndims+1] = 0;
-                    lift_node(sv, it+1, 0); 
+                    lift_state(sv, it+1, 0); 
                 }                                  
                 iv = go(sv);                                  
             }
@@ -355,7 +355,7 @@ int Arcflow::go(const vector<int> &su){
 void Arcflow::build_dp(){
     dp.clear();
     A.clear();
-    NS.clear();   
+    NS.clear();
     
     if(binary)
         go(vector<int>(lsize, 0));
