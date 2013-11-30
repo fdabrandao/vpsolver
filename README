@@ -21,23 +21,24 @@ Requirements:
 
 --
 Proposed in:
-Brandão, F. and Pedroso, J. P. (2013).
-Bin Packing and Related Problems: General Arc-flow Formulation with Graph Compression.
-Technical Report DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.
+Brandão, F. and Pedroso, J. P. (2013). Bin Packing and Related Problems: 
+General Arc-flow Formulation with Graph Compression. Technical Report 
+DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do 
+Porto, Portugal.
 
 --
 See also:
-Brandão, F. and Pedroso, J. P. (2013). 
-Cutting Stock with Binary Patterns: Arc-flow Formulation with Graph Compression.
-Technical Report DCC-2013-09, Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.
+Brandão, F. and Pedroso, J. P. (2013). Cutting Stock with Binary Patterns: 
+Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-09, 
+Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.
 
 Brandão, F. (2012). Bin Packing and Related Problems: Pattern-Based Approaches. 
 Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.
 
 --
-Computational results: 
+Computational results on several benchmark test data sets: 
 http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/
 
 --
-Filipe Brandao's Homepage: http://www.dcc.fc.up.pt/~fdabrandao/
+Filipe Brandão's Homepage: http://www.dcc.fc.up.pt/~fdabrandao/
 
