@@ -13,12 +13,16 @@ For more details, please refer to the manual.
 
 --
 Proposed in:
-    Brandão, F. and Pedroso, J. P. (2013).
-    Bin Packing and Related Problems: General Arc-flow Formulation with Graph Compression.
-    Technical Report DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.
+Brandão, F. and Pedroso, J. P. (2013).
+Bin Packing and Related Problems: General Arc-flow Formulation with Graph Compression.
+Technical Report DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.
 
 --
-Requires Gurobi and/or GLPK to solve MIP models.
+Requirements:
+    MIP solver: Gurobi, GLPK, COIN-OR, lp_solve, ...
+    Compiler: g++ >= 4.6
 
 --
+VPSolver Homepage: http://code.google.com/p/vpsolver/
 Filipe Brandao's Homepage: http://www.dcc.fc.up.pt/~fdabrandao/
+
