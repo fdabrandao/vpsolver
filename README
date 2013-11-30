@@ -1,15 +1,23 @@
+Arc-flow Vector Packing Solver (VPSolver)
+
 Copyright (C) 2013, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
-
-Arc-flow Vector Packing Solver (VPSolver)
 
 --
 VPSolver is a vector packing solver based on an arc-flow formulation with graph 
 compression. VPSolver can generate .mps and .lp files that can be solved using 
 general-purpose mixed-integer programming solvers such as Gurobi and GLPK. 
 
-For more details, please refer to the manual.
+For more details, please refer to the manual. 
+
+--
+Project Homepage: http://code.google.com/p/vpsolver/
+
+--
+Requirements:
+    MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, lp_solve, ...
+    Compiler: g++ >= 4.6
 
 --
 Proposed in:
@@ -18,11 +26,18 @@ Bin Packing and Related Problems: General Arc-flow Formulation with Graph Compre
 Technical Report DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.
 
 --
-Requirements:
-    MIP solver: Gurobi, GLPK, COIN-OR, lp_solve, ...
-    Compiler: g++ >= 4.6
+See also:
+Brandão, F. and Pedroso, J. P. (2013). 
+Cutting Stock with Binary Patterns: Arc-flow Formulation with Graph Compression.
+Technical Report DCC-2013-09, Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.
+
+Brandão, F. (2012). Bin Packing and Related Problems: Pattern-Based Approaches. 
+Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.
 
 --
-VPSolver Homepage: http://code.google.com/p/vpsolver/
+Computational results: 
+http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/
+
+--
 Filipe Brandao's Homepage: http://www.dcc.fc.up.pt/~fdabrandao/
 

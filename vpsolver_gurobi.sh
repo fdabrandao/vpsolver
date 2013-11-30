@@ -22,23 +22,27 @@ set -e
 echo "Copyright (C) 2013, Filipe Brandao"
 echo "Usage: vpsolver_gurobi.sh instance.vbp"
 
-tmpdir=tmp/
-grbopts=Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0 MIPGapAbs=1-10^5
+GRB_PARAMS=Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0 MIPGapAbs=1-10^5
+
+BASEDIR=`dirname $0`
+TMP_DIR=$BASEDIR/tmp/
+BIN_DIR=$BASEDIR/bin/
 if [ "$#" -eq 1 ]; then
-    fname=$1
-    echo "\nvbp2afg..."
-    bin/vbp2afg $fname $tmpdir/$fname.afg -2 
+    instance=$1
+    fname=`basename $instance`    
+    
+    echo "\n>>> vbp2afg..."
+    $BIN_DIR/vbp2afg $instance $TMP_DIR/$fname.afg -2 
 
-    echo "\nafg2mps..."
-    bin/afg2mps $tmpdir/$fname.afg $tmpdir/$fname.mps
+    echo "\n>>> afg2mps..."
+    $BIN_DIR/afg2mps $TMP_DIR/$fname.afg $TMP_DIR/$fname.mps
 
-    echo "\nsolving the MIP model using lp_solve..."
-    lp_solve -mps $tmpdir/$fname.mps > $tmpdir/$fname.out    
-    sed -e '1,/variables:/d' $tmpdir/$fname.out > $tmpdir/$fname.sol
+    echo "\n>>> solving the MIP model using Gurobi..."
+    echo "Note: different parameter settings may improve the performance substantially!"
+    gurobi_cl $GRB_PARAMS ResultFile=$TMP_DIR/$fname.sol $TMP_DIR/$fname.mps
+    sed '/#/d' < $TMP_DIR/$fname.sol > $TMP_DIR/$fname.sol2
+    mv $TMP_DIR/$fname.sol2 $TMP_DIR/$fname.sol
 
-    gurobi_cl $grbopts ResultFile=$tmpdir/$fname.sol $tmpdir/$fname.mps
-    sed -i '/#/d' $tmpdir/$fname.sol
-
-    echo "\nvbpsol..."
-    bin/vbpsol $tmpdir/$fname.afg $tmpdir/$fname.sol | sed -e '/Instance:/,$d' | sed '/^$/d'
+    echo "\n>>> vbpsol..."
+    $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol | sed -e '/Instance:/,$d' | sed '/^$/d'
 fi

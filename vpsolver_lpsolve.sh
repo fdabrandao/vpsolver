@@ -22,19 +22,24 @@ set -e
 echo "Copyright (C) 2013, Filipe Brandao"
 echo "Usage: vpsolver_lpsolve.sh instance.vbp"
 
-tmpdir=tmp/
+BASEDIR=`dirname $0`
+TMP_DIR=$BASEDIR/tmp/
+BIN_DIR=$BASEDIR/bin/
 if [ "$#" -eq 1 ]; then
-    fname=$1
-    echo "\nvbp2afg..."
-    bin/vbp2afg $fname $tmpdir/$fname.afg -2 
+    instance=$1
+    fname=`basename $instance`  
+    
+    echo "\n>>> vbp2afg..."
+    $BIN_DIR/vbp2afg $instance $TMP_DIR/$fname.afg -2 
 
-    echo "\nafg2mps..."
-    bin/afg2mps $tmpdir/$fname.afg $tmpdir/$fname.mps
+    echo "\n>>> afg2mps..."
+    $BIN_DIR/afg2mps $TMP_DIR/$fname.afg $TMP_DIR/$fname.mps
 
-    echo "\nsolving the MIP model using lp_solve..."
-    lp_solve -mps $tmpdir/$fname.mps > $tmpdir/$fname.out    
-    sed -e '1,/variables:/d' $tmpdir/$fname.out > $tmpdir/$fname.sol
+    echo "\n>>> solving the MIP model using lp_solve..."
+    echo "Note: different parameter settings may improve the performance substantially!"
+    lp_solve -mps $TMP_DIR/$fname.mps > $TMP_DIR/$fname.out    
+    sed -e '1,/variables:/d' < $TMP_DIR/$fname.out > $TMP_DIR/$fname.sol
 
-    echo "\nvbpsol..."
-    bin/vbpsol $tmpdir/$fname.afg $tmpdir/$fname.sol | sed -e '/Instance:/,$d' | sed '/^$/d'
+    echo "\n>>> vbpsol..."
+    $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol | sed -e '/Instance:/,$d' | sed '/^$/d'
 fi

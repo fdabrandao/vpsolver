@@ -20,14 +20,14 @@
 
 set -e
 echo "Copyright (C) 2013, Filipe Brandao"
-echo "Usage: vpsolver_glpk.sh instance.vbp"
+echo "Usage: vpsolver_lpsolve.sh instance.vbp"
 
 BASEDIR=`dirname $0`
 TMP_DIR=$BASEDIR/tmp/
 BIN_DIR=$BASEDIR/bin/
 if [ "$#" -eq 1 ]; then
     instance=$1
-    fname=`basename $instance`
+    fname=`basename $instance`  
     
     echo "\n>>> vbp2afg..."
     $BIN_DIR/vbp2afg $instance $TMP_DIR/$fname.afg -2 
@@ -35,10 +35,17 @@ if [ "$#" -eq 1 ]; then
     echo "\n>>> afg2mps..."
     $BIN_DIR/afg2mps $TMP_DIR/$fname.afg $TMP_DIR/$fname.mps
 
-    echo "\n>>> solving the MIP model using GLPK..."
+    echo "\n>>> solving the MIP model using CPLEX..."
     echo "Note: different parameter settings may improve the performance substantially!"
-    glpsol --mps $TMP_DIR/$fname.mps -o $TMP_DIR/$fname.out
-    grep "*" $TMP_DIR/$fname.out | awk '{ print $2, $4 }' > $TMP_DIR/$fname.sol
+    rm $TMP_DIR/$fname.sol;
+    (
+        echo "read $TMP_DIR/$fname.mps"
+        echo "optimize"
+        echo "write $TMP_DIR/$fname.sol"
+    ) | cplex
+    echo ""
+    awk -F\" '/variable name/ {print $2, $6}' OFS=" " $TMP_DIR/$fname.sol > $TMP_DIR/$fname.sol2
+    mv $TMP_DIR/$fname.sol2 $TMP_DIR/$fname.sol
 
     echo "\n>>> vbpsol..."
     $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol | sed -e '/Instance:/,$d' | sed '/^$/d'

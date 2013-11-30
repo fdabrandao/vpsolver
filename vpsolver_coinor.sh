@@ -22,19 +22,24 @@ set -e
 echo "Copyright (C) 2013, Filipe Brandao"
 echo "Usage: vpsolver_coinor.sh instance.vbp"
 
-tmpdir=tmp/
+BASEDIR=`dirname $0`
+TMP_DIR=$BASEDIR/tmp/
+BIN_DIR=$BASEDIR/bin/
 if [ "$#" -eq 1 ]; then
-    fname=$1
-    echo "\nvbp2afg..."
-    bin/vbp2afg $fname $tmpdir/$fname.afg -2 
+    instance=$1
+    fname=`basename $instance`
     
-    echo "\nafg2mps..."
-    bin/afg2mps $tmpdir/$fname.afg $tmpdir/$fname.mps
+    echo "\n>>> vbp2afg..."
+    $BIN_DIR/vbp2afg $instance $TMP_DIR/$fname.afg -2 
     
-    echo "\nsolving the MIP model using cbc..."    
-    cbc $tmpdir/$fname.mps -cuts off -strategy 4 -solve -solu $tmpdir/$fname.out
-    tail -n +2 $tmpdir/$fname.out | awk '{ print $2, $3 }' > $tmpdir/$fname.sol
+    echo "\n>>> afg2mps..."
+    $BIN_DIR/afg2mps $TMP_DIR/$fname.afg $TMP_DIR/$fname.mps
     
-    echo "\nvbpsol..."
-    bin/vbpsol $tmpdir/$fname.afg $tmpdir/$fname.sol | sed -e '/Instance:/,$d' | sed '/^$/d'
+    echo "\n>>> solving the MIP model using COIN-OR..."
+    echo "Note: different parameter settings may improve the performance substantially!"
+    cbc $TMP_DIR/$fname.mps -cuts off -strategy 4 -solve -solu $TMP_DIR/$fname.out
+    tail -n +2 $TMP_DIR/$fname.out | awk '{ print $2, $3 }' > $TMP_DIR/$fname.sol
+    
+    echo "\n>>> vbpsol..."
+    $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol | sed -e '/Instance:/,$d' | sed '/^$/d'
 fi
