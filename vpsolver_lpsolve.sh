@@ -41,5 +41,5 @@ if [ "$#" -eq 1 ]; then
     sed -e '1,/variables:/d' < $TMP_DIR/$fname.out > $TMP_DIR/$fname.sol
 
     echo "\n>>> vbpsol..."
-    $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol | sed -e '/Instance:/,$d' | sed '/^$/d'
+    $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol
 fi

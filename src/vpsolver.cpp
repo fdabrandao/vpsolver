@@ -154,7 +154,7 @@ int main(int argc, char *argv[]){
     setvbuf(stdout, NULL, _IONBF, 0);
     assert(argc >= 2 && argc <= 5);
    
-    Instance inst(argv[1]);      
+    Instance inst(argv[1]);
     if(argc >= 3) {
         inst.method = atoi(argv[2]);
         assert(inst.method >= MIN_METHOD && inst.method <= MAX_METHOD);

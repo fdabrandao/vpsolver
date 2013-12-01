@@ -181,13 +181,13 @@ void ArcflowSol::print_solution(const Instance &inst,
         printf("%d x [", pat->first);
         ForEach(i, tmp){                        
             if(i != tmp.begin()) printf(", ");            
-            printf("%d", *i);
+            printf("i=%d", *i);
         }
         printf("]\n");
     }
     
     if(print_inst){
-        printf("\nInstance:\n");
+        printf("Instance:\n");
         for(int i = 0; i < inst.m; i++){
             printf("w_%d: (", i+1);
             for(int j = 0; j < inst.ndims; j++){

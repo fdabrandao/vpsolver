@@ -44,5 +44,5 @@ if [ "$#" -eq 1 ]; then
     mv $TMP_DIR/$fname.sol2 $TMP_DIR/$fname.sol
 
     echo "\n>>> vbpsol..."
-    $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol | sed -e '/Instance:/,$d' | sed '/^$/d'
+    $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol
 fi

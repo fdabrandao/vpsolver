@@ -31,13 +31,18 @@ using namespace std;
 
 int main(int argc, char *argv[]){     
     printf("Copyright (C) 2013, Filipe Brandao\n");
-    printf("Usage: vbpsol graph.afg vars.sol\n");
+    printf("Usage: vbpsol graph.afg vars.sol [print_instance:0]\n");
     setvbuf(stdout, NULL, _IONBF, 0);
-    assert(argc == 3);
+    assert(argc >= 3 && argc <= 4);
     FILE *fafg = fopen(argv[1], "r");
     assert(fafg != NULL);
     FILE *fsol = fopen(argv[2], "r");    
     assert(fsol != NULL);
+    
+    bool print_inst = false;
+    if(argc >= 4){
+        print_inst = atoi(argv[3]) != 0;        
+    }
     
     assert(fscanf(fafg, " #INSTANCE_BEGIN# ")==0);
     Instance inst(fafg);    
@@ -77,7 +82,7 @@ int main(int argc, char *argv[]){
     }
     
     ArcflowSol sol(flow, S, T, inst.binary);
-    sol.print_solution(inst, true, true);               
+    sol.print_solution(inst, print_inst, true);               
     return 0;
 }
 
