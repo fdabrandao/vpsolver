@@ -41,11 +41,6 @@ private:
     inline vector<int> hash(const vector<int> &su);
     vector<int> max_label;
     vector<int> min_label;
-    vector<int> stretch;
-    vector<int> stretch1;
-    vector<int> stretch2;    
-    vector<int> stretch3;     
-    bool bstretch;
     vector<vector<int> > ls_mat;    
     int lsize;
 protected:
@@ -72,9 +67,9 @@ protected:
     void compress();
     void finalize();       
 public:
-    Arcflow(const Instance &inst);        
+    Arcflow(const Instance &inst);
     void write(const char *fname);
-    void write(FILE *fout);    
+    void write(FILE *fout);
 };
 
 #endif

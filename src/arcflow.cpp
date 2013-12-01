@@ -248,9 +248,9 @@ void Arcflow::lift_state(vector<int> &u, int it, int ic) const{
             
             if(val >= u[d]){
                 u[d] = val;
-            }else if(W[d]-u[d] > 0){ 
+            }else{
                 // lift method 3
-                u[d] = W[d]-knapsack(r, it, d, W[d]-u[d]); 
+                u[d] = W[d]-knapsack(r, it, d, W[d]-u[d]);
             }
         }
     }
