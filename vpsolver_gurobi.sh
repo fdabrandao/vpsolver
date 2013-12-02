@@ -20,12 +20,24 @@
 
 set -e
 echo "Copyright (C) 2013, Filipe Brandao"
-echo "Usage 1: vpsolver_gurobi.sh instance.vbp"
-echo "Usage 2: vpsolver_gurobi.sh graph.afg model.mps/.lp"
 
 BASEDIR=`dirname $0`
 BIN_DIR=$BASEDIR/bin/
 TMP_DIR=`mktemp -d -t XXXXXXXXXX`
+trap "rm -rf $TMP_DIR" EXIT
+
+usage(){
+    echo -e "Usage:"
+    echo -e "  $0 --vbp instance.vbp"
+    echo -e "  $0 --mps/--lp model.mps/.lp"
+    echo -e "  $0 --mps/--lp model.mps/.lp --afg graph.afg"
+}
+
+error(){
+    echo "Error: invalid arguments."
+    usage
+    exit 1
+}
 
 solve(){
     local model_file=$1
@@ -37,31 +49,77 @@ solve(){
     mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol
 }
 
-if [ "$#" -gt 2 ]; then
-    exit
+model_file=""
+afg_file=""
+vbp_file=""
+
+while true;
+do
+  case "$1" in
+    --mps)
+        if [[ -n "$2" && -e "$2" && "$2" =~ \.mps$ ]]; then
+            model_file=$2
+        else
+            error
+        fi
+        shift 2;;
+        
+    --lp)
+        if [[ -n "$2" && -e "$2" && "$2" =~ \.lp$ ]]; then
+            model_file=$2
+        else
+            error
+        fi
+        shift 2;;        
+
+    --afg)
+        if [[ -n "$2" && -e "$2" && "$2" =~ \.afg$ ]]; then
+            afg_file=$2
+        else
+            error
+        fi
+        shift 2;;    
+ 
+    --vbp)
+        if [[ -n "$2" && -e "$2" && "$2" =~ \.vbp$ ]]; then
+            vbp_file=$2
+        else
+            error            
+        fi
+        shift 2;;        
+            
+    *)
+        if [[ -n "$1" ]]; then
+            error
+        else
+            break        
+        fi
+  esac
+done
+
+if [[ -z "$vbp_file" && -z "$model_file" ]]; then
+    error
 fi
 
-if [ "$#" -eq 1 ]; then
-    instance=$1
+if [[ -n "$vbp_file" ]]; then
+    if [[ -n "$afg_file" || -n "$model_file" ]]; then
+        error
+    fi
+    
     afg_file=$TMP_DIR/graph.afg
     model_file=$TMP_DIR/model.mps
     
     echo -e "\n>>> vbp2afg..."
-    $BIN_DIR/vbp2afg $instance $afg_file -2 
+    $BIN_DIR/vbp2afg $vbp_file $afg_file -2 
 
     echo -e "\n>>> afg2mps..."
     $BIN_DIR/afg2mps $afg_file $model_file
 fi
 
-if [ "$#" -eq 2 ]; then 
-    afg_file=$1
-    model_file=$2    
-fi
-
 solve $model_file;
 
-echo -e "\n>>> vbpsol..."
-$BIN_DIR/vbpsol $afg_file $TMP_DIR/vars.sol
-
-rm -rf $TMP_DIR
+if [[ -n "$afg_file" ]]; then
+    echo -e "\n>>> vbpsol..."
+    $BIN_DIR/vbpsol $afg_file $TMP_DIR/vars.sol
+fi       
 

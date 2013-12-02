@@ -149,11 +149,13 @@ public:
 };
 
 int main(int argc, char *argv[]){     
-    printf("Copyright (C) 2013, Filipe Brandao\n");
-    printf("Usage: vpsolver instance.vbp [method:-2] [binary:0] [vtype:I]\n");
-    setvbuf(stdout, NULL, _IONBF, 0);
-    assert(argc >= 2 && argc <= 5);
-   
+    printf("Copyright (C) 2013, Filipe Brandao\n");    
+    setvbuf(stdout, NULL, _IONBF, 0);    
+    if(argc < 2 || argc > 5){
+        printf("Usage: vpsolver instance.vbp [method:-2] [binary:0] [vtype:I]\n");
+        return 1;
+    }
+
     Instance inst(argv[1]);
     if(argc >= 3) {
         inst.method = atoi(argv[2]);

@@ -81,10 +81,13 @@ public:
 };
 
 int main(int argc, char *argv[]){     
-    printf("Copyright (C) 2013, Filipe Brandao\n");
-    printf("Usage: afg2mps graph.afg model.mps\n");
-    setvbuf(stdout, NULL, _IONBF, 0);
-    assert(argc == 3);    
+    printf("Copyright (C) 2013, Filipe Brandao\n");    
+    setvbuf(stdout, NULL, _IONBF, 0);    
+    if(argc != 3){
+        printf("Usage: afg2mps graph.afg model.mps\n");
+        return 1;
+    }
+    
     FILE *fin = fopen(argv[1], "r");
     FILE *fout = fopen(argv[2], "w");    
     assert(fin != NULL);

@@ -1,6 +1,11 @@
+tmp/*
 *~
 *.log
 *.out
 *.pyc
 *.pyo
+
+#temporary
+pysrc/*
+*.py
 

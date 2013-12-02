@@ -26,10 +26,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 int main(int argc, char *argv[]){     
-    printf("Copyright (C) 2013, Filipe Brandao\n");
-    printf("Usage: solve_gurobi model.mps|model.lp [vars.sol]\n");    
+    printf("Copyright (C) 2013, Filipe Brandao\n");    
     setvbuf(stdout, NULL, _IONBF, 0);
-    assert(argc == 2 || argc == 3);
+    if(argc < 2 || argc > 3){
+        printf("Usage: solve_gurobi model.mps|model.lp [vars.sol]\n"); 
+        return 1;
+    }
                 
     GRBEnv env = GRBEnv();
     GRBModel model = GRBModel(env, argv[1]);

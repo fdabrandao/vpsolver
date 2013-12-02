@@ -30,10 +30,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 int main(int argc, char *argv[]){     
-    printf("Copyright (C) 2013, Filipe Brandao\n");
-    printf("Usage: vbpsol graph.afg vars.sol [print_instance:0]\n");
-    setvbuf(stdout, NULL, _IONBF, 0);
-    assert(argc >= 3 && argc <= 4);
+    printf("Copyright (C) 2013, Filipe Brandao\n");    
+    setvbuf(stdout, NULL, _IONBF, 0);    
+    if(argc < 3 || argc > 4){
+        printf("Usage: vbpsol graph.afg vars.sol [print_instance:0]\n");
+        return 1;
+    }
+    
     FILE *fafg = fopen(argv[1], "r");
     assert(fafg != NULL);
     FILE *fsol = fopen(argv[2], "r");    

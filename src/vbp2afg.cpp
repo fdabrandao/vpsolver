@@ -26,10 +26,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 int main(int argc, char *argv[]){   
-    printf("Copyright (C) 2013, Filipe Brandao\n");
-    printf("Usage: vbp2afg instance.vbp graph.afg [method:-2] [binary:0] [vtype:I]\n");
+    printf("Copyright (C) 2013, Filipe Brandao\n");    
     setvbuf(stdout, NULL, _IONBF, 0);
-    assert(argc >= 3 && argc <= 6);    
+    if(argc < 3 || argc > 6){
+        printf("Usage: vbp2afg instance.vbp graph.afg [method:-2] [binary:0] [vtype:I]\n");
+        return 1;
+    }
+        
     FILE *fout = fopen(argv[2], "w");    
     assert(fout != NULL);
 

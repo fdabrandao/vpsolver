@@ -100,11 +100,13 @@ void solve(Instance inst, bool hsol = false){
 }
 
 int main(int argc, char *argv[]){
-    printf("Copyright (C) 2013, Filipe Brandao\n");
-    printf("Usage: gg_afg instance.vbp [method:-2] [binary:0] [htlimit:0]\n");
+    printf("Copyright (C) 2013, Filipe Brandao\n");    
     setvbuf(stdout, NULL, _IONBF, 0);
-    assert(argc >= 2 && argc <= 5);    
-
+    if(argc < 2 || argc > 5){
+        printf("Usage: gg_afg instance.vbp [method:-2] [binary:0] [htlimit:0]\n");
+        return 1;
+    }
+        
     Instance inst(argv[1]);                      
     if(argc >= 3) {
         inst.method = atoi(argv[2]);
@@ -112,8 +114,7 @@ int main(int argc, char *argv[]){
     }
     if(argc >= 4){
         inst.binary = atoi(argv[3]);        
-    }
-    
+    }    
     if(argc >= 5){
         int t = atoi(argv[4]);
         solve(inst, t != 0);        
