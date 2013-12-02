@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 #
 # Copyright (C) 2013, Filipe Brandao
@@ -20,26 +20,50 @@
 
 set -e
 echo "Copyright (C) 2013, Filipe Brandao"
-echo "Usage: vpsolver_lpsolve.sh instance.vbp"
+echo "Usage 1: vpsolver_lpsolve.sh instance.vbp"
+echo "Usage 2: vpsolver_lpsolve.sh graph.afg model.mps/.lp"
 
 BASEDIR=`dirname $0`
-TMP_DIR=$BASEDIR/tmp/
 BIN_DIR=$BASEDIR/bin/
+TMP_DIR=`mktemp -d -t XXXXXXXXXX`
+
+solve(){
+    local model_file=$1       
+    echo -e "\n>>> solving the MIP model using lp_solve..."
+    echo -e "Note: different parameter settings may improve the performance substantially!"
+    if [[ $model_file =~ \.mps$ ]]; then
+        lp_solve -mps $model_file > $TMP_DIR/sol.out    
+    else
+        lp_solve -lp $model_file > $TMP_DIR/sol.out    
+    fi
+    sed -e '1,/variables:/d' < $TMP_DIR/sol.out > $TMP_DIR/vars.sol
+}
+
+if [ "$#" -gt 2 ]; then
+    exit
+fi
+
 if [ "$#" -eq 1 ]; then
     instance=$1
-    fname=`basename $instance`  
+    afg_file=$TMP_DIR/graph.afg
+    model_file=$TMP_DIR/model.mps
     
-    echo "\n>>> vbp2afg..."
-    $BIN_DIR/vbp2afg $instance $TMP_DIR/$fname.afg -2 
+    echo -e "\n>>> vbp2afg..."
+    $BIN_DIR/vbp2afg $instance $afg_file -2 
 
-    echo "\n>>> afg2mps..."
-    $BIN_DIR/afg2mps $TMP_DIR/$fname.afg $TMP_DIR/$fname.mps
-
-    echo "\n>>> solving the MIP model using lp_solve..."
-    echo "Note: different parameter settings may improve the performance substantially!"
-    lp_solve -mps $TMP_DIR/$fname.mps > $TMP_DIR/$fname.out    
-    sed -e '1,/variables:/d' < $TMP_DIR/$fname.out > $TMP_DIR/$fname.sol
-
-    echo "\n>>> vbpsol..."
-    $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol
+    echo -e "\n>>> afg2mps..."
+    $BIN_DIR/afg2mps $afg_file $model_file
 fi
+
+if [ "$#" -eq 2 ]; then 
+    afg_file=$1
+    model_file=$2    
+fi
+
+solve $model_file;
+
+echo -e "\n>>> vbpsol..."
+$BIN_DIR/vbpsol $afg_file $TMP_DIR/vars.sol
+
+rm -rf $TMP_DIR
+

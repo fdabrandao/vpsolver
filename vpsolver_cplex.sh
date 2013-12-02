@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 #
 # Copyright (C) 2013, Filipe Brandao
@@ -20,33 +20,53 @@
 
 set -e
 echo "Copyright (C) 2013, Filipe Brandao"
-echo "Usage: vpsolver_lpsolve.sh instance.vbp"
+echo "Usage 1: vpsolver_cplex.sh instance.vbp"
+echo "Usage 2: vpsolver_cplex.sh graph.afg model.mps/.lp"
 
 BASEDIR=`dirname $0`
-TMP_DIR=$BASEDIR/tmp/
 BIN_DIR=$BASEDIR/bin/
-if [ "$#" -eq 1 ]; then
-    instance=$1
-    fname=`basename $instance`  
-    
-    echo "\n>>> vbp2afg..."
-    $BIN_DIR/vbp2afg $instance $TMP_DIR/$fname.afg -2 
+TMP_DIR=`mktemp -d -t XXXXXXXXXX`
 
-    echo "\n>>> afg2mps..."
-    $BIN_DIR/afg2mps $TMP_DIR/$fname.afg $TMP_DIR/$fname.mps
-
-    echo "\n>>> solving the MIP model using CPLEX..."
-    echo "Note: different parameter settings may improve the performance substantially!"
-    rm $TMP_DIR/$fname.sol;
+solve(){
+    local model_file=$1
+    echo -e "\n>>> solving the MIP model using CPLEX..."
+    echo -e "Note: different parameter settings may improve the performance substantially!"
+    rm -rf $TMP_DIR/vars.sol;
     (
-        echo "read $TMP_DIR/$fname.mps"
+        echo "read $model_file"
         echo "optimize"
-        echo "write $TMP_DIR/$fname.sol"
+        echo "write $TMP_DIR/vars.sol"
     ) | cplex
     echo ""
-    awk -F\" '/variable name/ {print $2, $6}' OFS=" " $TMP_DIR/$fname.sol > $TMP_DIR/$fname.sol2
-    mv $TMP_DIR/$fname.sol2 $TMP_DIR/$fname.sol
+    awk -F\" '/variable name/ {print $2, $6}' OFS=" " $TMP_DIR/vars.sol > $TMP_DIR/vars.sol2
+    mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol    
+}
 
-    echo "\n>>> vbpsol..."
-    $BIN_DIR/vbpsol $TMP_DIR/$fname.afg $TMP_DIR/$fname.sol
+if [ "$#" -gt 2 ]; then
+    exit
 fi
+
+if [ "$#" -eq 1 ]; then
+    instance=$1
+    afg_file=$TMP_DIR/graph.afg
+    model_file=$TMP_DIR/model.mps
+    
+    echo -e "\n>>> vbp2afg..."
+    $BIN_DIR/vbp2afg $instance $afg_file -2 
+
+    echo -e "\n>>> afg2mps..."
+    $BIN_DIR/afg2mps $afg_file $model_file
+fi
+
+if [ "$#" -eq 2 ]; then 
+    afg_file=$1
+    model_file=$2    
+fi
+
+solve $model_file;
+
+echo -e "\n>>> vbpsol..."
+$BIN_DIR/vbpsol $afg_file $TMP_DIR/vars.sol
+
+rm -rf $TMP_DIR
+
