@@ -54,6 +54,7 @@ solve(){
 model_file=""
 afg_file=""
 vbp_file=""
+sol_file=""
 
 while true;
 do
@@ -85,6 +86,14 @@ do
     --vbp)
         if [[ -n "$2" && -e "$2" && "$2" =~ \.vbp$ ]]; then
             vbp_file=$2
+        else
+            error            
+        fi
+        shift 2;;
+
+    --wsol)        
+        if [[ -n "$2" && "$2" =~ \.sol$ ]]; then
+            sol_file=$2
         else
             error            
         fi
@@ -123,5 +132,9 @@ solve $model_file;
 if [[ -n "$afg_file" ]]; then
     echo -e "\n>>> vbpsol..."
     $BIN_DIR/vbpsol $afg_file $TMP_DIR/vars.sol
-fi       
+fi
+
+if [[ -n "$sol_file" ]]; then
+    cp $TMP_DIR/vars.sol $sol_file
+fi
 
