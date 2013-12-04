@@ -104,7 +104,7 @@ void Instance::read(FILE *fin){
         assert(fscanf(fin, "%d", &items[i].demand)==1);
         int S = 0;
         for(int d = 0; d < ndims; d++){
-            assert(items[i][d] <= W[d]);
+            assert(items[i].demand == 0 || items[i][d] <= W[d]);
             S += W[d] > 0 ? round(items[i][d]/double(W[d])*NORM_PRECISION) : 0;
         }
         items[i].key = S;
