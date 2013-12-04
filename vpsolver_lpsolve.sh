@@ -46,7 +46,8 @@ solve(){
     if [[ $model_file =~ \.mps$ ]]; then
         lp_solve -mps $model_file > $TMP_DIR/sol.out    
     else
-        lp_solve -lp $model_file > $TMP_DIR/sol.out    
+        echo -e "Note: lp_solve requires xli_CPLEX to read CPLEX lp models"
+        lp_solve -rxli xli_CPLEX $model_file > $TMP_DIR/sol.out
     fi
     sed -e '1,/variables:/d' < $TMP_DIR/sol.out > $TMP_DIR/vars.sol
 }
