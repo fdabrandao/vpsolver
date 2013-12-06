@@ -22,7 +22,7 @@ set -e
 echo "Copyright (C) 2013, Filipe Brandao"
 
 BASEDIR=`dirname $0`
-BIN_DIR=$BASEDIR/bin/
+BIN_DIR=$BASEDIR/../bin/
 TMP_DIR=`mktemp -d -t XXXXXXXXXX`
 trap "rm -rf $TMP_DIR" EXIT
 
