@@ -41,10 +41,10 @@ error(){
 
 solve(){
     local model_file=$1
-    GRB_PARAMS=Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0 MIPGapAbs=1-10^5
+    GRB_PARAMS="Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0 MIPGapAbs=1-10^5"
     echo -e "\n>>> solving the MIP model using Gurobi..."
     echo -e "Note: different parameter settings may improve the performance substantially!"
-    gurobi_cl $GRB_PARAMS ResultFile=$TMP_DIR/vars.sol $model_file
+    gurobi_cl $GRB_PARAMS ResultFile=$TMP_DIR/vars.sol $model_file    
     sed '/#/d' < $TMP_DIR/vars.sol > $TMP_DIR/vars.sol2
     mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol
 }
