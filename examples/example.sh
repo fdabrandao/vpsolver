@@ -51,7 +51,7 @@ echo "* > vpsolver_glpk.sh --lp model.lp --afg graph.afg       *"
 echo "**********************************************************"
 vbp2afg instance.vbp $TMP_DIR/graph.afg
 afg2lp $TMP_DIR/graph.afg $TMP_DIR/model.lp
-../scripts/vpsolver_glpk.sh --lp $TMP_DIR/model.lp --afg $TMP_DIR/graph.afg
+vpsolver_glpk.sh --lp $TMP_DIR/model.lp --afg $TMP_DIR/graph.afg
 
 echo -e "\n\n"
 
