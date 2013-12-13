@@ -20,27 +20,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import atexit
 import shutil
 import tempfile
+from model import *
 from afgutils import *
 
-class VBPInstance:
+class VBP:
     def __init__(self, W, w, b, verbose=None):
         self.vbp_file = VPSolver.new_tmp_file(".vbp")
         f = open(self.vbp_file,"w")
-        if type(W)==int: W=[W]
+        if type(W)==int: 
+            W=[W]
+        else: 
+            W = list(W)
         print >>f, len(W)
         print >>f, " ".join(map(str,W))
         print >>f, len(w)
         for i in xrange(len(w)):
-            if type(w[i])==int: row = [w[i],b[i]]
-            else: row = w[i]+[b[i]]
+            if type(w[i])==int: 
+                row = [w[i],b[i]]
+            else: 
+                row = list(w[i])+[b[i]]
+            assert len(row) == len(W)+1
             print >>f, " ".join(map(str,row))
         f.close()
         if verbose:
             f = open(self.vbp_file,"r")
             print f.read()
             f.close()
+        self.m = len(b)
+        self.ndims = len(W)
         self.W, self.w, self.b = W, w, b
 
     @classmethod        
@@ -62,25 +72,29 @@ class VBPInstance:
         try:
             os.remove(self.vbp_file)
         except:
-            pass            
+            pass
 
-class AFGraph:
+class AFG:
     def __init__(self, instance, opts="", verbose=None):
-        assert isinstance(instance, VBPInstance)
+        assert isinstance(instance, VBP)
         VPSolver.set_verbose(verbose)
         self.instance = instance
         self.afg_file = VPSolver.new_tmp_file(".afg")
         self.output = VPSolver.vbp2afg(instance.vbp_file, self.afg_file, opts)
-        
+        self.V, self.A, self.S, self.T = None, None, None, None
+
+    def graph(self):        
+        return AFGraph.fromFile(self.afg_file)    
+
     def __del__(self):
         try:
             os.remove(self.afg_file)
         except:
             pass            
         
-class MPSModel:
+class MPS:
     def __init__(self, graph, verbose=None):
-        assert isinstance(graph, AFGraph)
+        assert isinstance(graph, AFG)
         VPSolver.set_verbose(verbose)
         self.afg_graph = graph
         self.mps_file = VPSolver.new_tmp_file(".mps")
@@ -91,10 +105,10 @@ class MPSModel:
             os.remove(self.mps_file)    
         except:
             pass            
-        
-class LPModel:
+  
+class LP:
     def __init__(self, graph, verbose=None):
-        assert isinstance(graph, AFGraph)
+        assert isinstance(graph, AFG)
         VPSolver.set_verbose(verbose)
         self.afg_graph = graph
         self.lp_file = VPSolver.new_tmp_file(".lp")
@@ -132,7 +146,8 @@ class VPSolver:
         VPSolver.TMP_CNT += 1
         return fname
 
-    @staticmethod        
+    @staticmethod    
+    @atexit.register    
     def clear():
         shutil.rmtree(VPSolver.TMP_DIR)
 
@@ -154,19 +169,12 @@ class VPSolver:
                 sol.append((mult,pat))
         except:
             return None                
-        return obj, sol   
-
-    @staticmethod           
-    def print_solution(sol):
-        obj, patterns = sol
-        print "Objective:", obj
-        for mult, patt in patterns:
-            print "%x x [%s]" % (mult, ', '.join(["i=%d" % (it+1) for it in patt]))
+        return obj, sol
 
     @staticmethod           
     def vbpsol(afg_file, sol_file, opts="", verbose=None):            
         VPSolver.set_verbose(verbose)  
-        if isinstance(afg_file, AFGraph):
+        if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file        
         out_file = VPSolver.new_tmp_file()        
         os.system("%s %s %s %s | tee %s %s" % (VPSolver.VBPSOL, afg_file, sol_file, opts, out_file, VPSolver.REDIRECT))
@@ -179,7 +187,7 @@ class VPSolver:
     @staticmethod     
     def vpsolver(vbp_file, opts="", verbose=None):
         VPSolver.set_verbose(verbose)
-        if isinstance(vbp_file, VBPInstance):
+        if isinstance(vbp_file, VBP):
             vbp_file = vbp_file.vbp_file        
         out_file = VPSolver.new_tmp_file()
         os.system("%s %s %s | tee %s %s" % (VPSolver.VPSOLVER, vbp_file, opts, out_file, VPSolver.REDIRECT))
@@ -192,7 +200,7 @@ class VPSolver:
     @staticmethod  
     def vbp2afg(vbp_file, afg_file, opts="", verbose=None):
         VPSolver.set_verbose(verbose)
-        if isinstance(vbp_file, VBPInstance):
+        if isinstance(vbp_file, VBP):
             vbp_file = vbp_file.vbp_file
         out_file = VPSolver.new_tmp_file()        
         os.system("%s %s %s %s | tee %s %s" % (VPSolver.VBP2AFG, vbp_file, afg_file, opts, out_file, VPSolver.REDIRECT))
@@ -205,7 +213,7 @@ class VPSolver:
     @staticmethod          
     def afg2mps(afg_file, mps_file, opts="", verbose=None):
         VPSolver.set_verbose(verbose)
-        if isinstance(afg_file, AFGraph):
+        if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file 
         out_file = VPSolver.new_tmp_file()
         os.system("%s %s %s %s | tee %s %s" % (VPSolver.AFG2MPS, afg_file, mps_file, opts, out_file, VPSolver.REDIRECT))
@@ -218,7 +226,7 @@ class VPSolver:
     @staticmethod  
     def afg2lp(afg_file, lp_file, opts="", verbose=None):
         VPSolver.set_verbose(verbose)
-        if isinstance(afg_file, AFGraph):
+        if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file                    
         out_file = VPSolver.new_tmp_file()
         os.system("%s %s %s %s | tee %s %s" % (VPSolver.AFG2LP, afg_file, lp_file, opts, out_file, VPSolver.REDIRECT))
@@ -233,19 +241,67 @@ class VPSolver:
         VPSolver.set_verbose(verbose)
         cmd = script_name
         for arg in [arg1, arg2]:
-            if isinstance(arg, MPSModel):
+            if isinstance(arg, MPS):
                 cmd += " --mps " + arg.mps_file
-            elif isinstance(arg, LPModel):
+            elif isinstance(arg, LP):
                 cmd += " --lp " + arg.lp_file
-            elif isinstance(arg, AFGraph):
+            elif isinstance(arg, AFG):
                 cmd += " --afg " + arg.afg_file        
-            elif isinstance(arg, VBPInstance):
-                cmd += " --vbp " + arg.vbp_file        
+            elif isinstance(arg, VBP):
+                cmd += " --vbp " + arg.vbp_file  
+            elif isinstance(arg, str):
+                if arg.endswith(".mps"):
+                    cmd += " --mps " + arg
+                elif arg.endswith(".lp"):
+                    cmd += " --lp " + arg 
+                elif arg.endswith(".afg"):
+                    cmd += " --afg " + arg 
+                elif arg.endswith(".vbp"):
+                    cmd += " --vbp " + arg
+                else:
+                    raise Exception("Invalid file extension!")                                        
         out_file = VPSolver.new_tmp_file()
         os.system("%s | tee %s %s" % (cmd, out_file, VPSolver.REDIRECT))               
         f = open(out_file)
         output = f.read()
         f.close()
-        os.remove(out_file)        
+        os.remove(out_file)
         return output, VPSolver.parse_vbpsol(output)                   
+
+    @staticmethod     
+    def script_wsol(script_name, model, verbose=None):
+        VPSolver.set_verbose(verbose)
+        cmd = script_name
+        if isinstance(model, MPS):
+            cmd += " --mps " + model.mps_file
+        elif isinstance(model, LP):
+            cmd += " --lp " + model.lp_file
+        elif isinstance(model,str):
+            if model.endswith(".mps"):
+                cmd += " --mps " + model
+            elif model.endswith(".lp"):
+                cmd += " --lp " + model 
+            else:
+                raise Exception("Invalid file extension!")     
+        out_file = VPSolver.new_tmp_file()
+        sol_file = VPSolver.new_tmp_file(".sol")
+        os.system("%s --wsol %s | tee %s %s" % (cmd, sol_file, out_file, VPSolver.REDIRECT))               
+        f = open(out_file)
+        output = f.read()
+        f.close()
+        os.remove(out_file)   
+        try:
+            f = open(sol_file)  
+            sol = f.read().split()
+            vals = {}
+            assert len(sol)%2 == 0
+            for i in xrange(0,len(sol),2):                    
+                var, value = sol[i], int(round(float(sol[i+1])))
+                if value != 0:
+                    vals[var] = value
+            f.close()
+            os.remove(sol_file)
+        except:
+            vals = None                           
+        return output, vals
 

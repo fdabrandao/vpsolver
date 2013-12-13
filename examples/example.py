@@ -21,57 +21,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys, os
 sdir = os.path.dirname(__file__)
-if sdir != '': os.chdir(sdir)
+if sdir != "": os.chdir(sdir)
 
-""" Add VPSolver directories to path """
+""" Add VPSolver folders to path """
 
-#add vpsolver/pysrc to sys.path
-sys.path.insert(0, "./pysrc")
+#add vpsolver folder to sys.path
+sys.path.insert(0, "../")
 
 #add vpsolver bin directory to path
-os.environ["PATH"] = "./bin"+":"+os.environ["PATH"]
+os.environ["PATH"] = "../bin"+":"+os.environ["PATH"]
 
 #add vpsolver script directory to path
-os.environ["PATH"] = "./"+":"+os.environ["PATH"]
+os.environ["PATH"] = "../scripts"+":"+os.environ["PATH"]
 
 """ Example """
 
 ## load all the vpsolver utils ##
-from vpsolver import *
+from pyvpsolver import *
 
 ## Creating instanceA ##
-instanceA = VBPInstance([5180], [1120, 1250, 520, 1066, 1000, 1150], 
+instanceA = VBP([5180], [1120, 1250, 520, 1066, 1000, 1150], 
                         [9, 5, 91, 18, 11, 64], verbose=False)
 
 ## Creating instanceB from a .vbp file ##
-instanceB = VBPInstance.fromFile("example.vbp", verbose=False)
+instanceB = VBP.fromFile("instance.vbp", verbose=False)
 
 ## Creating an arc-flow graph for instanceA ##
-graph = AFGraph(instanceA, verbose=False)
+afg = AFG(instanceA, verbose=False)
 
 ## Creating .mps and .lp models for instanceA ##
-mps_model = MPSModel(graph, verbose=False)
-lp_model = LPModel(graph, verbose=False)
+mps_model = MPS(afg, verbose=False)
+lp_model = LP(afg, verbose=False)
 
 ## Drawing an arc-flow graph (requires pygraphviz) ##
-try:
-    V, A, S, T = AFGUtils.load_graph(graph.afg_file)
-    AFGUtils.draw('graph.svg', V, A, S, T)
-except:
-    pass
+afg.graph().draw("tmp/graph.svg")
 
 ## Solving instanceA using bin/vpsolver (requires Gurobi) ##
 ## The input must be an instance.                         ##
-res, sol = VPSolver.vpsolver(instanceA, verbose=True)
+out, sol = VPSolver.vpsolver(instanceA, verbose=True)
 
 ## Solving instanceA using any vpsolver script (i.e., any MIP solver) ##
 ## The scripts accept models with and without the underlying graphs.  ##
 ## However, the graphs are required to extract the solution.          ##
-res, sol = VPSolver.script("vpsolver_glpk.sh", lp_model, graph, verbose=True)
-res, sol = VPSolver.script("vpsolver_gurobi.sh", mps_model, verbose=True)
+out, sol = VPSolver.script("vpsolver_glpk.sh", lp_model, afg, verbose=True)
+out, sol = VPSolver.script("vpsolver_gurobi.sh", mps_model, verbose=True)
 
-# solving an instance without creating AFGraph's, MPSModel's or LPModel's
-res, sol = VPSolver.script("vpsolver_glpk.sh", instanceB, verbose=True)
+# solving an instance directly without creating AFG, MPS or LP objects
+out, sol = VPSolver.script("vpsolver_glpk.sh", instanceB, verbose=True)
 
 ## printing the solution ##
 obj, patterns = sol
@@ -79,8 +75,5 @@ print "Objective:", obj
 print "Solution:", patterns
 
 ## pretty print for solutions ##
-VPSolver.print_solution(sol)
-
-# delete temporary files
-VPSolver.clear()
+print_solution_vbp(obj, patterns)
 
