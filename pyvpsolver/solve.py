@@ -23,6 +23,12 @@ from vpsolver import *
 import sys
 
 def solve_mvbp(Ws, ws, b, cost, svg_file="", log_file="", verbose=False, script="vpsolver_gurobi.sh"):
+    """
+    Solves multiple-choice vector bin packing instances using the method
+    proposed in Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
+    Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13, 
+    Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
+    """
     assert svg_file=="" or svg_file.endswith(".svg")
     nbtypes = len(Ws)
     ndims = len(Ws[0])

@@ -34,7 +34,14 @@ os.environ["PATH"] = "../bin"+":"+os.environ["PATH"]
 #add vpsolver/scripts folder to path
 os.environ["PATH"] = "../scripts"+":"+os.environ["PATH"]
 
-""" Example """
+""" Multiple-choice Vector Bin Packing Example """
+
+"""
+Uses the method proposed in:
+Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
+Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13, 
+Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
+"""
 
 from pyvpsolver import *
 

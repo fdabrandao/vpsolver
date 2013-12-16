@@ -34,7 +34,7 @@ os.environ["PATH"] = "../bin"+":"+os.environ["PATH"]
 #add vpsolver/scripts folder to path
 os.environ["PATH"] = "../scripts"+":"+os.environ["PATH"]
 
-""" Example """
+""" Vector Packing Example """
 
 from pyvpsolver import *
 
