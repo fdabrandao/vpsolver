@@ -60,7 +60,6 @@ def write_lp(model, filename):
     obj = model.obj
     if obj == []:
         obj = [(var, 0) for var in model.vars]
-    print obj
     print >>f, "\tobjective:%s" % lincomb2str(obj)
 
     ### constraints            
