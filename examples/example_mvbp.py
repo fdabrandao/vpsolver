@@ -28,10 +28,10 @@ if sdir != '': os.chdir(sdir)
 #add vpsolver folder to sys.path
 sys.path.insert(0, "../")
 
-#add vpsolver bin folder to path
+#add vpsolver/bin folder to path
 os.environ["PATH"] = "../bin"+":"+os.environ["PATH"]
 
-#add vpsolver script's folder to path
+#add vpsolver/scripts folder to path
 os.environ["PATH"] = "../scripts"+":"+os.environ["PATH"]
 
 """ Example """

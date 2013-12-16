@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from writelp import write_lp
+from writemps import write_mps
 
 class Model:
     def __init__(self):
@@ -45,26 +46,40 @@ class Model:
         assert name not in self.vars
         return name
 
+    def addVar(self, lb=None, ub=None, name=None, vtype="C"):
+        if name == None: name = self.genVarName()
+        assert name not in self.vars
+        assert vtype in ["C", "I"]
+        self.vars[name] = {}
+        self.vars[name]["lb"] = lb
+        self.vars[name]["ub"] = ub
+        self.vars[name]["vtype"] = vtype
+        return name
+
     def addCons(self, lincomb, sign, rhs, name=None):        
         sign = sign[:1]
         assert sign in ["<", "=", ">"]
         if lincomb == []:
             return
-        if name == None: 
+        if name == None:
             name = self.genConsName()
         for var, coef in lincomb:
             assert var in self.vars
         assert name not in self.cons
         self.cons[name] = (lincomb, sign, rhs)       
     
-    def addVar(self, lb=None, ub=None, name=None):
-        if name == None: name = self.genVarName()
-        assert name not in self.vars
-        self.vars[name] = {}
-        if lb != None: self.vars[name]['lb'] = lb
-        if ub != None: self.vars[name]['ub'] = ub
-        return name 
-        
     def writeLP(self, lp_file):
         write_lp(self, lp_file)
+        
+    def writeMPS(self, mps_file):
+        write_mps(self, mps_file)
+        
+    def write(self, model_file):
+        if model_file.endswith(".lp"):
+            self.writeLP(model_file)
+        elif model_file.endswith(".mps"):
+            self.writeMPS(model_file)
+        else:
+            raise Exception("Invalid file extension!")
+            
 

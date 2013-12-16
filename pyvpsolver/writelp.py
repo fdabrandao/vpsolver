@@ -41,7 +41,7 @@ from model import *
 def lincomb2str(lincomb):
     expr = ""
     for var, coef in lincomb:
-        if coef > 0:
+        if coef >= 0:
             expr += " + %d %s" % (coef, var)
         elif coef < 0:
             expr += " - %d %s" % (abs(coef), var) 
@@ -56,8 +56,12 @@ def write_lp(model, filename):
         print >>f, "Minimize"
     else:
         print >>f, "Maximize"
-        
-    print >>f, "\tobjective:%s" % lincomb2str(model.obj)
+    
+    obj = model.obj
+    if obj == []:
+        obj = [(var, 0) for var in model.vars]
+    print obj
+    print >>f, "\tobjective:%s" % lincomb2str(obj)
 
     ### constraints            
             
@@ -95,8 +99,9 @@ def write_lp(model, filename):
     ### free variables
     
     print >>f, "General"
-    for name in model.vars:
-        print >>f, "\t%s" % name
+    for name in sorted(model.vars):
+        if model.vars[name]["vtype"]=="I":
+            print >>f, "\t%s" % name
     
     print >>f, "End"
     

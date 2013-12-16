@@ -4,5 +4,5 @@
 *.pyc
 *.pyo
 *.svg
-upload.sh
+push.sh
 
