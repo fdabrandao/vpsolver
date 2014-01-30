@@ -115,13 +115,13 @@ def solve_mvbp(Ws, ws, b, cost, svg_file="", log_file="", verbose=False, script=
     assert set([v for v in V if v not in vlbl]) == set([S,T]+Ts)
 
     nv1, na1 = len(V), len(A)
-    print "#V1: %d #A1: %d" % (nv1, na1)
+    #print "#V1: %d #A1: %d" % (nv1, na1)
            
     graph.relabel(lambda u: vlbl.get(u,u))
     V, A = graph.V, graph.A
 
     nv2, na2 = len(V), len(A)
-    print "#V2: %d #A2: %d" % (nv2, na2)       
+    #print "#V2: %d #A2: %d" % (nv2, na2)       
 
     if svg_file.endswith(".svg"):
         graph.draw(svg_file.replace(".svg", ".final.svg"), ignore=[('T','S')])    
@@ -130,7 +130,7 @@ def solve_mvbp(Ws, ws, b, cost, svg_file="", log_file="", verbose=False, script=
     At = []
     used = set()
     for (u,v,i) in A:
-        if i < len(itlabel):
+        if isinstance(i, int) and i < len(itlabel):
             k = (u,v,itlabel[i][0])
         else:
             k = (u,v,'L')
@@ -140,9 +140,9 @@ def solve_mvbp(Ws, ws, b, cost, svg_file="", log_file="", verbose=False, script=
 
     A = At
     nv3, na3 = len(V), len(A)
-    print "#V3: %d #A3: %d" % (nv3, na3)         
+    #print "#V3: %d #A3: %d" % (nv3, na3)         
 
-    print "#V3/#V1: %.2f #A3/#A1: %.1f" % (nv3/float(nv1), na3/float(na1))
+    #print "#V3/#V1: %.2f #A3/#A1: %.1f" % (nv3/float(nv1), na3/float(na1))
 
     varl, cons = graph.getFlowCons()
 
