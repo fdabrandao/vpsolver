@@ -25,16 +25,15 @@ setup(
     packages=['pyvpsolver'],
     include_package_data=True,
     scripts=[
-      'bin/vbp2afg'
-      'bin/solve_glpk'
-      'bin/afg2mps'
-      'bin/vbpsol'
-      'bin/afg2lp'
-      'scripts/vpsolver_coinor.sh'
-      'scripts/vpsolver_glpk.sh'
-      'scripts/vpsolver_gurobi.sh'
-      'scripts/vpsolver_lpsolve.sh'
-      'scripts/vpsolver_cplex.sh'
+      'bin/vbp2afg',
+      'bin/afg2mps',
+      'bin/vbpsol',
+      'bin/afg2lp',
+      'scripts/vpsolver_coinor.sh',
+      'scripts/vpsolver_glpk.sh',
+      'scripts/vpsolver_gurobi.sh',
+      'scripts/vpsolver_lpsolve.sh',
+      'scripts/vpsolver_cplex.sh',
     ],
     url='',
     license='LICENSE',
