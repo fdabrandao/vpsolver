@@ -12,7 +12,7 @@ class CustomInstallCommand(install):
     def run(self):
         try:
             system('/bin/bash ./compile.sh')
-            system('/bin/cp bin/* ' + self.install_script)
+            system('/bin/cp bin/* ' + self.install_scripts)
         except IOError:
             pass
         install.run(self)
