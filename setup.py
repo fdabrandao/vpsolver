@@ -42,5 +42,6 @@ setup(
       'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
       'Topic :: Scientific/Engineering'
     ],
-    cmdclass = { 'install' : CustomInstallCommand }
+    cmdclass = { 'install' : CustomInstallCommand },
+    use_2to3 = True
 )
