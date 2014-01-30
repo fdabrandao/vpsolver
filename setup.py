@@ -12,6 +12,7 @@ class CustomInstallCommand(install):
     def run(self):
         try:
             system('/bin/bash ./compile.sh')
+            system('/bin/cp bin/* ' + self.install_script)
         except IOError:
             pass
         install.run(self)
@@ -25,10 +26,6 @@ setup(
     packages=['pyvpsolver'],
     include_package_data=True,
     scripts=[
-      'bin/vbp2afg',
-      'bin/afg2mps',
-      'bin/vbpsol',
-      'bin/afg2lp',
       'scripts/vpsolver_coinor.sh',
       'scripts/vpsolver_glpk.sh',
       'scripts/vpsolver_gurobi.sh',
