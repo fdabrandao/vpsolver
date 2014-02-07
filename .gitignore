@@ -4,5 +4,7 @@
 *.pyc
 *.pyo
 *.svg
+*.egg-info
+build/
 push.sh
 
