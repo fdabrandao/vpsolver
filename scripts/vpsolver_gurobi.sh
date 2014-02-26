@@ -1,7 +1,7 @@
 #!/bin/bash
 # This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 #
-# Copyright (C) 2013, Filipe Brandao
+# Copyright (C) 2013-2014, Filipe Brandao
 # Faculdade de Ciencias, Universidade do Porto
 # Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 #
@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 set -e
-echo "Copyright (C) 2013, Filipe Brandao"
+echo "Copyright (C) 2013-2014, Filipe Brandao"
 
 BASEDIR=`dirname $0`
 BIN_DIR=$BASEDIR/../bin/

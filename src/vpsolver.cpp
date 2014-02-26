@@ -1,7 +1,7 @@
 /**
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013, Filipe Brandao
+Copyright (C) 2013-2014, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
@@ -149,7 +149,7 @@ public:
 };
 
 int main(int argc, char *argv[]){     
-    printf("Copyright (C) 2013, Filipe Brandao\n");    
+    printf("Copyright (C) 2013-2014, Filipe Brandao\n");    
     setvbuf(stdout, NULL, _IONBF, 0);    
     if(argc < 2 || argc > 5){
         printf("Usage: vpsolver instance.vbp [method:-2] [binary:0] [vtype:I]\n");

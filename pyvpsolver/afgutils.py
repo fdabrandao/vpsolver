@@ -1,7 +1,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013, Filipe Brandao
+Copyright (C) 2013-2014, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
