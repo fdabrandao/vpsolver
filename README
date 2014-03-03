@@ -21,7 +21,7 @@ Bitbucket Mirror: https://bitbucket.org/fdabrandao/vpsolver
 
 --
 Requirements:
-    MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, lp_solve, ...
+    MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...
     Compiler: g++ >= 4.6
     Python 2.7 for the python interface (optional)
 
@@ -36,10 +36,10 @@ VPSolver includes several scripts for solving arc-flow models using different
 solvers:
     scripts/vpsolver_gurobi.sh  - Gurobi
     scripts/vpsolver_cplex.sh   - IBM CPLEX
-    scripts/vpsolver_coinor.sh  - COIN-OR CBC Solver
+    scripts/vpsolver_coinor.sh  - COIN-OR CBC
     scripts/vpsolver_glpk.sh    - GLPK
-    scripts/vpsolver_lpsolve.sh - lp_solve
     scripts/vpsolver_scip.sh    - SCIP
+    scripts/vpsolver_lpsolve.sh - lp_solve
 
 --
 VPSolver includes several examples:
