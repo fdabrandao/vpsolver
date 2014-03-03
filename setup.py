@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-""" Basic Setup Script """
-"""
+""" 
+Basic Setup Script
+
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
 Copyright (C) 2013-2014, Filipe Brandao
@@ -46,11 +47,12 @@ setup(
     packages=['pyvpsolver'],
     include_package_data=True,
     scripts=[
-      'scripts/vpsolver_coinor.sh',
-      'scripts/vpsolver_glpk.sh',
       'scripts/vpsolver_gurobi.sh',
-      'scripts/vpsolver_lpsolve.sh',
       'scripts/vpsolver_cplex.sh',
+      'scripts/vpsolver_coinor.sh',
+      'scripts/vpsolver_glpk.sh',      
+      'scripts/vpsolver_lpsolve.sh',
+      'scripts/vpsolver_scip.sh',
     ],
     url='',
     license='LICENSE',

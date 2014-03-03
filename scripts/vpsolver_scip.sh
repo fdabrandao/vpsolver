@@ -40,16 +40,18 @@ error(){
 }
 
 solve(){
-    local model_file=$1       
-    echo -e "\n>>> solving the MIP model using lp_solve..."
+    local model_file=$1
+    echo -e "\n>>> solving the MIP model using SCIP..."
     echo -e "Note: different parameter settings may improve the performance substantially!"
-    if [[ $model_file =~ \.mps$ ]]; then
-        lp_solve -mps $model_file > $TMP_DIR/sol.out    
-    else
-        echo -e "Note: lp_solve requires xli_CPLEX to read CPLEX lp models"
-        lp_solve -rxli xli_CPLEX $model_file > $TMP_DIR/sol.out
-    fi
-    sed -e '1,/variables:/d' < $TMP_DIR/sol.out > $TMP_DIR/vars.sol
+    rm -rf $TMP_DIR/vars.sol;
+    (
+        echo "read $model_file"
+        echo "optimize"
+        echo "write solution $TMP_DIR/vars.sol"
+    ) | scip
+    echo ""
+    tail -n+3 $TMP_DIR/vars.sol | awk '{ print $1, $2 }' > $TMP_DIR/vars.sol2
+    mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol        
 }
 
 model_file=""
@@ -133,7 +135,7 @@ solve $model_file;
 if [[ -n "$afg_file" && -z "$sol_file" ]]; then
     echo -e "\n>>> vbpsol..."
     $BIN_DIR/vbpsol $afg_file $TMP_DIR/vars.sol
-fi     
+fi
 
 if [[ -n "$sol_file" ]]; then
     cp $TMP_DIR/vars.sol $sol_file

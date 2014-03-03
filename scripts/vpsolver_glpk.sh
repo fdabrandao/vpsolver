@@ -92,7 +92,7 @@ do
         shift 2;;
 
     --wsol)        
-        if [[ -n "$2" && "$2" =~ \.sol$ ]]; then
+        if [[ -n "$2" ]]; then
             sol_file=$2
         else
             error            
@@ -129,7 +129,7 @@ fi
 
 solve $model_file;
 
-if [[ -n "$afg_file" ]]; then
+if [[ -n "$afg_file" && -z "$sol_file" ]]; then
     echo -e "\n>>> vbpsol..."
     $BIN_DIR/vbpsol $afg_file $TMP_DIR/vars.sol
 fi

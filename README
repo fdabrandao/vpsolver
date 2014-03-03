@@ -39,6 +39,7 @@ solvers:
     scripts/vpsolver_coinor.sh  - COIN-OR CBC Solver
     scripts/vpsolver_glpk.sh    - GLPK
     scripts/vpsolver_lpsolve.sh - lp_solve
+    scripts/vpsolver_scip.sh    - SCIP
 
 --
 VPSolver includes several examples:
