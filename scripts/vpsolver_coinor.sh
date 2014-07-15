@@ -43,7 +43,7 @@ solve(){
     local model_file=$1
     echo -e "\n>>> solving the MIP model using COIN-OR CBC..."
     echo -e "Note: different parameter settings may improve the performance substantially!"
-    cbc $model_file -cuts off -strategy 4 -solve -solu $TMP_DIR/sol.out
+    stdbuf -i0 -o0 -e0 cbc $model_file -cuts off -strategy 4 -solve -solu $TMP_DIR/sol.out
     tail -n +2 $TMP_DIR/sol.out | awk '{ print $2, $3 }' > $TMP_DIR/vars.sol
 }
 
