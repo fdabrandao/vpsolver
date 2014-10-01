@@ -122,8 +122,7 @@ class AFGraph:
         
         go(node_a, float('inf'), [])
             
-        # group equal patterns
-        
+        # group identical patterns        
         rep = {}
         for (r, p) in solution:
             p = tuple(sorted(p))

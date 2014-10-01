@@ -75,12 +75,12 @@ class VBP:
             pass
 
 class AFG:
-    def __init__(self, instance, opts="", verbose=None):
+    def __init__(self, instance, compress=-2, binary=False, vtype="I", verbose=None):
         assert isinstance(instance, VBP)
         VPSolver.set_verbose(verbose)
         self.instance = instance
         self.afg_file = VPSolver.new_tmp_file(".afg")
-        self.output = VPSolver.vbp2afg(instance.vbp_file, self.afg_file, opts)
+        self.output = VPSolver.vbp2afg(instance.vbp_file, self.afg_file, compress, binary, vtype)
         self.V, self.A, self.S, self.T = None, None, None, None
 
     def graph(self):        
@@ -185,11 +185,12 @@ class VPSolver:
         return output
    
     @staticmethod     
-    def vpsolver(vbp_file, opts="", verbose=None):
+    def vpsolver(vbp_file, compress=-2, binary=False, vtype="I", verbose=None):
         VPSolver.set_verbose(verbose)
         if isinstance(vbp_file, VBP):
             vbp_file = vbp_file.vbp_file        
         out_file = VPSolver.new_tmp_file()
+        opts = "%d %d %s" % (compress, binary, vtype)
         os.system("%s %s %s | tee %s %s" % (VPSolver.VPSOLVER, vbp_file, opts, out_file, VPSolver.REDIRECT))
         f = open(out_file)
         output = f.read()
@@ -198,11 +199,12 @@ class VPSolver:
         return output, VPSolver.parse_vbpsol(output)        
 
     @staticmethod  
-    def vbp2afg(vbp_file, afg_file, opts="", verbose=None):
+    def vbp2afg(vbp_file, afg_file, compress=-2, binary=False, vtype="I", verbose=None):
         VPSolver.set_verbose(verbose)
         if isinstance(vbp_file, VBP):
             vbp_file = vbp_file.vbp_file
-        out_file = VPSolver.new_tmp_file()        
+        out_file = VPSolver.new_tmp_file()
+        opts = "%d %d %s" % (compress, binary, vtype)
         os.system("%s %s %s %s | tee %s %s" % (VPSolver.VBP2AFG, vbp_file, afg_file, opts, out_file, VPSolver.REDIRECT))
         f = open(out_file)
         output = f.read()
