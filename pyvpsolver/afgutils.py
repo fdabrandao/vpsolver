@@ -42,20 +42,21 @@ class AFGraph:
     def draw(self, svg_file, multigraph=True, showlabel=False, ignore=None):
         AFGUtils.draw(svg_file, self.V, self.A, multigraph=multigraph, showlabel=showlabel, ignore=ignore)
 
-    def vname(self, u, v, i):
+    def vname(self, u, v, i, vnames=None):
+        if vnames == None: vnames = self.names
         #return "F_%s_%s_%s" % (u,v,i)
-        if (u,v,i) in self.names:
-            return self.names[u,v,i]
-        self.names[u,v,i] = "F%x" % len(self.names)
-        return self.names[u,v,i]
+        if (u,v,i) in vnames:
+            return vnames[u,v,i]
+        vnames[u,v,i] = "F%x" % len(vnames)
+        return vnames[u,v,i]
 
-    def getFlowCons(self):
+    def getFlowCons(self, vnames=None):        
         if self.V == None: self.load()
         Ain = {u:[] for u in self.V}
         Aout = {u:[] for u in self.V}
         varl = []
         for (u,v,i) in self.A:            
-            name = self.vname(u,v,i)
+            name = self.vname(u,v,i,vnames)
             Aout[v].append(name)
             Ain[u].append(name)
             varl.append(name)
@@ -66,11 +67,11 @@ class AFGraph:
             cons.append((lincomb,"=",0))            
         return varl, cons
         
-    def getAssocs(self):
+    def getAssocs(self, vnames=None):
         assocs = {}
         for (u,v,i) in self.A:  
             if i not in assocs: assocs[i] = []
-            name = self.vname(u,v,i)
+            name = self.vname(u,v,i,vnames)
             assocs[i].append(name)
         return assocs
         
