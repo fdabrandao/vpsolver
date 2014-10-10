@@ -34,10 +34,10 @@ class AFGraph:
         V, A = AFGUtils.relabel(V, A, lambda u: "S" if u == S else "T" if u == T else u)
         return cls(V, A, "S", "T")
 
-    def relabel(self, f):
-        self.S = f(self.S)
-        self.T = f(self.T)
-        self.V, self.A = AFGUtils.relabel(self.V, self.A, f)        
+    def relabel(self, fv, fa = lambda x: x):
+        self.S = fv(self.S)
+        self.T = fv(self.T)
+        self.V, self.A = AFGUtils.relabel(self.V, self.A, fv, fa)
 
     def draw(self, svg_file, multigraph=True, showlabel=False, ignore=None):
         AFGUtils.draw(svg_file, self.V, self.A, multigraph=multigraph, showlabel=showlabel, ignore=ignore)
@@ -189,14 +189,13 @@ class AFGUtils:
         return V, A, S, T         
        
     @staticmethod        
-    def relabel(V, A, f):
-        V = map(f, V)
-        #At = map(lambda (u,v,i):(f(u),f(v),i), A)
+    def relabel(V, A, fv, fa = lambda x: x):
+        V = map(fv, V)
         At = []
         for (u, v, i) in A:
-            u, v = f(u), f(v)
+            u, v = fv(u), fv(v)
             if u != v:
-                At.append((u,v,i))
+                At.append((u,v,fa(i)))
         return list(set(V)), list(set(At))
         
     @staticmethod
