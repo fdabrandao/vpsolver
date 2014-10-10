@@ -39,8 +39,8 @@ class AFGraph:
         self.T = fv(self.T)
         self.V, self.A = AFGUtils.relabel(self.V, self.A, fv, fa)
 
-    def draw(self, svg_file, multigraph=True, showlabel=False, ignore=None):
-        AFGUtils.draw(svg_file, self.V, self.A, multigraph=multigraph, showlabel=showlabel, ignore=ignore)
+    def draw(self, svg_file, multigraph=True, showlabel=False, ignore=None, loss=None):
+        AFGUtils.draw(svg_file, self.V, self.A, multigraph=multigraph, showlabel=showlabel, ignore=ignore, loss=loss)
 
     def vname(self, u, v, i, vnames=None):
         if vnames == None: vnames = self.names
@@ -199,7 +199,10 @@ class AFGUtils:
         return list(set(V)), list(set(At))
         
     @staticmethod
-    def draw(svg_file, V, A, multigraph=True, showlabel=False, ignore=None):   
+    def draw(svg_file, V, A, multigraph=True, showlabel=False, ignore=None, loss=None):   
+        if loss == None:
+            loss = [i for (u,v,i) in A if type(i)!=int]
+            loss.append(max([i for (u,v,i) in A if type(i)==int]+[-1]))
         try:
             from pygraphviz.agraph import AGraph    
         except:
@@ -214,7 +217,9 @@ class AFGUtils:
         g.node_attr["fontstyle"] = "bold"
         g.node_attr["penwidth"] = "2.0"
 
-        M = max(i for (u,v,i) in A if type(i)==int)
+        lbls = list(set(i for (u,v,i) in A))
+        lbls.sort()
+        M = len(lbls)
 
         if multigraph:
             colors = uniquecolors(2*M)
@@ -223,11 +228,11 @@ class AFGUtils:
             for (u,v,i) in A:
                 if ignore != None and (u,v) in ignore: continue
                 assert u != v
-                if i == M or type(i) != int:
+                if i in loss:
                     g.add_edge(u,v,color="black", penwidth=4)                
                 else:
                     lbl = str(i) if showlabel else ""
-                    g.add_edge(u,v,color=colors[i%len(colors)], penwidth="%d" % 4, label=lbl)
+                    g.add_edge(u,v,color=colors[lbls.index(i)%len(colors)], penwidth="%d" % 4, label=lbl)
 
         else:
             colors = uniquecolors(M+1)
