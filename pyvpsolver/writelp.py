@@ -42,9 +42,9 @@ def lincomb2str(lincomb):
     expr = ""
     for var, coef in lincomb:
         if coef >= 0:
-            expr += " + %d %s" % (coef, var)
+            expr += " + %f %s" % (coef, var)
         elif coef < 0:
-            expr += " - %d %s" % (abs(coef), var) 
+            expr += " - %f %s" % (abs(coef), var) 
     return expr            
 
 def write_lp(model, filename):                   
@@ -89,11 +89,11 @@ def write_lp(model, filename):
         print >>f, "Bounds"                
         for name, lb, ub in bounds:
             if lb != None and ub != None:
-                print >>f, "\t%d <= %s <= %d" % (lb, name, ub)
+                print >>f, "\t%f <= %s <= %f" % (lb, name, ub)
             elif lb != None:
-                print >>f, "\t%d <= %s" % (lb, name)
+                print >>f, "\t%f <= %s" % (lb, name)
             elif ub != None:
-                print >>f, "\t%s <= %d" % (name, ub)                        
+                print >>f, "\t%s <= %f" % (name, ub)                        
     
     ### free variables
     
