@@ -20,9 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import sys
+import signal
 import atexit
 import shutil
 import tempfile
+import subprocess
 from model import *
 from afgutils import *
 
@@ -130,6 +133,7 @@ class VPSolver:
     TMP_DIR = tempfile.mkdtemp()
     TMP_CNT = 0       
     REDIRECT = "2>&1"
+    PLIST = []
 
     @staticmethod
     def set_verbose(verbose):
@@ -149,7 +153,21 @@ class VPSolver:
     @staticmethod    
     @atexit.register    
     def clear():
-        shutil.rmtree(VPSolver.TMP_DIR)
+        for p in VPSolver.PLIST:
+            try:
+                os.killpg(p.pid, signal.SIGTERM)
+            except:
+                pass                
+        try:
+            shutil.rmtree(VPSolver.TMP_DIR)
+        except:
+            pass
+
+    @staticmethod    
+    def run(cmd):
+        p = subprocess.Popen(cmd, shell=True, preexec_fn=os.setsid)
+        VPSolver.PLIST.append(p)
+        p.wait()
 
     @staticmethod           
     def parse_vbpsol(vpsol_output):
@@ -177,7 +195,7 @@ class VPSolver:
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file        
         out_file = VPSolver.new_tmp_file()        
-        os.system("%s %s %s %s | tee %s %s" % (VPSolver.VBPSOL, afg_file, sol_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run("%s %s %s %s | tee %s %s" % (VPSolver.VBPSOL, afg_file, sol_file, opts, out_file, VPSolver.REDIRECT))
         f = open(out_file)
         output = f.read()
         f.close()
@@ -191,7 +209,7 @@ class VPSolver:
             vbp_file = vbp_file.vbp_file        
         out_file = VPSolver.new_tmp_file()
         opts = "%d %d %s" % (compress, binary, vtype)
-        os.system("%s %s %s | tee %s %s" % (VPSolver.VPSOLVER, vbp_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run("%s %s %s | tee %s %s" % (VPSolver.VPSOLVER, vbp_file, opts, out_file, VPSolver.REDIRECT))
         f = open(out_file)
         output = f.read()
         f.close()
@@ -205,7 +223,7 @@ class VPSolver:
             vbp_file = vbp_file.vbp_file
         out_file = VPSolver.new_tmp_file()
         opts = "%d %d %s" % (compress, binary, vtype)
-        os.system("%s %s %s %s | tee %s %s" % (VPSolver.VBP2AFG, vbp_file, afg_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run("%s %s %s %s | tee %s %s" % (VPSolver.VBP2AFG, vbp_file, afg_file, opts, out_file, VPSolver.REDIRECT))
         f = open(out_file)
         output = f.read()
         f.close()
@@ -218,7 +236,7 @@ class VPSolver:
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file 
         out_file = VPSolver.new_tmp_file()
-        os.system("%s %s %s %s | tee %s %s" % (VPSolver.AFG2MPS, afg_file, mps_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run("%s %s %s %s | tee %s %s" % (VPSolver.AFG2MPS, afg_file, mps_file, opts, out_file, VPSolver.REDIRECT))
         f = open(out_file)
         output = f.read()
         f.close()
@@ -231,7 +249,7 @@ class VPSolver:
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file                    
         out_file = VPSolver.new_tmp_file()
-        os.system("%s %s %s %s | tee %s %s" % (VPSolver.AFG2LP, afg_file, lp_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run("%s %s %s %s | tee %s %s" % (VPSolver.AFG2LP, afg_file, lp_file, opts, out_file, VPSolver.REDIRECT))
         f = open(out_file)
         output = f.read()
         f.close()
@@ -263,7 +281,7 @@ class VPSolver:
                 else:
                     raise Exception("Invalid file extension!")                                        
         out_file = VPSolver.new_tmp_file()
-        os.system("%s | tee %s %s" % (cmd, out_file, VPSolver.REDIRECT))               
+        VPSolver.run("%s | tee %s %s" % (cmd, out_file, VPSolver.REDIRECT))
         f = open(out_file)
         output = f.read()
         f.close()
@@ -287,7 +305,7 @@ class VPSolver:
                 raise Exception("Invalid file extension!")     
         out_file = VPSolver.new_tmp_file()
         sol_file = VPSolver.new_tmp_file(".sol")
-        os.system("%s --wsol %s | tee %s %s" % (cmd, sol_file, out_file, VPSolver.REDIRECT))               
+        VPSolver.run("%s --wsol %s | tee %s %s" % (cmd, sol_file, out_file, VPSolver.REDIRECT))               
         f = open(out_file)
         output = f.read()
         f.close()
@@ -306,4 +324,12 @@ class VPSolver:
         except:
             vals = None                           
         return output, vals
+
+def signal_handler(signal, frame):
+    print "signal received: %d" % signal
+    VPSolver.clear()
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGHUP, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 #
-# Copyright (C) 2013-2014, Filipe Brandao
+# Copyright (C) 2013-2015, Filipe Brandao
 # Faculdade de Ciencias, Universidade do Porto
 # Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 #
@@ -19,12 +19,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 set -e
-echo "Copyright (C) 2013-2014, Filipe Brandao"
+echo "Copyright (C) 2013-2015, Filipe Brandao"
 
 BASEDIR=`dirname $0`
 BIN_DIR=$BASEDIR/../bin/
 TMP_DIR=`mktemp -d -t XXXXXXXXXX`
-trap "rm -rf $TMP_DIR" EXIT
+trap "rm -rf $TMP_DIR;" SIGHUP SIGINT SIGTERM EXIT
 
 usage(){
     echo -e "Usage:"
@@ -48,7 +48,10 @@ solve(){
         echo "read $model_file"
         echo "optimize"
         echo "write $TMP_DIR/vars.sol"
-    ) | cplex
+    ) | cplex &
+    local pid=$!
+    trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
+    wait $pid
     echo ""
     awk -F\" '/variable name/ {print $2, $6}' OFS=" " $TMP_DIR/vars.sol > $TMP_DIR/vars.sol2
     mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol    
@@ -124,7 +127,10 @@ if [[ -n "$vbp_file" ]]; then
     model_file=$TMP_DIR/model.mps
     
     echo -e "\n>>> vbp2afg..."
-    $BIN_DIR/vbp2afg $vbp_file $afg_file -2 
+    $BIN_DIR/vbp2afg $vbp_file $afg_file -2 &
+    pid=$!
+    trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
+    wait $pid
 
     echo -e "\n>>> afg2mps..."
     $BIN_DIR/afg2mps $afg_file $model_file

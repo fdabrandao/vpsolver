@@ -1,7 +1,7 @@
 #!/bin/bash
 # This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 #
-# Copyright (C) 2013-2014, Filipe Brandao
+# Copyright (C) 2013-2015, Filipe Brandao
 # Faculdade de Ciencias, Universidade do Porto
 # Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 #
@@ -19,12 +19,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 set -e
-echo "Copyright (C) 2013-2014, Filipe Brandao"
+echo "Copyright (C) 2013-2015, Filipe Brandao"
 
 BASEDIR=`dirname $0`
 BIN_DIR=$BASEDIR/../bin/
 TMP_DIR=`mktemp -d -t XXXXXXXXXX`
-trap "rm -rf $TMP_DIR" EXIT
+trap "rm -rf $TMP_DIR;" SIGHUP SIGINT SIGTERM EXIT
 
 usage(){
     echo -e "Usage:"
@@ -44,10 +44,16 @@ solve(){
     echo -e "\n>>> solving the MIP model using lp_solve..."
     echo -e "Note: different parameter settings may improve the performance substantially!"
     if [[ $model_file =~ \.mps$ ]]; then
-        lp_solve -mps $model_file > $TMP_DIR/sol.out    
+        lp_solve -mps $model_file > $TMP_DIR/sol.out  &
+        local pid=$!
+        trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
+        wait $pid   
     else
         echo -e "Note: lp_solve requires xli_CPLEX to read CPLEX lp models"
-        lp_solve -rxli xli_CPLEX $model_file > $TMP_DIR/sol.out
+        lp_solve -rxli xli_CPLEX $model_file > $TMP_DIR/sol.out &
+        local pid=$!
+        trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
+        wait $pid
     fi
     sed -e '1,/variables:/d' < $TMP_DIR/sol.out > $TMP_DIR/vars.sol
 }
@@ -122,7 +128,10 @@ if [[ -n "$vbp_file" ]]; then
     model_file=$TMP_DIR/model.mps
     
     echo -e "\n>>> vbp2afg..."
-    $BIN_DIR/vbp2afg $vbp_file $afg_file -2 
+    $BIN_DIR/vbp2afg $vbp_file $afg_file -2 &
+    pid=$!
+    trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
+    wait $pid
 
     echo -e "\n>>> afg2mps..."
     $BIN_DIR/afg2mps $afg_file $model_file
