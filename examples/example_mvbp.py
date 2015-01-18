@@ -2,7 +2,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2014, Filipe Brandao
+Copyright (C) 2013-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
@@ -51,7 +51,7 @@ W1 = (100, 100)
 W2 = (50, 120)
 W3 = (150, 25)
 Ws = [W1, W2, W3]
-cost = [3, 7, 2]
+Cs = [3, 7, 2]
 #items
 ws1, b1 = [(50, 25), (25, 50), (0, 75)], 1
 ws2, b2 = [(40, 40), (60, 25), (25, 60)], 1
@@ -60,7 +60,7 @@ b = [b1, b2, b3]
 ws = [ws1, ws2, ws3]
 
 #solve Example 1
-obj, sol = solve_mvbp(Ws, ws, b, cost, svg_file="tmp/graphA_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
+obj, sol = solve_mvbp(Ws, Cs, ws, b, svg_file="tmp/graphA_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
 print "obj:", obj
 print "sol:", sol
 print_solution_mvbp(obj, sol)
@@ -70,7 +70,7 @@ print_solution_mvbp(obj, sol)
 W1 = (100, 75)
 W2 = (75, 50)
 Ws = [W1, W2]
-cost = [3, 2]
+Cs = [3, 2]
 #items
 ws1, b1 = [(75, 50)], 2
 ws2, b2 = [(40, 15), (25, 25)], 1
@@ -78,7 +78,7 @@ b = [b1, b2]
 ws = [ws1, ws2]
 
 #solve Example 2
-obj, sol = solve_mvbp(Ws, ws, b, cost, svg_file="tmp/graphB_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
+obj, sol = solve_mvbp(Ws, Cs, ws, b, svg_file="tmp/graphB_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
 print "obj:", obj
 print "sol:", sol
 print_solution_mvbp(obj, sol)
