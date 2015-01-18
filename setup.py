@@ -4,7 +4,7 @@ Basic Setup Script
 
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2014, Filipe Brandao
+Copyright (C) 2013-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
@@ -41,7 +41,7 @@ class CustomInstallCommand(install):
 setup(
     name='VPSolver',
     version='1.1',
-    description='Vector Packing Exact Solver Based on Arc-Flow Formulation',
+    description='Cutting and Packing Exact Solver Based on an Arc-Flow Formulation',
     author='',
     author_email='',
     packages=['pyvpsolver'],

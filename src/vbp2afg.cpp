@@ -1,7 +1,7 @@
 /**
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2014, Filipe Brandao
+Copyright (C) 2013-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 int main(int argc, char *argv[]){   
-    printf("Copyright (C) 2013-2014, Filipe Brandao\n");    
+    printf("Copyright (C) 2013-2015, Filipe Brandao\n");    
     setvbuf(stdout, NULL, _IONBF, 0);
     if(argc < 3 || argc > 6){
         printf("Usage: vbp2afg instance.vbp graph.afg [method:-2] [binary:0] [vtype:I]\n");
