@@ -101,7 +101,7 @@ class MPS:
         VPSolver.set_verbose(verbose)
         self.afg_graph = graph
         self.mps_file = VPSolver.new_tmp_file(".mps")
-        self.output = VPSolver.afg2mps(graph.afg_file, self.mps_file)
+        self.output = VPSolver.afg2mps(graph.afg_file, self.mps_file, verbose=verbose)
         
     def __del__(self):
         try:
@@ -115,7 +115,7 @@ class LP:
         VPSolver.set_verbose(verbose)
         self.afg_graph = graph
         self.lp_file = VPSolver.new_tmp_file(".lp")
-        self.output = VPSolver.afg2lp(graph.afg_file, self.lp_file)
+        self.output = VPSolver.afg2lp(graph.afg_file, self.lp_file, verbose=verbose)
         
     def __del__(self):
         try:

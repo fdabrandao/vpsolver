@@ -22,7 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from vpsolver import *
 import sys
 
-def solve_mvbp(Ws, Cs, ws, b, svg_file="", log_file="", verbose=False, script="vpsolver_gurobi.sh"):
+def solve_mvbp(Ws, Cs, ws, b, svg_file="", lp_file="", mps_file="", log_file="", 
+               verbose=False, script="vpsolver_gurobi.sh"):
     """
     Solves multiple-choice vector bin packing instances using the method
     proposed in Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
@@ -180,6 +181,12 @@ def solve_mvbp(Ws, Cs, ws, b, svg_file="", log_file="", verbose=False, script="v
 
     model_file = VPSolver.new_tmp_file(".lp")  
     model.write(model_file)
+    if lp_file.endswith(".lp"):
+        model.write(lp_file)
+        if verbose: print ".LP model successfully generated!"
+    if mps_file.endswith(".mps"):
+        model.write(mps_file)
+        if verbose: print ".MPS model successfully generated!"
     out, varvalues = VPSolver.script_wsol(script, model_file, verbose=verbose)
     os.remove(model_file)
     
@@ -211,14 +218,23 @@ def solve_mvbp(Ws, Cs, ws, b, svg_file="", log_file="", verbose=False, script="v
     
     return c1, lst_sol
 
-def solve_vbp(W, w, b, svg_file="", verbose=False, script="vpsolver_gurobi.sh"):
+def solve_vbp(W, w, b, svg_file="", lp_file="", mps_file="", 
+              verbose=False, script="vpsolver_gurobi.sh"):
     assert svg_file=="" or svg_file.endswith(".svg")
     instance = VBP(W, w, b, verbose=False)
-    if svg_file == "":           
+    if svg_file == "" and lp_file == "" and mps_file == "":           
         out, (obj, sol) = VPSolver.script(script, instance, verbose=verbose)    
     else:
         afg = AFG(instance, verbose=verbose)
-        afg.graph().draw(svg_file)
+        if svg_file.endswith(".svg"):
+            if verbose: print "Generating .SVG file..."
+            afg.graph().draw(svg_file)
+        if lp_file.endswith(".lp"):
+            VPSolver.afg2lp(afg.afg_file, lp_file, verbose=False)
+            if verbose: print ".LP model successfully generated!"
+        if mps_file.endswith(".mps"):
+            VPSolver.afg2mps(afg.afg_file, mps_file, verbose=False)            
+            if verbose: print ".MPS model successfully generated!"
         mps_model = MPS(afg, verbose=verbose)
         out, (obj, sol) = VPSolver.script(script, mps_model, afg, verbose=verbose)
     return obj, sol

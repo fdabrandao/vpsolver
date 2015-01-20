@@ -46,13 +46,13 @@ Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
 from pyvpsolver import *
 
 Ws = [[100], [120], [150]]
-cost = [100, 120, 150]
+Cs = [100, 120, 150]
 ws = [[[10]], [[14]], [[17]], [[19]], [[24]], [[29]], [[32]], [[33]], [[36]], 
       [[38]], [[40]], [[50]], [[54]], [[55]], [[63]], [[66]], [[71]], [[77]], 
       [[79]], [[83]], [[92]], [[95]], [[99]]]
 b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
 
-obj, sol = solve_mvbp(Ws, ws, b, cost, svg_file="tmp/graph_vsbpp.svg", verbose=True, script="vpsolver_glpk.sh")
+obj, sol = solve_mvbp(Ws, Cs, ws, b, svg_file="tmp/graph_vsbpp.svg", verbose=True, script="vpsolver_glpk.sh")
 print "obj:", obj
 print "sol:", sol
 print_solution_mvbp(obj, sol)
