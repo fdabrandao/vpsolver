@@ -179,14 +179,14 @@ def solve_mvbp(Ws, Cs, ws, b, svg_file="", lp_file="", mps_file="", log_file="",
     lincomb = [(graph.vname(Ts[i], 'T', 'L'), Cs[i]) for i in xrange(nbtypes)]
     model.setObj("min", lincomb)
 
-    model_file = VPSolver.new_tmp_file(".lp")  
-    model.write(model_file)
+    model_file = VPSolver.new_tmp_file(".lp")
+    model.write(model_file)  
     if lp_file.endswith(".lp"):
         model.write(lp_file)
         if verbose: print ".LP model successfully generated!"
     if mps_file.endswith(".mps"):
         model.write(mps_file)
-        if verbose: print ".MPS model successfully generated!"
+        if verbose: print ".MPS model successfully generated!"        
     out, varvalues = VPSolver.script_wsol(script, model_file, verbose=verbose)
     os.remove(model_file)
     

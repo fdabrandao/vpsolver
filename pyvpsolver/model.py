@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from writelp import write_lp
 from writemps import write_mps
 
+inf = float('inf')
+
 class Model:
     def __init__(self):
         self.vars = {}
@@ -34,6 +36,7 @@ class Model:
         self.objdir = objdir
         for var, coef in lincomb: 
             assert var in self.vars
+            assert coef != inf and coef != -inf
         self.obj = lincomb
 
     def genConsName(self):
@@ -48,6 +51,9 @@ class Model:
 
     def addVar(self, lb=None, ub=None, name=None, vtype="C"):
         if name == None: name = self.genVarName()
+        assert lb != inf and ub != -inf
+        if lb == -inf: lb = None
+        if ub == inf: ub = None
         assert name not in self.vars
         assert vtype in ["C", "I"]
         self.vars[name] = {}
@@ -65,6 +71,7 @@ class Model:
             name = self.genConsName()
         for var, coef in lincomb:
             assert var in self.vars
+            assert coef != inf and coef != -inf
         assert name not in self.cons
         self.cons[name] = (lincomb, sign, rhs)       
     
