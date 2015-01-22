@@ -57,6 +57,8 @@ int main(int argc, char *argv[]){
     assert(fin != NULL);
     assert(fout != NULL);
     
+    printf("Generating the .LP model...");
+    
     assert(fscanf(fin, " #INSTANCE_BEGIN# ")==0);
     Instance inst(fin);
     

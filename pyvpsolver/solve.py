@@ -240,16 +240,16 @@ def solve_vbp(W, w, b, svg_file="", lp_file="", mps_file="",
     return obj, sol
 
 def print_solution_mvbp(obj, lst_sol, f=sys.stdout):
-    print >>f, "Objective:", obj
+    if obj != None: print >>f, "Objective:", obj
     print >>f, "Solution:"
     for i, sol in enumerate(lst_sol):
         cnt = sum(m for m,p in sol)
-        print >>f, "Bins of type %d: %d" % (i+1, cnt)
+        print >>f, "Bins of type %d: %d %s" % (i+1, cnt, ["bins","bin"][cnt==1])
         for mult, patt in sol:
             print >>f, "%d x [%s]" % (mult, ", ".join(["i=%d opt=%d" % (it+1, opt+1) for it, opt in patt]))    
     
 def print_solution_vbp(obj, sol, f=sys.stdout):    
-    print >>f, "Objective:", obj
+    if obj != None: print >>f, "Objective:", obj
     print >>f, "Solution:"
     for mult, patt in sol:
         print >>f, "%d x [%s]" % (mult, ", ".join(["i=%d" % (it+1) for it in patt]))
