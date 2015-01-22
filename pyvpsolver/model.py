@@ -65,6 +65,7 @@ class Model:
     def addCons(self, lincomb, sign, rhs, name=None):        
         sign = sign[:1]
         assert sign in ["<", "=", ">"]
+        assert rhs != inf and rhs != -inf
         if lincomb == []:
             return
         if name == None:

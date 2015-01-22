@@ -77,16 +77,16 @@ def write_mps(model, filename):
     if len(Ivars) != 0:
         print >>f, "COLUMNS"
         print >>f, mps_row([(2, "MARKER"), 
-                             (3, "\"MARKER\""), 
-                             (5, "\"INTORG\"")])
+                             (3, "\'MARKER\'"), 
+                             (5, "\'INTORG\'")])
     
         for vname in Ivars: 
             for con, coef in columns[vname]:
                 print >>f, mps_row([(2, vname), (3, con), (4, coef)])                    
         
         print >>f, mps_row([(2, "MARKER"), 
-                             (3, "\"MARKER\""), 
-                             (5, "\"INTEND\"")])                    
+                             (3, "\'MARKER\'"), 
+                             (5, "\'INTEND\'")])                    
     
     if len(Cvars) != 0:
         for vname in Cvars:
@@ -103,19 +103,19 @@ def write_mps(model, filename):
     ### bounds
     
     print >>f, "BOUNDS"
-    
+   
     for vname in sorted(model.vars):
         lb = model.vars[vname]["lb"]
         ub = model.vars[vname]["ub"]
-        if lb==None:
-            print >>f, mps_row([(1, "MI"), (2, "BND1"), (3, vname)])
-        else:
-            print >>f, mps_row([(1, "LO"), (2, "BND1"), (3, vname), (4, lb)])                                             
-        
-        if ub==None:                              
-            print >>f, mps_row([(1, "PL"), (2, "BND1"), (3, vname)])
-        else:
-            print >>f, mps_row([(1, "UP"), (2, "BND1"), (3, vname), (4, ub)])
+        if lb!=None:
+            print >>f, mps_row([(1, "LO"), (2, "BND1"), (3, vname), (4, lb)])
+        #else:
+        #    print >>f, mps_row([(1, "MI"), (2, "BND1"), (3, vname)])            
+
+        if ub!=None:                              
+            print >>f, mps_row([(1, "UP"), (2, "BND1"), (3, vname), (4, ub)])            
+        #else:
+        #    print >>f, mps_row([(1, "PL"), (2, "BND1"), (3, vname)])            
     
     print >>f, "ENDATA"
 
