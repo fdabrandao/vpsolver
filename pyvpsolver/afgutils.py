@@ -24,7 +24,7 @@ from random import *
 
 class AFGraph:
     def __init__(self, V, A, S, T):
-        self.V, self.A = V, A
+        self.V, self.A = list(set(V)), list(set(A))
         self.S, self.T = S, T
         self.names = {}
     
