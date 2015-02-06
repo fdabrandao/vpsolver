@@ -5,6 +5,7 @@
 *.pyo
 *.svg
 *.egg-info
-build/
-push.sh
+/build/
+/git_push.sh
+/git_fetch.sh
 
