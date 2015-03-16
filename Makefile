@@ -3,8 +3,8 @@ BIN = bin
 CC=g++
 CFLAGS= -Wall -O2
 
-GUROBI_DIR = /opt/gurobi501/linux32
-CLIB     = -L$(GUROBI_DIR)/lib/ -lgurobi50
+GUROBI_DIR = /opt/gurobi602/linux64
+CLIB     = -L$(GUROBI_DIR)/lib/ -lgurobi60
 INC      = $(GUROBI_DIR)/include/
 CPPLIB   = -L$(GUROBI_DIR)/lib/ -lgurobi_c++ $(CLIB)
 GUROBI_OPTS = -I$(INC) $(CPPLIB) -lpthread
