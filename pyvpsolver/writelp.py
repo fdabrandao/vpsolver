@@ -42,10 +42,10 @@ def lincomb2str(lincomb):
     expr = ""
     for var, coef in lincomb:
         if coef >= 0:
-            expr += " + %f %s" % (coef, var)
+            expr += " + %g %s" % (coef, var)
         elif coef < 0:
-            expr += " - %f %s" % (abs(coef), var) 
-    return expr            
+            expr += " - %g %s" % (abs(coef), var) 
+    return expr
 
 def write_lp(model, filename):                   
     f = open(filename, "w")               
