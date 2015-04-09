@@ -57,16 +57,17 @@ class AFGraph:
         varl = []
         for (u,v,i) in self.A:            
             name = self.vname(u,v,i,vnames)
-            Aout[v].append(name)
-            Ain[u].append(name)
+            Aout[u].append(name)
+            Ain[v].append(name)
             varl.append(name)
         cons = []
         for u in self.V:
-            lincomb = [(var, 1) for var in Ain[u]]
-            lincomb += [(var, -1) for var in Aout[u]]
-            cons.append((lincomb,"=",0))            
+            if Ain[u] != [] and Aout[u] != []:
+                lincomb = [(var, 1) for var in Ain[u]]
+                lincomb += [(var, -1) for var in Aout[u]]
+                cons.append((lincomb,"=",0))            
         return varl, cons
-        
+
     def getAssocs(self, vnames=None):
         assocs = {}
         for (u,v,i) in self.A:  
