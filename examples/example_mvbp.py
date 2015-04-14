@@ -45,6 +45,8 @@ Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
 
 from pyvpsolver import *
 
+inf = float('inf')
+
 ## Example 1
 #bins
 W1 = (100, 100)
@@ -52,6 +54,7 @@ W2 = (50, 120)
 W3 = (150, 25)
 Ws = [W1, W2, W3]
 Cs = [3, 7, 2]
+Qs = [inf, inf, inf]
 #items
 ws1, b1 = [(50, 25), (25, 50), (0, 75)], 1
 ws2, b2 = [(40, 40), (60, 25), (25, 60)], 1
@@ -60,7 +63,7 @@ b = [b1, b2, b3]
 ws = [ws1, ws2, ws3]
 
 #solve Example 1
-obj, sol = solve_mvbp(Ws, Cs, ws, b, svg_file="tmp/graphA_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
+obj, sol = solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="tmp/graphA_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
 print "obj:", obj
 print "sol:", sol
 print_solution_mvbp(obj, sol)
@@ -71,6 +74,7 @@ W1 = (100, 75)
 W2 = (75, 50)
 Ws = [W1, W2]
 Cs = [3, 2]
+Qs = [inf, inf]
 #items
 ws1, b1 = [(75, 50)], 2
 ws2, b2 = [(40, 15), (25, 25)], 1
@@ -78,7 +82,7 @@ b = [b1, b2]
 ws = [ws1, ws2]
 
 #solve Example 2
-obj, sol = solve_mvbp(Ws, Cs, ws, b, svg_file="tmp/graphB_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
+obj, sol = solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="tmp/graphB_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
 print "obj:", obj
 print "sol:", sol
 print_solution_mvbp(obj, sol)

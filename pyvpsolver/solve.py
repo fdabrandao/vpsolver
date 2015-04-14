@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from vpsolver import *
 import sys
 
-def solve_mvbp(Ws, Cs, ws, b, svg_file="", lp_file="", mps_file="", log_file="", 
+def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file="", 
                verbose=False, script="vpsolver_gurobi.sh"):
     """
     Solves multiple-choice vector bin packing instances using the method
@@ -168,6 +168,11 @@ def solve_mvbp(Ws, Cs, ws, b, svg_file="", lp_file="", mps_file="", log_file="",
     for i in xrange(len(b)):
         for var in assocs[i]:
             ub[var] = b[i]
+
+    n = sum(b)
+    for i in xrange(nbtypes):
+        var = graph.vname(Ts[i], 'T', 'L')
+        ub[var] = min(Qs[i],n)            
 
     for var in varl:
         #model.addVar(name=var, lb=0, vtype="I")
