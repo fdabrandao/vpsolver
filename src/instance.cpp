@@ -32,15 +32,11 @@ using namespace std;
 
 bool Item::operator<(const Item &o) const{
     assert(ndims == o.ndims);
-    if(key < o.key){
-        return true;
-    }else if(key == o.key){
-        for(int i = 0; i < ndims; i++){
-            if(w[i] == o.w[i]) continue;
-            else return w[i] < o.w[i];
-        }
+    if(abs(key-o.key) >= 1e-5) return key < o.key;    
+    for(int i = 0; i < ndims; i++){
+        if(w[i] != o.w[i]) return w[i] < o.w[i];
     }
-    return false;
+    return demand < o.demand;
 }
 
 int Item::operator[](int i) const{ 

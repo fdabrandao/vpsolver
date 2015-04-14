@@ -94,6 +94,7 @@ int main(int argc, char *argv[]){
     // demand constraints
 
     for(int i = 0; i < inst.m; i++){
+        if(inst.items[i].demand == 0) continue;
         fprintf(fout, "\tB%d:", i);
         ForEach(ai, Ai[i])
             fprintf(fout, " + X%x", *ai);
