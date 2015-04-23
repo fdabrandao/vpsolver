@@ -39,7 +39,7 @@ os.environ["PATH"] = "../scripts"+":"+os.environ["PATH"]
 """
 Uses the method proposed in:
 Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
-Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13, 
+Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
 Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
 """
 

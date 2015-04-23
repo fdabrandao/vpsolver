@@ -44,51 +44,51 @@ using namespace std;
     End
 */
 
-int main(int argc, char *argv[]){     
+int main(int argc, char *argv[]){
     printf("Copyright (C) 2013-2015, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if(argc != 3){
         printf("Usage: afg2mps graph.afg model.lp\n");
         return 1;
     }
-        
+
     FILE *fin = fopen(argv[1], "r");
-    FILE *fout = fopen(argv[2], "w");    
+    FILE *fout = fopen(argv[2], "w");
     assert(fin != NULL);
     assert(fout != NULL);
-    
+
     printf("Generating the .LP model...");
-    
+
     assert(fscanf(fin, " #INSTANCE_BEGIN# ")==0);
     Instance inst(fin);
-    
-    assert(fscanf(fin, " #GRAPH_BEGIN# ")==0);        
+
+    assert(fscanf(fin, " #GRAPH_BEGIN# ")==0);
 
     int S, T;
     assert(fscanf(fin, " S: %d ", &S)==1);
-    assert(fscanf(fin, " T: %d ", &T)==1);    
-    
-    int NV, NA;   
+    assert(fscanf(fin, " T: %d ", &T)==1);
+
+    int NV, NA;
     assert(fscanf(fin, " NV: %d ", &NV)==1);
-    assert(fscanf(fin, " NA: %d ", &NA)==1);        
-    
+    assert(fscanf(fin, " NA: %d ", &NA)==1);
+
     map<int, vector<int> > Ai;
     map<int, vector<int> > in;
-    map<int, vector<int> > out;    
+    map<int, vector<int> > out;
     for(int i = 0; i < NA; i++){
-        int i_u, i_v, label;    
+        int i_u, i_v, label;
         assert(fscanf(fin, " %d %d %d ", &i_u, &i_v, &label)==3);
         Ai[label].push_back(i);
         in[i_v].push_back(i);
-        out[i_u].push_back(i);     
+        out[i_u].push_back(i);
     }
-    
+
     /* objective */
-   
+
     fprintf(fout, "Minimize Z\n");
-    
+
     /* constraints */
-    
+
     fprintf(fout, "Subject To\n");
 
     // demand constraints
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]){
         if(inst.items[i].ctype == '=' && !inst.relax_domains)
             fprintf(fout, " = %d", inst.items[i].demand);
         else
-            fprintf(fout, " >= %d", inst.items[i].demand);        
+            fprintf(fout, " >= %d", inst.items[i].demand);
         fprintf(fout, "\n");
     }
 
@@ -112,50 +112,50 @@ int main(int argc, char *argv[]){
         ForEach(ai, in[i])
             fprintf(fout, " + X%x", *ai);
         ForEach(ai, out[i])
-            fprintf(fout, " - X%x", *ai);                        
-        if(i == S) 
-            fprintf(fout, " + Z = 0");                         
+            fprintf(fout, " - X%x", *ai);
+        if(i == S)
+            fprintf(fout, " + Z = 0");
         else if(i == T)
             fprintf(fout, " - Z = 0");
         else
             fprintf(fout, " = 0");
-        fprintf(fout, "\n");            
+        fprintf(fout, "\n");
     }
 
     /* bounds */
-    
+
     int n = 0;
     for(int i = 0; i < inst.m; i++)
         n += inst.items[i].demand;
-    
+
     fprintf(fout, "Bounds\n");
     ForEach(e, Ai){
-        int i = e->first;        
+        int i = e->first;
         ForEach(ai, e->second){
-            if(i != inst.m && !inst.relax_domains) 
+            if(i != inst.m && !inst.relax_domains)
                 fprintf(fout, "0 <= X%x <= %d\n", *ai, inst.items[i].demand);
             else
-                fprintf(fout, "0 <= X%x <= %d\n", *ai, n);            
+                fprintf(fout, "0 <= X%x <= %d\n", *ai, n);
         }
     }
     fprintf(fout, "0 <= Z <= %d\n", n);
-    
+
     /* integer variables */
 
     if(inst.vtype == 'I'){
         fprintf(fout, "General\n");
-        
+
         fprintf(fout, "\t");
         for(int i = 0; i < NA; i++){
-            if(!i)    
+            if(!i)
                 fprintf(fout, "X%x", i);
             else
                 fprintf(fout, " X%x", i);
         }
         fprintf(fout, " Z\n");
     }
-    
-    fprintf(fout, "End\n");        
+
+    fprintf(fout, "End\n");
 
     fclose(fin);
     fclose(fout);

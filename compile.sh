@@ -20,12 +20,12 @@
 BASEDIR=`dirname $0`
 cd $BASEDIR
 
-make clean >compile.log 2>&1 
+make clean >compile.log 2>&1
 
 echo "mandatory:"
 
 echo -n "  vbp2afg "
-make bin/vbp2afg >>compile.log 2>&1 
+make bin/vbp2afg >>compile.log 2>&1
 if [[ $? == 0 ]]; then echo "[OK]";
 else echo "[Failed]"; fi
 
@@ -47,7 +47,7 @@ else echo "[Failed]"; fi
 echo "optional:"
 
 echo -n "  vpsolver "
-make bin/vpsolver >>compile.log 2>&1 
+make bin/vpsolver >>compile.log 2>&1
 if [[ $? == 0 ]]; then echo "[OK]";
 else echo "[Failed]"; fi
 
@@ -65,6 +65,3 @@ echo -n "  solve_glpk   "
 make bin/solve_glpk >>compile.log 2>&1
 if [[ $? == 0 ]]; then echo "[OK]";
 else echo "[Failed]"; fi
-
-
-

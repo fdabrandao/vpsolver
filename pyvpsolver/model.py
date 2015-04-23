@@ -101,7 +101,7 @@ class Model:
         assert lb != inf and ub != -inf
         if lb == -inf: lb = None
         if ub == inf: ub = None
-        assert name not in self.vars        
+        assert name not in self.vars
         assert vtype in ["C", "I"]
         self.vars_list.append(name)
         self.vars[name] = {}
@@ -139,5 +139,3 @@ class Model:
             self.writeMPS(model_file)
         else:
             raise Exception("Invalid file extension!")
-
-

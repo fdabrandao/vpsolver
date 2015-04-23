@@ -22,18 +22,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from vpsolver import *
 import sys
 
-def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file="", 
+def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file="",
                verbose=False, script="vpsolver_gurobi.sh"):
     """
     Solves multiple-choice vector bin packing instances using the method
     proposed in Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
-    Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13, 
+    Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
     Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
     """
     assert svg_file=="" or svg_file.endswith(".svg")
     nbtypes = len(Ws)
     ndims = len(Ws[0])
-    
+
     ww = []
     bb = []
     itlabel = []
@@ -41,12 +41,12 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
         for j in xrange(len(ws[i])):
             itlabel.append((i,j))
             ww.append(ws[i][j])
-            bb.append(b[i])            
-            
+            bb.append(b[i])
+
     instances = [None] * nbtypes
     graphs = [None] * nbtypes
     Ss, Ts = [None] * nbtypes, [None] * nbtypes
-    for i in xrange(nbtypes):        
+    for i in xrange(nbtypes):
         bbi = bb[:]
         for j in xrange(len(ww)):
             if any(a > b for a,b in zip(ww[j], Ws[i])):
@@ -58,7 +58,7 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
         graphs[i].relabel(lambda u: "%s%s" % (symb,u))
         Ss[i] = symb+"S"
         Ts[i] = symb+"T"
-        if svg_file.endswith(".svg"): 
+        if svg_file.endswith(".svg"):
             graphs[i].draw(svg_file.replace(".svg", "%d.svg" % i))
 
     V = sum([g.V for g in graphs], [])
@@ -66,8 +66,8 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
     V += ['S', 'T']
     A += [('S', s, 'L') for s in Ss]
     A += [(t, 'T', 'L') for t in Ts]
-    A += [('T', 'S', 'L')]       
-    
+    A += [('T', 'S', 'L')]
+
     graph = AFGraph(V, A, 'S', 'T')
     if svg_file.endswith(".svg"):
         graph.draw(svg_file, ignore=[('T','S')])
@@ -76,8 +76,8 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
     for (u,v,i) in A:
         adj[v].append((u,i))
     S, T = 'S', 'T'
-                       
-    newlbl = {}        
+
+    newlbl = {}
     def compress(u):
         if u == S: return [0]*ndims
         if u in newlbl: return newlbl[u]
@@ -85,7 +85,7 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
             if type(lbl) == int and lbl < len(ww):
                 return ww[lbl]
             else:
-                return [0]*ndims                
+                return [0]*ndims
         lbl = [0]*ndims
         for v,i in adj[u]:
             wi = itemw(i)
@@ -95,7 +95,7 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
         newlbl[u] = lbl
         return lbl
 
-    compress(T)    
+    compress(T)
     revlbl = {tuple(x): [] for x in newlbl.values()}
     for u in newlbl:
         if u not in Ts+[T]:
@@ -106,7 +106,7 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
         if sum(x) != 0:
             revlbl2["V%d"%i] = revlbl[x]
         else:
-            revlbl2[S] = revlbl[x] 
+            revlbl2[S] = revlbl[x]
 
     vlbl = {}
     for lbl in revlbl2:
@@ -117,54 +117,54 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
 
     if verbose:
         print "Final compression steps:"
-        
+
     nv1, na1 = len(V), len(A)
     if verbose:
         print "  #V1: %d #A1: %d" % (nv1, na1)
-           
+
     graph.relabel(lambda u: vlbl.get(u,u))
     V, A = graph.V, graph.A
 
     nv2, na2 = len(V), len(A)
     if verbose:
-        print "  #V2: %d #A2: %d" % (nv2, na2)       
+        print "  #V2: %d #A2: %d" % (nv2, na2)
         print "  #V2/#V1 = %.2f" % (nv2/float(nv1))
         print "  #A2/#A1 = %.2f" % (na2/float(na1))
 
     if svg_file.endswith(".svg"):
-        graph.draw(svg_file.replace(".svg", ".final.svg"), ignore=[('T','S')])    
+        graph.draw(svg_file.replace(".svg", ".final.svg"), ignore=[('T','S')])
 
     # remove redudant parallel arcs
     At = []
     used = set()
-    for (u,v,i) in A:        
+    for (u,v,i) in A:
         k = itlabel[i][0] if (isinstance(i, int) and i < len(itlabel)) else 'L'
         if (u,v,k) not in used:
             At.append((u,v,i))
             used.add((u,v,k))
 
-    A = At   
-    graph = AFGraph(V, A, 'S', 'T') 
+    A = At
+    graph = AFGraph(V, A, 'S', 'T')
     if verbose:
         nv3, na3 = len(V), len(A)
-        print "  #V3: %d #A3: %d" % (nv3, na3)       
+        print "  #V3: %d #A3: %d" % (nv3, na3)
         print "  #V3/#V1 = %.2f" % (nv3/float(nv1))
-        print "  #A3/#A1 = %.2f" % (na3/float(na1))   
+        print "  #A3/#A1 = %.2f" % (na3/float(na1))
 
     varl, cons = graph.getFlowCons()
 
     assocs = graph.getAssocs()
     for i in xrange(len(b)):
-        lincomb = [(var, 1) for it, (j, t) in enumerate(itlabel) if j==i for var in assocs[it]]    
-        #cons.append((lincomb,">=",b[i]))      
+        lincomb = [(var, 1) for it, (j, t) in enumerate(itlabel) if j==i for var in assocs[it]]
+        #cons.append((lincomb,">=",b[i]))
         if b[i] > 1:
-            cons.append((lincomb,">=",b[i]))      
+            cons.append((lincomb,">=",b[i]))
         else:
             cons.append((lincomb,"=",b[i]))
 
-    model = Model()        
+    model = Model()
 
-    ub = {}        
+    ub = {}
     for i in xrange(len(b)):
         for var in assocs[i]:
             ub[var] = b[i]
@@ -172,7 +172,7 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
     n = sum(b)
     for i in xrange(nbtypes):
         var = graph.vname(Ts[i], 'T', 'L')
-        ub[var] = min(Qs[i],n)            
+        ub[var] = min(Qs[i],n)
 
     for var in varl:
         #model.addVar(name=var, lb=0, vtype="I")
@@ -180,21 +180,21 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
 
     for lincomb, sign, rhs in cons:
         model.addCons(lincomb, sign, rhs)
-                                                
+
     lincomb = [(graph.vname(Ts[i], 'T', 'L'), Cs[i]) for i in xrange(nbtypes)]
     model.setObj("min", lincomb)
 
     model_file = VPSolver.new_tmp_file(".lp")
-    model.write(model_file)  
+    model.write(model_file)
     if lp_file.endswith(".lp"):
         model.write(lp_file)
         if verbose: print ".LP model successfully generated!"
     if mps_file.endswith(".mps"):
         model.write(mps_file)
-        if verbose: print ".MPS model successfully generated!"        
+        if verbose: print ".MPS model successfully generated!"
     out, varvalues = VPSolver.script_wsol(script, model_file, verbose=verbose)
     os.remove(model_file)
-    
+
     if log_file != "":
         f = open(log_file, "w")
         print >>f, "#V1: %d #A1: %d" % (nv1, na1)
@@ -203,32 +203,32 @@ def solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file
         print >>f, "#V3/#V1: %.2f #A3/#A1: %.1f" % (nv3/float(nv1), na3/float(na1))
         print >>f, out
         f.close()
-    
+
     labels = {}
     for (u,v,i) in A:
-        if type(i) == int and i < len(itlabel):        
-            labels[u,v,i] = [itlabel[i]]              
-    
+        if type(i) == int and i < len(itlabel):
+            labels[u,v,i] = [itlabel[i]]
+
     lst_sol = []
     graph.set_flow(varvalues)
     graph.set_labels(labels)
     for i in xrange(nbtypes):
-        lst_sol.append(graph.extract_solution('S', '<-', Ts[i]))            
-    
+        lst_sol.append(graph.extract_solution('S', '<-', Ts[i]))
+
     assert graph.validate_solution(lst_sol, nbtypes, ndims, Ws, ws, b)
-    
+
     c1 = sum(sum(r for r, patt in lst_sol[i])*Cs[i] for i in xrange(nbtypes))
     c2 = sum(varvalues.get(graph.vname(Ts[i], 'T', 'L'),0) * Cs[i] for i in xrange(nbtypes))
     assert c1 == c2
-    
+
     return c1, lst_sol
 
-def solve_vbp(W, w, b, svg_file="", lp_file="", mps_file="", 
+def solve_vbp(W, w, b, svg_file="", lp_file="", mps_file="",
               verbose=False, script="vpsolver_gurobi.sh"):
     assert svg_file=="" or svg_file.endswith(".svg")
     instance = VBP(W, w, b, verbose=False)
-    if svg_file == "" and lp_file == "" and mps_file == "":           
-        out, (obj, sol) = VPSolver.script(script, instance, verbose=verbose)    
+    if svg_file == "" and lp_file == "" and mps_file == "":
+        out, (obj, sol) = VPSolver.script(script, instance, verbose=verbose)
     else:
         afg = AFG(instance, verbose=verbose)
         if svg_file.endswith(".svg"):
@@ -238,7 +238,7 @@ def solve_vbp(W, w, b, svg_file="", lp_file="", mps_file="",
             VPSolver.afg2lp(afg.afg_file, lp_file, verbose=False)
             if verbose: print ".LP model successfully generated!"
         if mps_file.endswith(".mps"):
-            VPSolver.afg2mps(afg.afg_file, mps_file, verbose=False)            
+            VPSolver.afg2mps(afg.afg_file, mps_file, verbose=False)
             if verbose: print ".MPS model successfully generated!"
         mps_model = MPS(afg, verbose=verbose)
         out, (obj, sol) = VPSolver.script(script, mps_model, afg, verbose=verbose)
@@ -251,12 +251,12 @@ def print_solution_mvbp(obj, lst_sol, f=sys.stdout):
         cnt = sum(m for m,p in sol)
         print >>f, "Bins of type %d: %d %s" % (i+1, cnt, ["bins","bin"][cnt==1])
         for mult, patt in sol:
-            print >>f, "%d x [%s]" % (mult, ", ".join(["i=%d opt=%d" % (it+1, opt+1) for it, opt in patt]))    
-    
-def print_solution_vbp(obj, sol, f=sys.stdout):    
+            print >>f, "%d x [%s]" % (mult, ", ".join(["i=%d opt=%d" % (it+1, opt+1) for it, opt in patt]))
+
+def print_solution_vbp(obj, sol, f=sys.stdout):
     if obj != None: print >>f, "Objective:", obj
     print >>f, "Solution:"
     for mult, patt in sol:
         print >>f, "%d x [%s]" % (mult, ", ".join(["i=%d" % (it+1) for it in patt]))
-    
-    
+
+

@@ -53,63 +53,63 @@ def lincomb2str(lincomb):
                 expr += " - %s" % (var)
     return expr
 
-def write_lp(model, filename):                   
-    f = open(filename, "w")               
-    
+def write_lp(model, filename):
+    f = open(filename, "w")
+
     ### objective
-    
+
     if model.objdir == "min":
         print >>f, "Minimize"
     else:
         print >>f, "Maximize"
-    
+
     obj = model.obj
     if obj == []:
         obj = [(var, 0) for var in model.vars]
     print >>f, "\tobjective:%s" % lincomb2str(obj)
 
-    ### constraints            
-            
-    print >>f, "Subject To"          
-        
-    # demand constraints        
-        
-    for name in model.cons_list:    
+    ### constraints
+
+    print >>f, "Subject To"
+
+    # demand constraints
+
+    for name in model.cons_list:
         lincomb, sign, rhs = model.cons[name]
         if sign in [">","<"]:
             sign += "="
-        print >>f, "\t%s:%s %s %s" % (name, lincomb2str(lincomb), sign, rhs)                   
-    
+        print >>f, "\t%s:%s %s %s" % (name, lincomb2str(lincomb), sign, rhs)
+
     ### bounds
 
     bounds = []
     for name in model.vars_list:
         lb = model.vars[name].get('lb', None)
-        ub = model.vars[name].get('ub', None)   
+        ub = model.vars[name].get('ub', None)
         if lb != None or ub != None:
             bounds.append((name, lb, ub))
         else:
             free.append(name)
-    
+
     if bounds != []:
-        print >>f, "Bounds"                
+        print >>f, "Bounds"
         for name, lb, ub in bounds:
             if lb != None and ub != None:
                 print >>f, "\t%g <= %s <= %g" % (lb, name, ub)
             elif lb != None:
                 print >>f, "\t%g <= %s" % (lb, name)
             elif ub != None:
-                print >>f, "\t%s <= %g" % (name, ub)                        
-    
+                print >>f, "\t%s <= %g" % (name, ub)
+
     ### free variables
-    
+
     print >>f, "General"
     for name in sorted(model.vars):
         if model.vars[name]["vtype"]=="I":
             print >>f, "\t%s" % name
-    
+
     print >>f, "End"
-    
+
     f.close()
 
 

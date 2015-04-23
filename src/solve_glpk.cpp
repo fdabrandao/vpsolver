@@ -25,17 +25,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <glpk.h>
 using namespace std;
 
-int main(int argc, char *argv[]){     
-    printf("Copyright (C) 2013-2015, Filipe Brandao\n");    
+int main(int argc, char *argv[]){
+    printf("Copyright (C) 2013-2015, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if(argc < 2 || argc > 3){
-        printf("Usage: solve_glpk model.mps|model.lp [vars.sol]\n");  
+        printf("Usage: solve_glpk model.mps|model.lp [vars.sol]\n");
         return 1;
     }
-                
+
     glp_prob *P;
     P = glp_create_prob();
-    
+
     char *fname = argv[1];
     char *dot = strrchr(fname, '.');
     if(dot && !strcmp(dot, ".mps")){
@@ -53,20 +53,20 @@ int main(int argc, char *argv[]){
 
     if(argc == 3){
         FILE *fout = fopen(argv[2], "w");
-        assert(fout != NULL);        
-            
+        assert(fout != NULL);
+
         int nvars = glp_get_num_cols(P);
-        for (int i = 1; i <= nvars; i++){      
+        for (int i = 1; i <= nvars; i++){
             double value = glp_mip_col_val(P, i);
             if(value != 0){
                 const char *name = glp_get_col_name(P, i);
-                fprintf(fout, "%s %.6f\n", name, value);    
+                fprintf(fout, "%s %.6f\n", name, value);
             }
         }
         fclose(fout);
     }
-    
-    glp_delete_prob(P);        
+
+    glp_delete_prob(P);
     return 0;
 }
 

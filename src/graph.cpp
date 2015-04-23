@@ -29,14 +29,14 @@ using namespace std;
 
 /* Class NodeSet */
 
-int NodeSet::get_index(const vector<int> &lbl){    
+int NodeSet::get_index(const vector<int> &lbl){
     if(index.count(lbl)){
         return index[lbl];
     }else{
         int ind = labels.size();
         labels.push_back(lbl);
         index[lbl] = ind;
-        return ind;     
+        return ind;
     }
 }
 
@@ -52,12 +52,12 @@ int NodeSet::size() const{
 void NodeSet::clear(){
     index.clear();
     labels.clear();
-}    
+}
 
 void NodeSet::sort(){
     index.clear();
     ::sort(All(labels));
-    int pos = 0;        
+    int pos = 0;
     ForEach(itr, labels)
         index[*itr] = pos++;
 }
@@ -68,15 +68,15 @@ vector<int> NodeSet::topological_order() const{
     int pos = 0;
     ForEach(itr, tmp)
         ord[itr->second] = pos++;
-    return ord;        
+    return ord;
 }
 
 
 /* Class Arc */
 
 bool Arc::operator<(const Arc &o) const{
-    return (u < o.u) || 
-           (u == o.u && v < o.v) || 
+    return (u < o.u) ||
+           (u == o.u && v < o.v) ||
            (u == o.u && v == o.v && label < o.label);
 }
 
@@ -88,16 +88,16 @@ bool Arc::operator==(const Arc &o) const{
 /* Additional Functions  */
 
 adj_list get_adj(int nv, const vector<Arc> &arcs, bool transpose){
-    adj_list adj(nv);    
+    adj_list adj(nv);
     ForEach(itr, arcs){
         const int u = itr->u;
-        const int v = itr->v;  
+        const int v = itr->v;
         assert(u < nv && v < nv);
         if(!transpose)
             adj[u].push_back(MP(v, itr->label));
         else
             adj[v].push_back(MP(u, itr->label));
-    }    
+    }
     return adj;
 }
 

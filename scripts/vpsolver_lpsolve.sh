@@ -40,14 +40,14 @@ error(){
 }
 
 solve(){
-    local model_file=$1       
+    local model_file=$1
     echo -e "\n>>> solving the MIP model using lp_solve..."
     echo -e "Note: different parameter settings may improve the performance substantially!"
     if [[ $model_file =~ \.mps$ ]]; then
         lp_solve -mps $model_file > $TMP_DIR/sol.out  &
         local pid=$!
         trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
-        wait $pid   
+        wait $pid
     else
         echo -e "Note: lp_solve requires xli_CPLEX to read CPLEX lp models"
         lp_solve -rxli xli_CPLEX $model_file > $TMP_DIR/sol.out &
@@ -73,14 +73,14 @@ do
             error
         fi
         shift 2;;
-        
+
     --lp)
         if [[ -n "$2" && -e "$2" && "$2" =~ \.lp$ ]]; then
             model_file=$2
         else
             error
         fi
-        shift 2;;        
+        shift 2;;
 
     --afg)
         if [[ -n "$2" && -e "$2" && "$2" =~ \.afg$ ]]; then
@@ -88,29 +88,29 @@ do
         else
             error
         fi
-        shift 2;;    
- 
+        shift 2;;
+
     --vbp)
         if [[ -n "$2" && -e "$2" && "$2" =~ \.vbp$ ]]; then
             vbp_file=$2
         else
-            error            
+            error
         fi
         shift 2;;
-        
-    --wsol)        
+
+    --wsol)
         if [[ -n "$2" ]]; then
             sol_file=$2
         else
-            error            
+            error
         fi
-        shift 2;;        
-            
+        shift 2;;
+
     *)
         if [[ -n "$1" ]]; then
             error
         else
-            break        
+            break
         fi
   esac
 done
@@ -123,10 +123,10 @@ if [[ -n "$vbp_file" ]]; then
     if [[ -n "$afg_file" || -n "$model_file" ]]; then
         error
     fi
-    
+
     afg_file=$TMP_DIR/graph.afg
     model_file=$TMP_DIR/model.mps
-    
+
     echo -e "\n>>> vbp2afg..."
     $BIN_DIR/vbp2afg $vbp_file $afg_file -2 &
     pid=$!
@@ -142,7 +142,7 @@ solve $model_file;
 if [[ -n "$afg_file" && -z "$sol_file" ]]; then
     echo -e "\n>>> vbpsol..."
     $BIN_DIR/vbpsol $afg_file $TMP_DIR/vars.sol
-fi     
+fi
 
 if [[ -n "$sol_file" ]]; then
     cp $TMP_DIR/vars.sol $sol_file

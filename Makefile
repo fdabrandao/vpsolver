@@ -34,9 +34,8 @@ $(BIN)/solve_glpk: $(SRC)/solve_glpk.cpp
 $(BIN)/vbpsol: $(SRC)/vbpsol.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp
 	$(CC) -o $(BIN)/vbpsol $(CFLAGS) $(SRC)/vbpsol.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp
 
-$(BIN)/gg_afg: $(SRC)/gg_afg.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp 
+$(BIN)/gg_afg: $(SRC)/gg_afg.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp
 	$(CC) -o $(BIN)/gg_afg $(CFLAGS) $(SRC)/gg_afg.cpp $(SRC)/instance.cpp  $(SRC)/graph.cpp $(SRC)/arcflow.cpp  $(GUROBI_OPTS)
-	
+
 clean:
 	rm -rf *~ $(BIN)/*~ $(SRC)/*~ $(BIN)/*
-	

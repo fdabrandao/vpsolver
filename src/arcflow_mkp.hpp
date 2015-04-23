@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.hpp"
 #include "arcflow.hpp"
 #include "instance.hpp"
-using namespace std; 
+using namespace std;
 
 class ArcflowMKP: public Arcflow{
 private:
@@ -40,7 +40,7 @@ private:
     vector<int> pre_it;
     vector<double> dp1;
     vector<pair<double, int> > dp2;
-    
+
     vector<int_pair> best_path(int best){
         int u = best;
         vector<int> path;
@@ -48,19 +48,19 @@ private:
             int item = pre_it[u];
             if(item != m)
                 path.push_back(item);
-            u = pre_v[u];    
+            u = pre_v[u];
         }
         sort(All(path));
         vector<int_pair> result;
         ForEach(it, path){
             if(result.empty() || *it != result.back().first)
-                result.push_back(MP(*it, 1));  
+                result.push_back(MP(*it, 1));
             else
                 result[result.size()-1].second++;
-        }     
+        }
         return result;
     }
-    
+
 public:
     ArcflowMKP(const Instance &inst): Arcflow(inst) {
         iS = 0;
@@ -68,18 +68,18 @@ public:
         nv = NS.size()+1;
         adj = get_adj(nv, A, TRANSPOSE);
     }
-        
-    vector<int_pair> knapsack(const vector<double> &values, double min_profit = 0){  
+
+    vector<int_pair> knapsack(const vector<double> &values, double min_profit = 0){
         return knapsack1(values, min_profit);
-    }      
-    
+    }
+
     vector<int_pair> knapsack1(const vector<double> &values, double min_profit = 0){
-        dp1.assign(nv, -1);    
+        dp1.assign(nv, -1);
         pre_v.assign(nv, -1);
-        pre_it.assign(nv, -1);    
+        pre_it.assign(nv, -1);
         dp1[iS] = 0;
-        
-        int best = iS;                
+
+        int best = iS;
         for(int v = iS+1; v < iT; v++){
             ForEach(itr, adj[v]){
                 const int &u = itr->first;
@@ -96,20 +96,20 @@ public:
                 }
             }
         }
-        
+
         if(dp1[best] >= min_profit)
             return best_path(best);
         else
             return vector<int_pair>();
     }
-        
+
     vector<int_pair> knapsack2(const vector<double> &values, double min_profit = 0){
-        dp2.assign(nv, MP(-1, 0));    
+        dp2.assign(nv, MP(-1, 0));
         pre_v.assign(nv, -1);
-        pre_it.assign(nv, -1);    
+        pre_it.assign(nv, -1);
         dp2[iS] = MP(0, 0);
-        
-        int best = iS;       
+
+        int best = iS;
         for(int v = iS+1; v < iT; v++){
             ForEach(itr, adj[v]){
                 const int &u = itr->first;
@@ -128,7 +128,7 @@ public:
                 }
             }
         }
-        
+
         if(dp2[best].first >= min_profit)
             return best_path(best);
         else

@@ -33,7 +33,7 @@ using namespace std;
 
 
 
-class Arcflow{    
+class Arcflow{
 private:
     set<Arc> AS;
     map<vector<int>, int> dp;
@@ -41,7 +41,7 @@ private:
     inline vector<int> hash(const vector<int> &su);
     vector<int> max_label;
     vector<int> min_label;
-    vector<vector<int> > ls_mat;    
+    vector<vector<int> > ls_mat;
     int lsize;
 protected:
     bool ready;
@@ -52,20 +52,20 @@ protected:
     vector<Item> items;
     NodeSet NS;
     vector<Arc> A;
-    
+
     vector<int> max_rep(const vector<int> &u, int i0, int sub_i0) const;
     void lift_state(vector<int> &u, int it, int ic) const;
     int knapsack(const vector<int> &b, int i0, int d, int C) const;
     bool is_valid(const vector<int> &u) const;
     bool is_compatible(const Item &a, const Item &b) const;
-    void relabel_graph(const vector<int> &label);   
+    void relabel_graph(const vector<int> &label);
     void build();
-    void build_dp();        
+    void build_dp();
     void break_symmetry();
     void main_compression_step();
     void final_compression_step();
     void compress();
-    void finalize();       
+    void finalize();
 public:
     Arcflow(const Instance &inst);
     void write(const char *fname);

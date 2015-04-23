@@ -40,7 +40,7 @@ os.environ["PATH"] = "../scripts"+":"+os.environ["PATH"]
 from pyvpsolver import *
 
 ## Creating instanceA ##
-instanceA = VBP([5180], [1120, 1250, 520, 1066, 1000, 1150], 
+instanceA = VBP([5180], [1120, 1250, 520, 1066, 1000, 1150],
                         [9, 5, 91, 18, 11, 64], verbose=False)
 
 ## Creating instanceB from a .vbp file ##

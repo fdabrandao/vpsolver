@@ -36,64 +36,64 @@ class GrbArcflow: public Arcflow{
 public:
     GrbArcflow(const Instance &inst): Arcflow(inst){}
 
-    void solve(const Instance &inst){            
+    void solve(const Instance &inst){
         assert(ready == true);
         char vtype = inst.vtype;
         GRBEnv* env = new GRBEnv();
-        GRBModel model = GRBModel(*env);        
+        GRBModel model = GRBModel(*env);
         model.set(GRB_StringAttr_ModelName, "flow");
-        
+
         model.getEnv().set(GRB_IntParam_OutputFlag, 1);
         model.getEnv().set(GRB_IntParam_Threads, 1);
         model.getEnv().set(GRB_IntParam_Presolve, 1);
         //model.getEnv().set(GRB_IntParam_Method, 0);
         model.getEnv().set(GRB_IntParam_Method, 2);
-        model.getEnv().set(GRB_IntParam_MIPFocus, 1);        
+        model.getEnv().set(GRB_IntParam_MIPFocus, 1);
         //model.getEnv().set(GRB_IntParam_RINS, 1);
         model.getEnv().set(GRB_DoubleParam_Heuristics, 1);
         model.getEnv().set(GRB_DoubleParam_MIPGap, 0);
-        model.getEnv().set(GRB_DoubleParam_MIPGapAbs, 1-1e-5);    
-        //model.getEnv().set(GRB_DoubleParam_ImproveStartTime, 60);    
+        model.getEnv().set(GRB_DoubleParam_MIPGapAbs, 1-1e-5);
+        //model.getEnv().set(GRB_DoubleParam_ImproveStartTime, 60);
         //model.getEnv().set(GRB_DoubleParam_ImproveStartGap, 1);
-        
+
         int iS = 0;
         int iT = NS.size();
-        
-        sort(All(A));         
+
+        sort(All(A));
         //reverse(All(A));
-        map<Arc, GRBVar> va;    
+        map<Arc, GRBVar> va;
         for(int i = 0; i < 3; i++){
             ForEach(a, A){
                 if(i == 1 && a->u != iS) continue;
                 if(i == 2 && a->v != iT) continue;
                 if(i == 0 && (a->u == iS || a->v == iT)) continue;
-                
+
                 if(a->label == m || inst.relax_domains)
                     va[*a] = model.addVar(0.0, GRB_INFINITY, 0, vtype);
                 else
-                    va[*a] = model.addVar(0.0, items[a->label].demand, 0, vtype);        
+                    va[*a] = model.addVar(0.0, items[a->label].demand, 0, vtype);
             }
         }
         /*ForEach(a, A){
             if(a->label == m)
                 va[*a] = model.addVar(0.0, GRB_INFINITY, 0, vtype);
             else
-                va[*a] = model.addVar(0.0, items[a->label].demand, 0, vtype);        
+                va[*a] = model.addVar(0.0, items[a->label].demand, 0, vtype);
         }*/
-        GRBVar z = model.addVar(0.0, GRB_INFINITY, 1, vtype);        
+        GRBVar z = model.addVar(0.0, GRB_INFINITY, 1, vtype);
         model.update();
-        
+
         vector<vector<Arc> > Al(m);
         vector<vector<Arc> > in(NS.size()+1);
         vector<vector<Arc> > out(NS.size()+1);
-        
+
         ForEach(itr, A){
             if(itr->label != m)
                 Al[itr->label].push_back(*itr);
             out[itr->u].push_back(*itr);
             in[itr->v].push_back(*itr);
         }
-        
+
         for(int it = 0; it < m; it++){
             GRBLinExpr lin = 0;
             ForEach(a, Al[it]) lin += va[*a];
@@ -101,8 +101,8 @@ public:
                 model.addConstr(lin >= items[it].demand);
             else
                 model.addConstr(lin == items[it].demand);
-        }     
-        
+        }
+
         for(int u = 0; u <= NS.size(); u++){
             GRBLinExpr lin = 0;
             ForEach(a, in[u]) lin += va[*a];
@@ -114,20 +114,20 @@ public:
             else
                 model.addConstr(lin == 0);
         }
-        
+
         Al.clear();
         in.clear();
         out.clear();
 
         double pre = TIMEDIF(tstart);
-        model.optimize();                               
+        model.optimize();
         printf("Preprocessing time: %.2f seconds\n", pre);
         double tg = model.get(GRB_DoubleAttr_Runtime);
-        printf("Gurobi run time: %.2f seconds\n", tg);        
+        printf("Gurobi run time: %.2f seconds\n", tg);
         printf("Total run time: %.2f seconds\n", tg+pre);
 
-        if(inst.vtype == 'I'){ 
-            map<Arc, int> flow;              
+        if(inst.vtype == 'I'){
+            map<Arc, int> flow;
             ForEach(a, va){
                 double x = a->second.get(GRB_DoubleAttr_X);
                 int rx = (int)round(x);
@@ -139,18 +139,18 @@ public:
                     Arc a(u, v, lbl);
                     flow[a] = rx;
                 }
-            }                      
+            }
             ArcflowSol sol(flow, iS, iT, binary);
-            sol.print_solution(inst, false, true);            
+            sol.print_solution(inst, false, true);
         }
 
         free(env);
     }
 };
 
-int main(int argc, char *argv[]){     
-    printf("Copyright (C) 2013-2015, Filipe Brandao\n");    
-    setvbuf(stdout, NULL, _IONBF, 0);    
+int main(int argc, char *argv[]){
+    printf("Copyright (C) 2013-2015, Filipe Brandao\n");
+    setvbuf(stdout, NULL, _IONBF, 0);
     if(argc < 2 || argc > 5){
         printf("Usage: vpsolver instance.vbp [method:-2] [binary:0] [vtype:I]\n");
         return 1;
@@ -162,13 +162,13 @@ int main(int argc, char *argv[]){
         assert(inst.method >= MIN_METHOD && inst.method <= MAX_METHOD);
     }
     if(argc >= 4){
-        inst.binary = atoi(argv[3]);        
-    }    
+        inst.binary = atoi(argv[3]);
+    }
     if(argc >= 5){
         inst.vtype = argv[4][0];
         assert(inst.vtype == 'I' || inst.vtype == 'C');
-    }                
-    
+    }
+
     GrbArcflow graph(inst);
     graph.solve(inst);
     return 0;

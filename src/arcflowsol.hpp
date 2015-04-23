@@ -28,19 +28,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "graph.hpp"
 #include "common.hpp"
 #include "instance.hpp"
-using namespace std; 
+using namespace std;
 
 class ArcflowSol{
 private:
-    map<Arc, int> flow;     
+    map<Arc, int> flow;
     int S, T;
     bool binary;
-    
+
     vector<pair<int, vector<int_pair> > > remove_excess(
         const vector<pair<int, vector<int> > > &sol, vector<int> dem) const;
-        
+
     bool is_valid(vector<pair<int, vector<int_pair> > > sol,
-        const Instance &inst) const;        
+        const Instance &inst) const;
 
 public:
     ArcflowSol(const map<Arc, int> &_flow, int _S, int _T, bool _binary = false):
@@ -48,8 +48,8 @@ public:
 
     vector<pair<int, vector<int_pair> > > extract_solution(
         const vector<int> &dem);
-        
-    void print_solution(const Instance &inst, bool print_inst, bool validate);        
+
+    void print_solution(const Instance &inst, bool print_inst, bool validate);
 };
 
 #endif

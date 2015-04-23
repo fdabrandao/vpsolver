@@ -8,7 +8,7 @@ def rgbcode(t):
     r, g, b = t
     r = int(r*255)
     g = int(g*255)
-    b = int(b*255)        
+    b = int(b*255)
     return '#%0.2x%0.2x%0.2x' % (r, g, b)
 
 def rgbcolor(h, f, v, p):
@@ -27,7 +27,7 @@ def rgbcolor(h, f, v, p):
     elif h == 4:
         return f, p, v
     elif h == 5:
-        return v, p, 1 - f  
+        return v, p, 1 - f
 
 def uniquecolors(n, v=0.5, p=0.0):
     """Compute a list of distinct colors, ecah of which is

@@ -37,10 +37,10 @@ private:
     vector<vector<int> > labels;
 public:
     int get_index(const vector<int> &lbl);
-    vector<int> get_label(int ind) const;    
+    vector<int> get_label(int ind) const;
     int size() const;
-    void clear();    
-    void sort();    
+    void clear();
+    void sort();
     vector<int> topological_order() const;
 };
 

@@ -90,4 +90,3 @@ echo "* Example 6:                                             *"
 echo "* > ./vpsolver_gurobi.sh --vbp instance.vbp              *"
 echo "**********************************************************"
 vpsolver_gurobi.sh --vbp instance.vbp
-

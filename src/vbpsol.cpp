@@ -29,50 +29,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "arcflowsol.hpp"
 using namespace std;
 
-int main(int argc, char *argv[]){     
-    printf("Copyright (C) 2013-2015, Filipe Brandao\n");    
-    setvbuf(stdout, NULL, _IONBF, 0);    
+int main(int argc, char *argv[]){
+    printf("Copyright (C) 2013-2015, Filipe Brandao\n");
+    setvbuf(stdout, NULL, _IONBF, 0);
     if(argc < 3 || argc > 4){
         printf("Usage: vbpsol graph.afg vars.sol [print_instance:0]\n");
         return 1;
     }
-    
+
     FILE *fafg = fopen(argv[1], "r");
     assert(fafg != NULL);
-    FILE *fsol = fopen(argv[2], "r");    
+    FILE *fsol = fopen(argv[2], "r");
     assert(fsol != NULL);
-    
+
     bool print_inst = false;
     if(argc >= 4){
-        print_inst = atoi(argv[3]) != 0;        
+        print_inst = atoi(argv[3]) != 0;
     }
-    
+
     assert(fscanf(fafg, " #INSTANCE_BEGIN# ")==0);
-    Instance inst(fafg);    
-    assert(fscanf(fafg, " #GRAPH_BEGIN# ")==0);        
-    assert(fscanf(fafg, " #GRAPH_BEGIN# ")==0);          
+    Instance inst(fafg);
+    assert(fscanf(fafg, " #GRAPH_BEGIN# ")==0);
+    assert(fscanf(fafg, " #GRAPH_BEGIN# ")==0);
 
     int S, T;
     assert(fscanf(fafg, " S: %d ", &S)==1);
-    assert(fscanf(fafg, " T: %d ", &T)==1);    
-    
-    int NV, NA;   
+    assert(fscanf(fafg, " T: %d ", &T)==1);
+
+    int NV, NA;
     assert(fscanf(fafg, " NV: %d ", &NV)==1);
-    assert(fscanf(fafg, " NA: %d ", &NA)==1);        
-    
+    assert(fscanf(fafg, " NA: %d ", &NA)==1);
+
     vector<int> a_u(NA), a_v(NA), a_l(NA);
     for(int i = 0; i < NA; i++)
-        assert(fscanf(fafg, " %d %d %d ", &a_u[i], &a_v[i], &a_l[i])==3);    
+        assert(fscanf(fafg, " %d %d %d ", &a_u[i], &a_v[i], &a_l[i])==3);
     fclose(fafg);
-    
+
     int ind;
     double x;
-    char buf[MAX_LEN];        
-    map<Arc, int> flow;              
+    char buf[MAX_LEN];
+    map<Arc, int> flow;
     while(fscanf(fsol, "%s %lf", buf, &x) != EOF){
-        if(strlen(buf) <= 1) continue;        
+        if(strlen(buf) <= 1) continue;
         sscanf(&buf[1], "%x", &ind);
-        assert(ind < NA);     
+        assert(ind < NA);
         int rx = (int)round(x);
         assert(x - rx <= EPS);
         if(rx > 0){
@@ -81,11 +81,11 @@ int main(int argc, char *argv[]){
             int lbl = a_l[ind];
             Arc a(u, v, lbl);
             flow[a] = rx;
-        }      
+        }
     }
-    
+
     ArcflowSol sol(flow, S, T, inst.binary);
-    sol.print_solution(inst, print_inst, true);               
+    sol.print_solution(inst, print_inst, true);
     return 0;
 }
 
