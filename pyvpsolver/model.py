@@ -65,7 +65,7 @@ def transform_lincomb(left, sign, right):
             if type(x) not in [float, int]:
                 add_entry(x, -1)
             else:
-                rhs -= x
+                rhs += x
 
     return (lincomb, sign, rhs)
 
