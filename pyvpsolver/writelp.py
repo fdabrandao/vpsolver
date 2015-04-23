@@ -41,10 +41,16 @@ from model import *
 def lincomb2str(lincomb):
     expr = ""
     for var, coef in lincomb:
-        if coef >= 0:
-            expr += " + %g %s" % (coef, var)
-        elif coef < 0:
-            expr += " - %g %s" % (abs(coef), var) 
+        if abs(coef) != 1:
+            if coef >= 0:
+                expr += " + %g %s" % (coef, var)
+            elif coef < 0:
+                expr += " - %g %s" % (abs(coef), var)
+        else:
+            if coef >= 0:
+                expr += " + %s" % (var)
+            elif coef < 0:
+                expr += " - %s" % (var)
     return expr
 
 def write_lp(model, filename):                   
@@ -68,7 +74,7 @@ def write_lp(model, filename):
         
     # demand constraints        
         
-    for name in sorted(model.cons):    
+    for name in model.cons_list:    
         lincomb, sign, rhs = model.cons[name]
         if sign in [">","<"]:
             sign += "="
@@ -77,7 +83,7 @@ def write_lp(model, filename):
     ### bounds
 
     bounds = []
-    for name in sorted(model.vars):
+    for name in model.vars_list:
         lb = model.vars[name].get('lb', None)
         ub = model.vars[name].get('ub', None)   
         if lb != None or ub != None:
@@ -89,11 +95,11 @@ def write_lp(model, filename):
         print >>f, "Bounds"                
         for name, lb, ub in bounds:
             if lb != None and ub != None:
-                print >>f, "\t%f <= %s <= %f" % (lb, name, ub)
+                print >>f, "\t%g <= %s <= %g" % (lb, name, ub)
             elif lb != None:
-                print >>f, "\t%f <= %s" % (lb, name)
+                print >>f, "\t%g <= %s" % (lb, name)
             elif ub != None:
-                print >>f, "\t%s <= %f" % (name, ub)                        
+                print >>f, "\t%s <= %g" % (name, ub)                        
     
     ### free variables
     

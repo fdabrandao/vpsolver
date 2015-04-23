@@ -73,6 +73,8 @@ class Model:
     def __init__(self):
         self.vars = {}
         self.cons = {}
+        self.vars_list = []
+        self.cons_list = []
         self.obj = []
         self.objdir = "min"
 
@@ -99,8 +101,9 @@ class Model:
         assert lb != inf and ub != -inf
         if lb == -inf: lb = None
         if ub == inf: ub = None
-        assert name not in self.vars
+        assert name not in self.vars        
         assert vtype in ["C", "I"]
+        self.vars_list.append(name)
         self.vars[name] = {}
         self.vars[name]["lb"] = lb
         self.vars[name]["ub"] = ub
@@ -120,6 +123,7 @@ class Model:
             assert var in self.vars
             assert coef != inf and coef != -inf
         assert name not in self.cons
+        self.cons_list.append(name)
         self.cons[name] = (lincomb, sign, rhs)
 
     def writeLP(self, lp_file):

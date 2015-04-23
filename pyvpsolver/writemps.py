@@ -51,7 +51,7 @@ def write_mps(model, filename):
     print >>f, "ROWS"        
     print >>f, mps_row([(1, "N"), (2, "OBJ")])
     
-    for cname in sorted(model.cons):    
+    for cname in model.cons_list:    
         lincomb, sign, rhs = model.cons[cname]
         if sign[0] == ">":
             s = "G"
@@ -66,13 +66,13 @@ def write_mps(model, filename):
     columns = {var:[] for var in model.vars}
     for var, coef in model.obj:
         columns[var].append(("OBJ", coef))
-    for cname in sorted(model.cons):    
+    for cname in model.cons_list: 
         lincomb, sign, rhs = model.cons[cname]
         for var, coef in lincomb:
             columns[var].append((cname, coef))                               
     
-    Ivars = [v for v in sorted(model.vars) if model.vars[v]["vtype"]=="I"]
-    Cvars = [v for v in sorted(model.vars) if model.vars[v]["vtype"]!="I"]
+    Ivars = [v for v in model.vars_list if model.vars[v]["vtype"]=="I"]
+    Cvars = [v for v in model.vars_list if model.vars[v]["vtype"]!="I"]
     
     if len(Ivars) != 0:
         print >>f, "COLUMNS"
@@ -96,7 +96,7 @@ def write_mps(model, filename):
     ### right-hand-side vector
     
     print >>f, "RHS"
-    for cname in sorted(model.cons):    
+    for cname in model.cons_list:
         lincomb, sign, rhs = model.cons[cname]
         print >>f, mps_row([(2, "RHS1"), (3, cname), (4, rhs)])
 
@@ -104,7 +104,7 @@ def write_mps(model, filename):
     
     print >>f, "BOUNDS"
    
-    for vname in sorted(model.vars):
+    for vname in model.vars_list:
         lb = model.vars[vname]["lb"]
         ub = model.vars[vname]["ub"]
         if lb!=None:
