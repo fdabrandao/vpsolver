@@ -258,5 +258,3 @@ def print_solution_vbp(obj, sol, f=sys.stdout):
     print >>f, "Solution:"
     for mult, patt in sol:
         print >>f, "%d x [%s]" % (mult, ", ".join(["i=%d" % (it+1) for it in patt]))
-
-

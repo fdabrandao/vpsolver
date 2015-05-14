@@ -44,10 +44,10 @@ class AFGraph:
 
     def vname(self, u, v, i, vnames=None):
         if vnames == None: vnames = self.names
-        #return "F_%s_%s_%s" % (u,v,i)
         if (u,v,i) in vnames:
             return vnames[u,v,i]
         vnames[u,v,i] = "F%x" % len(vnames)
+        #vnames[u,v,i] = "F_%s_%s_%s" % (u,v,i)
         return vnames[u,v,i]
 
     def getFlowCons(self, vnames=None):
@@ -63,9 +63,13 @@ class AFGraph:
         cons = []
         for u in self.V:
             if Ain[u] != [] and Aout[u] != []:
-                lincomb = [(var, 1) for var in Ain[u]]
-                lincomb += [(var, -1) for var in Aout[u]]
-                cons.append((lincomb,"=",0))
+                lincomb = []
+                if u in Ain:
+                    lincomb += [(var, 1) for var in Ain[u]]
+                if u in Aout:
+                    lincomb += [(var, -1) for var in Aout[u]]
+                if lincomb != []:
+                    cons.append((lincomb,"=",0))
         return varl, cons
 
     def getAssocs(self, vnames=None):
@@ -74,6 +78,20 @@ class AFGraph:
             if i not in assocs: assocs[i] = []
             name = self.vname(u,v,i,vnames)
             assocs[i].append(name)
+        return assocs
+
+    def getAssocsMulti(self, vnames=None):
+        assocs = {}
+        for (u,v,l) in self.A:
+            if type(l) != list and type(l) != tuple:
+                lst = [l]
+            else:
+                lst = l
+            name = self.vname(u,v,l,vnames)
+            for i in set(lst):
+                if i not in assocs: assocs[i] = []
+                coef = lst.count(i)
+                assocs[i].append((name,coef))
         return assocs
 
     def set_flow(self, varvalues):
@@ -256,4 +274,3 @@ class AFGUtils:
 
         g.draw(svg_file, format="svg", prog="dot")
         print "SVG file '%s' generated!" % svg_file
-
