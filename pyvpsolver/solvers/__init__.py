@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
@@ -19,31 +18,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import sys, os
-sdir = os.path.dirname(__file__)
-if sdir != '': os.chdir(sdir)
 
-""" Add VPSolver folders to path """
-
-#add vpsolver folder to sys.path
-sys.path.insert(0, "../")
-
-#add vpsolver/bin folder to path
-os.environ["PATH"] = "../bin"+":"+os.environ["PATH"]
-
-#add vpsolver/scripts folder to path
-os.environ["PATH"] = "../scripts"+":"+os.environ["PATH"]
-
-""" Vector Packing Example """
-
-from pyvpsolver import *
-
-W = (5180, 2)
-w = [(1120,1), (1250,1), (520,1), (1066,1), (1000,1), (1150,1)]
-b = [9, 5, 91, 18, 11, 64]
-
-#solve
-obj, sol = solvers.vbp.solve(W, w, b, svg_file="tmp/graph_vbp.svg", verbose=False, script="vpsolver_gurobi.sh")
-print "obj:", obj
-print "sol:", sol
-solvers.vbp.print_solution(obj, sol)
+import mvbp
+import vbp

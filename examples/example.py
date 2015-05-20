@@ -75,5 +75,4 @@ print "Objective:", obj
 print "Solution:", patterns
 
 ## pretty print for solutions ##
-print_solution_vbp(obj, patterns)
-
+solvers.vbp.print_solution(obj, patterns)

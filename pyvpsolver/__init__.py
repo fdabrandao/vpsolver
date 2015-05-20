@@ -24,7 +24,5 @@ import shutil
 import tempfile
 from model import *
 from afgutils import *
-from solve import *
-
-
-
+from vpsolver import *
+import solvers

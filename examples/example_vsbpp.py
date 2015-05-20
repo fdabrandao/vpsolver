@@ -55,7 +55,7 @@ ws = [[[10]], [[14]], [[17]], [[19]], [[24]], [[29]], [[32]], [[33]], [[36]],
       [[79]], [[83]], [[92]], [[95]], [[99]]]
 b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
 
-obj, sol = solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="tmp/graph_vsbpp.svg", verbose=True, script="vpsolver_glpk.sh")
+obj, sol = solvers.mvbp.solve(Ws, Cs, Qs, ws, b, svg_file="tmp/graph_vsbpp.svg", verbose=True, script="vpsolver_glpk.sh")
 print "obj:", obj
 print "sol:", sol
-print_solution_mvbp(obj, sol)
+solvers.mvbp.print_solution(obj, sol)

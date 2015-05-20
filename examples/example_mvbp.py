@@ -63,10 +63,10 @@ b = [b1, b2, b3]
 ws = [ws1, ws2, ws3]
 
 #solve Example 1
-obj, sol = solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="tmp/graphA_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
+obj, sol = solvers.mvbp.solve(Ws, Cs, Qs, ws, b, svg_file="tmp/graphA_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
 print "obj:", obj
 print "sol:", sol
-print_solution_mvbp(obj, sol)
+solvers.mvbp.print_solution(obj, sol)
 
 ## Example 2
 #bins
@@ -82,8 +82,7 @@ b = [b1, b2]
 ws = [ws1, ws2]
 
 #solve Example 2
-obj, sol = solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="tmp/graphB_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
+obj, sol = solvers.mvbp.solve(Ws, Cs, Qs, ws, b, svg_file="tmp/graphB_mvbp.svg", verbose=True, script="vpsolver_gurobi.sh")
 print "obj:", obj
 print "sol:", sol
-print_solution_mvbp(obj, sol)
-
+solvers.mvbp.print_solution(obj, sol)
