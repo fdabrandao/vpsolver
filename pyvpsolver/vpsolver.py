@@ -26,8 +26,7 @@ import atexit
 import shutil
 import tempfile
 import subprocess
-from model import *
-from afgutils import *
+from . import *
 
 class VBP:
     def __init__(self, W, w, b, verbose=None):
@@ -332,4 +331,3 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGHUP, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
-

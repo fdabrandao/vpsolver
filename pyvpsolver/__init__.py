@@ -23,6 +23,6 @@ import os
 import shutil
 import tempfile
 from model import *
-from afgutils import *
+from afgraph import *
 from vpsolver import *
 import solvers
