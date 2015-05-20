@@ -36,8 +36,6 @@ General
 End
 """
 
-from model import *
-
 def lincomb2str(lincomb):
     expr = ""
     for var, coef in lincomb:
@@ -72,8 +70,6 @@ def write_lp(model, filename):
 
     print >>f, "Subject To"
 
-    # demand constraints
-
     for name in model.cons_list:
         lincomb, sign, rhs = model.cons[name]
         if sign in [">","<"]:
@@ -101,7 +97,7 @@ def write_lp(model, filename):
             elif ub != None:
                 print >>f, "\t%s <= %g" % (name, ub)
 
-    ### free variables
+    ### integer variables
 
     print >>f, "General"
     for name in sorted(model.vars):
@@ -111,5 +107,3 @@ def write_lp(model, filename):
     print >>f, "End"
 
     f.close()
-
-

@@ -49,7 +49,7 @@ inf = float('inf')
 
 Ws = [[100], [120], [150]] # capacities
 Cs = [100, 120, 150] # costs
-Qs = [inf, 1, 30] # number of bins available of each type (note: the model may become infeasible)
+Qs = [inf, inf, inf] # number of bins available of each type (note: the model may become infeasible)
 ws = [[[10]], [[14]], [[17]], [[19]], [[24]], [[29]], [[32]], [[33]], [[36]],
       [[38]], [[40]], [[50]], [[54]], [[55]], [[63]], [[66]], [[71]], [[77]],
       [[79]], [[83]], [[92]], [[95]], [[99]]]
@@ -59,4 +59,3 @@ obj, sol = solve_mvbp(Ws, Cs, Qs, ws, b, svg_file="tmp/graph_vsbpp.svg", verbose
 print "obj:", obj
 print "sol:", sol
 print_solution_mvbp(obj, sol)
-
