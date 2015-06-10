@@ -32,7 +32,8 @@ def glpk_mod2mps(fname_mod, fname_mps):
 
 class ParseAMPL:
     def __init__(self, mod_in, mod_out = None, pyvars={}):
-        FLOW = CmdFlow()
+        FLOW = CmdFlow("I")
+        FLOW_LP = CmdFlow("C")
         LOAD_VBP = CmdLoadVBP()
         pyvars['FLOW'] = FLOW
         pyvars['LOAD_VBP'] = LOAD_VBP
@@ -44,7 +45,7 @@ class ParseAMPL:
         result = text[:]
         for match in rgx.finditer(text):
             comment, call, args1, args2 = match.groups()[:-1]
-            assert call in ['LOAD_VBP', 'FLOW', 'PY']
+            assert call in ['LOAD_VBP', 'FLOW', 'FLOW_LP', 'PY']
             strmatch = text[match.start():match.end()]
             if comment != None:
                 result = result.replace(strmatch, '/*IGNORED:'+strmatch.strip('/**/')+'*/')
@@ -69,6 +70,12 @@ class ParseAMPL:
                 assert args1 != None
                 zvar = args1.strip("[]'\"")
                 call = 'FLOW[\''+zvar+'\']('+args2+')'
+                res = eval(call)
+                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
+            elif call == 'FLOW_LP':
+                assert args1 != None
+                zvar = args1.strip("[]'\"")
+                call = 'FLOW_LP[\''+zvar+'\']('+args2+')'
                 res = eval(call)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
             else:

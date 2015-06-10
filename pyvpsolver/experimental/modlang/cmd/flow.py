@@ -41,10 +41,11 @@ def lincomb2str(lincomb):
     return expr
 
 class CmdFlow:
-    def __init__(self):
+    def __init__(self, vtype="I"):
         self.zvars = []
         self.graphs = []
         self.prefixes = []
+        self.vtype = vtype
 
     def parse_var_range(self, exp, m):
         match = re.match("("+rgx_varname+"){(\d+)?..(\d+)?}", exp)
@@ -63,6 +64,8 @@ class CmdFlow:
         match = re.match("("+rgx_varname+")(.*)", zvar)
         zvar, ztype = match.groups()
         ztype = ztype.replace(',','')
+        #print '>>>', ztype
+        #assert False
 
         if type(args[0]) in [list, tuple]:
             W, w, b, bounds = list(args)+[None]*(4-len(args))
@@ -131,7 +134,7 @@ class CmdFlow:
 
         model = Model()
         for var in varl:
-            model.addVar(name=var, lb=0, ub=ub.get(var,None), vtype="I")
+            model.addVar(name=var, lb=0, ub=ub.get(var,None), vtype=self.vtype)
         for lincomb, sign, rhs in cons:
             model.addCons(lincomb, sign, rhs)
 
