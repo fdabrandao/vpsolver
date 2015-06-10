@@ -22,22 +22,4 @@ Subject To
  demand(4): - x(4) + Z0 <= -0
  demand(5): - x(5) + Z0 <= -0
 
-Generals
- _Z_F1
- _Z_F2
- _Z_F3
- _Z_F4
- _Z_F5
- _Z_F6
- _Z_F7
- _Z_F8
- _Z_F9
- _Z_Fa
- _Z_Fb
- _Z_Fc
- _Z_Fd
- _Z_Fe
- Z
- Z0
-
 End

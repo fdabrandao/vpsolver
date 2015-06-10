@@ -13,4 +13,4 @@ print
 print 'varvalues:', [(k,v) for k,v in sorted(varvalues.items())]
 print
 
-os.system("glpsol --math " + ampl.model_file() + " --nomip")
+os.system("glpsol --math " + ampl.model_file())
