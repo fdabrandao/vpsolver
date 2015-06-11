@@ -1,4 +1,4 @@
-$LOAD_VBP[instance1]{"instance.vbp"};
+$LOAD_VBP[instance1]{"instance.vbp",1};
 
 set I := 1..instance1_m;
 var x{I}, >= 0;

@@ -27,17 +27,21 @@ class CmdLoadVBP:
         self.data = ""
 
     def __getitem__(self, name):
-        return lambda fname: self.evalcmd(name, fname)
+        return lambda *args: self.evalcmd(name, args)
 
-    def evalcmd(self, name, fname):
+    def evalcmd(self, name, args):
+        assert 1 <= len(args) <= 3
+        fname = args[0]
+        i0 = args[1] if len(args) > 1 else 1
+        d0 = args[2] if len(args) > 2 else 1
         instance = VBP.fromFile(fname, verbose=False)
 
         self.defs += "#BEGIN_DEFS: %s\n" % name
         self.defs += "param %s_m := %d;\n" % (name, instance.m)
         self.defs += "param %s_n := %d;\n" % (name, sum(instance.b))
         self.defs += "param %s_p := %d;\n" % (name, instance.ndims)
-        self.defs += "set %s_I := 1..%s_m;\n" % (name, name)
-        self.defs += "set %s_D := 1..%s_p;\n" % (name, name)
+        self.defs += "set %s_I := %d..%s_m;\n" % (name, i0, name)
+        self.defs += "set %s_D := %d..%s_p;\n" % (name, d0, name)
         self.defs += "param %s_W{%s_D};\n" % (name, name)
         self.defs += "param %s_b{%s_I};\n" % (name, name)
         self.defs += "param %s_w{%s_I,%s_D};\n" % (name, name, name)
@@ -47,18 +51,18 @@ class CmdLoadVBP:
         self.data += "param %s_W default 0 := " % name
         for i in xrange(instance.ndims):
             if instance.W[i] != 0:
-                self.data += "[%d]%d" % (i+1, instance.W[i])
+                self.data += "[%d]%d" % (i0+i, instance.W[i])
         self.data += ";\n"
         self.data += "param %s_b default 0 := " % name
         for i in xrange(instance.m):
             if instance.b[i] != 0:
-                self.data += "[%d]%d" % (i+1, instance.b[i])
+                self.data += "[%d]%d" % (i0+i, instance.b[i])
         self.data += ";\n"
         self.data += "param %s_w default 0 := " % name
         for i in xrange(instance.m):
             for d in xrange(instance.ndims):
                 if instance.w[i][d] != 0:
-                    self.data += "[%d,%d]%d" % (i+1, d+1, instance.w[i][d])
+                    self.data += "[%d,%d]%d" % (i0+i, d0+d, instance.w[i][d])
         self.data += ";\n"
         self.data += "#END_DATA: %s\n" % name
 

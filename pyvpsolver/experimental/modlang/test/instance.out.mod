@@ -8,7 +8,7 @@ param instance1_W{instance1_D};
 param instance1_b{instance1_I};
 param instance1_w{instance1_I,instance1_D};
 #END_DEFS: instance1
-/*EVALUATED:$LOAD_VBP[instance1]{"instance.vbp"};*/
+/*EVALUATED:$LOAD_VBP[instance1]{"instance.vbp",1};*/
 
 set I := 1..instance1_m;
 var x{I}, >= 0;

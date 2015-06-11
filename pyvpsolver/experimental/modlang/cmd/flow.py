@@ -64,8 +64,6 @@ class CmdFlow:
         match = re.match("("+rgx_varname+")(.*)", zvar)
         zvar, ztype = match.groups()
         ztype = ztype.replace(',','')
-        #print '>>>', ztype
-        #assert False
 
         if type(args[0]) in [list, tuple]:
             W, w, b, bounds = list(args)+[None]*(4-len(args))
