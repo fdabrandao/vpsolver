@@ -1,4 +1,4 @@
-\* Problem: 4 *\
+\* Problem: 5 *\
 
 Minimize
  obj: + Z
@@ -770,7 +770,6 @@ Subject To
  demand(49): + x(49) >= 1
  demand(50): + x(50) >= 1
  demand(51): + x(51) >= 1
- cenas: + y(1,1) >= 10
 
 Generals
  _Z_F4a9

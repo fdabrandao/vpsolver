@@ -48,9 +48,14 @@ class CmdFlow:
         self.vtype = vtype
 
     def parse_var_range(self, exp, m):
-        match = re.match("("+rgx_varname+"){(\d+)?..(\d+)?}", exp)
-        assert match != None
-        vname, x, y = match.groups()
+        if '{' in exp:
+            match = re.match("("+rgx_varname+"){(\d+)?..(\d+)?}", exp)
+            assert match != None
+            vname, x, y = match.groups()
+        else:
+            match = re.match("("+rgx_varname+")", exp)
+            vname = match.groups()[0]
+            x, y = None, None
         assert x != None or x == y == None
         if x == None: x, y = 1, m
         elif y == None: x, y = int(x), int(x)+m-1
@@ -65,11 +70,8 @@ class CmdFlow:
         zvar, ztype = match.groups()
         ztype = ztype.replace(',','')
 
-        if type(args[0]) in [list, tuple]:
+        if type(args[0]) in [list, tuple, dict]:
             W, w, b, bounds = list(args)+[None]*(4-len(args))
-            if type(b) == str:
-                b = self.parse_var_range(b, len(w))
-                assert len(b) == len(w)
         else:
             fname, b, bounds = list(args)+[None]*(3-len(args))
             if type(fname) == str:
@@ -81,9 +83,25 @@ class CmdFlow:
             if b == None:
                 b = instance.b
                 bounds = instance.b
-            elif type(b) == str:
-                b = self.parse_var_range(b, instance.m)
-                assert len(b) == len(w)
+
+        if type(W) == dict:
+            W = [W[k] for k in sorted(W)]
+        if type(w) == dict:
+            i0 = min(i for i,d in w)
+            d0 = min(d for i,d in w)
+            m = max(i for i,d in w)-i0+1
+            p = max(d for i,d in w)-d0+1
+            ww = [None]*m
+            for i in xrange(m):
+                ww[i] = [w[i0+i,d0+d] for d in xrange(p)]
+            w = ww
+        if type(b) == dict:
+            b = [b[k] for k in sorted(b)]
+        if type(bounds) == dict:
+            bounds = [bounds[k] for k in sorted(bounds)]
+        if type(b) == str:
+            b = self.parse_var_range(b, len(w))
+            assert len(b) == len(w)
 
         graph, model, excluded_vars = self.generate_model(zvar, W, w, b, bounds, noobj=True)
         prefix = "_"+zvar+"_"
