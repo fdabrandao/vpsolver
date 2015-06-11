@@ -2,8 +2,8 @@
 param instance1_m := 51;
 param instance1_n := 51;
 param instance1_p := 20;
-set instance1_I := 1..instance1_m;
-set instance1_D := 1..instance1_p;
+set instance1_I := 1..51;
+set instance1_D := 1..20;
 param instance1_W{instance1_D};
 param instance1_b{instance1_I};
 param instance1_w{instance1_I,instance1_D};
@@ -22,9 +22,13 @@ var x{I}, >= 0;
 minimize obj: Z;
 s.t. demand{i in I}: x[i] >= instance1_b[i];
 
+var y{I,I}, >= 0;
+s.t. cenas: y[1,1] >= 10;
+
 solve;
 display Z;
 display x;
+display y;
 data;
 #BEGIN_DATA: instance1
 param instance1_W default 0 := [1]100[2]100[3]100[4]100[5]100[6]100[7]100[8]100[9]100[10]100[11]100[12]100[13]100[14]100[15]100[16]100[17]100[18]100[19]100[20]100;

@@ -12,7 +12,11 @@ $FLOW[Z]{
 minimize obj: Z;
 s.t. demand{i in I}: x[i] >= instance1_b[i];
 
+var y{I,I}, >= 0;
+s.t. cenas: y[1,1] >= 10;
+
 solve;
 display Z;
 display x;
+display y;
 end;

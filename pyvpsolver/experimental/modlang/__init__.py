@@ -34,7 +34,7 @@ class ParseAMPL:
     def __init__(self, mod_in, mod_out = None, pyvars={}):
         FLOW = CmdFlow("I")
         FLOW_LP = CmdFlow("C")
-        LOAD_VBP = CmdLoadVBP()
+        LOAD_VBP = CmdLoadVBP(pyvars)
         pyvars['FLOW'] = FLOW
         pyvars['FLOW_LP'] = FLOW_LP
         pyvars['LOAD_VBP'] = LOAD_VBP
@@ -66,8 +66,7 @@ class ParseAMPL:
                 assert args1 != None
                 varname = args1.strip("[]'\"")
                 call = 'LOAD_VBP[\''+varname+'\']('+args2+')'
-                print varname, '\n'*10
-                exec(varname + ' = ' + call, globals(), pyvars)
+                exec(call, globals(), pyvars)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             elif call == 'FLOW':
                 assert args1 != None
