@@ -160,23 +160,6 @@ class CmdFlow:
             for k in vv:
                 del newvv[prefix+k]
             graph.set_flow(vv)
-            """
-            V, A = graph.V, graph.A
-            f = graph.flow
-            adj = {u:[] for u in V}
-            for (u,v,i) in A:
-                if f.get((u,v,i), 0) > 0:
-                    lbl = graph.labels.get((u,v,i),[])
-                    adj[u].append((v,lbl))
-            lst = set()
-            def dfs(u, pattern=[]):
-                if u == graph.T:
-                    lst.add(tuple(sorted(pattern)))
-                for v, it in adj[u]:
-                    dfs(v,pattern+it)
-            dfs(graph.S)
-            lst_sol.append((zvar, varvalues.get(zvar,0), [(1,x) for x in lst]))
-            """
             sol = graph.extract_solution(graph.S, '<-', graph.T)
             lst_sol.append((zvar, varvalues.get(zvar,0), sol))
             if verbose:

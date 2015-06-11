@@ -10,6 +10,7 @@ glpk_mod2lp(ampl.model_file(), "equivknapsack.lp")
 out, varvalues = VPSolver.script_wsol("vpsolver_gurobi.sh", "equivknapsack.lp", verbose=True)
 sol, varvalues = ampl.FLOW.extract(varvalues, verbose=True)
 print
+print 'sol:', sol
 print 'varvalues:', [(k,v) for k,v in sorted(varvalues.items())]
 print
 
