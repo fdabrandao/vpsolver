@@ -4,10 +4,10 @@ sys.path.insert(0, "../../../../")
 
 from pyvpsolver.experimental.modlang import *
 
-ampl = ParseAMPL("equivknapsack.mod")
-ampl.writeMOD("equivknapsack.out.mod")
-glpk_mod2lp(ampl.model_file(), "equivknapsack.lp")
-out, varvalues = VPSolver.script_wsol("vpsolver_gurobi.sh", "equivknapsack.lp", verbose=True)
+ampl = ParseAMPL("instance.mod")
+ampl.writeMOD("instance.out.mod")
+glpk_mod2lp(ampl.model_file(), "instance.lp")
+out, varvalues = VPSolver.script_wsol("vpsolver_gurobi.sh", "instance.lp", verbose=True)
 sol, varvalues = ampl.FLOW.extract(varvalues, verbose=True)
 print
 print 'sol:', sol

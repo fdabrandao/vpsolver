@@ -36,6 +36,7 @@ class ParseAMPL:
         FLOW_LP = CmdFlow("C")
         LOAD_VBP = CmdLoadVBP()
         pyvars['FLOW'] = FLOW
+        pyvars['FLOW_LP'] = FLOW_LP
         pyvars['LOAD_VBP'] = LOAD_VBP
         self.FLOW = FLOW
         self.LOAD_VBP = LOAD_VBP
@@ -46,6 +47,7 @@ class ParseAMPL:
         for match in rgx.finditer(text):
             comment, call, args1, args2 = match.groups()[:-1]
             assert call in ['LOAD_VBP', 'FLOW', 'FLOW_LP', 'PY']
+            print '>>>', call
             strmatch = text[match.start():match.end()]
             if comment != None:
                 result = result.replace(strmatch, '/*IGNORED:'+strmatch.strip('/**/')+'*/')
@@ -64,19 +66,20 @@ class ParseAMPL:
                 assert args1 != None
                 varname = args1.strip("[]'\"")
                 call = 'LOAD_VBP[\''+varname+'\']('+args2+')'
+                print varname, '\n'*10
                 exec(varname + ' = ' + call, globals(), pyvars)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             elif call == 'FLOW':
                 assert args1 != None
                 zvar = args1.strip("[]'\"")
                 call = 'FLOW[\''+zvar+'\']('+args2+')'
-                res = eval(call)
+                res = eval(call, globals(), pyvars)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
             elif call == 'FLOW_LP':
                 assert args1 != None
                 zvar = args1.strip("[]'\"")
                 call = 'FLOW_LP[\''+zvar+'\']('+args2+')'
-                res = eval(call)
+                res = eval(call, globals(), pyvars)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
             else:
                 print "Invalid syntax:", strmatch
