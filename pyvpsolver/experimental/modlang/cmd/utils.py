@@ -19,7 +19,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from data import *
-from flow import *
-from graph import *
-from loadvbp import *
+from .... import *
+
+def ampl_set(name, values):
+    defs = "set %s := {" % name
+    first = True
+    for x in values:
+        if type(x) == str: x = "'%s'"%x
+        if first: defs += "%s" % str(x)
+        else: defs += ",%s" % str(x)
+        first = False
+    defs += "};\n"
+    return defs, ""

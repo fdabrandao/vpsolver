@@ -32,10 +32,12 @@ def glpk_mod2mps(fname_mod, fname_mps):
 
 class ParseAMPL:
     def __init__(self, mod_in, mod_out = None, pyvars={}):
+        SET = CmdSet()
         FLOW = CmdFlow("I")
         FLOW_LP = CmdFlow("C")
         LOAD_VBP = CmdLoadVBP(pyvars)
         GRAPH = CmdGraph()
+        pyvars['SET'] = SET
         pyvars['FLOW'] = FLOW
         pyvars['FLOW_LP'] = FLOW_LP
         pyvars['GRAPH'] = GRAPH
@@ -48,7 +50,7 @@ class ParseAMPL:
         result = text[:]
         for match in rgx.finditer(text):
             comment, call, args1, args2 = match.groups()[:-1]
-            assert call in ['LOAD_VBP', 'FLOW', 'FLOW_LP', 'GRAPH', 'PY']
+            assert call in ['SET', 'LOAD_VBP', 'FLOW', 'FLOW_LP', 'GRAPH', 'PY']
             print '>>>', call
             strmatch = text[match.start():match.end()]
             if comment != None:
@@ -68,6 +70,12 @@ class ParseAMPL:
                 assert args1 != None
                 varname = args1.strip("[]'\"")
                 call = 'LOAD_VBP[\''+varname+'\']('+args2+')'
+                exec(call, globals(), pyvars)
+                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
+            elif call == 'SET':
+                assert args1 != None
+                name = args1.strip("[]'\"")
+                call = 'SET[\''+name+'\']('+args2+')'
                 exec(call, globals(), pyvars)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             elif call == 'FLOW':
@@ -92,7 +100,7 @@ class ParseAMPL:
                 print "Invalid syntax:", strmatch
                 assert False
 
-        defs = LOAD_VBP.defs + GRAPH.defs
+        defs = LOAD_VBP.defs + SET.defs + GRAPH.defs
         data = LOAD_VBP.data
         self.result = defs + result
         data_stmt = re.search("data\s*;", self.result, re.DOTALL)

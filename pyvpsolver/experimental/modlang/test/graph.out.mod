@@ -1,6 +1,9 @@
+#BEGIN_DEFS: XPTO
+set XPTO := {1,2,3,-1};
+#END_DEFS: XPTO
 #BEGIN_DEFS: (V,A)
-set V := {1,2,3,4,5,6,7,8,9,10,11,'T','S'};
-set A := {(1,'T','LOSS'),(6,7,'LOSS'),(9,10,'LOSS'),(9,'T','LOSS'),(8,'T','LOSS'),(4,'T','LOSS'),(2,3,'LOSS'),(3,'T','LOSS'),(5,'T','LOSS'),('S',3,2),(1,2,'LOSS'),('S',1,9),(11,'T','LOSS'),(10,'T','LOSS'),(7,'T','LOSS'),(6,'T','LOSS'),(8,10,5),(8,9,'LOSS'),(2,'T','LOSS'),('S',4,'LOSS'),(4,6,'LOSS'),(3,5,3),(7,9,6),(1,8,1),(8,10,6),(5,6,'LOSS'),(9,10,7),('S',4,3),(7,9,'LOSS'),('S',2,1),(10,11,8),(6,7,5),(2,8,2),(4,6,4),(5,8,4),(3,4,'LOSS')};
+set V := {1,2,3,4,5,6,7,8,9,10,11,'S','T'};
+set A := {(1, 'T', 'LOSS'),(10, 'T', 'LOSS'),(3, 'T', 'LOSS'),(2, 8, 2),('S', 3, 2),('S', 4, 3),(5, 6, 'LOSS'),(2, 'T', 'LOSS'),('S', 1, 9),(8, 'T', 'LOSS'),(6, 7, 5),(11, 'T', 'LOSS'),(4, 'T', 'LOSS'),(7, 'T', 'LOSS'),(6, 7, 'LOSS'),(9, 10, 'LOSS'),(4, 6, 'LOSS'),(3, 4, 'LOSS'),(2, 3, 'LOSS'),(9, 'T', 'LOSS'),(7, 9, 6),(7, 9, 'LOSS'),(5, 'T', 'LOSS'),(8, 10, 5),(6, 'T', 'LOSS'),(3, 5, 3),(1, 8, 1),('S', 2, 1),(8, 10, 6),(1, 2, 'LOSS'),('S', 4, 'LOSS'),(10, 11, 8),(8, 9, 'LOSS'),(4, 6, 4),(5, 8, 4),(9, 10, 7)};
 #END_DEFS: V,A
 /*EVALUATED:$PY{
 a, a0 = [65, 64, 41, 22, 13, 12, 8, 2], 80
@@ -17,6 +20,8 @@ W = [a0]+[1]*len(a)
 w = [[a[i]]+[1 if j == i else 0 for j in xrange(m)] for i in xrange(m)]
 labels = [i+1 for i in xrange(m)]
 };*/
+
+/*EVALUATED:$SET[XPTO]{[1,2,3,-1]};*/
 
 /*EVALUATED:$GRAPH[V,A]{
     W,
@@ -40,7 +45,6 @@ display{i in I} pi[i];
 display pi[0];
 display theta['T'];
 */
-
 
 set I := 1..9;
 var f{A} >= 0;

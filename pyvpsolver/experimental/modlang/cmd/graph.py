@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .... import *
+from utils import *
 import re
 
 class CmdGraph:
@@ -55,20 +56,8 @@ class CmdGraph:
         graph = self.generate_graph(W, w, labels, bounds)
 
         self.defs += "#BEGIN_DEFS: (%s,%s)\n" % (Vname, Aname)
-        self.defs += "set %s := {" % Vname
-        first = True
-        for u in graph.V:
-            if first: self.defs += "%s" % u
-            else: self.defs += ",%s" % u
-            first = False
-        self.defs += "};\n"
-        self.defs += "set %s := {" % Aname
-        first = True
-        for u,v,i in graph.A:
-            if first: self.defs += "(%s,%s,%s)" % (u,v,i)
-            else: self.defs += ",(%s,%s,%s)" % (u,v,i)
-            first = False
-        self.defs += "};\n"
+        self.defs += ampl_set(Vname, graph.V)[0]
+        self.defs += ampl_set(Aname, graph.A)[0]
         self.defs += "#END_DEFS: %s\n" % name
 
     def generate_graph(self, W, w, labels, bounds):
@@ -82,6 +71,5 @@ class CmdGraph:
 
         instance = VBP(W, w, b, verbose=False)
         graph = AFG(instance, verbose=False).graph()
-        graph.relabel(lambda u: u if type(u) != str else "'%s'"%u, lambda i: labels[i] if type(i)==int and i < m else "'LOSS'")
-
+        graph.relabel(lambda u: u if type(u) != str else "%s"%u, lambda i: labels[i] if type(i)==int and i < m else "LOSS")
         return graph

@@ -19,7 +19,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from data import *
-from flow import *
-from graph import *
-from loadvbp import *
+from .... import *
+from utils import *
+
+class CmdSet:
+    def __init__(self):
+        self.defs = ""
+        self.data = ""
+
+    def __getitem__(self, name):
+        return lambda *args: self.evalcmd(name, args)
+
+    def evalcmd(self, name, args):
+        assert len(args) == 1
+        values = args[0]
+        self.defs += "#BEGIN_DEFS: %s\n" % name
+        self.defs += ampl_set(name, values)[0]
+        self.defs += "#END_DEFS: %s\n" % name
