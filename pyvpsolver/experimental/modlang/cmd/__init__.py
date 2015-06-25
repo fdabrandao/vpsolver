@@ -20,4 +20,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from flow import *
+from graph import *
 from loadvbp import *

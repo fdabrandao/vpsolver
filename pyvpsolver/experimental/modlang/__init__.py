@@ -35,8 +35,10 @@ class ParseAMPL:
         FLOW = CmdFlow("I")
         FLOW_LP = CmdFlow("C")
         LOAD_VBP = CmdLoadVBP(pyvars)
+        GRAPH = CmdGraph()
         pyvars['FLOW'] = FLOW
         pyvars['FLOW_LP'] = FLOW_LP
+        pyvars['GRAPH'] = GRAPH
         pyvars['LOAD_VBP'] = LOAD_VBP
         self.FLOW = FLOW
         self.LOAD_VBP = LOAD_VBP
@@ -46,7 +48,7 @@ class ParseAMPL:
         result = text[:]
         for match in rgx.finditer(text):
             comment, call, args1, args2 = match.groups()[:-1]
-            assert call in ['LOAD_VBP', 'FLOW', 'FLOW_LP', 'PY']
+            assert call in ['LOAD_VBP', 'FLOW', 'FLOW_LP', 'GRAPH', 'PY']
             print '>>>', call
             strmatch = text[match.start():match.end()]
             if comment != None:
@@ -80,11 +82,18 @@ class ParseAMPL:
                 call = 'FLOW_LP[\''+zvar+'\']('+args2+')'
                 res = eval(call, globals(), pyvars)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
+            elif call == 'GRAPH':
+                assert args1 != None
+                set_names = args1.strip("[]'\"")
+                call = 'GRAPH[\''+set_names+'\']('+args2+')'
+                exec(call, globals(), pyvars)
+                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             else:
                 print "Invalid syntax:", strmatch
                 assert False
 
-        defs, data = LOAD_VBP.defs, LOAD_VBP.data
+        defs = LOAD_VBP.defs + GRAPH.defs
+        data = LOAD_VBP.data
         self.result = defs + result
         data_stmt = re.search("data\s*;", self.result, re.DOTALL)
         end_stmt = re.search("end\s*;", self.result, re.DOTALL)
