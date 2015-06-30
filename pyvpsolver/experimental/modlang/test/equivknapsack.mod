@@ -1,24 +1,26 @@
-set I := 1..5;
-var x{I}, >= 0;
-param c{I};
+$PARAM[m]{len(a)};
 
-$FLOW_LP[Z]{
-    (10, 1, 1, 1, 1, 1),
-    [(6, 1, 0, 0, 0, 0),
-     (5, 0, 1, 0, 0, 0),
-     (4, 0, 0, 1, 0, 0),
-     (4, 0, 0, 0, 1, 0),
-     (2, 0, 0, 0, 0, 1)],
-    'x{1..5}'
+set I := 1..m;
+var pi{{0} union I} >= 0;
+var theta{V} >= 0;
+
+$PY{
+m = len(a)
+W = [a0]+[1]*len(a)
+w = [[a[i]]+[1 if j == i else 0 for j in xrange(m)] for i in xrange(m)]
+b = [1 if w[i] <= W else 0 for i in xrange(m)]
+labels = [i+1 for i in xrange(m)]
 };
 
-var Z0, >= 0;
-maximize obj: Z0;
-s.t. flow: Z = 1+2*Z0;
-s.t. demand{i in I}: -x[i]+Z0 <= 0;
+$GRAPH[V,A]{W, w, labels, b};
+
+minimize obj: pi[0];
+s.t. gamma{(u,v,i) in A}: theta[v] >= theta[u]+(if i != 'LOSS' then pi[i] else 0);
+s.t. pi0: pi[0] = theta['T'];
+s.t. pisum: sum{i in I} pi[i] = 1+2*pi[0];
 
 solve;
-display Z0;
-display x;
-display {i in I} demand[i].dual;
-end;
+
+display{i in I} pi[i];
+display pi[0];
+display theta['T'];

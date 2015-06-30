@@ -24,11 +24,17 @@ from cmd import *
 import os
 import re
 
-def glpk_mod2lp(fname_mod, fname_lp):
-    os.system("glpsol --math " + fname_mod + " --check --wlp " + fname_lp + "| grep -v Generating")
+def glpk_mod2lp(fname_mod, fname_lp, verbose = False):
+    if verbose:
+        os.system("glpsol --math " + fname_mod + " --check --wlp " + fname_lp + "| grep -v Generating")
+    else:
+        os.system("glpsol --math " + fname_mod + " --check --wlp " + fname_lp + ">> /dev/null")
 
-def glpk_mod2mps(fname_mod, fname_mps):
-    os.system("glpsol --math " + fname_mod + " --check --wmps " + fname_mps + "| grep -v Generating")
+def glpk_mod2mps(fname_mod, fname_mps, verbose = False):
+    if verbose:
+        os.system("glpsol --math " + fname_mod + " --check --wmps " + fname_mps + "| grep -v Generating")
+    else:
+        os.system("glpsol --math " + fname_mod + " --check --wmps " + fname_mps + ">> /dev/null")
 
 class ParseAMPL:
     def __init__(self, mod_in, mod_out = None, pyvars={}):
@@ -53,7 +59,7 @@ class ParseAMPL:
         for match in rgx.finditer(text):
             comment, call, args1, args2 = match.groups()[:-1]
             assert call in ['SET', 'PARAM', 'LOAD_VBP', 'FLOW', 'FLOW_LP', 'GRAPH', 'PY']
-            print '>>>', call
+            #print '>>>', call
             strmatch = text[match.start():match.end()]
             if comment != None:
                 result = result.replace(strmatch, '/*IGNORED:'+strmatch.strip('/**/')+'*/')

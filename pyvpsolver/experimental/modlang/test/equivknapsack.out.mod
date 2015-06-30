@@ -1,27 +1,36 @@
-set I := 1..5;
-var x{I}, >= 0;
-param c{I};
+#BEGIN_DEFS
+param m := 7;
+set V := {1,2,3,4,5,6,7,8,9,10,'S','T'};
+set A := {(1,'T','LOSS'),(1,4,5),(3,'T','LOSS'),('S',6,7),(2,'T','LOSS'),(8,'T','LOSS'),(4,'T','LOSS'),(8,10,1),(2,3,3),(7,'T','LOSS'),(6,7,'LOSS'),(7,10,6),(7,8,'LOSS'),('S',1,4),(2,3,'LOSS'),(9,'T','LOSS'),(3,5,'LOSS'),(5,'T','LOSS'),(5,9,'LOSS'),(6,'T','LOSS'),('S',2,'LOSS'),(10,'T','LOSS'),(9,10,2),(4,5,'LOSS'),(1,2,'LOSS'),(5,9,1),(4,8,6),(8,9,'LOSS'),('S',2,5),(3,5,6),(6,10,3),(4,7,3)};
+#END_DEFS
+/*EVALUATED:$PARAM[m]{len(a)};*/
 
-/*EVALUATED:$FLOW_LP[Z]{
-    (10, 1, 1, 1, 1, 1),
-    [(6, 1, 0, 0, 0, 0),
-     (5, 0, 1, 0, 0, 0),
-     (4, 0, 0, 1, 0, 0),
-     (4, 0, 0, 0, 1, 0),
-     (2, 0, 0, 0, 0, 1)],
-    'x{1..5}'
-};*/var _Z_F1, >= 0;var _Z_F2, >= 0;var _Z_F3, >= 0;var _Z_F4, >= 0;var _Z_F5, >= 0;var _Z_F6, >= 0;var _Z_F7, >= 0;var _Z_F8, >= 0;var _Z_F9, >= 0;var _Z_Fa, >= 0;var _Z_Fb, >= 0;var _Z_Fc, >= 0;var _Z_Fd, >= 0;var _Z_Fe, >= 0;var Z, >= 0;s.t. _Z_RC0: + _Z_F3 + _Z_Fc - _Z_F5 - _Z_F8 - _Z_Fd = 0;s.t. _Z_RC1: + _Z_Fa + _Z_Fe - _Z_F1 - _Z_F4 - _Z_F7 - _Z_Fb = 0;s.t. _Z_RC2: + _Z_F1 + _Z_F8 + _Z_Fd - _Z_F6 - _Z_F9 = 0;s.t. _Z_RC3: + _Z_F4 + _Z_F7 + _Z_F9 - _Z_F2 = 0;s.t. _Z_RC4: + Z - _Z_F3 - _Z_Fa - _Z_Fc - _Z_Fe = 0;s.t. _Z_RC5: + _Z_F2 + _Z_F5 + _Z_F6 + _Z_Fb - Z = 0;s.t. _Z_RC6: + _Z_Fe - x[1] = 0;s.t. _Z_RC7: + _Z_Fa - x[2] = 0;s.t. _Z_RC8: + _Z_F3 + _Z_F7 - x[3] = 0;s.t. _Z_RC9: + _Z_F4 + _Z_Fd - x[4] = 0;s.t. _Z_RCa: + _Z_F9 - x[5] = 0;
+set I := 1..m;
+var pi{{0} union I} >= 0;
+var theta{V} >= 0;
 
-var Z0, >= 0;
-maximize obj: Z0;
-s.t. flow: Z = 1+2*Z0;
-s.t. demand{i in I}: -x[i]+Z0 <= 0;
+/*EVALUATED:$PY{
+m = len(a)
+W = [a0]+[1]*len(a)
+w = [[a[i]]+[1 if j == i else 0 for j in xrange(m)] for i in xrange(m)]
+b = [1 if w[i] <= W else 0 for i in xrange(m)]
+labels = [i+1 for i in xrange(m)]
+};*/
+
+/*EVALUATED:$GRAPH[V,A]{W, w, labels, b};*/
+
+minimize obj: pi[0];
+s.t. gamma{(u,v,i) in A}: theta[v] >= theta[u]+(if i != 'LOSS' then pi[i] else 0);
+s.t. pi0: pi[0] = theta['T'];
+s.t. pisum: sum{i in I} pi[i] = 1+2*pi[0];
 
 solve;
-display Z0;
-display x;
-display {i in I} demand[i].dual;
-data;
 
+display{i in I} pi[i];
+display pi[0];
+display theta['T'];
+data;
+#BEGIN_DATA
+#END_DATA
 end;
 

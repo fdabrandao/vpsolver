@@ -45,17 +45,22 @@ class CmdParam:
 
     def evalcmd(self, name, args):
         assert len(args) == 1
-        print name
-        match = re.match("\s*("+rgx_varname+")\s*({"+rgx_varname+"})?\s*", name)
-        assert match != None
-        name, index = match.groups()
+        values = args[0]
+        if type(values) in [list, dict]:
+            match = re.match("\s*("+rgx_varname+")\s*({"+rgx_varname+"})?\s*", name)
+            assert match != None
+            name, index = match.groups()
+        else:
+            match = re.match("\s*("+rgx_varname+")\s*", name)
+            assert match != None
+            name, index = match.group(0), None
         if index == None:
             index = name+"_I"
         else:
             index = index.strip('{} ')
         name = name.strip()
-        values = args[0]
-        if type(values) == list: values = list2dict(values)
+        if type(values) == list:
+            values = list2dict(values)
         if type(values) == dict:
             self.defs += ampl_set(index, values.keys())[0]
         pdefs, pdata = ampl_param(name, index, values)
