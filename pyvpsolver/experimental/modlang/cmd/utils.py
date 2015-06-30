@@ -67,5 +67,5 @@ def ampl_param(name, index, value):
         return defs, data
     else:
         if type(value) == str: value = "'%s'"%value
-        defs = "param %s = %s;\n" % (name, str(value))
+        defs = "param %s := %s;\n" % (name, str(value))
         return defs, ""
