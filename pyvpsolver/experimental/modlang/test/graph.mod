@@ -42,6 +42,20 @@ var f{A} >= 0;
 var Z;
 var Z0;
 
+$SET[stest1]{range(10)};
+$PARAM[ptest2]{{(i,'a',i):i for i in range(10)}};
+$PARAM[ptest3{indexset}]{range(10)};
+$PARAM[ptest4]{10};
+display indexset;
+
+set I1 := 1..2;
+set I2 := 1..2;
+set I3 := 1..2;
+set II := I1 cross I2 cross I3;
+display II;
+param coise{II} default 0;
+param coise2{(i,j,k) in II} := coise[i,j,k];
+
 maximize obj: Z0;
 s.t. flowcon{k in V diff {'S','T'}}: sum{(u,v,i) in A: v == k} f[u,v,i] - sum{(u,v,i) in A: u == k} f[u, v, i] = 0;
 s.t. conZ: sum{(u,v,i) in A: v == 'T'} f[u,v,i] = Z;

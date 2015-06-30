@@ -53,9 +53,9 @@ def ampl_set(name, values):
     defs += "};\n"
     return defs, ""
 
-def ampl_param(name, value):
+def ampl_param(name, index, value):
     if type(value) == dict:
-        defs = "param %s{%s_I};\n" % (name, name)
+        defs = "param %s{%s};\n" % (name, index)
         data = "param %s := " % name
         first = True
         for k in value:
