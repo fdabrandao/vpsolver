@@ -38,7 +38,7 @@ class CmdLoadVBP:
         instance = VBP.fromFile(fname, verbose=False)
 
         self.pyvars[name] = instance
-        self.defs += "#BEGIN_DEFS: %s\n" % name
+        self.defs += "#BEGIN_DEFS: Instance[%s]\n" % name
         self.defs += "param %s_m := %d;\n" % (name, instance.m)
         self.pyvars[name+"_m"] = instance.m
         self.defs += "param %s_n := %d;\n" % (name, sum(instance.b))
@@ -54,7 +54,7 @@ class CmdLoadVBP:
         self.defs += "param %s_w{%s_I,%s_D};\n" % (name, name, name)
         self.defs += "#END_DEFS: %s\n" % name
 
-        self.data += "#BEGIN_DATA: %s\n" % name
+        self.data += "#BEGIN_DATA: Intance[%s]\n" % name
         self.data += "param %s_W default 0 := " % name
         W = {}
         for i in xrange(instance.ndims):

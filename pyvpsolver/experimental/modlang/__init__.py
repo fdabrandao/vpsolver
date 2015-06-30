@@ -33,11 +33,13 @@ def glpk_mod2mps(fname_mod, fname_mps):
 class ParseAMPL:
     def __init__(self, mod_in, mod_out = None, pyvars={}):
         SET = CmdSet()
+        PARAM = CmdParam()
         FLOW = CmdFlow("I")
         FLOW_LP = CmdFlow("C")
         LOAD_VBP = CmdLoadVBP(pyvars)
         GRAPH = CmdGraph()
         pyvars['SET'] = SET
+        pyvars['PARAM'] = PARAM
         pyvars['FLOW'] = FLOW
         pyvars['FLOW_LP'] = FLOW_LP
         pyvars['GRAPH'] = GRAPH
@@ -50,7 +52,7 @@ class ParseAMPL:
         result = text[:]
         for match in rgx.finditer(text):
             comment, call, args1, args2 = match.groups()[:-1]
-            assert call in ['SET', 'LOAD_VBP', 'FLOW', 'FLOW_LP', 'GRAPH', 'PY']
+            assert call in ['SET', 'PARAM', 'LOAD_VBP', 'FLOW', 'FLOW_LP', 'GRAPH', 'PY']
             print '>>>', call
             strmatch = text[match.start():match.end()]
             if comment != None:
@@ -78,6 +80,12 @@ class ParseAMPL:
                 call = 'SET[\''+name+'\']('+args2+')'
                 exec(call, globals(), pyvars)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
+            elif call == 'PARAM':
+                assert args1 != None
+                name = args1.strip("[]'\"")
+                call = 'PARAM[\''+name+'\']('+args2+')'
+                exec(call, globals(), pyvars)
+                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             elif call == 'FLOW':
                 assert args1 != None
                 zvar = args1.strip("[]'\"")
@@ -100,8 +108,12 @@ class ParseAMPL:
                 print "Invalid syntax:", strmatch
                 assert False
 
-        defs = LOAD_VBP.defs + SET.defs + GRAPH.defs
-        data = LOAD_VBP.data
+        defs = "#BEGIN_DEFS\n"
+        defs += LOAD_VBP.defs + SET.defs + PARAM.defs + GRAPH.defs
+        defs += "#END_DEFS\n"
+        data = "#BEGIN_DATA\n"
+        data += LOAD_VBP.data + PARAM.data
+        data += "#END_DATA\n"
         self.result = defs + result
         data_stmt = re.search("data\s*;", self.result, re.DOTALL)
         end_stmt = re.search("end\s*;", self.result, re.DOTALL)

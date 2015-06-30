@@ -33,6 +33,25 @@ class CmdSet:
     def evalcmd(self, name, args):
         assert len(args) == 1
         values = args[0]
-        self.defs += "#BEGIN_DEFS: %s\n" % name
         self.defs += ampl_set(name, values)[0]
-        self.defs += "#END_DEFS: %s\n" % name
+
+class CmdParam:
+    def __init__(self):
+        self.defs = ""
+        self.data = ""
+
+    def __getitem__(self, name):
+        return lambda *args: self.evalcmd(name, args)
+
+    def evalcmd(self, name, args):
+        assert len(args) == 1
+        if '{' in name: name = name[:name.find('{')]
+        name = name.strip()
+        values = args[0]
+        if type(values) == list: values = list2dict(values)
+        if type(values) == dict:
+            self.defs += ampl_set(name+"_I", values.keys())[0]
+        print name, type(values)
+        pdefs, pdata = ampl_param(name, values)
+        self.defs += pdefs
+        self.data += pdata

@@ -55,10 +55,8 @@ class CmdGraph:
 
         graph = self.generate_graph(W, w, labels, bounds)
 
-        self.defs += "#BEGIN_DEFS: (%s,%s)\n" % (Vname, Aname)
         self.defs += ampl_set(Vname, graph.V)[0]
         self.defs += ampl_set(Aname, graph.A)[0]
-        self.defs += "#END_DEFS: %s\n" % name
 
     def generate_graph(self, W, w, labels, bounds):
         m = len(w)
