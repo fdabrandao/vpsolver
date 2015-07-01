@@ -47,21 +47,6 @@ class CmdFlow:
         self.prefixes = []
         self.vtype = vtype
 
-    def parse_var_range(self, exp, m):
-        if '{' in exp:
-            match = re.match("("+rgx_varname+"){(\d+)?..(\d+)?}", exp)
-            assert match != None
-            vname, x, y = match.groups()
-        else:
-            match = re.match("("+rgx_varname+")", exp)
-            vname = match.groups()[0]
-            x, y = None, None
-        assert x != None or x == y == None
-        if x == None: x, y = 1, m
-        elif y == None: x, y = int(x), int(x)+m-1
-        else: x, y = int(x), int(y)
-        return ["%s[%d]"%(vname,i) for i in xrange(x,y+1)]
-
     def __getitem__(self, zvar):
         return lambda *args: self.evalcmd(zvar, args)
 
@@ -70,19 +55,7 @@ class CmdFlow:
         zvar, ztype = match.groups()
         ztype = ztype.replace(',','')
 
-        if type(args[0]) in [list, tuple, dict]:
-            W, w, b, bounds = list(args)+[None]*(4-len(args))
-        else:
-            fname, b, bounds = list(args)+[None]*(3-len(args))
-            if type(fname) == str:
-                instance = VBP.fromFile(fname, verbose=False)
-            else:
-                assert isinstance(fname, VBP)
-                instance = fname
-            W, w = instance.W, instance.w
-            if b == None:
-                b = instance.b
-                bounds = instance.b
+        W, w, b, bounds = list(args)+[None]*(4-len(args))
 
         if type(W) == dict:
             W = [W[k] for k in sorted(W)]
@@ -99,9 +72,6 @@ class CmdFlow:
             b = [b[k] for k in sorted(b)]
         if type(bounds) == dict:
             bounds = [bounds[k] for k in sorted(bounds)]
-        if type(b) == str:
-            b = self.parse_var_range(b, len(w))
-            assert len(b) == len(w)
 
         graph, model, excluded_vars = self.generate_model(zvar, W, w, b, bounds, noobj=True)
         prefix = "_"+zvar+"_"

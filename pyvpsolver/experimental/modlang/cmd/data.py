@@ -53,7 +53,7 @@ class CmdParam:
         else:
             values = args[0]
         if type(values) in [list, dict]:
-            match = re.match("\s*("+rgx_varname+")\s*({"+rgx_varname+"})?\s*", name)
+            match = re.match("\s*("+rgx_varname+")\s*({\s*"+rgx_varname+"\s*})?\s*", name)
             assert match != None
             name, index = match.groups()
         else:
@@ -63,7 +63,7 @@ class CmdParam:
         if index == None:
             index = name+"_I"
         else:
-            index = index.strip('{} ')
+            index = index.strip('{ }')
         name = name.strip()
         if type(values) == list:
             values = list2dict(values)

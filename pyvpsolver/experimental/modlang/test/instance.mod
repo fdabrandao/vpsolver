@@ -1,42 +1,11 @@
-$LOAD_VBP[instance1]{"instance.vbp",1};
+$LOAD_VBP[instance1{I,D}]{"instance.vbp",1};
 
-set I := 1..instance1_m;
 var x{I}, >= 0;
 
-/*$FLOW[Z]{
+$FLOW[Z]{
     instance1.W,
     instance1.w,
-    'x{1..}'
-};*/
-
-/*$FLOW[Z]{
-    instance1_W,
-    instance1_w,
-    'x{1..}'
-};*/
-
-/*$FLOW[Z]{
-    instance1,
-    'x{1..}'
-};*/
-
-/*$FLOW[Z]{
-    instance1
-};*/
-
-/*$FLOW[Z]{
-    instance1,
-    'x',
-    instance1_b
-};*/
-
-/*$FLOW[Z]{
-    "instance.vbp"
-};*/
-
-$FLOW[Z]{
-    "instance.vbp",
-    'x'
+    ["x[%d]"%i for i in I]
 };
 
 $PY[model]{

@@ -32,7 +32,6 @@ class CmdGraph:
         return lambda *args: self.evalcmd(name, args)
 
     def evalcmd(self, name, args):
-        rgx_varname = "[a-zA-Z_][a-zA-Z0-9_]*"
         match = re.match("\s*("+rgx_varname+")\s*,\s*("+rgx_varname+")\s*", name)
         assert match != None
         Vname, Aname = match.groups()

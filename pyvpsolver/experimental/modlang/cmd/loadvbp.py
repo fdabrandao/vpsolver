@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .... import *
+from utils import *
 
 class CmdLoadVBP:
     def __init__(self, pyvars):
@@ -31,6 +32,18 @@ class CmdLoadVBP:
         return lambda *args: self.evalcmd(name, args)
 
     def evalcmd(self, name, args):
+        match = re.match("\s*("+rgx_varname+")\s*({"+rgx_varname+"}|{\s*"+rgx_varname+"\s*,\s*"+rgx_varname+"\s*})?\s*", name)
+        assert match != None
+        name, index = match.groups()
+        index_I, index_D = name+"_I", name+"_D"
+        if index != None:
+            index = index.strip('{ }')
+            index = index.split(',')
+            if len(index) == 2:
+                index_I = index[0].strip()
+                index_D = index[1].strip()
+            elif len(index) == 1:
+                index_I = index[0].strip()
         assert 1 <= len(args) <= 3
         fname = args[0]
         i0 = args[1] if len(args) > 1 else 0
@@ -45,13 +58,13 @@ class CmdLoadVBP:
         self.pyvars[name+"_n"] = sum(instance.b)
         self.defs += "param %s_p := %d;\n" % (name, instance.ndims)
         self.pyvars[name+"_p"] = instance.ndims
-        self.defs += "set %s_I := %d..%d;\n" % (name, i0, i0+instance.m-1)
-        self.pyvars[name+"_I"] = range(i0, i0+instance.m-1)
-        self.defs += "set %s_D := %d..%d;\n" % (name, d0, d0+instance.ndims-1)
-        self.pyvars[name+"_D"] = range(d0, d0+instance.ndims-1)
-        self.defs += "param %s_W{%s_D};\n" % (name, name)
-        self.defs += "param %s_b{%s_I};\n" % (name, name)
-        self.defs += "param %s_w{%s_I,%s_D};\n" % (name, name, name)
+        self.defs += "set %s := %d..%d;\n" % (index_I, i0, i0+instance.m)
+        self.pyvars[index_I] = range(i0, i0+instance.m)
+        self.defs += "set %s := %d..%d;\n" % (index_D, d0, d0+instance.ndims)
+        self.pyvars[index_D] = range(d0, d0+instance.ndims)
+        self.defs += "param %s_W{%s};\n" % (name, index_D)
+        self.defs += "param %s_b{%s};\n" % (name, index_I)
+        self.defs += "param %s_w{%s,%s};\n" % (name, index_I, index_D)
         self.defs += "#END_DEFS: %s\n" % name
 
         self.data += "#BEGIN_DATA: Intance[%s]\n" % name
