@@ -23,6 +23,7 @@ from .... import *
 from utils import *
 import re
 
+
 class CmdGraph:
     def __init__(self, sets):
         self.zvars = []
@@ -41,13 +42,13 @@ class CmdGraph:
         if type(W) == dict:
             W = [W[k] for k in sorted(W)]
         if type(w) == dict:
-            i0 = min(i for i,d in w)
-            d0 = min(d for i,d in w)
-            m = max(i for i,d in w)-i0+1
-            p = max(d for i,d in w)-d0+1
+            i0 = min(i for i, d in w)
+            d0 = min(d for i, d in w)
+            m = max(i for i, d in w)-i0+1
+            p = max(d for i, d in w)-d0+1
             ww = [None]*m
             for i in xrange(m):
-                ww[i] = [w[i0+i,d0+d] for d in xrange(p)]
+                ww[i] = [w[i0+i, d0+d] for d in xrange(p)]
             w = ww
         if type(bounds) == dict:
             bounds = [bounds[k] for k in sorted(bounds)]
@@ -64,9 +65,15 @@ class CmdGraph:
         else:
             b = [0]*m
             for i in xrange(m):
-                b[i] = min(W[d]/w[i][d] for d in xrange(len(w[i])) if w[i][d] != 0)
+                b[i] = min(
+                    W[d]/w[i][d]
+                    for d in xrange(len(w[i])) if w[i][d] != 0
+                )
 
         instance = VBP(W, w, b, verbose=False)
         graph = AFG(instance, verbose=False).graph()
-        graph.relabel(lambda u: u if type(u) != str else "%s"%u, lambda i: labels[i] if type(i)==int and i < m else "LOSS")
+        graph.relabel(
+            lambda u: u if type(u) != str else "%s" % u,
+            lambda i: labels[i] if type(i) == int and i < m else "LOSS"
+        )
         return graph

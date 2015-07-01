@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .... import *
 from utils import *
 
+
 class CmdSet:
     def __init__(self, pyvars):
         self.defs = ""
@@ -35,6 +36,7 @@ class CmdSet:
         assert len(args) == 1
         values = args[0]
         self.defs += ampl_set(name, values, self.pyvars)[0]
+
 
 class CmdParam:
     def __init__(self, sets, params):
@@ -54,20 +56,20 @@ class CmdParam:
         else:
             values = args[0]
             if type(values) == list:
-                 values = list2dict(values, i0)
+                values = list2dict(values, i0)
 
         if type(values) == dict:
             name, index = parse_index(arg1)
-            if index != None:
+            if index is not None:
                 assert len(index) == 1
                 index = index[0]
         else:
             name, index = parse_index(arg1)
-            assert index == None
+            assert index is None
 
         if type(values) == dict:
-            if index == None:
-                index = "%s_I"%name
+            if index is None:
+                index = "%s_I" % name
             self.defs += ampl_set(index, values.keys(), self.sets)[0]
 
         pdefs, pdata = ampl_param(name, index, values, self.params)

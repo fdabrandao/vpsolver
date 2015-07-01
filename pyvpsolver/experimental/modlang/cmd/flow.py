@@ -25,6 +25,7 @@ import re
 
 rgx_varname = "[a-zA-Z_][a-zA-Z0-9_]*"
 
+
 def lincomb2str(lincomb):
     expr = ""
     for var, coef in lincomb:
@@ -40,6 +41,7 @@ def lincomb2str(lincomb):
                 expr += " - %s" % (var)
     return expr
 
+
 class CmdFlow:
     def __init__(self):
         self.zvars = []
@@ -52,28 +54,30 @@ class CmdFlow:
     def evalcmd(self, zvar, args):
         match = re.match("("+rgx_varname+")(.*)", zvar)
         zvar, ztype = match.groups()
-        ztype = ztype.replace(',','')
+        ztype = ztype.replace(",", "")
 
         W, w, b, bounds = list(args)+[None]*(4-len(args))
 
         if type(W) == dict:
             W = [W[k] for k in sorted(W)]
         if type(w) == dict:
-            i0 = min(i for i,d in w)
-            d0 = min(d for i,d in w)
-            m = max(i for i,d in w)-i0+1
-            p = max(d for i,d in w)-d0+1
+            i0 = min(i for i, d in w)
+            d0 = min(d for i, d in w)
+            m = max(i for i, d in w)-i0+1
+            p = max(d for i, d in w)-d0+1
             ww = [None]*m
             for i in xrange(m):
-                ww[i] = [w[i0+i,d0+d] for d in xrange(p)]
+                ww[i] = [w[i0+i, d0+d] for d in xrange(p)]
             w = ww
         if type(b) == dict:
             b = [b[k] for k in sorted(b)]
         if type(bounds) == dict:
             bounds = [bounds[k] for k in sorted(bounds)]
 
-        graph, model, excluded_vars = self.generate_model(zvar, W, w, b, bounds, noobj=True)
-        prefix = "_%s_"%zvar
+        graph, model, excluded_vars = self.generate_model(
+            zvar, W, w, b, bounds, noobj=True
+        )
+        prefix = "_%s_" % zvar
         self.zvars.append(zvar)
         self.graphs.append(graph)
         self.prefixes.append(prefix)
@@ -85,16 +89,18 @@ class CmdFlow:
         bvars = []
         for i in xrange(m):
             if type(b[i]) == str:
-                bb[i] = min(W[d]/w[i][d] for d in xrange(len(w[i])) if w[i][d] != 0)
-                if bounds != None:
-                    bb[i] = min(bb[i],bounds[i])
+                bb[i] = min(
+                    W[d]/w[i][d] for d in xrange(len(w[i])) if w[i][d] != 0
+                )
+                if bounds is not None:
+                    bb[i] = min(bb[i], bounds[i])
                 bvars.append(b[i])
             else:
                 bb[i] = b[i]
 
         instance = VBP(W, w, bb, verbose=False)
         graph = AFG(instance, verbose=False).graph()
-        feedback = (graph.T, graph.S, 'Z')
+        feedback = (graph.T, graph.S, "Z")
         graph.A.append(feedback)
 
         vnames = {}
@@ -105,49 +111,51 @@ class CmdFlow:
         graph.names = vnames
 
         for i in xrange(m):
-            if bounds != None:
+            if bounds is not None:
                 for var in assocs[i]:
                     ub[var] = bounds[i]
             if type(b[i]) == str:
                 varl.append(b[i])
-                cons.append((assocs[i],"=",b[i]))
+                cons.append((assocs[i], "=", b[i]))
             else:
                 if b[i] > 1:
-                    cons.append((assocs[i],">=",b[i]))
+                    cons.append((assocs[i], ">=", b[i]))
                 else:
-                    cons.append((assocs[i],"=",b[i]))
+                    cons.append((assocs[i], "=", b[i]))
 
         model = Model()
         for var in varl:
-            model.addVar(name=var, lb=0, ub=ub.get(var,None), vtype="I")
+            model.addVar(name=var, lb=0, ub=ub.get(var, None), vtype="I")
         for lincomb, sign, rhs in cons:
             model.addCons(lincomb, sign, rhs)
 
-        if noobj == False:
+        if noobj is False:
             objlincomb = [(vnames[feedback], 1)]
             model.setObj("min", objlincomb)
 
         labels = {}
-        for (u,v,i) in graph.A:
+        for (u, v, i) in graph.A:
             if type(i) == int and i < m:
-                labels[u,v,i] = ["i=%d"%(i+1)]
+                labels[u, v, i] = ["i=%d" % (i+1)]
         graph.set_labels(labels)
 
-        excluded_vars=bvars
+        excluded_vars = bvars
         return graph, model, excluded_vars
 
     def extract(self, varvalues, verbose=False):
         lst_sol = []
         newvv = varvalues.copy()
-        for i in xrange(len(self.zvars)):
-            zvar, graph, prefix = self.zvars[i], self.graphs[i], self.prefixes[i]
-            vv = {k.replace(prefix,'',1):v for k,v in varvalues.items() if k.startswith(prefix)}
+        for zvar, graph, prefix in zip(self.zvars, self.graphs, self.prefixes):
+            vv = {
+                k.replace(prefix, "", 1): v
+                for k, v in varvalues.items() if k.startswith(prefix)
+            }
             for k in vv:
                 del newvv[prefix+k]
             graph.set_flow(vv)
-            sol = graph.extract_solution(graph.S, '<-', graph.T)
-            lst_sol.append((zvar, varvalues.get(zvar,0), sol))
+            sol = graph.extract_solution(graph.S, "<-", graph.T)
+            lst_sol.append((zvar, varvalues.get(zvar, 0), sol))
             if verbose:
-                print 'Graph: %s (flow=%d)' % (zvar, varvalues.get(zvar,0))
-                print '\t', sol
+                print "Graph: %s (flow=%d)" % (zvar, varvalues.get(zvar, 0))
+                print "\t", sol
         return lst_sol, newvv

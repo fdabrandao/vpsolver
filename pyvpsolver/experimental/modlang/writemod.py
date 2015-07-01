@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+
 """
 AMPL format example:
 
@@ -28,6 +29,7 @@ maximize obj: 0.6 * x1 + 0.5 * x2;
 s.t. c1: x1 + 2 * x2 <= 1;
 s.t. c2: 3 * x1 + x2 <= 2;
 """
+
 
 def lincomb2str(lincomb):
     expr = ""
@@ -44,83 +46,92 @@ def lincomb2str(lincomb):
                 expr += " - %s" % (var)
     return expr
 
+
 def write_mod(model, filename):
     f = open(filename, "w")
 
     print >>f, gmpl_model
 
-    ### variables
+    # variables
 
     for var in model.vars:
         lb = model.vars[var]["lb"]
         ub = model.vars[var]["ub"]
         typ = ""
-        if model.vars[var]["vtype"]=="I": typ = ", integer"
-        if lb != None and ub != None:
+        if model.vars[var]["vtype"] == "I":
+            typ = ", integer"
+        if lb is not None and ub is not None:
             print >>f, "var %s%s, >= %g, <= %g;" % (var, typ, lb, ub)
-        elif lb != None:
+        elif lb is not None:
             print >>f, "var %s%s, >= %g;" % (var, typ, lb)
-        elif ub != None:
+        elif ub is not None:
             print >>f, "var %s%s, <= %g;" % (var, typ, ub)
         else:
             print >>f, "var %s%s;" % (var, typ)
 
-    ### objective
+    # objective
 
     if model.obj != []:
         if model.objdir == "min":
             print >>f, "minimize obj:",
         else:
             print >>f, "maximize obj:",
-        print >>f, lincomb2str(model.obj)+';'
+        print >>f, lincomb2str(model.obj)+";"
 
-    ### constraints
+    # constraints
 
     for name in model.cons_list:
         lincomb, sign, rhs = model.cons[name]
-        if sign in [">","<"]:
+        if sign in [">", "<"]:
             sign += "="
-        print >>f, "s.t. %s:%s %s %s;" % (name, lincomb2str(lincomb), sign, rhs)
+        print >>f, "s.t. %s:%s %s %s;" % (
+            name, lincomb2str(lincomb), sign, rhs
+        )
 
     print >>f, "end;"
     f.close()
 
-def model2gmpl(model, zvar, ztype, excluded_vars = [], prefix=""):
+
+def model2gmpl(model, zvar, ztype, excluded_vars=[], prefix=""):
     res = ""
 
-    ### variables
+    # variables
 
     excluded_vars = set(excluded_vars)
     for var in model.vars:
-        if var in excluded_vars: continue
+        if var in excluded_vars:
+            continue
         lb = model.vars[var]["lb"]
         ub = model.vars[var]["ub"]
         typ = ""
         pref = prefix
-        if model.vars[var]["vtype"]=="I": typ = ", integer"
+        if model.vars[var]["vtype"] == "I":
+            typ = ", integer"
         if var == zvar:
             pref = ""
-            if any(x in ztype for x in ["integer","binary",">","<"]):
+            if any(x in ztype for x in ["integer", "binary", ">", "<"]):
                 typ = ztype
                 lb, ub = None, None
-        if lb != None and ub != None:
+        if lb is not None and ub is not None:
             res += "var %s%s%s, >= %g, <= %g;" % (pref, var, typ, lb, ub)
-        elif lb != None:
+        elif lb is not None:
             res += "var %s%s%s, >= %g;" % (pref, var, typ, lb)
-        elif ub != None:
+        elif ub is not None:
             res += "var %s%s%s, <= %g;" % (pref, var, typ, ub)
         else:
             res += "var %s%s%s;" % (pref, var, typ)
 
-    ### constraints
+    # constraints
 
     for name in model.cons_list:
         lincomb, sign, rhs = model.cons[name]
-        if sign in [">","<"]:
+        if sign in [">", "<"]:
             sign += "="
         for i in xrange(len(lincomb)):
             if lincomb[i][0] != zvar and lincomb[i][0] not in excluded_vars:
                 lincomb[i] = (prefix+lincomb[i][0], lincomb[i][1])
-        res += "s.t. %s%s:%s %s %s;" % (prefix, name, lincomb2str(lincomb) , sign, rhs)
+        res += "s.t. %s%s:%s %s %s;" % (
+            prefix, name, lincomb2str(lincomb), sign, rhs
+        )
 
     return res

@@ -24,20 +24,35 @@ from cmd import *
 import os
 import re
 
-def glpk_mod2lp(fname_mod, fname_lp, verbose = False):
-    if verbose:
-        os.system("glpsol --math " + fname_mod + " --check --wlp " + fname_lp + "| grep -v Generating")
-    else:
-        os.system("glpsol --math " + fname_mod + " --check --wlp " + fname_lp + ">> /dev/null")
 
-def glpk_mod2mps(fname_mod, fname_mps, verbose = False):
+def glpk_mod2lp(fname_mod, fname_lp, verbose=False):
     if verbose:
-        os.system("glpsol --math " + fname_mod + " --check --wmps " + fname_mps + "| grep -v Generating")
+        os.system(
+            "glpsol --math " + fname_mod + " --check --wlp " + fname_lp +
+            "| grep -v Generating"
+        )
     else:
-        os.system("glpsol --math " + fname_mod + " --check --wmps " + fname_mps + ">> /dev/null")
+        os.system(
+            "glpsol --math " + fname_mod + " --check --wlp " + fname_lp +
+            ">> /dev/null"
+        )
+
+
+def glpk_mod2mps(fname_mod, fname_mps, verbose=False):
+    if verbose:
+        os.system(
+            "glpsol --math " + fname_mod + " --check --wmps " + fname_mps +
+            "| grep -v Generating"
+        )
+    else:
+        os.system(
+            "glpsol --math " + fname_mod + " --check --wmps " + fname_mps +
+            ">> /dev/null"
+        )
+
 
 class ParseAMPL:
-    def __init__(self, mod_in, mod_out = None, pyvars={}):
+    def __init__(self, mod_in, mod_out=None, pyvars={}):
         _globals, _locals = {}, pyvars
         sets, params = {}, {}
         SET = CmdSet(sets)
@@ -45,42 +60,56 @@ class ParseAMPL:
         FLOW = CmdFlow()
         GRAPH = CmdGraph(sets)
         LOAD_VBP = CmdLoadVBP(pyvars, sets, params)
-        pyvars['_sets'] = sets
-        pyvars['_params'] = params
-        pyvars['SET'] = SET
-        pyvars['PARAM'] = PARAM
-        pyvars['FLOW'] = FLOW
-        pyvars['GRAPH'] = GRAPH
-        pyvars['LOAD_VBP'] = LOAD_VBP
+        pyvars["_sets"] = sets
+        pyvars["_params"] = params
+        pyvars["SET"] = SET
+        pyvars["PARAM"] = PARAM
+        pyvars["FLOW"] = FLOW
+        pyvars["GRAPH"] = GRAPH
+        pyvars["LOAD_VBP"] = LOAD_VBP
         self.FLOW = FLOW
         self.LOAD_VBP = LOAD_VBP
         f = open(mod_in, "r")
         text = f.read()
-        rgx = re.compile("(#|/\*\s*)?\$([^\s{\[]+)(\[[^\]]*\])?{(.+?(?=}\s*;))}\s*;(\s*\*/)?", re.DOTALL)
+        rgx = re.compile(
+            "(#|/\*\s*)?"
+            "\$([^\s{\[]+)"
+            "(\[[^\]]*\])?"
+            "{(.+?(?=}\s*;))}\s*;"
+            "(\s*\*/)?",
+            re.DOTALL
+        )
         result = text[:]
         for match in rgx.finditer(text):
             comment, call, args1, args2 = match.groups()[:-1]
-            assert call in ['SET', 'PARAM', 'LOAD_VBP', 'FLOW', 'GRAPH', 'PY']
+            assert call in ["SET", "PARAM", "LOAD_VBP", "FLOW", "GRAPH", "PY"]
             strmatch = text[match.start():match.end()]
-            if comment != None:
-                result = result.replace(strmatch, '/*IGNORED:'+strmatch.strip('/**/')+'*/')
+            if comment is not None:
+                result = result.replace(
+                    strmatch, "/*IGNORED:"+strmatch.strip("/**/")+"*/"
+                )
                 continue
-            if call == 'PY':
-                if args1 != None:
+            if call == "PY":
+                if args1 is not None:
                     varname = args1.strip("[]")
-                    exec(varname + ' = ""', _globals, _locals)
+                    exec(varname + " = ''", _globals, _locals)
                     exec(args2, _globals, _locals)
                     output = _locals[varname]
                 else:
                     exec(args2, _globals, _locals)
                     output = ""
-                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+output)
-            elif call in ['SET', 'PARAM', 'GRAPH', 'LOAD_VBP', 'FLOW']:
-                assert args1 != None
-                call = "%s['%s'](%s)" % (call, args1.strip('[]'), args2)
+                result = result.replace(
+                    strmatch, "/*EVALUATED:"+strmatch+"*/"+output
+                )
+            elif call in ["SET", "PARAM", "GRAPH", "LOAD_VBP", "FLOW"]:
+                assert args1 is not None
+                call = "%s['%s'](%s)" % (call, args1.strip("[]"), args2)
                 res = eval(call, _globals, _locals)
-                if res == None: res = ""
-                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
+                if res is None:
+                    res = ""
+                result = result.replace(
+                    strmatch, "/*EVALUATED:"+strmatch+"*/"+res
+                )
             else:
                 print "Invalid command:", strmatch
                 assert False
@@ -94,19 +123,21 @@ class ParseAMPL:
         self.result = defs + result
         data_stmt = re.search("data\s*;", self.result, re.DOTALL)
         end_stmt = re.search("end\s*;", self.result, re.DOTALL)
-        if data_stmt != None:
+        if data_stmt is not None:
             match = data_stmt.group(0)
-            self.result = self.result.replace(match, match+'\n'+data)
+            self.result = self.result.replace(match, match+"\n"+data)
         else:
-            if end_stmt == None:
+            if end_stmt is None:
                 self.result += "data;\n"+data
             else:
                 match = end_stmt.group(0)
-                self.result = self.result.replace(match, "data;\n"+data+"\nend;")
-        if end_stmt == None:
+                self.result = self.result.replace(
+                    match, "data;\n"+data+"\nend;"
+                )
+        if end_stmt is None:
             self.result += "end;\n"
 
-        if mod_out != None:
+        if mod_out is not None:
             self.mod_out = mod_out
         else:
             self.mod_out = VPSolver.new_tmp_file(".mod")
