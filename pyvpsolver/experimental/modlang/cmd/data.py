@@ -44,8 +44,14 @@ class CmdParam:
         return lambda *args: self.evalcmd(name, args)
 
     def evalcmd(self, name, args):
-        assert len(args) == 1
-        values = args[0]
+        assert 1 <= len(args) <= 2
+        if len(args) == 2:
+            values, i0 = args
+            assert type(values) == list
+            assert type(i0) == int
+            values = {i0+i:x for i,x in enumerate(values)}
+        else:
+            values = args[0]
         if type(values) in [list, dict]:
             match = re.match("\s*("+rgx_varname+")\s*({"+rgx_varname+"})?\s*", name)
             assert match != None

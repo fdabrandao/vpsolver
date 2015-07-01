@@ -33,8 +33,8 @@ class CmdLoadVBP:
     def evalcmd(self, name, args):
         assert 1 <= len(args) <= 3
         fname = args[0]
-        i0 = args[1] if len(args) > 1 else 1
-        d0 = args[2] if len(args) > 2 else 1
+        i0 = args[1] if len(args) > 1 else 0
+        d0 = args[2] if len(args) > 2 else 0
         instance = VBP.fromFile(fname, verbose=False)
 
         self.pyvars[name] = instance

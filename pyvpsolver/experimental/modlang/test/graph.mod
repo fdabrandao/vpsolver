@@ -5,9 +5,8 @@ if a0 < (sum(a)-1)/2:
     a0 += aS
 a.append(aS)
 
-print 'sel-dual:', a, a0
+print 'self-dual:', a, a0
 
-#a, a0 = [6,5,4,4,2], 10
 m = len(a)
 W = [a0]+[1]*len(a)
 w = [[a[i]]+[1 if j == i else 0 for j in xrange(m)] for i in xrange(m)]
@@ -21,9 +20,10 @@ $GRAPH[V,A]{
     [1 if w[i] <= W else 0 for i in xrange(m)]
 };
 
+$PARAM[m]{m};
 
 /*
-set I := 1..9;
+set I := 1..m;
 var pi{{0} union I} >= 0, integer;
 var theta{V} >= 0;
 
@@ -37,7 +37,7 @@ display pi[0];
 display theta['T'];
 */
 
-set I := 1..9;
+set I := 1..m;
 var f{A} >= 0;
 var Z;
 var Z0;

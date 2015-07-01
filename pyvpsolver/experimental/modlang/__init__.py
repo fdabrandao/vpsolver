@@ -38,6 +38,7 @@ def glpk_mod2mps(fname_mod, fname_mps, verbose = False):
 
 class ParseAMPL:
     def __init__(self, mod_in, mod_out = None, pyvars={}):
+        _globals, _locals = {}, pyvars
         SET = CmdSet()
         PARAM = CmdParam()
         FLOW = CmdFlow("I")
@@ -59,7 +60,6 @@ class ParseAMPL:
         for match in rgx.finditer(text):
             comment, call, args1, args2 = match.groups()[:-1]
             assert call in ['SET', 'PARAM', 'LOAD_VBP', 'FLOW', 'FLOW_LP', 'GRAPH', 'PY']
-            #print '>>>', call
             strmatch = text[match.start():match.end()]
             if comment != None:
                 result = result.replace(strmatch, '/*IGNORED:'+strmatch.strip('/**/')+'*/')
@@ -67,48 +67,48 @@ class ParseAMPL:
             if call == 'PY':
                 if args1 != None:
                     varname = args1.strip("[]")
-                    exec(varname + ' = ""', globals(), pyvars)
-                    exec(args2, globals(), pyvars)
-                    output = pyvars[varname]
+                    exec(varname + ' = ""', _globals, _locals)
+                    exec(args2, _globals, _locals)
+                    output = _locals[varname]
                 else:
-                    exec(args2, globals(), pyvars)
+                    exec(args2, _globals, _locals)
                     output = ""
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+output)
             elif call == 'LOAD_VBP':
                 assert args1 != None
                 varname = args1.strip("[]'\"")
                 call = 'LOAD_VBP[\''+varname+'\']('+args2+')'
-                exec(call, globals(), pyvars)
+                exec(call, _globals, _locals)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             elif call == 'SET':
                 assert args1 != None
                 name = args1.strip("[]'\"")
                 call = 'SET[\''+name+'\']('+args2+')'
-                exec(call, globals(), pyvars)
+                exec(call, _globals, _locals)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             elif call == 'PARAM':
                 assert args1 != None
                 name = args1.strip("[]'\"")
                 call = 'PARAM[\''+name+'\']('+args2+')'
-                exec(call, globals(), pyvars)
+                exec(call, _globals, _locals)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             elif call == 'FLOW':
                 assert args1 != None
                 zvar = args1.strip("[]'\"")
                 call = 'FLOW[\''+zvar+'\']('+args2+')'
-                res = eval(call, globals(), pyvars)
+                res = eval(call, _globals, _locals)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
             elif call == 'FLOW_LP':
                 assert args1 != None
                 zvar = args1.strip("[]'\"")
                 call = 'FLOW_LP[\''+zvar+'\']('+args2+')'
-                res = eval(call, globals(), pyvars)
+                res = eval(call, _globals, _locals)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
             elif call == 'GRAPH':
                 assert args1 != None
                 set_names = args1.strip("[]'\"")
                 call = 'GRAPH[\''+set_names+'\']('+args2+')'
-                exec(call, globals(), pyvars)
+                exec(call, _globals, _locals)
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             else:
                 print "Invalid syntax:", strmatch

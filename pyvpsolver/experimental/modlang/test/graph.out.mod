@@ -1,4 +1,5 @@
 #BEGIN_DEFS
+param m := 9;
 set V := {1,2,3,4,5,6,7,8,9,10,11,'S','T'};
 set A := {(1,'T','LOSS'),(10,'T','LOSS'),(3,'T','LOSS'),(2,8,2),('S',3,2),('S',4,3),(5,6,'LOSS'),(2,'T','LOSS'),('S',1,9),(8,'T','LOSS'),(6,7,5),(11,'T','LOSS'),(4,'T','LOSS'),(7,'T','LOSS'),(6,7,'LOSS'),(9,10,'LOSS'),(4,6,'LOSS'),(3,4,'LOSS'),(2,3,'LOSS'),(9,'T','LOSS'),(7,9,6),(7,9,'LOSS'),(5,'T','LOSS'),(8,10,5),(6,'T','LOSS'),(3,5,3),(1,8,1),('S',2,1),(8,10,6),(1,2,'LOSS'),('S',4,'LOSS'),(10,11,8),(8,9,'LOSS'),(4,6,4),(5,8,4),(9,10,7)};
 #END_DEFS
@@ -9,9 +10,8 @@ if a0 < (sum(a)-1)/2:
     a0 += aS
 a.append(aS)
 
-print 'sel-dual:', a, a0
+print 'self-dual:', a, a0
 
-#a, a0 = [6,5,4,4,2], 10
 m = len(a)
 W = [a0]+[1]*len(a)
 w = [[a[i]]+[1 if j == i else 0 for j in xrange(m)] for i in xrange(m)]
@@ -25,9 +25,10 @@ labels = [i+1 for i in xrange(m)]
     [1 if w[i] <= W else 0 for i in xrange(m)]
 };*/
 
+/*EVALUATED:$PARAM[m]{m};*/
 
 /*
-set I := 1..9;
+set I := 1..m;
 var pi{{0} union I} >= 0, integer;
 var theta{V} >= 0;
 
@@ -41,7 +42,7 @@ display pi[0];
 display theta['T'];
 */
 
-set I := 1..9;
+set I := 1..m;
 var f{A} >= 0;
 var Z;
 var Z0;
