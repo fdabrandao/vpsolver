@@ -32,9 +32,9 @@ class CmdLoadVBP:
         self.params = params
 
     def __getitem__(self, name):
-        return lambda *args: self.evalcmd(name, args)
+        return lambda *args, **kwargs: self.evalcmd(name, *args, **kwargs)
 
-    def evalcmd(self, name, args):
+    def evalcmd(self, name, fname, i0=0, d0=0):
         name, index = parse_index(name)
         index_I, index_D = "%s_I" % name, "%s_D" % name
         if index is not None:
@@ -44,10 +44,6 @@ class CmdLoadVBP:
             elif len(index) == 1:
                 index_I = index[0]
 
-        assert 1 <= len(args) <= 3
-        fname = args[0]
-        i0 = args[1] if len(args) > 1 else 0
-        d0 = args[2] if len(args) > 2 else 0
         instance = VBP.fromFile(fname, verbose=False)
 
         W = {}

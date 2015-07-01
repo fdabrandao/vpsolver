@@ -31,13 +31,11 @@ class CmdGraph:
         self.sets = sets
 
     def __getitem__(self, arg1):
-        return lambda *args: self.evalcmd(arg1, args)
+        return lambda *args, **kwargs: self.evalcmd(arg1, *args, **kwargs)
 
-    def evalcmd(self, arg1, args):
+    def evalcmd(self, arg1, W=None, w=None, labels=None, bounds=None):
         lst = parse_varlist(arg1)
         Vname, Aname = lst
-
-        W, w, labels, bounds = list(args)+[None]*(4-len(args))
 
         if type(W) == dict:
             W = [W[k] for k in sorted(W)]

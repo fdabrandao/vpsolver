@@ -49,14 +49,12 @@ class CmdFlow:
         self.prefixes = []
 
     def __getitem__(self, zvar):
-        return lambda *args: self.evalcmd(zvar, args)
+        return lambda *args, **kwargs: self.evalcmd(zvar, *args, **kwargs)
 
-    def evalcmd(self, zvar, args):
+    def evalcmd(self, zvar, W=None, w=None, b=None, bounds=None):
         match = re.match("("+rgx_varname+")(.*)", zvar)
         zvar, ztype = match.groups()
         ztype = ztype.replace(",", "")
-
-        W, w, b, bounds = list(args)+[None]*(4-len(args))
 
         if type(W) == dict:
             W = [W[k] for k in sorted(W)]

@@ -30,11 +30,9 @@ class CmdSet:
         self.pyvars = pyvars
 
     def __getitem__(self, name):
-        return lambda *args: self.evalcmd(name, args)
+        return lambda *args, **kwargs: self.evalcmd(name, *args, **kwargs)
 
-    def evalcmd(self, name, args):
-        assert len(args) == 1
-        values = args[0]
+    def evalcmd(self, name, values):
         self.defs += ampl_set(name, values, self.pyvars)[0]
 
 
@@ -46,25 +44,27 @@ class CmdParam:
         self.params = params
 
     def __getitem__(self, arg1):
-        return lambda *args: self.evalcmd(arg1, args)
+        return lambda *args, **kwargs: self.evalcmd(arg1, *args, **kwargs)
 
-    def evalcmd(self, arg1, args):
-        assert 1 <= len(args) <= 2
-        if len(args) == 2:
-            values, i0 = args
+    def evalcmd(self, arg1, values, i0=None):
+        name, index = parse_index(arg1)
+
+        if type(values) == list:
+            if i0 is None:
+                i0 = 0
             values = list2dict(values, i0)
-        else:
-            values = args[0]
-            if type(values) == list:
-                values = list2dict(values, i0)
-
-        if type(values) == dict:
-            name, index = parse_index(arg1)
             if index is not None:
                 assert len(index) == 1
                 index = index[0]
         else:
-            name, index = parse_index(arg1)
+            assert i0 is None
+
+        if type(values) == dict:
+            if index is not None:
+                assert len(index) == 1
+                index = index[0]
+        else:
+            assert i0 is None
             assert index is None
 
         if type(values) == dict:
