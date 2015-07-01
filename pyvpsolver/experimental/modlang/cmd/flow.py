@@ -41,11 +41,10 @@ def lincomb2str(lincomb):
     return expr
 
 class CmdFlow:
-    def __init__(self, vtype="I"):
+    def __init__(self):
         self.zvars = []
         self.graphs = []
         self.prefixes = []
-        self.vtype = vtype
 
     def __getitem__(self, zvar):
         return lambda *args: self.evalcmd(zvar, args)
@@ -74,7 +73,7 @@ class CmdFlow:
             bounds = [bounds[k] for k in sorted(bounds)]
 
         graph, model, excluded_vars = self.generate_model(zvar, W, w, b, bounds, noobj=True)
-        prefix = "_"+zvar+"_"
+        prefix = "_%s_"%zvar
         self.zvars.append(zvar)
         self.graphs.append(graph)
         self.prefixes.append(prefix)
@@ -120,7 +119,7 @@ class CmdFlow:
 
         model = Model()
         for var in varl:
-            model.addVar(name=var, lb=0, ub=ub.get(var,None), vtype=self.vtype)
+            model.addVar(name=var, lb=0, ub=ub.get(var,None), vtype="I")
         for lincomb, sign, rhs in cons:
             model.addCons(lincomb, sign, rhs)
 

@@ -23,9 +23,10 @@ from .... import *
 from utils import *
 
 class CmdSet:
-    def __init__(self):
+    def __init__(self, pyvars):
         self.defs = ""
         self.data = ""
+        self.pyvars = pyvars
 
     def __getitem__(self, name):
         return lambda *args: self.evalcmd(name, args)
@@ -33,12 +34,14 @@ class CmdSet:
     def evalcmd(self, name, args):
         assert len(args) == 1
         values = args[0]
-        self.defs += ampl_set(name, values)[0]
+        self.defs += ampl_set(name, values, self.pyvars)[0]
 
 class CmdParam:
-    def __init__(self):
+    def __init__(self, sets, params):
         self.defs = ""
         self.data = ""
+        self.sets = sets
+        self.params = params
 
     def __getitem__(self, name):
         return lambda *args: self.evalcmd(name, args)
@@ -60,15 +63,15 @@ class CmdParam:
             match = re.match("\s*("+rgx_varname+")\s*", name)
             assert match != None
             name, index = match.group(0), None
-        if index == None:
-            index = name+"_I"
-        else:
+        if index != None:
             index = index.strip('{ }')
         name = name.strip()
         if type(values) == list:
+            if index == None:
+                index = "%s_I"%name
             values = list2dict(values)
         if type(values) == dict:
-            self.defs += ampl_set(index, values.keys())[0]
-        pdefs, pdata = ampl_param(name, index, values)
+            self.defs += ampl_set(index, values.keys(), self.sets)[0]
+        pdefs, pdata = ampl_param(name, index, values, self.params)
         self.defs += pdefs
         self.data += pdata

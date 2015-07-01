@@ -39,11 +39,14 @@ def glpk_mod2mps(fname_mod, fname_mps, verbose = False):
 class ParseAMPL:
     def __init__(self, mod_in, mod_out = None, pyvars={}):
         _globals, _locals = {}, pyvars
-        SET = CmdSet()
-        PARAM = CmdParam()
+        sets, params = {}, {}
+        SET = CmdSet(sets)
+        PARAM = CmdParam(sets, params)
         FLOW = CmdFlow()
-        LOAD_VBP = CmdLoadVBP(pyvars)
-        GRAPH = CmdGraph()
+        GRAPH = CmdGraph(sets)
+        LOAD_VBP = CmdLoadVBP(pyvars, sets, params)
+        pyvars['_sets'] = sets
+        pyvars['_params'] = params
         pyvars['SET'] = SET
         pyvars['PARAM'] = PARAM
         pyvars['FLOW'] = FLOW

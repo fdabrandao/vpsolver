@@ -24,9 +24,10 @@ from utils import *
 import re
 
 class CmdGraph:
-    def __init__(self):
+    def __init__(self, sets):
         self.zvars = []
         self.defs = ""
+        self.sets = sets
 
     def __getitem__(self, name):
         return lambda *args: self.evalcmd(name, args)
@@ -54,8 +55,8 @@ class CmdGraph:
 
         graph = self.generate_graph(W, w, labels, bounds)
 
-        self.defs += ampl_set(Vname, graph.V)[0]
-        self.defs += ampl_set(Aname, graph.A)[0]
+        self.defs += ampl_set(Vname, graph.V, self.sets)[0]
+        self.defs += ampl_set(Aname, graph.A, self.sets)[0]
 
     def generate_graph(self, W, w, labels, bounds):
         m = len(w)

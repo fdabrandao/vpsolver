@@ -19,8 +19,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re
 from .... import *
+from copy import deepcopy
+import re
 
 rgx_varname = "[a-zA-Z_][a-zA-Z0-9_]*"
 
@@ -41,7 +42,9 @@ def list2dict(lst):
 def tuple2str(tp):
     return ','.join(map(lambda x: str(x) if type(x) != str else "'%s'"%x, tp))
 
-def ampl_set(name, values):
+def ampl_set(name, values, sets):
+    assert name not in sets
+    sets[name] = deepcopy(values)
     defs = "set %s := {" % name
     first = True
     for x in values:
@@ -53,7 +56,9 @@ def ampl_set(name, values):
     defs += "};\n"
     return defs, ""
 
-def ampl_param(name, index, value):
+def ampl_param(name, index, value, params):
+    assert name not in params
+    params[name] = deepcopy(value)
     if type(value) == dict:
         defs = "param %s{%s};\n" % (name, index)
         data = "param %s := " % name
@@ -66,6 +71,8 @@ def ampl_param(name, index, value):
         data += ";\n"
         return defs, data
     else:
+        assert index == None
+        assert type(value) in [str,float,int]
         if type(value) == str: value = "'%s'"%value
         defs = "param %s := %s;\n" % (name, str(value))
         return defs, ""

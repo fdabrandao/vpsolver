@@ -770,7 +770,6 @@ Subject To
  demand(49): + x(49) >= 1
  demand(50): + x(50) >= 1
  demand(51): + x(51) >= 1
- demand(52): + x(52) >= -0
 
 Generals
  _Z_F4a9

@@ -23,10 +23,12 @@ from .... import *
 from utils import *
 
 class CmdLoadVBP:
-    def __init__(self, pyvars):
+    def __init__(self, pyvars, sets, params):
         self.defs = ""
         self.data = ""
         self.pyvars = pyvars
+        self.sets = sets
+        self.params = params
 
     def __getitem__(self, name):
         return lambda *args: self.evalcmd(name, args)
@@ -45,52 +47,51 @@ class CmdLoadVBP:
             elif len(index) == 1:
                 index_I = index[0].strip()
         assert 1 <= len(args) <= 3
+
         fname = args[0]
         i0 = args[1] if len(args) > 1 else 0
         d0 = args[2] if len(args) > 2 else 0
         instance = VBP.fromFile(fname, verbose=False)
 
-        self.pyvars[name] = instance
-        self.defs += "#BEGIN_DEFS: Instance[%s]\n" % name
-        self.defs += "param %s_m := %d;\n" % (name, instance.m)
-        self.pyvars[name+"_m"] = instance.m
-        self.defs += "param %s_n := %d;\n" % (name, sum(instance.b))
-        self.pyvars[name+"_n"] = sum(instance.b)
-        self.defs += "param %s_p := %d;\n" % (name, instance.ndims)
-        self.pyvars[name+"_p"] = instance.ndims
-        self.defs += "set %s := %d..%d;\n" % (index_I, i0, i0+instance.m)
-        self.pyvars[index_I] = range(i0, i0+instance.m)
-        self.defs += "set %s := %d..%d;\n" % (index_D, d0, d0+instance.ndims)
-        self.pyvars[index_D] = range(d0, d0+instance.ndims)
-        self.defs += "param %s_W{%s};\n" % (name, index_D)
-        self.defs += "param %s_b{%s};\n" % (name, index_I)
-        self.defs += "param %s_w{%s,%s};\n" % (name, index_I, index_D)
-        self.defs += "#END_DEFS: %s\n" % name
-
-        self.data += "#BEGIN_DATA: Intance[%s]\n" % name
-        self.data += "param %s_W default 0 := " % name
         W = {}
         for i in xrange(instance.ndims):
-            if instance.W[i] != 0:
-                self.data += "[%d]%d" % (i0+i, instance.W[i])
             W[i0+i] = instance.W[i]
-        self.data += ";\n"
-        self.pyvars[name+"_W"] = W
-        self.data += "param %s_b default 0 := " % name
-        b = {}
-        for i in xrange(instance.m):
-            if instance.b[i] != 0:
-                self.data += "[%d]%d" % (i0+i, instance.b[i])
-            b[i0+i] = instance.b[i]
-        self.data += ";\n"
-        self.pyvars[name+"_b"] = b
-        self.data += "param %s_w default 0 := " % name
         w = {}
         for i in xrange(instance.m):
             for d in xrange(instance.ndims):
-                if instance.w[i][d] != 0:
-                    self.data += "[%d,%d]%d" % (i0+i, d0+d, instance.w[i][d])
                 w[i0+i, d0+d] = instance.w[i][d]
-        self.data += ";\n"
-        self.pyvars[name+"_w"] = w
-        self.data += "#END_DATA: %s\n" % name
+        b = {}
+        for i in xrange(instance.m):
+            b[i0+i] = instance.b[i]
+
+        self.pyvars["_%s"%name] = instance
+        sets, params = self.sets, self.params
+
+        self.defs += "#BEGIN_DEFS: Instance[%s]\n" % name
+        self.data += "#BEGIN_DATA: Instance[%s]\n" % name
+        defs, data = ampl_param("%s_m"%name, None, instance.m, params)
+        self.defs += defs
+        self.data += data
+        defs, data = ampl_param("%s_n"%name, None, sum(instance.b), params)
+        self.defs += defs
+        self.data += data
+        defs, data = ampl_param("%s_p"%name, None, instance.ndims, params)
+        self.defs += defs
+        self.data += data
+        defs, data = ampl_set(index_I, range(i0, i0+instance.m), sets)
+        self.defs += defs
+        self.data += data
+        defs, data = ampl_set(index_D, range(i0, d0+instance.ndims), sets)
+        self.defs += defs
+        self.data += data
+        defs, data = ampl_param("%s_W"%name, index_D, W, params)
+        self.defs += defs
+        self.data += data
+        defs, data = ampl_param("%s_b"%name, index_I, b, params)
+        self.defs += defs
+        self.data += data
+        defs, data = ampl_param("%s_w"%name, "%s,%s"%(index_I, index_D), w, params)
+        self.defs += defs
+        self.data += data
+        self.defs += "#END_DEFS: Instance[%s]\n" % name
+        self.data += "#END_DATA: Instance[%s]\n" % name
