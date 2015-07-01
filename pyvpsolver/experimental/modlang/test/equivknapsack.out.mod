@@ -1,7 +1,7 @@
 #BEGIN_DEFS
 param m := 3;
-set None := {1,2,3};
-param bounds{None};
+set bounds_I := {1,2,3};
+param bounds{bounds_I};
 set V := {1,2,3,4,5,6,7,'S','T'};
 set A := {(3,5,1),(1,2,'LOSS'),(5,'T','LOSS'),('S',1,2),(1,'T','LOSS'),(4,'T','LOSS'),(6,'T','LOSS'),(7,'T','LOSS'),('S',1,3),(6,7,1),(3,'T','LOSS'),(4,7,2),(1,4,2),(4,5,'LOSS'),('S',2,1),(5,6,1),(2,3,1),(2,'T','LOSS')};
 #END_DEFS

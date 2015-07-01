@@ -50,12 +50,13 @@ class CmdParam:
         assert 1 <= len(args) <= 2
         if len(args) == 2:
             values, i0 = args
-            assert type(values) == list
-            assert type(i0) == int
-            values = {i0+i:x for i,x in enumerate(values)}
+            values = list2dict(values, i0)
         else:
             values = args[0]
-        if type(values) in [list, dict]:
+            if type(values) == list:
+                 values = list2dict(values, i0)
+
+        if type(values) == dict:
             name, index = parse_index(arg1)
             if index != None:
                 assert len(index) == 1
@@ -63,12 +64,12 @@ class CmdParam:
         else:
             name, index = parse_index(arg1)
             assert index == None
-        if type(values) == list:
+
+        if type(values) == dict:
             if index == None:
                 index = "%s_I"%name
-            values = list2dict(values)
-        if type(values) == dict:
             self.defs += ampl_set(index, values.keys(), self.sets)[0]
+
         pdefs, pdata = ampl_param(name, index, values, self.params)
         self.defs += pdefs
         self.data += pdata

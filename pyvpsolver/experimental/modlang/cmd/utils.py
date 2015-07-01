@@ -48,17 +48,17 @@ def parse_index(expr):
         index = [x.strip() for x in index]
     return name, index
 
-def list2dict(lst):
+def list2dict(lst, i0 = 0):
     d = {}
-    def f(k, lst):
+    def f(key, lst):
         for i in xrange(len(lst)):
             if type(lst[i]) != list:
-                if k == []:
-                    d[i] = lst[i]
+                if key == []:
+                    d[i0+i] = lst[i]
                 else:
-                    d[tuple(k+[i])] = lst[i]
+                    d[tuple(key+[i0+i])] = lst[i]
             else:
-                f(k+[i], lst[i])
+                f(key+[i0+i], lst[i])
     f([],lst)
     return d
 
