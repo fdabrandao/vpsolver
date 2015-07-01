@@ -25,6 +25,29 @@ import re
 
 rgx_varname = "[a-zA-Z_][a-zA-Z0-9_]*"
 
+def parse_varname(expr):
+    match = re.match("\s*("+rgx_varname+")\s*$", expr)
+    assert match != None
+    name = match.groups()[0]
+    return name
+
+def parse_varlist(expr):
+    match = re.match("\s*(\s*"+rgx_varname+"\s*(?:,\s*"+rgx_varname+"\s*)*)\s*$", expr)
+    assert match != None
+    lst = match.groups()[0].split(',')
+    lst = [x.strip() for x in lst]
+    return lst
+
+def parse_index(expr):
+    match = re.match("\s*("+rgx_varname+")\s*({\s*"+rgx_varname+"\s*(?:,\s*"+rgx_varname+"\s*)*})?\s*$", expr)
+    assert match != None
+    name, index = match.groups()
+    if index != None:
+        index = index.strip('{} ')
+        index = index.split(',')
+        index = [x.strip() for x in index]
+    return name, index
+
 def list2dict(lst):
     d = {}
     def f(k, lst):

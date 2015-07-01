@@ -34,20 +34,16 @@ class CmdLoadVBP:
         return lambda *args: self.evalcmd(name, args)
 
     def evalcmd(self, name, args):
-        match = re.match("\s*("+rgx_varname+")\s*({"+rgx_varname+"}|{\s*"+rgx_varname+"\s*,\s*"+rgx_varname+"\s*})?\s*", name)
-        assert match != None
-        name, index = match.groups()
+        name, index = parse_index(name)
         index_I, index_D = name+"_I", name+"_D"
         if index != None:
-            index = index.strip('{ }')
-            index = index.split(',')
+            assert 1 <= len(index) <= 2
             if len(index) == 2:
-                index_I = index[0].strip()
-                index_D = index[1].strip()
+                index_I, index_D = index
             elif len(index) == 1:
-                index_I = index[0].strip()
-        assert 1 <= len(args) <= 3
+                index_I = index[0]
 
+        assert 1 <= len(args) <= 3
         fname = args[0]
         i0 = args[1] if len(args) > 1 else 0
         d0 = args[2] if len(args) > 2 else 0

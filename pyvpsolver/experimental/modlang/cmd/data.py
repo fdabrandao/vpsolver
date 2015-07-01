@@ -43,10 +43,10 @@ class CmdParam:
         self.sets = sets
         self.params = params
 
-    def __getitem__(self, name):
-        return lambda *args: self.evalcmd(name, args)
+    def __getitem__(self, arg1):
+        return lambda *args: self.evalcmd(arg1, args)
 
-    def evalcmd(self, name, args):
+    def evalcmd(self, arg1, args):
         assert 1 <= len(args) <= 2
         if len(args) == 2:
             values, i0 = args
@@ -56,16 +56,13 @@ class CmdParam:
         else:
             values = args[0]
         if type(values) in [list, dict]:
-            match = re.match("\s*("+rgx_varname+")\s*({\s*"+rgx_varname+"\s*})?\s*", name)
-            assert match != None
-            name, index = match.groups()
+            name, index = parse_index(arg1)
+            if index != None:
+                assert len(index) == 1
+                index = index[0]
         else:
-            match = re.match("\s*("+rgx_varname+")\s*", name)
-            assert match != None
-            name, index = match.group(0), None
-        if index != None:
-            index = index.strip('{ }')
-        name = name.strip()
+            name, index = parse_index(arg1)
+            assert index == None
         if type(values) == list:
             if index == None:
                 index = "%s_I"%name

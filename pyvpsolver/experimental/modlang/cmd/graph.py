@@ -29,13 +29,12 @@ class CmdGraph:
         self.defs = ""
         self.sets = sets
 
-    def __getitem__(self, name):
-        return lambda *args: self.evalcmd(name, args)
+    def __getitem__(self, arg1):
+        return lambda *args: self.evalcmd(arg1, args)
 
-    def evalcmd(self, name, args):
-        match = re.match("\s*("+rgx_varname+")\s*,\s*("+rgx_varname+")\s*", name)
-        assert match != None
-        Vname, Aname = match.groups()
+    def evalcmd(self, arg1, args):
+        lst = parse_varlist(arg1)
+        Vname, Aname = lst
 
         W, w, labels, bounds = list(args)+[None]*(4-len(args))
 
