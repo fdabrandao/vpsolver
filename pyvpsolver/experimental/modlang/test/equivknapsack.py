@@ -35,8 +35,8 @@ for k in xrange(len(kp_cons)):
     b = [varvalues.get('pi(%d)'%(i+1),0) for i in xrange(len(a))]
     b0 = varvalues.get('pi(0)',0)
 
-    print a, a0
-    print b, b0
+    #print a, a0
+    #print b, b0
 
     if fix_as == 1:
         b0 -= b[-1]

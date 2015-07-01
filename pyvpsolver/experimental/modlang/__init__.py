@@ -41,14 +41,12 @@ class ParseAMPL:
         _globals, _locals = {}, pyvars
         SET = CmdSet()
         PARAM = CmdParam()
-        FLOW = CmdFlow("I")
-        FLOW_LP = CmdFlow("C")
+        FLOW = CmdFlow()
         LOAD_VBP = CmdLoadVBP(pyvars)
         GRAPH = CmdGraph()
         pyvars['SET'] = SET
         pyvars['PARAM'] = PARAM
         pyvars['FLOW'] = FLOW
-        pyvars['FLOW_LP'] = FLOW_LP
         pyvars['GRAPH'] = GRAPH
         pyvars['LOAD_VBP'] = LOAD_VBP
         self.FLOW = FLOW
@@ -59,7 +57,7 @@ class ParseAMPL:
         result = text[:]
         for match in rgx.finditer(text):
             comment, call, args1, args2 = match.groups()[:-1]
-            assert call in ['SET', 'PARAM', 'LOAD_VBP', 'FLOW', 'FLOW_LP', 'GRAPH', 'PY']
+            assert call in ['SET', 'PARAM', 'LOAD_VBP', 'FLOW', 'GRAPH', 'PY']
             strmatch = text[match.start():match.end()]
             if comment != None:
                 result = result.replace(strmatch, '/*IGNORED:'+strmatch.strip('/**/')+'*/')
@@ -74,44 +72,14 @@ class ParseAMPL:
                     exec(args2, _globals, _locals)
                     output = ""
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+output)
-            elif call == 'LOAD_VBP':
+            elif call in ['SET', 'PARAM', 'GRAPH', 'LOAD_VBP', 'FLOW']:
                 assert args1 != None
-                varname = args1.strip("[]'\"")
-                call = 'LOAD_VBP[\''+varname+'\']('+args2+')'
-                exec(call, _globals, _locals)
-                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
-            elif call == 'SET':
-                assert args1 != None
-                name = args1.strip("[]'\"")
-                call = 'SET[\''+name+'\']('+args2+')'
-                exec(call, _globals, _locals)
-                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
-            elif call == 'PARAM':
-                assert args1 != None
-                name = args1.strip("[]'\"")
-                call = 'PARAM[\''+name+'\']('+args2+')'
-                exec(call, _globals, _locals)
-                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
-            elif call == 'FLOW':
-                assert args1 != None
-                zvar = args1.strip("[]'\"")
-                call = 'FLOW[\''+zvar+'\']('+args2+')'
+                call = "%s['%s'](%s)" % (call, args1.strip('[]'), args2)
                 res = eval(call, _globals, _locals)
+                if res == None: res = ""
                 result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
-            elif call == 'FLOW_LP':
-                assert args1 != None
-                zvar = args1.strip("[]'\"")
-                call = 'FLOW_LP[\''+zvar+'\']('+args2+')'
-                res = eval(call, _globals, _locals)
-                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/'+res)
-            elif call == 'GRAPH':
-                assert args1 != None
-                set_names = args1.strip("[]'\"")
-                call = 'GRAPH[\''+set_names+'\']('+args2+')'
-                exec(call, _globals, _locals)
-                result = result.replace(strmatch, '/*EVALUATED:'+strmatch+'*/')
             else:
-                print "Invalid syntax:", strmatch
+                print "Invalid command:", strmatch
                 assert False
 
         defs = "#BEGIN_DEFS\n"
