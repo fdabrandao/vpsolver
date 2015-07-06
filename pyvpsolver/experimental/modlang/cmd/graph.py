@@ -26,54 +26,60 @@ from .utils import *
 
 class CmdGraph(object):
     def __init__(self, pyvars, sets, params):
-        self.zvars = []
-        self.defs = ""
-        self.pyvars = pyvars
-        self.sets = sets
-        self.params = params
+        self._defs = ""
+        self._data = ""
+        self._pyvars = pyvars
+        self._sets = sets
+        self._params = params
+
+    @property
+    def defs(self):
+        return self._defs
+
+    @property
+    def data(self):
+        return self._data
 
     def __getitem__(self, arg1):
-        return lambda *args, **kwargs: self.evalcmd(arg1, *args, **kwargs)
+        return lambda *args, **kwargs: self._evalcmd(arg1, *args, **kwargs)
 
-    def evalcmd(self, arg1, W=None, w=None, labels=None, bounds=None):
+    def _evalcmd(self, arg1, W=None, w=None, labels=None, bounds=None):
         lst = parse_varlist(arg1)
         Vname, Aname = lst
 
-        if type(W) == dict:
+        if isinstance(W, dict):
             W = [W[k] for k in sorted(W)]
-        if type(w) == dict:
+        if isinstance(w, dict):
             i0 = min(i for i, d in w)
             d0 = min(d for i, d in w)
             m = max(i for i, d in w)-i0+1
             p = max(d for i, d in w)-d0+1
-            ww = [None]*m
-            for i in xrange(m):
-                ww[i] = [w[i0+i, d0+d] for d in xrange(p)]
+            ww = [
+                [w[i0+i, d0+d] for d in xrange(p)] for i in xrange(m)
+            ]
             w = ww
-        if type(bounds) == dict:
+        if isinstance(bounds, dict):
             bounds = [bounds[k] for k in sorted(bounds)]
 
-        graph = self.generate_graph(W, w, labels, bounds)
+        graph = self._generate_graph(W, w, labels, bounds)
 
-        self.defs += ampl_set(Vname, graph.V, self.sets)[0]
-        self.defs += ampl_set(Aname, graph.A, self.sets)[0]
+        self._defs += ampl_set(Vname, graph.V, self._sets)[0]
+        self._defs += ampl_set(Aname, graph.A, self._sets)[0]
 
-    def generate_graph(self, W, w, labels, bounds):
+    def _generate_graph(self, W, w, labels, bounds):
         m = len(w)
-        if type(bounds) == list:
+        ndims = len(W)
+        if isinstance(bounds, list):
             b = bounds
         else:
-            b = [0]*m
-            for i in xrange(m):
-                b[i] = min(
-                    W[d]/w[i][d]
-                    for d in xrange(len(w[i])) if w[i][d] != 0
-                )
-
+            b = [
+                min(W[d]/w[i][d] for d in xrange(ndims) if w[i][d] != 0)
+                for i in xrange(m)
+            ]
         instance = VBP(W, w, b, verbose=False)
         graph = AFG(instance, verbose=False).graph()
         graph.relabel(
-            lambda u: u if type(u) != str else "%s" % u,
-            lambda i: labels[i] if type(i) == int and i < m else "LOSS"
+            lambda u: u if isinstance(u, str) else "%s" % u,
+            lambda i: labels[i] if isinstance(i, int) and i < m else "LOSS"
         )
         return graph

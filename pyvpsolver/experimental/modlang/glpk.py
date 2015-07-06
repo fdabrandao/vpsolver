@@ -19,4 +19,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import .modlang
+import os
+
+
+def glpk_mod2lp(fname_mod, fname_lp, verbose=False):
+    if verbose:
+        os.system(
+            "glpsol --math " + fname_mod + " --check --wlp " + fname_lp +
+            "| grep -v Generating"
+        )
+    else:
+        os.system(
+            "glpsol --math " + fname_mod + " --check --wlp " + fname_lp +
+            ">> /dev/null"
+        )
+
+
+def glpk_mod2mps(fname_mod, fname_mps, verbose=False):
+    if verbose:
+        os.system(
+            "glpsol --math " + fname_mod + " --check --wmps " + fname_mps +
+            "| grep -v Generating"
+        )
+    else:
+        os.system(
+            "glpsol --math " + fname_mod + " --check --wmps " + fname_mps +
+            ">> /dev/null"
+        )

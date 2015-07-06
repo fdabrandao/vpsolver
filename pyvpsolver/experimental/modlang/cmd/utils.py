@@ -63,7 +63,7 @@ def list2dict(lst, i0=0):
 
     def f(key, lst):
         for i in xrange(len(lst)):
-            if type(lst[i]) != list:
+            if not isinstance(lst[i], list):
                 if key == []:
                     d[i0+i] = lst[i]
                 else:
@@ -77,25 +77,24 @@ def list2dict(lst, i0=0):
 
 def tuple2str(tp):
     return ",".join(
-        map(lambda x: str(x) if type(x) != str else "'%s'" % x, tp)
+        map(lambda x: str(x) if not isinstance(x, str) else "'%s'" % x, tp)
     )
 
 
 def ampl_set(name, values, sets):
     assert name not in sets
     sets[name] = deepcopy(values)
-    defs = "set %s := {" % name
-    first = True
-    for x in values:
-        if type(x) == str:
-            x = "'%s'" % x
-        if type(x) in [tuple, list]:
-            x = "(%s)" % tuple2str(x)
-        if first:
-            defs += "%s" % str(x)
+
+    def format_entry(x):
+        if isinstance(x, str):
+            return "'%s'" % x
+        elif isinstance(x, (tuple, list)):
+            return "(%s)" % tuple2str(x)
         else:
-            defs += ",%s" % str(x)
-        first = False
+            return str(x)
+
+    defs = "set %s := {" % name
+    defs += ",".join(format_entry(x) for x in values)
     defs += "};\n"
     return defs, ""
 
@@ -103,23 +102,30 @@ def ampl_set(name, values, sets):
 def ampl_param(name, index, value, params):
     assert name not in params
     params[name] = deepcopy(value)
-    if type(value) == dict:
+    if isinstance(value, dict):
         defs = "param %s{%s};\n" % (name, index)
-        data = "param %s := " % name
-        first = True
-        for k in value:
-            x = value[k]
-            if type(x) == str:
-                x = "'%s'" % x
-            if type(k) == tuple:
+
+        def format_entry(k, v):
+            if isinstance(k, str):
+                k = "'%s'" % k
+            elif isinstance(k, tuple):
                 k = tuple2str(k)
-            data += "[%s]%s" % (k, str(x))
+            else:
+                k = str(k)
+            if isinstance(v, str):
+                v = "'%s'" % v
+            else:
+                v = str(v)
+            return "[%s]%s" % (k, v)
+
+        data = "param %s := " % name
+        data += ",".join(format_entry(k, v) for k, v in value.items())
         data += ";\n"
         return defs, data
     else:
         assert index is None
-        assert type(value) in [str, float, int]
-        if type(value) == str:
+        assert isinstance(value, (str, float, int))
+        if isinstance(value, str):
             value = "'%s'" % value
         defs = "param %s := %s;\n" % (name, str(value))
         return defs, ""

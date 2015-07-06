@@ -2,8 +2,8 @@
 param m := 3;
 set bounds_I := {1,2,3};
 param bounds{bounds_I};
-set V := {1,2,3,4,5,6,7,'S','T'};
-set A := {(3,5,1),(1,2,'LOSS'),(5,'T','LOSS'),('S',1,2),(1,'T','LOSS'),(4,'T','LOSS'),(6,'T','LOSS'),(7,'T','LOSS'),('S',1,3),(6,7,1),(3,'T','LOSS'),(4,7,2),(1,4,2),(4,5,'LOSS'),('S',2,1),(5,6,1),(2,3,1),(2,'T','LOSS')};
+set V := {'S','1','3','2','5','4','7','6','T'};
+set A := {('4','7',2),('2','T','LOSS'),('S','1',2),('1','4',2),('S','2',1),('5','6',1),('7','T','LOSS'),('2','3',1),('4','5','LOSS'),('1','2','LOSS'),('4','T','LOSS'),('5','T','LOSS'),('S','1',3),('3','5',1),('3','T','LOSS'),('6','T','LOSS'),('1','T','LOSS'),('6','7',1)};
 #END_DEFS
 /*EVALUATED:$PARAM[m]{len(a)};*/
 /*EVALUATED:$PARAM[bounds]{bounds,1};*/
@@ -33,7 +33,7 @@ display{i in I} pi[i];
 display pi[0];
 data;
 #BEGIN_DATA
-param bounds := [1]5[2]3[3]1;
+param bounds := [1]5,[2]3,[3]1;
 #END_DATA
 end;
 

@@ -82,7 +82,7 @@ def write_mod(model, filename):
 
     for name in model.cons_list:
         lincomb, sign, rhs = model.cons[name]
-        if sign in [">", "<"]:
+        if sign in (">", "<"):
             sign += "="
         print >>f, "s.t. %s:%s %s %s;" % (
             name, lincomb2str(lincomb), sign, rhs
@@ -109,7 +109,7 @@ def model2ampl(model, zvar, ztype, excluded_vars=[], prefix=""):
             typ = ", integer"
         if var == zvar:
             pref = ""
-            if any(x in ztype for x in ["integer", "binary", ">", "<"]):
+            if any(x in ztype for x in ("integer", "binary", ">", "<")):
                 typ = ztype
                 lb, ub = None, None
         if lb is not None and ub is not None:

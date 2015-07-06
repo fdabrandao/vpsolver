@@ -25,34 +25,50 @@ from .utils import *
 
 class CmdSet(object):
     def __init__(self, pyvars, sets, params):
-        self.defs = ""
-        self.data = ""
-        self.pyvars = pyvars
-        self.sets = sets
-        self.params = params
+        self._defs = ""
+        self._data = ""
+        self._pyvars = pyvars
+        self._sets = sets
+        self._params = params
+
+    @property
+    def defs(self):
+        return self._defs
+
+    @property
+    def data(self):
+        return self._data
 
     def __getitem__(self, name):
-        return lambda *args, **kwargs: self.evalcmd(name, *args, **kwargs)
+        return lambda *args, **kwargs: self._evalcmd(name, *args, **kwargs)
 
-    def evalcmd(self, name, values):
-        self.defs += ampl_set(name, values, self.pyvars)[0]
+    def _evalcmd(self, name, values):
+        self._defs += ampl_set(name, values, self._sets)[0]
 
 
 class CmdParam(object):
     def __init__(self, pyvars, sets, params):
-        self.defs = ""
-        self.data = ""
-        self.pyvars = pyvars
-        self.sets = sets
-        self.params = params
+        self._defs = ""
+        self._data = ""
+        self._pyvars = pyvars
+        self._sets = sets
+        self._params = params
+
+    @property
+    def defs(self):
+        return self._defs
+
+    @property
+    def data(self):
+        return self._data
 
     def __getitem__(self, arg1):
-        return lambda *args, **kwargs: self.evalcmd(arg1, *args, **kwargs)
+        return lambda *args, **kwargs: self._evalcmd(arg1, *args, **kwargs)
 
-    def evalcmd(self, arg1, values, i0=None):
+    def _evalcmd(self, arg1, values, i0=None):
         name, index = parse_index(arg1)
 
-        if type(values) == list:
+        if isinstance(values, list):
             if i0 is None:
                 i0 = 0
             values = list2dict(values, i0)
@@ -62,7 +78,7 @@ class CmdParam(object):
         else:
             assert i0 is None
 
-        if type(values) == dict:
+        if isinstance(values, dict):
             if index is not None:
                 assert len(index) == 1
                 index = index[0]
@@ -70,11 +86,11 @@ class CmdParam(object):
             assert i0 is None
             assert index is None
 
-        if type(values) == dict:
+        if isinstance(values, dict):
             if index is None:
                 index = "%s_I" % name
-            self.defs += ampl_set(index, values.keys(), self.sets)[0]
+            self._defs += ampl_set(index, values.keys(), self._sets)[0]
 
-        pdefs, pdata = ampl_param(name, index, values, self.params)
-        self.defs += pdefs
-        self.data += pdata
+        pdefs, pdata = ampl_param(name, index, values, self._params)
+        self._defs += pdefs
+        self._data += pdata

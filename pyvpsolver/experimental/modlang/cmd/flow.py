@@ -44,54 +44,54 @@ def lincomb2str(lincomb):
 
 class CmdFlow(object):
     def __init__(self, pyvars, sets, params):
-        self.zvars = []
-        self.graphs = []
-        self.prefixes = []
-        self.pyvars = pyvars
-        self.sets = sets
-        self.params = params
+        self._zvars = []
+        self._graphs = []
+        self._prefixes = []
+        self._pyvars = pyvars
+        self._sets = sets
+        self._params = params
 
     def __getitem__(self, zvar):
-        return lambda *args, **kwargs: self.evalcmd(zvar, *args, **kwargs)
+        return lambda *args, **kwargs: self._evalcmd(zvar, *args, **kwargs)
 
-    def evalcmd(self, zvar, W=None, w=None, b=None, bounds=None):
-        match = re.match("("+RGX_VARNAME+")(.*)", zvar)
+    def _evalcmd(self, zvar, W=None, w=None, b=None, bounds=None):
+        match = re.match("\s*("+RGX_VARNAME+")(.*)", zvar)
         zvar, ztype = match.groups()
         ztype = ztype.replace(",", "")
 
-        if type(W) == dict:
+        if isinstance(W, dict):
             W = [W[k] for k in sorted(W)]
-        if type(w) == dict:
+        if isinstance(w, dict):
             i0 = min(i for i, d in w)
             d0 = min(d for i, d in w)
             m = max(i for i, d in w)-i0+1
             p = max(d for i, d in w)-d0+1
-            ww = [None]*m
-            for i in xrange(m):
-                ww[i] = [w[i0+i, d0+d] for d in xrange(p)]
+            ww = [
+                [w[i0+i, d0+d] for d in xrange(p)] for i in xrange(m)
+            ]
             w = ww
-        if type(b) == dict:
+        if isinstance(b, dict):
             b = [b[k] for k in sorted(b)]
-        if type(bounds) == dict:
+        if isinstance(bounds, dict):
             bounds = [bounds[k] for k in sorted(bounds)]
 
-        graph, model, excluded_vars = self.generate_model(
+        graph, model, excluded_vars = self._generate_model(
             zvar, W, w, b, bounds, noobj=True
         )
         prefix = "_%s_" % zvar
-        self.zvars.append(zvar)
-        self.graphs.append(graph)
-        self.prefixes.append(prefix)
-        self.pyvars["_model"] += model2ampl(
+        self._zvars.append(zvar)
+        self._graphs.append(graph)
+        self._prefixes.append(prefix)
+        self._pyvars["_model"] += model2ampl(
             model, zvar, ztype, excluded_vars, prefix
         )
 
-    def generate_model(self, zvar, W, w, b, bounds=None, noobj=False):
+    def _generate_model(self, zvar, W, w, b, bounds=None, noobj=False):
         m = len(w)
         bb = [0]*m
         bvars = []
         for i in xrange(m):
-            if type(b[i]) == str:
+            if isinstance(b[i], str):
                 bb[i] = min(
                     W[d]/w[i][d] for d in xrange(len(w[i])) if w[i][d] != 0
                 )
@@ -117,7 +117,7 @@ class CmdFlow(object):
             if bounds is not None:
                 for var in assocs[i]:
                     ub[var] = bounds[i]
-            if type(b[i]) == str:
+            if isinstance(b[i], str):
                 varl.append(b[i])
                 cons.append((assocs[i], "=", b[i]))
             else:
@@ -136,10 +136,11 @@ class CmdFlow(object):
             objlincomb = [(vnames[feedback], 1)]
             model.setObj("min", objlincomb)
 
-        labels = {}
-        for (u, v, i) in graph.A:
-            if type(i) == int and i < m:
-                labels[u, v, i] = ["i=%d" % (i+1)]
+        labels = {
+            (u, v, i): ["i=%d" % (i+1)]
+            for (u, v, i) in graph.A
+            if isinstance(i, int) and i < m
+        }
         graph.set_labels(labels)
 
         excluded_vars = bvars
@@ -148,7 +149,8 @@ class CmdFlow(object):
     def extract(self, varvalues, verbose=False):
         lst_sol = []
         newvv = varvalues.copy()
-        for zvar, graph, prefix in zip(self.zvars, self.graphs, self.prefixes):
+        for zvar, graph, prefix in zip(
+                self._zvars, self._graphs, self._prefixes):
             vv = {
                 k.replace(prefix, "", 1): v
                 for k, v in varvalues.items() if k.startswith(prefix)
