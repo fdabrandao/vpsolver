@@ -55,7 +55,7 @@ class CmdFlow(object):
         return lambda *args, **kwargs: self._evalcmd(zvar, *args, **kwargs)
 
     def _evalcmd(self, zvar, W=None, w=None, b=None, bounds=None):
-        match = re.match("\s*("+RGX_VARNAME+")(.*)", zvar)
+        match = re.match("\s*("+RGX_VARNAME+")\s*(.*)", zvar, re.DOTALL)
         zvar, ztype = match.groups()
         ztype = ztype.replace(",", "")
 
