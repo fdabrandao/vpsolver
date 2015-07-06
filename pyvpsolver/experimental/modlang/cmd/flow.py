@@ -19,11 +19,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import re
 from .... import *
 from ..writemod import *
-import re
 
-rgx_varname = "[a-zA-Z_][a-zA-Z0-9_]*"
+RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 
 
 def lincomb2str(lincomb):
@@ -43,16 +43,19 @@ def lincomb2str(lincomb):
 
 
 class CmdFlow:
-    def __init__(self):
+    def __init__(self, pyvars, sets, params):
         self.zvars = []
         self.graphs = []
         self.prefixes = []
+        self.pyvars = pyvars
+        self.sets = sets
+        self.params = params
 
     def __getitem__(self, zvar):
         return lambda *args, **kwargs: self.evalcmd(zvar, *args, **kwargs)
 
     def evalcmd(self, zvar, W=None, w=None, b=None, bounds=None):
-        match = re.match("("+rgx_varname+")(.*)", zvar)
+        match = re.match("("+RGX_VARNAME+")(.*)", zvar)
         zvar, ztype = match.groups()
         ztype = ztype.replace(",", "")
 
@@ -79,7 +82,9 @@ class CmdFlow:
         self.zvars.append(zvar)
         self.graphs.append(graph)
         self.prefixes.append(prefix)
-        return model2gmpl(model, zvar, ztype, excluded_vars, prefix)
+        self.pyvars["_model"] += model2ampl(
+            model, zvar, ztype, excluded_vars, prefix
+        )
 
     def generate_model(self, zvar, W, w, b, bounds=None, noobj=False):
         m = len(w)

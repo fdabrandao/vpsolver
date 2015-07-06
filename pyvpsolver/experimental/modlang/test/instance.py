@@ -4,11 +4,11 @@ sys.path.insert(0, "../../../../")
 
 from pyvpsolver.experimental.modlang import *
 
-ampl = ParseAMPL("instance.mod")
-ampl.writeMOD("instance.out.mod")
-glpk_mod2lp(ampl.model_file(), "instance.lp")
+ampl = ParserAMPL("instance.mod")
+ampl.writeMOD("tmp/instance.out.mod")
+glpk_mod2lp(ampl.model_file(), "tmp/instance.lp")
 out, varvalues = VPSolver.script_wsol(
-    "vpsolver_gurobi.sh", "instance.lp", verbose=True
+    "vpsolver_gurobi.sh", "tmp/instance.lp", verbose=True
 )
 sol, varvalues = ampl.FLOW.extract(varvalues, verbose=True)
 print

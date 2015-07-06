@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .... import *
-from utils import *
+from .utils import *
 
 
 class CmdLoadVBP:

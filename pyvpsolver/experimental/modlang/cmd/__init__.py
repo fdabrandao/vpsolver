@@ -19,7 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from data import *
-from flow import *
-from graph import *
-from loadvbp import *
+from .utils import *
+from .data import *
+from .flow import *
+from .graph import *
+from .loadvbp import *

@@ -19,15 +19,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .... import *
-from copy import deepcopy
 import re
+from copy import deepcopy
+from .... import *
 
-rgx_varname = "[a-zA-Z_][a-zA-Z0-9_]*"
+RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 
 
 def parse_varname(expr):
-    match = re.match("\s*("+rgx_varname+")\s*$", expr)
+    match = re.match("\s*("+RGX_VARNAME+")\s*$", expr)
     assert match is not None
     name = match.groups()[0]
     return name
@@ -35,7 +35,7 @@ def parse_varname(expr):
 
 def parse_varlist(expr):
     match = re.match(
-        "\s*(\s*"+rgx_varname+"\s*(?:,\s*"+rgx_varname+"\s*)*)\s*$", expr
+        "\s*(\s*"+RGX_VARNAME+"\s*(?:,\s*"+RGX_VARNAME+"\s*)*)\s*$", expr
     )
     assert match is not None
     lst = match.groups()[0].split(",")
@@ -45,8 +45,8 @@ def parse_varlist(expr):
 
 def parse_index(expr):
     match = re.match(
-        "\s*("+rgx_varname+")\s*"
-        "({\s*"+rgx_varname+"\s*(?:,\s*"+rgx_varname+"\s*)*})?\s*$",
+        "\s*("+RGX_VARNAME+")\s*"
+        "({\s*"+RGX_VARNAME+"\s*(?:,\s*"+RGX_VARNAME+"\s*)*})?\s*$",
         expr
     )
     assert match is not None

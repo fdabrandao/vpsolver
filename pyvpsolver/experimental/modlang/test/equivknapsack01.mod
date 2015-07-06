@@ -4,7 +4,7 @@ set I := 1..m;
 var pi{{0} union I} >= 0;
 var theta{V} >= 0;
 
-$PY{
+$EXEC{
 m = len(a)
 W = [a0]+[1]*len(a)
 w = [[a[i]]+[1 if j == i else 0 for j in xrange(m)] for i in xrange(m)]

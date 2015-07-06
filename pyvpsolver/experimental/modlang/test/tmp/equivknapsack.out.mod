@@ -12,7 +12,7 @@ set I := 1..m;
 var pi{{0} union I} >= 0 integer;
 var theta{V} >= 0;
 
-/*EVALUATED:$PY{
+/*EVALUATED:$EXEC{
 m = len(a)
 W = [a0]+bounds
 w = [[a[i]]+[1 if j == i else 0 for j in xrange(m)] for i in xrange(m)]

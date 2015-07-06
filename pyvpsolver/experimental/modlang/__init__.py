@@ -19,10 +19,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .. import *
-from cmd import *
 import os
 import re
+from .. import *
+from .cmd import *
 
 
 def glpk_mod2lp(fname_mod, fname_lp, verbose=False):
@@ -51,15 +51,20 @@ def glpk_mod2mps(fname_mod, fname_mps, verbose=False):
         )
 
 
-class ParseAMPL:
-    def __init__(self, mod_in, mod_out=None, pyvars={}):
-        _globals, _locals = {}, pyvars
+class ParserAMPL:
+    def __init__(self, mod_in, mod_out=None, locals_=None, globals_=None):
+        if locals_ is None:
+            locals_ = {}
+        if globals_ is None:
+            globals_ = globals()
+        pyvars = locals_
         sets, params = {}, {}
-        SET = CmdSet(sets)
-        PARAM = CmdParam(sets, params)
-        FLOW = CmdFlow()
-        GRAPH = CmdGraph(sets)
+        SET = CmdSet(pyvars, sets, params)
+        PARAM = CmdParam(pyvars, sets, params)
+        FLOW = CmdFlow(pyvars, sets, params)
+        GRAPH = CmdGraph(pyvars, sets, params)
         LOAD_VBP = CmdLoadVBP(pyvars, sets, params)
+        pyvars["_model"] = ""
         pyvars["_sets"] = sets
         pyvars["_params"] = params
         pyvars["SET"] = SET
@@ -71,48 +76,49 @@ class ParseAMPL:
         self.LOAD_VBP = LOAD_VBP
         f = open(mod_in, "r")
         text = f.read()
+        rgx_arg1 = "[^\]]*"
+        rgx_arg2 = """"(?:[^"]|\")*"|'(?:[^']|\')*'|[^}]*"""
         rgx = re.compile(
-            "(#|/\*\s*)?"
-            "\$([^\s{\[]+)"
-            "(\[[^\]]*\])?"
-            "{(.+?(?=}\s*;))}\s*;"
-            "(\s*\*/)?",
+            "(#|/\*\s*)?(?:"
+            "\$("+RGX_VARNAME+")(\["+rgx_arg1+"\])?{("+rgx_arg2+")}\s*;"
+            "|\${('+rgx_arg2+')}"
+            ")(?:\s*\*/)?",
             re.DOTALL
         )
         result = text[:]
         for match in rgx.finditer(text):
-            comment, call, args1, args2 = match.groups()[:-1]
-            assert call in ["SET", "PARAM", "LOAD_VBP", "FLOW", "GRAPH", "PY"]
+            comment, call, args1, args2, args3 = match.groups()
+            assert call in [
+                "EXEC", "EVAL", "SET", "PARAM",
+                "LOAD_VBP", "FLOW", "GRAPH", None
+            ]
             strmatch = text[match.start():match.end()]
             if comment is not None:
                 result = result.replace(
                     strmatch, "/*IGNORED:"+strmatch.strip("/**/")+"*/"
                 )
                 continue
-            if call == "PY":
-                if args1 is not None:
-                    varname = args1.strip("[]")
-                    exec(varname + " = ''", _globals, _locals)
-                    exec(args2, _globals, _locals)
-                    output = _locals[varname]
-                else:
-                    exec(args2, _globals, _locals)
-                    output = ""
-                result = result.replace(
-                    strmatch, "/*EVALUATED:"+strmatch+"*/"+output
-                )
-            elif call in ["SET", "PARAM", "GRAPH", "LOAD_VBP", "FLOW"]:
-                assert args1 is not None
-                call = "%s['%s'](%s)" % (call, args1.strip("[]"), args2)
-                res = eval(call, _globals, _locals)
-                if res is None:
-                    res = ""
-                result = result.replace(
-                    strmatch, "/*EVALUATED:"+strmatch+"*/"+res
-                )
+            if call is None:
+                res = eval(args3, globals_, locals_)
+            elif call == "EVAL":
+                res = eval(args2, globals_, locals_)
+            elif call == "EXEC":
+                assert args1 is None
+                locals_["_model"] = ""
+                exec(args2, globals_, locals_)
+                res = locals_["_model"]
             else:
-                print "Invalid command:", strmatch
-                assert False
+                if args1 is None:
+                    call = "%s[%s](%s)" % (call, args1, args2)
+                else:
+                    call = "%s['%s'](%s)" % (call, args1.strip("[]"), args2)
+                locals_["_model"] = ""
+                exec(call, globals_, locals_)
+                res = locals_["_model"]
+
+            result = result.replace(
+                strmatch, "/*EVALUATED:%s*/%s" % (strmatch, res)
+            )
 
         defs = "#BEGIN_DEFS\n"
         defs += LOAD_VBP.defs + SET.defs + PARAM.defs + GRAPH.defs

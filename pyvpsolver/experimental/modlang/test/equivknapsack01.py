@@ -31,12 +31,14 @@ for k in xrange(len(kp_cons)):
             continue
     a = a+[aS]
 
-    ampl = ParseAMPL("equivknapsack01.mod", pyvars=locals())
-    ampl.writeMOD("equivknapsack01.out.mod")
-    glpk_mod2lp(ampl.model_file(), "equivknapsack01.lp")
+    ampl = ParserAMPL(
+        "equivknapsack01.mod", locals_=locals(), globals_=globals()
+    )
+    ampl.writeMOD("tmp/equivknapsack01.out.mod")
+    glpk_mod2lp(ampl.model_file(), "tmp/equivknapsack01.lp")
     # os.system("glpsol --math " + ampl.model_file() + "| grep -v Generating")
     out, varvalues = VPSolver.script_wsol(
-        "vpsolver_gurobi.sh", "equivknapsack01.lp", verbose=False
+        "vpsolver_gurobi.sh", "tmp/equivknapsack01.lp", verbose=False
     )
 
     b = [varvalues.get("pi(%d)" % (i+1), 0) for i in xrange(len(a))]
@@ -57,8 +59,8 @@ for k in xrange(len(kp_cons)):
 print "Original knapsack inequalities:"
 for a, a0 in sorted(kp_cons, key=lambda x: (x[1], x[0])):
     # print a, a0
-    print " + ".join("%2g x%d" % (a[i], i) for i in xrange(len(a))), "<=", a0
+    print " + ".join("%2g x%d" % (a[i], i+1) for i in xrange(len(a))), "<=", a0
 print "Minimal equivalent knapsack inequalities:"
 for b, b0 in sorted(cons, key=lambda x: (x[1], x[0])):
     # print b, b0
-    print " + ".join("%2g x%d" % (b[i], i) for i in xrange(len(b))), "<=", b0
+    print " + ".join("%2g x%d" % (b[i], i+1) for i in xrange(len(b))), "<=", b0

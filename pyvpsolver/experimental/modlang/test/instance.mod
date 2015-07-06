@@ -8,7 +8,7 @@ $FLOW[Z]{
     ["x[%d]"%i for i in _sets['I']]
 };
 
-$PY[model]{
+$EXEC{
 print _params['instance1_b']
 print _instance1.b
 print "_sets:", _sets.keys()

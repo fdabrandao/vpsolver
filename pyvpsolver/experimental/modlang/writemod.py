@@ -92,7 +92,7 @@ def write_mod(model, filename):
     f.close()
 
 
-def model2gmpl(model, zvar, ztype, excluded_vars=[], prefix=""):
+def model2ampl(model, zvar, ztype, excluded_vars=[], prefix=""):
     res = ""
 
     # variables

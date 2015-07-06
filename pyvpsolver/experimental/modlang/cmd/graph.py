@@ -19,16 +19,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .... import *
-from utils import *
 import re
+from .... import *
+from .utils import *
 
 
 class CmdGraph:
-    def __init__(self, sets):
+    def __init__(self, pyvars, sets, params):
         self.zvars = []
         self.defs = ""
+        self.pyvars = pyvars
         self.sets = sets
+        self.params = params
 
     def __getitem__(self, arg1):
         return lambda *args, **kwargs: self.evalcmd(arg1, *args, **kwargs)

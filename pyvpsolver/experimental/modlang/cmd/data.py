@@ -20,14 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .... import *
-from utils import *
+from .utils import *
 
 
 class CmdSet:
-    def __init__(self, pyvars):
+    def __init__(self, pyvars, sets, params):
         self.defs = ""
         self.data = ""
         self.pyvars = pyvars
+        self.sets = sets
+        self.params = params
 
     def __getitem__(self, name):
         return lambda *args, **kwargs: self.evalcmd(name, *args, **kwargs)
@@ -37,9 +39,10 @@ class CmdSet:
 
 
 class CmdParam:
-    def __init__(self, sets, params):
+    def __init__(self, pyvars, sets, params):
         self.defs = ""
         self.data = ""
+        self.pyvars = pyvars
         self.sets = sets
         self.params = params
 
