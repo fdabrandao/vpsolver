@@ -51,7 +51,7 @@ def glpk_mod2mps(fname_mod, fname_mps, verbose=False):
         )
 
 
-class ParserAMPL:
+class ParserAMPL(object):
     def __init__(self, mod_in, mod_out=None, locals_=None, globals_=None):
         if locals_ is None:
             locals_ = {}
@@ -158,5 +158,6 @@ class ParserAMPL:
     def model(self):
         return self.result
 
+    @property
     def model_file(self):
         return self.mod_out

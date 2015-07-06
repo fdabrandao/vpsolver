@@ -16,4 +16,4 @@ print "sol:", sol
 print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
 print
 
-os.system("glpsol --math " + ampl.model_file() + "| grep -v Generating")
+os.system("glpsol --math " + ampl.model_file + "| grep -v Generating")

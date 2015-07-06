@@ -24,7 +24,7 @@ from .... import *
 from .utils import *
 
 
-class CmdGraph:
+class CmdGraph(object):
     def __init__(self, pyvars, sets, params):
         self.zvars = []
         self.defs = ""

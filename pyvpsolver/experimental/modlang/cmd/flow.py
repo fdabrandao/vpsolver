@@ -42,7 +42,7 @@ def lincomb2str(lincomb):
     return expr
 
 
-class CmdFlow:
+class CmdFlow(object):
     def __init__(self, pyvars, sets, params):
         self.zvars = []
         self.graphs = []

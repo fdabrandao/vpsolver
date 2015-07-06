@@ -23,7 +23,7 @@ from .... import *
 from .utils import *
 
 
-class CmdLoadVBP:
+class CmdLoadVBP(object):
     def __init__(self, pyvars, sets, params):
         self.defs = ""
         self.data = ""

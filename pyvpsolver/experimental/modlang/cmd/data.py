@@ -23,7 +23,7 @@ from .... import *
 from .utils import *
 
 
-class CmdSet:
+class CmdSet(object):
     def __init__(self, pyvars, sets, params):
         self.defs = ""
         self.data = ""
@@ -38,7 +38,7 @@ class CmdSet:
         self.defs += ampl_set(name, values, self.pyvars)[0]
 
 
-class CmdParam:
+class CmdParam(object):
     def __init__(self, pyvars, sets, params):
         self.defs = ""
         self.data = ""

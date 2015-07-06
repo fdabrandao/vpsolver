@@ -35,8 +35,8 @@ for k in xrange(len(kp_cons)):
         "equivknapsack01.mod", locals_=locals(), globals_=globals()
     )
     ampl.writeMOD("tmp/equivknapsack01.out.mod")
-    glpk_mod2lp(ampl.model_file(), "tmp/equivknapsack01.lp")
-    # os.system("glpsol --math " + ampl.model_file() + "| grep -v Generating")
+    glpk_mod2lp(ampl.model_file, "tmp/equivknapsack01.lp")
+    # os.system("glpsol --math " + ampl.model_file + "| grep -v Generating")
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_gurobi.sh", "tmp/equivknapsack01.lp", verbose=False
     )
