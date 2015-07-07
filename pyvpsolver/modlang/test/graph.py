@@ -27,16 +27,28 @@ sys.path.insert(0, "../../../")
 from pyvpsolver.modlang import AMPLParser, glpk_mod2lp
 from pyvpsolver import VPSolver
 
-parser = AMPLParser("graph.mod")
-parser.write_mod("tmp/graph.out.mod")
-glpk_mod2lp(parser.model_file, "tmp/graph.lp")
-out, varvalues = VPSolver.script_wsol(
-    "vpsolver_gurobi.sh", "tmp/graph.lp", verbose=True
-)
-sol, varvalues = parser.flow.extract(varvalues, verbose=True)
-print
-print "sol:", sol
-print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
-print
 
-os.system("glpsol --math " + parser.model_file + "| grep -v Generating")
+def main():
+    """Parses 'graph.mod'"""
+
+    mod_in = "graph.mod"
+    mod_out = "tmp/graph.out.mod"
+    parser = AMPLParser()
+    parser.parse(mod_in, mod_out)
+
+    lp_out = "tmp/graph.lp"
+    glpk_mod2lp(mod_out, lp_out)
+    out, varvalues = VPSolver.script_wsol(
+        "vpsolver_gurobi.sh", lp_out, verbose=True
+    )
+
+    sol, varvalues = parser.flow.extract(varvalues, verbose=True)
+    print
+    print "sol:", sol
+    print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
+    print
+
+    os.system("glpsol --math " + mod_out + "| grep -v Generating")
+
+if __name__ == "__main__":
+    main()

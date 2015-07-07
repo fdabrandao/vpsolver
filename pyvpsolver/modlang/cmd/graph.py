@@ -19,12 +19,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re
 from ...vpsolver import VBP, AFG
 from . import utils
 
 
 class CmdGraph(object):
+    """Command for creating arc-flow graphs."""
+
     def __init__(self, pyvars, sets, params):
         self._defs = ""
         self._data = ""
@@ -34,16 +35,25 @@ class CmdGraph(object):
 
     @property
     def defs(self):
+        """Returns definitions."""
         return self._defs
 
     @property
     def data(self):
+        """Returns data."""
         return self._data
 
+    def clear(self):
+        """Clears definitions and data."""
+        self._defs = ""
+        self._data = ""
+
     def __getitem__(self, arg1):
+        """Evalutates CMD[arg1]."""
         return lambda *args, **kwargs: self._evalcmd(arg1, *args, **kwargs)
 
     def _evalcmd(self, arg1, W=None, w=None, labels=None, bounds=None):
+        """Evalutates CMD[arg1](*arg2)."""
         lst = utils.parse_varlist(arg1)
         Vname, Aname = lst
 
@@ -67,6 +77,7 @@ class CmdGraph(object):
         self._defs += utils.ampl_set(Aname, graph.A, self._sets)[0]
 
     def _generate_graph(self, W, w, labels, bounds):
+        """Generates an arc-flow graph."""
         m = len(w)
         ndims = len(W)
         if isinstance(bounds, list):

@@ -1,4 +1,4 @@
-\* Problem: 4 *\
+\* Problem: instance *\
 
 Minimize
  obj: + Z

@@ -26,15 +26,17 @@ RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 
 
 def parse_varname(expr):
-    match = re.match("\s*("+RGX_VARNAME+")\s*$", expr)
+    """Parses variable names."""
+    match = re.match("\\s*("+RGX_VARNAME+")\\s*$", expr)
     assert match is not None
     name = match.groups()[0]
     return name
 
 
 def parse_varlist(expr):
+    """Parses lists of variable names."""
     match = re.match(
-        "\s*(\s*"+RGX_VARNAME+"\s*(?:,\s*"+RGX_VARNAME+"\s*)*)\s*$", expr
+        "\\s*(\\s*"+RGX_VARNAME+"\\s*(?:,\\s*"+RGX_VARNAME+"\\s*)*)\\s*$", expr
     )
     assert match is not None
     lst = match.groups()[0].split(",")
@@ -43,9 +45,10 @@ def parse_varlist(expr):
 
 
 def parse_index(expr):
+    """Parses indexed variables (i.e., variable{index})."""
     match = re.match(
-        "\s*("+RGX_VARNAME+")\s*"
-        "({\s*"+RGX_VARNAME+"\s*(?:,\s*"+RGX_VARNAME+"\s*)*})?\s*$",
+        "\\s*("+RGX_VARNAME+")\\s*"
+        "({\\s*"+RGX_VARNAME+"\\s*(?:,\\s*"+RGX_VARNAME+"\\s*)*})?\\s*$",
         expr
     )
     assert match is not None
@@ -58,29 +61,32 @@ def parse_index(expr):
 
 
 def list2dict(lst, i0=0):
-    d = {}
+    """Converts a list to a dictionary."""
+    dic = {}
 
-    def f(key, lst):
+    def conv_rec(key, lst):
         for i in xrange(len(lst)):
             if not isinstance(lst[i], list):
                 if key == []:
-                    d[i0+i] = lst[i]
+                    dic[i0+i] = lst[i]
                 else:
-                    d[tuple(key+[i0+i])] = lst[i]
+                    dic[tuple(key+[i0+i])] = lst[i]
             else:
-                f(key+[i0+i], lst[i])
+                conv_rec(key+[i0+i], lst[i])
 
-    f([], lst)
-    return d
+    conv_rec([], lst)
+    return dic
 
 
-def tuple2str(tp):
+def tuple2str(tuple_):
+    """Converts a tuple to a AMPL tuple."""
     return ",".join(
-        map(lambda x: str(x) if not isinstance(x, str) else "'%s'" % x, tp)
+        [str(x) if not isinstance(x, str) else "'%s'" % x for x in tuple_]
     )
 
 
 def ampl_set(name, values, sets):
+    """Generates a definition for an AMPL set."""
     assert name not in sets
     sets[name] = deepcopy(values)
 
@@ -99,6 +105,7 @@ def ampl_set(name, values, sets):
 
 
 def ampl_param(name, index, value, params):
+    """Generates a definition for an AMPL parameter."""
     assert name not in params
     params[name] = deepcopy(value)
     if isinstance(value, dict):

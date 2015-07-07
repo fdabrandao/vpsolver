@@ -19,61 +19,69 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 import re
-from ..vpsolver import VPSolver
 from .cmd import CmdSet, CmdParam, CmdFlow, CmdGraph, CmdLoadVBP
 
 
 class AMPLParser(object):
-    def __init__(self, mod_in, mod_out=None, locals_=None, globals_=None):
+    """Class for parsing AMPL files with modlang extensions"""
+
+    _RGX_CMD = "[a-zA-Z_][a-zA-Z0-9_]*"
+    _RGX_ARG1 = "[^\\]]*"
+    _RGX_ARG2 = """"(?:[^"]|\")*"|'(?:[^']|\')*'|[^}]*"""
+    _RGX_STMT = (
+        "(#|/\\*\\s*)?(?:"
+        "\\$("+_RGX_CMD+")\\s*(\\["+_RGX_ARG1+"\\])?\\s*{("+_RGX_ARG2+")}\\s*;"
+        "|\\${("+_RGX_ARG2+")}"
+        ")(?:\\s*\\*/)?"
+    )
+    _VALID_CMDS = (
+        "EXEC", "EVAL", "SET", "PARAM", "LOAD_VBP", "FLOW", "GRAPH", None
+    )
+
+    def __init__(self, locals_=None, globals_=None):
         if locals_ is None:
             locals_ = {}
         if globals_ is None:
             globals_ = globals()
-        pyvars = locals_
 
+        pyvars = locals_
         sets, params = {}, {}
-        SET = CmdSet(pyvars, sets, params)
-        PARAM = CmdParam(pyvars, sets, params)
-        FLOW = CmdFlow(pyvars, sets, params)
-        GRAPH = CmdGraph(pyvars, sets, params)
-        LOAD_VBP = CmdLoadVBP(pyvars, sets, params)
         pyvars["_model"] = ""
         pyvars["_sets"] = sets
         pyvars["_params"] = params
-        pyvars["SET"] = SET
-        pyvars["PARAM"] = PARAM
-        pyvars["FLOW"] = FLOW
-        pyvars["GRAPH"] = GRAPH
-        pyvars["LOAD_VBP"] = LOAD_VBP
-        self.flow = FLOW
+        pyvars["SET"] = CmdSet(pyvars, sets, params)
+        pyvars["PARAM"] = CmdParam(pyvars, sets, params)
+        pyvars["FLOW"] = CmdFlow(pyvars, sets, params)
+        pyvars["GRAPH"] = CmdGraph(pyvars, sets, params)
+        pyvars["LOAD_VBP"] = CmdLoadVBP(pyvars, sets, params)
 
-        with open(mod_in, "r") as f:
-            text = f.read()
+        self._cmds = ("SET", "PARAM", "FLOW", "GRAPH", "LOAD_VBP")
 
-        rgx_cmd = "[a-zA-Z_][a-zA-Z0-9_]*"
-        rgx_arg1 = "[^\]]*"
-        rgx_arg2 = """"(?:[^"]|\")*"|'(?:[^']|\')*'|[^}]*"""
-        rgx = re.compile(
-            "(#|/\*\s*)?(?:"
-            "\$("+rgx_cmd+")\s*(\["+rgx_arg1+"\])?\s*{("+rgx_arg2+")}\s*;"
-            "|\${("+rgx_arg2+")}"
-            ")(?:\s*\*/)?",
-            re.DOTALL
-        )
+        self._pyvars = pyvars
+        self._locals = locals_
+        self._globals = globals_
+        self._input = ""
+        self._output = ""
 
-        self._result = text[:]
-        for match in rgx.finditer(text):
+    def parse(self, mod_in, mod_out=None):
+        """Parses the input file."""
+        self._clear()
+        with open(mod_in, "r") as fin:
+            self._input = fin.read()
+            self._output = self._input
+
+        locals_ = self._locals
+        globals_ = self._globals
+
+        rgx = re.compile(self._RGX_STMT, re.DOTALL)
+        for match in rgx.finditer(self._input):
             comment, call, args1, args2, args3 = match.groups()
-            assert call in (
-                "EXEC", "EVAL", "SET", "PARAM",
-                "LOAD_VBP", "FLOW", "GRAPH", None
-            )
-            strmatch = text[match.start():match.end()]
+            assert call in self._VALID_CMDS
+            strmatch = self._input[match.start():match.end()]
 
             if comment is not None:
-                result = result.replace(
+                self._output = self._output.replace(
                     strmatch, "/*IGNORED:"+strmatch.strip("/**/")+"*/"
                 )
                 continue
@@ -97,54 +105,52 @@ class AMPLParser(object):
                 exec(call, globals_, locals_)
                 res = locals_["_model"]
 
-            self._result = self._result.replace(
+            self._output = self._output.replace(
                 strmatch, "/*EVALUATED:%s*/%s" % (strmatch, res)
             )
 
-        defs = "#BEGIN_DEFS\n"
-        defs += LOAD_VBP.defs + SET.defs + PARAM.defs + GRAPH.defs
-        defs += "#END_DEFS\n"
-        self._add_defs(defs)
-
-        data = "#BEGIN_DATA\n"
-        data += LOAD_VBP.data + PARAM.data
-        data += "#END_DATA\n"
-        self._add_data(data)
+        self._finalize()
 
         if mod_out is not None:
-            self._mod_out = mod_out
-        else:
-            self._mod_out = VPSolver.new_tmp_file(".mod")
+            self.write(mod_out)
 
-        self.write_mod(self._mod_out)
+    def _clear(self):
+        """Clears definitions from previous models."""
+        for cmd in self._cmds:
+            self._pyvars[cmd].clear()
+
+    def _finalize(self):
+        """Adds definitions to the model."""
+        for cmd in self._cmds:
+            self._add_defs(self._pyvars[cmd].defs)
+            self._add_data(self._pyvars[cmd].data)
 
     def _add_defs(self, defs):
-        self._result = defs + self._result
+        """Adds definitions to the model."""
+        self._output = defs + self._output
 
     def _add_data(self, data):
-        data_stmt = re.search("data\s*;", self._result, re.DOTALL)
-        end_stmt = re.search("end\s*;", self._result, re.DOTALL)
+        """Adds data to the model."""
+        data_stmt = re.search("data\\s*;", self._output, re.DOTALL)
+        end_stmt = re.search("end\\s*;", self._output, re.DOTALL)
         if data_stmt is not None:
             match = data_stmt.group(0)
-            self._result = self._result.replace(match, match+"\n"+data)
+            self._output = self._output.replace(match, match+"\n"+data)
         else:
             if end_stmt is None:
-                self._result += "data;\n" + data + "\nend;"
+                self._output += "data;\n" + data + "\nend;"
             else:
                 match = end_stmt.group(0)
-                self._result = self._result.replace(
+                self._output = self._output.replace(
                     match, "data;\n" + data + "\nend;"
                 )
 
-    def write_mod(self, fname_mod):
-        f = open(fname_mod, "w")
-        print >>f, self._result
-        f.close()
+    def write(self, mod_out):
+        """Writes the output to a file."""
+        with open(mod_out, "w") as fout:
+            print >>fout, self._output
 
     @property
-    def model(self):
-        return self._result
-
-    @property
-    def model_file(self):
-        return self._mod_out
+    def flow(self):
+        """Returns the FLOW object for solution extraction"""
+        return self._pyvars["FLOW"]

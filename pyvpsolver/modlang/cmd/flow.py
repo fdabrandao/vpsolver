@@ -28,6 +28,7 @@ RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 
 
 def lincomb2str(lincomb):
+    """Returns the linear combination as a string."""
     expr = ""
     for var, coef in lincomb:
         if abs(coef) != 1:
@@ -44,6 +45,8 @@ def lincomb2str(lincomb):
 
 
 class CmdFlow(object):
+    """Command for creating arc-flow models."""
+
     def __init__(self, pyvars, sets, params):
         self._zvars = []
         self._graphs = []
@@ -52,11 +55,27 @@ class CmdFlow(object):
         self._sets = sets
         self._params = params
 
+    @property
+    def defs(self):
+        """Returns definitions."""
+        return ""
+
+    @property
+    def data(self):
+        """Returns data."""
+        return ""
+
+    def clear(self):
+        """Clears definitions and data."""
+        pass
+
     def __getitem__(self, zvar):
+        """Evalutates CMD[arg1]."""
         return lambda *args, **kwargs: self._evalcmd(zvar, *args, **kwargs)
 
     def _evalcmd(self, zvar, W=None, w=None, b=None, bounds=None):
-        match = re.match("\s*("+RGX_VARNAME+")\s*(.*)", zvar, re.DOTALL)
+        """Evalutates CMD[arg1](*arg2)."""
+        match = re.match("\\s*("+RGX_VARNAME+")\\s*(.*)", zvar, re.DOTALL)
         zvar, ztype = match.groups()
         ztype = ztype.replace(",", "")
 
@@ -88,6 +107,7 @@ class CmdFlow(object):
         )
 
     def _generate_model(self, zvar, W, w, b, bounds=None, noobj=False):
+        """Generates a arc-flow model."""
         m = len(w)
         bb = [0]*m
         bvars = []
@@ -148,6 +168,7 @@ class CmdFlow(object):
         return graph, model, excluded_vars
 
     def extract(self, varvalues, verbose=False):
+        """Extracts an arc-flow solution."""
         lst_sol = []
         newvv = varvalues.copy()
         for zvar, graph, prefix in zip(

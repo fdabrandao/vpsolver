@@ -27,16 +27,28 @@ sys.path.insert(0, "../../../")
 from pyvpsolver.modlang import AMPLParser, glpk_mod2lp
 from pyvpsolver import VPSolver
 
-parser = AMPLParser("instance.mod")
-parser.write_mod("tmp/instance.out.mod")
-glpk_mod2lp(parser.model_file, "tmp/instance.lp")
-out, varvalues = VPSolver.script_wsol(
-    "vpsolver_gurobi.sh", "tmp/instance.lp", verbose=True
-)
-sol, varvalues = parser.flow.extract(varvalues, verbose=True)
-print
-print "sol:", sol
-print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
-print
 
-os.system("glpsol --math " + parser.model_file + "| grep -v Generating")
+def main():
+    """Parses 'instance.mod'"""
+
+    mod_in = "instance.mod"
+    mod_out = "tmp/instance.out.mod"
+    parser = AMPLParser()
+    parser.parse(mod_in, mod_out)
+
+    lp_out = "tmp/instance.lp"
+    glpk_mod2lp(mod_out, lp_out)
+    out, varvalues = VPSolver.script_wsol(
+        "vpsolver_gurobi.sh", lp_out, verbose=True
+    )
+    sol, varvalues = parser.flow.extract(varvalues, verbose=True)
+
+    print
+    print "sol:", sol
+    print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
+    print
+
+    os.system("glpsol --math " + mod_out + "| grep -v Generating")
+
+if __name__ == "__main__":
+    main()

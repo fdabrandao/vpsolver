@@ -1,4 +1,4 @@
-\* Problem: 3 *\
+\* Problem: graph *\
 
 Maximize
  obj: + Z0

@@ -24,6 +24,8 @@ from . import utils
 
 
 class CmdLoadVBP(object):
+    """Command for loading VBP instances."""
+
     def __init__(self, pyvars, sets, params):
         self._defs = ""
         self._data = ""
@@ -33,16 +35,25 @@ class CmdLoadVBP(object):
 
     @property
     def defs(self):
+        """Returns definitions."""
         return self._defs
 
     @property
     def data(self):
+        """Returns data."""
         return self._data
 
+    def clear(self):
+        """Clears definitions and data."""
+        self._defs = ""
+        self._data = ""
+
     def __getitem__(self, name):
+        """Evalutates CMD[arg1]."""
         return lambda *args, **kwargs: self._evalcmd(name, *args, **kwargs)
 
     def _evalcmd(self, name, fname, i0=0, d0=0):
+        """Evalutates CMD[arg1](*arg2)."""
         name, index = utils.parse_index(name)
         index_I, index_D = "%s_I" % name, "%s_D" % name
         if index is not None:

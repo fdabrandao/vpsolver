@@ -1,4 +1,4 @@
-\* Problem: 39 *\
+\* Problem: equivknapsack01 *\
 
 Minimize
  obj: + pi(0)

@@ -23,6 +23,7 @@ import os
 
 
 def glpk_mod2lp(fname_mod, fname_lp, verbose=False):
+    """Converts a GMPL file into an LP file using GLPK."""
     if verbose:
         os.system(
             "glpsol --math " + fname_mod + " --check --wlp " + fname_lp +
@@ -36,6 +37,7 @@ def glpk_mod2lp(fname_mod, fname_lp, verbose=False):
 
 
 def glpk_mod2mps(fname_mod, fname_mps, verbose=False):
+    """Converts a GMPL file into an MPS file using GLPK."""
     if verbose:
         os.system(
             "glpsol --math " + fname_mod + " --check --wmps " + fname_mps +

@@ -19,19 +19,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
-"""
-AMPL format example:
-
-var x1;
-var x2;
-maximize obj: 0.6 * x1 + 0.5 * x2;
-s.t. c1: x1 + 2 * x2 <= 1;
-s.t. c2: 3 * x1 + x2 <= 2;
-"""
+# AMPL format example:
+#
+# var x1;
+# var x2;
+# maximize obj: 0.6 * x1 + 0.5 * x2;
+# s.t. c1: x1 + 2 * x2 <= 1;
+# s.t. c2: 3 * x1 + x2 <= 2;
 
 
 def lincomb2str(lincomb):
+    """Returns the linear combination as a string."""
     expr = ""
     for var, coef in lincomb:
         if abs(coef) != 1:
@@ -48,9 +46,8 @@ def lincomb2str(lincomb):
 
 
 def write_mod(model, filename):
-    f = open(filename, "w")
-
-    print >>f, gmpl_model
+    """Exports the model in AMPL format."""
+    fout = open(filename, "w")
 
     # variables
 
@@ -61,22 +58,22 @@ def write_mod(model, filename):
         if model.vars[var]["vtype"] == "I":
             typ = ", integer"
         if lb is not None and ub is not None:
-            print >>f, "var %s%s, >= %g, <= %g;" % (var, typ, lb, ub)
+            print >>fout, "var %s%s, >= %g, <= %g;" % (var, typ, lb, ub)
         elif lb is not None:
-            print >>f, "var %s%s, >= %g;" % (var, typ, lb)
+            print >>fout, "var %s%s, >= %g;" % (var, typ, lb)
         elif ub is not None:
-            print >>f, "var %s%s, <= %g;" % (var, typ, ub)
+            print >>fout, "var %s%s, <= %g;" % (var, typ, ub)
         else:
-            print >>f, "var %s%s;" % (var, typ)
+            print >>fout, "var %s%s;" % (var, typ)
 
     # objective
 
     if model.obj != []:
         if model.objdir == "min":
-            print >>f, "minimize obj:",
+            print >>fout, "minimize obj:",
         else:
-            print >>f, "maximize obj:",
-        print >>f, lincomb2str(model.obj)+";"
+            print >>fout, "maximize obj:",
+        print >>fout, lincomb2str(model.obj)+";"
 
     # constraints
 
@@ -84,15 +81,16 @@ def write_mod(model, filename):
         lincomb, sign, rhs = model.cons[name]
         if sign in (">", "<"):
             sign += "="
-        print >>f, "s.t. %s:%s %s %s;" % (
+        print >>fout, "s.t. %s:%s %s %s;" % (
             name, lincomb2str(lincomb), sign, rhs
         )
 
-    print >>f, "end;"
-    f.close()
+    print >>fout, "end;"
+    fout.close()
 
 
 def model2ampl(model, zvar, ztype, excluded_vars=[], prefix=""):
+    """Returns the model in AMPL format as a string."""
     res = ""
 
     # variables
