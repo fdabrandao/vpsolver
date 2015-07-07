@@ -21,9 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import sys
-sys.path.insert(0, "../../../../")
+sys.path.insert(0, "../../../")
 
-from pyvpsolver.experimental.modlang import *
+from pyvpsolver.modlang import AMPLParser, glpk_mod2lp
+from pyvpsolver import VPSolver
 
 kp_cons = [
     ([3, 5], 17, None)

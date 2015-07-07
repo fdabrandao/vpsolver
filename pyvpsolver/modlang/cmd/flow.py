@@ -20,8 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import re
-from .... import *
-from ..writemod import *
+from ...vpsolver import VBP, AFG
+from ...model import Model
+from ..writemod import model2ampl
 
 RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 

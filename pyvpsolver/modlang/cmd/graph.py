@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import re
-from .... import *
-from .utils import *
+from ...vpsolver import VBP, AFG
+from .utils import parse_varlist, ampl_set
 
 
 class CmdGraph(object):

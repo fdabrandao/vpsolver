@@ -21,9 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import re
-from .. import *
-from .cmd import *
-
+from ..vpsolver import VPSolver
+from .cmd import CmdSet, CmdParam, CmdFlow, CmdGraph, CmdLoadVBP
 
 class AMPLParser(object):
     def __init__(self, mod_in, mod_out=None, locals_=None, globals_=None):
@@ -47,7 +46,7 @@ class AMPLParser(object):
         pyvars["FLOW"] = FLOW
         pyvars["GRAPH"] = GRAPH
         pyvars["LOAD_VBP"] = LOAD_VBP
-        self.FLOW = FLOW
+        self.flow = FLOW
 
         with open(mod_in, "r") as f:
             text = f.read()

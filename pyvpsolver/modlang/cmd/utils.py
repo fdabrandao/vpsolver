@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 from copy import deepcopy
-from .... import *
 
 RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 

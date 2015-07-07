@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
@@ -20,21 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import sys
-sys.path.insert(0, "../../../../")
-
-from pyvpsolver.experimental.modlang import *
-
-parser = AMPLParser("graph.mod")
-parser.write_mod("tmp/graph.out.mod")
-glpk_mod2lp(parser.model_file, "tmp/graph.lp")
-out, varvalues = VPSolver.script_wsol(
-    "vpsolver_gurobi.sh", "tmp/graph.lp", verbose=True
-)
-sol, varvalues = parser.FLOW.extract(varvalues, verbose=True)
-print
-print "sol:", sol
-print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
-print
-
-os.system("glpsol --math " + parser.model_file + "| grep -v Generating")
+from .data import CmdSet, CmdParam
+from .flow import CmdFlow
+from .graph import CmdGraph
+from .loadvbp import CmdLoadVBP

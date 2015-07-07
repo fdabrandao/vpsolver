@@ -19,8 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .... import *
-from .utils import *
+from .utils import ampl_set, ampl_param
+from .utils import parse_index, list2dict
 
 
 class CmdSet(object):
