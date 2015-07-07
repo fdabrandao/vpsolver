@@ -54,7 +54,7 @@ class CmdLoadVBP(object):
 
     def _evalcmd(self, name, fname, i0=0, d0=0):
         """Evalutates CMD[arg1](*arg2)."""
-        name, index = utils.parse_index(name)
+        name, index = utils.parse_indexed(name)
         index_I, index_D = "%s_I" % name, "%s_D" % name
         if index is not None:
             assert 1 <= len(index) <= 2

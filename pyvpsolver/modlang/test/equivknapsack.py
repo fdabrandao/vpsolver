@@ -20,6 +20,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os
+sdir = os.path.dirname(__file__)
+if sdir != "":
+    os.chdir(sdir)
 import sys
 sys.path.insert(0, "../../../")
 

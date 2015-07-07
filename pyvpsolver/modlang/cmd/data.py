@@ -87,7 +87,7 @@ class CmdParam(object):
 
     def _evalcmd(self, arg1, values, i0=None):
         """Evalutates CMD[arg1](*arg2)."""
-        name, index = utils.parse_index(arg1)
+        name, index = utils.parse_indexed(arg1)
 
         if isinstance(values, list):
             if i0 is None:

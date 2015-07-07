@@ -25,8 +25,8 @@ from copy import deepcopy
 RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 
 
-def parse_varname(expr):
-    """Parses variable names."""
+def parse_var(expr):
+    """Matches and returns a variable name."""
     match = re.match("\\s*("+RGX_VARNAME+")\\s*$", expr)
     assert match is not None
     name = match.groups()[0]
@@ -34,7 +34,7 @@ def parse_varname(expr):
 
 
 def parse_varlist(expr):
-    """Parses lists of variable names."""
+    """Matches and returns a list of variable names."""
     match = re.match(
         "\\s*(\\s*"+RGX_VARNAME+"\\s*(?:,\\s*"+RGX_VARNAME+"\\s*)*)\\s*$", expr
     )
@@ -44,8 +44,8 @@ def parse_varlist(expr):
     return lst
 
 
-def parse_index(expr):
-    """Parses indexed variables (i.e., variable{index})."""
+def parse_indexed(expr):
+    """Matches and returns an indexed variable (i.e., variable{index})."""
     match = re.match(
         "\\s*("+RGX_VARNAME+")\\s*"
         "({\\s*"+RGX_VARNAME+"\\s*(?:,\\s*"+RGX_VARNAME+"\\s*)*})?\\s*$",

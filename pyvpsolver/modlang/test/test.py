@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
@@ -24,34 +23,21 @@ import os
 sdir = os.path.dirname(__file__)
 if sdir != "":
     os.chdir(sdir)
-import sys
-sys.path.insert(0, "../../../")
 
-from pyvpsolver.modlang import AMPLParser, glpk_mod2lp
-from pyvpsolver import VPSolver
-
-
-def main():
-    """Parses 'instance.mod'"""
-
-    mod_in = "instance.mod"
-    mod_out = "tmp/instance.out.mod"
-    parser = AMPLParser()
-    parser.parse(mod_in, mod_out)
-
-    lp_out = "tmp/instance.lp"
-    glpk_mod2lp(mod_out, lp_out)
-    out, varvalues = VPSolver.script_wsol(
-        "vpsolver_gurobi.sh", lp_out, verbose=True
-    )
-    sol, varvalues = parser.flow.extract(varvalues, verbose=True)
-
-    print
-    print "sol:", sol
-    print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
-    print
-
-    os.system("glpsol --math " + mod_out + "| grep -v Generating")
+import equivknapsack01
+import equivknapsack
+import graph
+import instance
 
 if __name__ == "__main__":
-    main()
+    print "equivknapsack:"
+    equivknapsack.main()
+
+    print "equivknapsack01:"
+    equivknapsack01.main()
+
+    print "graph:"
+    graph.main()
+
+    print "instance:"
+    instance.main()
