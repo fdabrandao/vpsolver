@@ -20,8 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from ...vpsolver import VBP
-from .utils import ampl_set, ampl_param
-from .utils import parse_index
+from . import utils
 
 
 class CmdLoadVBP(object):
@@ -44,7 +43,7 @@ class CmdLoadVBP(object):
         return lambda *args, **kwargs: self._evalcmd(name, *args, **kwargs)
 
     def _evalcmd(self, name, fname, i0=0, d0=0):
-        name, index = parse_index(name)
+        name, index = utils.parse_index(name)
         index_I, index_D = "%s_I" % name, "%s_D" % name
         if index is not None:
             assert 1 <= len(index) <= 2
@@ -75,28 +74,42 @@ class CmdLoadVBP(object):
 
         self._defs += "#BEGIN_DEFS: Instance[%s]\n" % name
         self._data += "#BEGIN_DATA: Instance[%s]\n" % name
-        defs, data = ampl_param("%s_m" % name, None, instance.m, params)
+        defs, data = utils.ampl_param(
+            "%s_m" % name, None, instance.m, params
+        )
         self._defs += defs
         self._data += data
-        defs, data = ampl_param("%s_n" % name, None, sum(instance.b), params)
+        defs, data = utils.ampl_param(
+            "%s_n" % name, None, sum(instance.b), params
+        )
         self._defs += defs
         self._data += data
-        defs, data = ampl_param("%s_p" % name, None, instance.ndims, params)
+        defs, data = utils.ampl_param(
+            "%s_p" % name, None, instance.ndims, params
+        )
         self._defs += defs
         self._data += data
-        defs, data = ampl_set(index_I, range(i0, i0+instance.m), sets)
+        defs, data = utils.ampl_set(
+            index_I, range(i0, i0+instance.m), sets
+        )
         self._defs += defs
         self._data += data
-        defs, data = ampl_set(index_D, range(i0, d0+instance.ndims), sets)
+        defs, data = utils.ampl_set(
+            index_D, range(i0, d0+instance.ndims), sets
+        )
         self._defs += defs
         self._data += data
-        defs, data = ampl_param("%s_W" % name, index_D, W, params)
+        defs, data = utils.ampl_param(
+            "%s_W" % name, index_D, W, params
+        )
         self._defs += defs
         self._data += data
-        defs, data = ampl_param("%s_b" % name, index_I, b, params)
+        defs, data = utils.ampl_param(
+            "%s_b" % name, index_I, b, params
+        )
         self._defs += defs
         self._data += data
-        defs, data = ampl_param(
+        defs, data = utils.ampl_param(
             "%s_w" % name, "%s,%s" % (index_I, index_D), w, params
         )
         self._defs += defs

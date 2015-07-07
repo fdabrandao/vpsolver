@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 from ...vpsolver import VBP, AFG
-from .utils import parse_varlist, ampl_set
+from . import utils
 
 
 class CmdGraph(object):
@@ -44,7 +44,7 @@ class CmdGraph(object):
         return lambda *args, **kwargs: self._evalcmd(arg1, *args, **kwargs)
 
     def _evalcmd(self, arg1, W=None, w=None, labels=None, bounds=None):
-        lst = parse_varlist(arg1)
+        lst = utils.parse_varlist(arg1)
         Vname, Aname = lst
 
         if isinstance(W, dict):
@@ -63,8 +63,8 @@ class CmdGraph(object):
 
         graph = self._generate_graph(W, w, labels, bounds)
 
-        self._defs += ampl_set(Vname, graph.V, self._sets)[0]
-        self._defs += ampl_set(Aname, graph.A, self._sets)[0]
+        self._defs += utils.ampl_set(Vname, graph.V, self._sets)[0]
+        self._defs += utils.ampl_set(Aname, graph.A, self._sets)[0]
 
     def _generate_graph(self, W, w, labels, bounds):
         m = len(w)

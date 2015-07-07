@@ -19,8 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .utils import ampl_set, ampl_param
-from .utils import parse_index, list2dict
+from . import utils
 
 
 class CmdSet(object):
@@ -43,7 +42,7 @@ class CmdSet(object):
         return lambda *args, **kwargs: self._evalcmd(name, *args, **kwargs)
 
     def _evalcmd(self, name, values):
-        self._defs += ampl_set(name, values, self._sets)[0]
+        self._defs += utils.ampl_set(name, values, self._sets)[0]
 
 
 class CmdParam(object):
@@ -66,12 +65,12 @@ class CmdParam(object):
         return lambda *args, **kwargs: self._evalcmd(arg1, *args, **kwargs)
 
     def _evalcmd(self, arg1, values, i0=None):
-        name, index = parse_index(arg1)
+        name, index = utils.parse_index(arg1)
 
         if isinstance(values, list):
             if i0 is None:
                 i0 = 0
-            values = list2dict(values, i0)
+            values = utils.list2dict(values, i0)
             if index is not None:
                 assert len(index) == 1
                 index = index[0]
@@ -89,8 +88,8 @@ class CmdParam(object):
         if isinstance(values, dict):
             if index is None:
                 index = "%s_I" % name
-            self._defs += ampl_set(index, values.keys(), self._sets)[0]
+            self._defs += utils.ampl_set(index, values.keys(), self._sets)[0]
 
-        pdefs, pdata = ampl_param(name, index, values, self._params)
+        pdefs, pdata = utils.ampl_param(name, index, values, self._params)
         self._defs += pdefs
         self._data += pdata

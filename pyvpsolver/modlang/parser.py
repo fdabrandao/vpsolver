@@ -24,6 +24,7 @@ import re
 from ..vpsolver import VPSolver
 from .cmd import CmdSet, CmdParam, CmdFlow, CmdGraph, CmdLoadVBP
 
+
 class AMPLParser(object):
     def __init__(self, mod_in, mod_out=None, locals_=None, globals_=None):
         if locals_ is None:
@@ -89,7 +90,9 @@ class AMPLParser(object):
                 if args1 is None:
                     call = "%s[%s](%s)" % (call, args1, args2)
                 else:
-                    call = "%s['''%s'''](%s)" % (call, args1.strip("[]"), args2)
+                    call = "%s['''%s'''](%s)" % (
+                        call, args1.strip("[]"), args2
+                    )
                 locals_["_model"] = ""
                 exec(call, globals_, locals_)
                 res = locals_["_model"]
