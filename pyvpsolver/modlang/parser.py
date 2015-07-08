@@ -26,16 +26,16 @@ from .cmd import CmdSet, CmdParam, CmdFlow, CmdGraph, CmdLoadVBP
 class AMPLParser(object):
     """Class for parsing AMPL files with modlang extensions"""
 
-    _RGX_CMD = "[a-zA-Z_][a-zA-Z0-9_]*"
-    _RGX_ARG1 = "[^\\]]*"
-    _RGX_ARG2 = """"(?:[^"]|\")*"|'(?:[^']|\')*'|[^}]*"""
-    _RGX_STMT = (
+    RGX_CMD = "[a-zA-Z_][a-zA-Z0-9_]*"
+    RGX_ARG1 = "[^\\]]*"
+    RGX_ARG2 = """"(?:[^"]|\")*"|'(?:[^']|\')*'|{(?:[^}])*}|[^}]*"""
+    RGX_STMT = (
         "(#|/\\*\\s*)?(?:"
-        "\\$("+_RGX_CMD+")\\s*(\\["+_RGX_ARG1+"\\])?\\s*{("+_RGX_ARG2+")}\\s*;"
-        "|\\${("+_RGX_ARG2+")}"
+        "\\$("+RGX_CMD+")\\s*(\\["+RGX_ARG1+"\\])?\\s*{("+RGX_ARG2+")}\\s*;"
+        "|\\${("+RGX_ARG2+")}"
         ")(?:\\s*\\*/)?"
     )
-    _VALID_CMDS = (
+    VALID_CMDS = (
         "EXEC", "EVAL", "SET", "PARAM", "LOAD_VBP", "FLOW", "GRAPH", None
     )
 
@@ -61,27 +61,27 @@ class AMPLParser(object):
         self._pyvars = pyvars
         self._locals = locals_
         self._globals = globals_
-        self._input = ""
-        self._output = ""
+        self.input = ""
+        self.output = ""
 
-    def parse(self, mod_in, mod_out=None):
+    def parse(self, mod_in=None, mod_out=None):
         """Parses the input file."""
         self._clear()
-        with open(mod_in, "r") as fin:
-            self._input = fin.read()
-            self._output = self._input
+        if mod_in is not None:
+            self.read(mod_in)
+        self.output = self.input
 
         locals_ = self._locals
         globals_ = self._globals
 
-        rgx = re.compile(self._RGX_STMT, re.DOTALL)
-        for match in rgx.finditer(self._input):
+        rgx = re.compile(self.RGX_STMT, re.DOTALL)
+        for match in rgx.finditer(self.input):
             comment, call, args1, args2, args3 = match.groups()
-            assert call in self._VALID_CMDS
-            strmatch = self._input[match.start():match.end()]
+            assert call in self.VALID_CMDS
+            strmatch = self.input[match.start():match.end()]
 
             if comment is not None:
-                self._output = self._output.replace(
+                self.output = self.output.replace(
                     strmatch, "/*IGNORED:"+strmatch.strip("/**/")+"*/"
                 )
                 continue
@@ -105,7 +105,7 @@ class AMPLParser(object):
                 exec(call, globals_, locals_)
                 res = locals_["_model"]
 
-            self._output = self._output.replace(
+            self.output = self.output.replace(
                 strmatch, "/*EVALUATED:%s*/%s" % (strmatch, res)
             )
 
@@ -127,28 +127,35 @@ class AMPLParser(object):
 
     def _add_defs(self, defs):
         """Adds definitions to the model."""
-        self._output = defs + self._output
+        if defs != "":
+            self.output = defs + self.output
 
     def _add_data(self, data):
         """Adds data to the model."""
-        data_stmt = re.search("data\\s*;", self._output, re.DOTALL)
-        end_stmt = re.search("end\\s*;", self._output, re.DOTALL)
-        if data_stmt is not None:
-            match = data_stmt.group(0)
-            self._output = self._output.replace(match, match+"\n"+data)
-        else:
-            if end_stmt is None:
-                self._output += "data;\n" + data + "\nend;"
+        if data != "":
+            data_stmt = re.search("data\\s*;", self.output, re.DOTALL)
+            end_stmt = re.search("end\\s*;", self.output, re.DOTALL)
+            if data_stmt is not None:
+                match = data_stmt.group(0)
+                self.output = self.output.replace(match, match+"\n"+data)
             else:
-                match = end_stmt.group(0)
-                self._output = self._output.replace(
-                    match, "data;\n" + data + "\nend;"
-                )
+                if end_stmt is None:
+                    self.output += "data;\n" + data + "\nend;"
+                else:
+                    match = end_stmt.group(0)
+                    self.output = self.output.replace(
+                        match, "data;\n" + data + "\nend;"
+                    )
+
+    def read(self, mod_in):
+        """Reads the input file."""
+        with open(mod_in, "r") as fin:
+            self.input = fin.read()
 
     def write(self, mod_out):
         """Writes the output to a file."""
         with open(mod_out, "w") as fout:
-            print >>fout, self._output
+            print >>fout, self.output
 
     @property
     def flow(self):

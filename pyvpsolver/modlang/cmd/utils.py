@@ -125,7 +125,7 @@ def ampl_param(name, index, value, params):
             return "[%s]%s" % (k, v)
 
         data = "param %s := " % name
-        data += ",".join(format_entry(k, v) for k, v in value.items())
+        data += "".join(format_entry(k, v) for k, v in value.items())
         data += ";\n"
         return defs, data
     else:
