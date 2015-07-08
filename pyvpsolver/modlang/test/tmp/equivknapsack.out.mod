@@ -30,10 +30,6 @@ solve;
 display{i in I} pi[i];
 display pi[0];
 data;
-
-
-
-param bounds := [1]5,[2]3,[3]1;
-
+param bounds := [1]5[2]3[3]1;
 
 end;

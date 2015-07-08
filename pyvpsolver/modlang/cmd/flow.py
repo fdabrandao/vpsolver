@@ -23,6 +23,7 @@ import re
 from ...vpsolver import VBP, AFG
 from ...model import Model
 from ..writemod import model2ampl
+from .base import CmdBase
 
 RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 
@@ -44,34 +45,14 @@ def lincomb2str(lincomb):
     return expr
 
 
-class CmdFlow(object):
+class CmdFlow(CmdBase):
     """Command for creating arc-flow models."""
 
-    def __init__(self, pyvars, sets, params):
+    def __init__(self, *args, **kwargs):
+        CmdBase.__init__(self, *args, **kwargs)
         self._zvars = []
         self._graphs = []
         self._prefixes = []
-        self._pyvars = pyvars
-        self._sets = sets
-        self._params = params
-
-    @property
-    def defs(self):
-        """Returns definitions."""
-        return ""
-
-    @property
-    def data(self):
-        """Returns data."""
-        return ""
-
-    def clear(self):
-        """Clears definitions and data."""
-        pass
-
-    def __getitem__(self, zvar):
-        """Evalutates CMD[arg1]."""
-        return lambda *args, **kwargs: self._evalcmd(zvar, *args, **kwargs)
 
     def _evalcmd(self, zvar, W=None, w=None, b=None, bounds=None):
         """Evalutates CMD[arg1](*arg2)."""

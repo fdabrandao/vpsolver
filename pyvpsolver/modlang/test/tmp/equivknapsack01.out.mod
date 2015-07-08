@@ -26,10 +26,4 @@ solve;
 
 display{i in I} pi[i];
 display pi[0];
-data;
 
-
-
-
-
-end;

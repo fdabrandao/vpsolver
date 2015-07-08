@@ -44,7 +44,7 @@ def main():
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_gurobi.sh", lp_out, verbose=True
     )
-    sol, varvalues = parser.flow.extract(varvalues, verbose=True)
+    sol, varvalues = parser["FLOW"].extract(varvalues, verbose=True)
 
     print
     print "sol:", sol

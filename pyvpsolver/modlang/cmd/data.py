@@ -19,71 +19,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from . import utils
+from .. import utils
+from .base import CmdBase
 
 
-class CmdSet(object):
+class CmdSet(CmdBase):
     """Command for creating a new AMPL set."""
-
-    def __init__(self, pyvars, sets, params):
-        self._defs = ""
-        self._data = ""
-        self._pyvars = pyvars
-        self._sets = sets
-        self._params = params
-
-    @property
-    def defs(self):
-        """Returns definitions."""
-        return self._defs
-
-    @property
-    def data(self):
-        """Returns data."""
-        return self._data
-
-    def clear(self):
-        """Clears definitions and data."""
-        self._defs = ""
-        self._data = ""
-
-    def __getitem__(self, name):
-        """Evalutates CMD[arg1]."""
-        return lambda *args, **kwargs: self._evalcmd(name, *args, **kwargs)
 
     def _evalcmd(self, name, values):
         """Evalutates CMD[arg1](*arg2)."""
         self._defs += utils.ampl_set(name, values, self._sets)[0]
 
 
-class CmdParam(object):
+class CmdParam(CmdBase):
     """Command for creating a new AMPL parameter."""
-
-    def __init__(self, pyvars, sets, params):
-        self._defs = ""
-        self._data = ""
-        self._pyvars = pyvars
-        self._sets = sets
-        self._params = params
-
-    @property
-    def defs(self):
-        """Returns definitions."""
-        return self._defs
-
-    @property
-    def data(self):
-        """Returns data."""
-        return self._data
-
-    def clear(self):
-        """Clears definitions and data."""
-        self._defs = ""
-        self._data = ""
-
-    def __getitem__(self, arg1):
-        """Evalutates CMD[arg1]."""
-        return lambda *args, **kwargs: self._evalcmd(arg1, *args, **kwargs)
 
     def _evalcmd(self, arg1, values, i0=None):
         """Evalutates CMD[arg1](*arg2)."""

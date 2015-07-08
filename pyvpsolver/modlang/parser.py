@@ -35,9 +35,13 @@ class AMPLParser(object):
         "|\\${("+RGX_ARG2+")}"
         ")(?:\\s*\\*/)?"
     )
-    VALID_CMDS = (
+    VALID_CALLS = (
         "EXEC", "EVAL", "SET", "PARAM", "LOAD_VBP", "FLOW", "GRAPH", None
     )
+    CMDS = {
+        "SET": CmdSet, "PARAM": CmdParam,
+        "LOAD_VBP": CmdLoadVBP, "FLOW": CmdFlow, "GRAPH": CmdGraph
+    }
 
     def __init__(self, locals_=None, globals_=None):
         if locals_ is None:
@@ -50,13 +54,8 @@ class AMPLParser(object):
         pyvars["_model"] = ""
         pyvars["_sets"] = sets
         pyvars["_params"] = params
-        pyvars["SET"] = CmdSet(pyvars, sets, params)
-        pyvars["PARAM"] = CmdParam(pyvars, sets, params)
-        pyvars["FLOW"] = CmdFlow(pyvars, sets, params)
-        pyvars["GRAPH"] = CmdGraph(pyvars, sets, params)
-        pyvars["LOAD_VBP"] = CmdLoadVBP(pyvars, sets, params)
-
-        self._cmds = ("SET", "PARAM", "FLOW", "GRAPH", "LOAD_VBP")
+        for cmd, cls in self.CMDS.items():
+            pyvars[cmd] = cls(pyvars, sets, params)
 
         self._pyvars = pyvars
         self._locals = locals_
@@ -77,7 +76,7 @@ class AMPLParser(object):
         rgx = re.compile(self.RGX_STMT, re.DOTALL)
         for match in rgx.finditer(self.input):
             comment, call, args1, args2, args3 = match.groups()
-            assert call in self.VALID_CMDS
+            assert call in self.VALID_CALLS
             strmatch = self.input[match.start():match.end()]
 
             if comment is not None:
@@ -110,18 +109,17 @@ class AMPLParser(object):
             )
 
         self._finalize()
-
         if mod_out is not None:
             self.write(mod_out)
 
     def _clear(self):
         """Clears definitions from previous models."""
-        for cmd in self._cmds:
+        for cmd in self.CMDS:
             self._pyvars[cmd].clear()
 
     def _finalize(self):
         """Adds definitions to the model."""
-        for cmd in self._cmds:
+        for cmd in self.CMDS:
             self._add_defs(self._pyvars[cmd].defs)
             self._add_data(self._pyvars[cmd].data)
 
@@ -157,7 +155,10 @@ class AMPLParser(object):
         with open(mod_out, "w") as fout:
             print >>fout, self.output
 
-    @property
-    def flow(self):
-        """Returns the FLOW object for solution extraction"""
-        return self._pyvars["FLOW"]
+    def __getitem__(self, varname):
+        """Returns the internal variable varname."""
+        return self._pyvars[varname]
+
+    def __setitem__(self, varname, value):
+        """Sets the internal variable varname."""
+        self._pyvars[varname] = value

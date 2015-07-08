@@ -55,10 +55,4 @@ solve;
 display {i in I} demand[i].dual;
 display Z0;
 display conZ.dual;
-data;
 
-
-
-
-
-end;

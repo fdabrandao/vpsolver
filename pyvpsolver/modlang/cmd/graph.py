@@ -20,37 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from ...vpsolver import VBP, AFG
-from . import utils
+from .. import utils
+from .base import CmdBase
 
 
-class CmdGraph(object):
+class CmdGraph(CmdBase):
     """Command for creating arc-flow graphs."""
-
-    def __init__(self, pyvars, sets, params):
-        self._defs = ""
-        self._data = ""
-        self._pyvars = pyvars
-        self._sets = sets
-        self._params = params
-
-    @property
-    def defs(self):
-        """Returns definitions."""
-        return self._defs
-
-    @property
-    def data(self):
-        """Returns data."""
-        return self._data
-
-    def clear(self):
-        """Clears definitions and data."""
-        self._defs = ""
-        self._data = ""
-
-    def __getitem__(self, arg1):
-        """Evalutates CMD[arg1]."""
-        return lambda *args, **kwargs: self._evalcmd(arg1, *args, **kwargs)
 
     def _evalcmd(self, arg1, W=None, w=None, labels=None, bounds=None):
         """Evalutates CMD[arg1](*arg2)."""
