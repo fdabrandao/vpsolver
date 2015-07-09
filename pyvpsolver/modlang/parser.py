@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import re
-from .cmd import CmdSet, CmdParam, CmdFlow, CmdGraph, CmdLoadVBP
+from .cmd import CmdBase, CmdSet, CmdParam, CmdFlow, CmdGraph, CmdLoadVBP
 
 
 class AMPLParser(object):
@@ -35,10 +35,7 @@ class AMPLParser(object):
         "|\\${("+RGX_ARG2+")}"
         ")(?:\\s*\\*/)?"
     )
-    VALID_CALLS = (
-        "EXEC", "EVAL", "SET", "PARAM", "LOAD_VBP", "FLOW", "GRAPH", None
-    )
-    CMDS = {
+    DEFAULT_CMDS = {
         "SET": CmdSet, "PARAM": CmdParam,
         "LOAD_VBP": CmdLoadVBP, "FLOW": CmdFlow, "GRAPH": CmdGraph
     }
@@ -50,18 +47,29 @@ class AMPLParser(object):
             globals_ = globals()
 
         pyvars = locals_
-        sets, params = {}, {}
+        sets = {}
+        params = {}
+        self._pyvars = pyvars
+        self._sets = sets
+        self._params = params
+        self._locals = locals_
+        self._globals = globals_
+
         pyvars["_model"] = ""
         pyvars["_sets"] = sets
         pyvars["_params"] = params
-        for cmd, cls in self.CMDS.items():
-            pyvars[cmd] = cls(pyvars, sets, params)
 
-        self._pyvars = pyvars
-        self._locals = locals_
-        self._globals = globals_
+        self._cmds = ["EXEC", "EVAL", None]
+        for cmd, cls in self.DEFAULT_CMDS.items():
+            self.add_cmd(cmd, cls)
+
         self.input = ""
         self.output = ""
+
+    def add_cmd(self, cmd, cmdcls):
+        """Adds a new command to the parser."""
+        self._pyvars[cmd] = cmdcls(self._pyvars, self._sets, self._params)
+        self._cmds.append(cmd)
 
     def parse(self, mod_in=None, mod_out=None):
         """Parses the input file."""
@@ -76,7 +84,7 @@ class AMPLParser(object):
         rgx = re.compile(self.RGX_STMT, re.DOTALL)
         for match in rgx.finditer(self.input):
             comment, call, args1, args2, args3 = match.groups()
-            assert call in self.VALID_CALLS
+            assert call in self._cmds
             strmatch = self.input[match.start():match.end()]
 
             if comment is not None:
@@ -114,14 +122,18 @@ class AMPLParser(object):
 
     def _clear(self):
         """Clears definitions from previous models."""
-        for cmd in self.CMDS:
-            self._pyvars[cmd].clear()
+        for cmd_name in self._cmds:
+            cmd_obj = self._pyvars.get(cmd_name, None)
+            if issubclass(type(cmd_obj), CmdBase):
+                cmd_obj.clear()
 
     def _finalize(self):
         """Adds definitions to the model."""
-        for cmd in self.CMDS:
-            self._add_defs(self._pyvars[cmd].defs)
-            self._add_data(self._pyvars[cmd].data)
+        for cmd_name in self._cmds:
+            cmd_obj = self._pyvars.get(cmd_name, None)
+            if issubclass(type(cmd_obj), CmdBase):
+                self._add_defs(cmd_obj.defs)
+                self._add_data(cmd_obj.data)
 
     def _add_defs(self, defs):
         """Adds definitions to the model."""

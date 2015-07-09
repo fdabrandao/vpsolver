@@ -45,7 +45,7 @@ def main():
         "vpsolver_gurobi.sh", lp_out, verbose=True
     )
 
-    sol, varvalues = parser.flow.extract(varvalues, verbose=True)
+    sol, varvalues = parser["FLOW"].extract(varvalues, verbose=True)
     print
     print "sol:", sol
     print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
