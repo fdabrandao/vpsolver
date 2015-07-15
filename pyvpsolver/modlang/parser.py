@@ -89,31 +89,36 @@ class AMPLParser(object):
 
             if comment is not None:
                 self.output = self.output.replace(
-                    strmatch, "/*IGNORED:"+strmatch.strip("/**/")+"*/"
+                    strmatch, "/*IGNORED:{0}*/".format(strmatch.strip("/**/"))
                 )
                 continue
-            if call is None:
-                res = eval(args3, globals_, locals_)
-            elif call == "EVAL":
-                res = eval(args2, globals_, locals_)
-            elif call == "EXEC":
-                assert args1 is None
-                locals_["_model"] = ""
-                exec(args2, globals_, locals_)
-                res = locals_["_model"]
-            else:
-                if args1 is None:
-                    call = "%s[%s](%s)" % (call, args1, args2)
+
+            try:
+                if call is None:
+                    res = eval(args3, globals_, locals_)
+                elif call == "EVAL":
+                    res = eval(args2, globals_, locals_)
+                elif call == "EXEC":
+                    assert args1 is None
+                    locals_["_model"] = ""
+                    exec(args2, globals_, locals_)
+                    res = locals_["_model"]
                 else:
-                    call = "%s['''%s'''](%s)" % (
-                        call, args1.strip("[]"), args2
-                    )
-                locals_["_model"] = ""
-                exec(call, globals_, locals_)
-                res = locals_["_model"]
+                    if args1 is not None:
+                        args1 = "'''{0}'''".format(args1[1:-1])
+                    call = "{0}[{1}]({2})".format(call, args1, args2)
+                    locals_["_model"] = ""
+                    exec(call, globals_, locals_)
+                    res = locals_["_model"]
+            except:
+                print "Failed to evaluate (line {0:d}):".format(
+                    self.input[:match.start()].count("\n")+1
+                )
+                print "  "+strmatch.replace("\n", "\n  ")
+                raise
 
             self.output = self.output.replace(
-                strmatch, "/*EVALUATED:%s*/%s" % (strmatch, res)
+                strmatch, "/*EVALUATED:{0}*/{1}".format(strmatch, res), 1
             )
 
         self._finalize()
