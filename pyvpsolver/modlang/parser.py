@@ -24,13 +24,13 @@ from .cmd import CmdBase, CmdSet, CmdParam, CmdFlow, CmdGraph, CmdLoadVBP
 
 
 class AMPLParser(object):
-    """Class for parsing AMPL files with modlang extensions"""
+    """Class for parsing AMPL files with modlang calls"""
 
     RGX_CMD = "[a-zA-Z_][a-zA-Z0-9_]*"
     RGX_ARG1 = "[^\\]]*"
     RGX_ARG2 = """"(?:[^"]|\")*"|'(?:[^']|\')*'|{(?:[^}])*}|[^}]*"""
     RGX_STMT = (
-        "(#|/\\*\\s*)?(?:"
+        "(#\\s*|/\\*\\s*)?(?:"
         "\\$("+RGX_CMD+")\\s*(\\["+RGX_ARG1+"\\])?\\s*{("+RGX_ARG2+")}\\s*;"
         "|\\${("+RGX_ARG2+")}"
         ")(?:\\s*\\*/)?"
@@ -46,18 +46,14 @@ class AMPLParser(object):
         if globals_ is None:
             globals_ = globals()
 
-        pyvars = locals_
-        sets = {}
-        params = {}
-        self._pyvars = pyvars
-        self._sets = sets
-        self._params = params
+        self._sets = {}
+        self._params = {}
         self._locals = locals_
         self._globals = globals_
 
-        pyvars["_model"] = ""
-        pyvars["_sets"] = sets
-        pyvars["_params"] = params
+        self._locals["_model"] = ""
+        self._locals["_sets"] = self._sets
+        self._locals["_params"] = self._params
 
         self._cmds = ["EXEC", "EVAL", None]
         for cmd, cls in self.DEFAULT_CMDS.items():
@@ -68,7 +64,7 @@ class AMPLParser(object):
 
     def add_cmd(self, cmd, cmdcls):
         """Adds a new command to the parser."""
-        self._pyvars[cmd] = cmdcls(self._pyvars, self._sets, self._params)
+        self._locals[cmd] = cmdcls(self._locals, self._sets, self._params)
         self._cmds.append(cmd)
 
     def parse(self, mod_in=None, mod_out=None):
@@ -86,10 +82,11 @@ class AMPLParser(object):
             comment, call, args1, args2, args3 = match.groups()
             assert call in self._cmds
             strmatch = self.input[match.start():match.end()]
+            clean_strmatch = strmatch.strip("/*# ")
 
             if comment is not None:
                 self.output = self.output.replace(
-                    strmatch, "/*IGNORED:{0}*/".format(strmatch.strip("/**/"))
+                    strmatch, "/*IGNORED:{0}*/".format(clean_strmatch)
                 )
                 continue
 
@@ -118,7 +115,7 @@ class AMPLParser(object):
                 raise
 
             self.output = self.output.replace(
-                strmatch, "/*EVALUATED:{0}*/{1}".format(strmatch, res), 1
+                strmatch, "/*EVALUATED:{0}*/{1}".format(clean_strmatch, res), 1
             )
 
         self._finalize()
@@ -128,14 +125,14 @@ class AMPLParser(object):
     def _clear(self):
         """Clears definitions from previous models."""
         for cmd_name in self._cmds:
-            cmd_obj = self._pyvars.get(cmd_name, None)
+            cmd_obj = self._locals.get(cmd_name, None)
             if issubclass(type(cmd_obj), CmdBase):
                 cmd_obj.clear()
 
     def _finalize(self):
         """Adds definitions to the model."""
         for cmd_name in self._cmds:
-            cmd_obj = self._pyvars.get(cmd_name, None)
+            cmd_obj = self._locals.get(cmd_name, None)
             if issubclass(type(cmd_obj), CmdBase):
                 self._add_defs(cmd_obj.defs)
                 self._add_data(cmd_obj.data)
@@ -174,8 +171,8 @@ class AMPLParser(object):
 
     def __getitem__(self, varname):
         """Returns the internal variable varname."""
-        return self._pyvars[varname]
+        return self._locals[varname]
 
     def __setitem__(self, varname, value):
         """Sets the internal variable varname."""
-        self._pyvars[varname] = value
+        self._locals[varname] = value

@@ -27,18 +27,21 @@ if sdir != "":
 import sys
 sys.path.insert(0, "../../../")
 
-from pyvpsolver.modlang import AMPLParser, glpk_mod2lp
+from pyvpsolver.modlang import AMPLParser
 
 
 class TestAMPLParser(unittest.TestCase):
+    """Unittests for the AMPLParser class"""
 
     def test_empty(self):
+        """Tests empty files"""
         parser = AMPLParser()
         parser.input = ""
         parser.parse()
         self.assertEqual(parser.output, "")
 
     def test_set(self):
+        """Tests $SET[name]{values} calls"""
         parser = AMPLParser()
         parser.input = """
         $SET[A]{range(5)};
@@ -47,6 +50,7 @@ class TestAMPLParser(unittest.TestCase):
         self.assertIn("set A := {0,1,2,3,4};", parser.output)
 
     def test_param(self):
+        """Tests $PARAM[name]{value} calls"""
         parser = AMPLParser()
         parser.input = """
         $PARAM[NAME]{"something"};
@@ -59,14 +63,36 @@ class TestAMPLParser(unittest.TestCase):
         self.assertIn("param P := ['a']1['b']2;", parser.output)
 
     def test_comments(self):
+        """Tests valid comments"""
         parser = AMPLParser()
         parser.input = """
-        /*$SET[A]{range(5)};*/
-        #$PARAM[VALUE]{10};
+        /* $SET[A]{range(5)};*/
+        # $PARAM[VALUE]{10};
+        param a := "/*";
+        $PARAM[Y]{10};
+        param b := "*/";
         """
         parser.parse()
         self.assertNotIn("set A := {0,1,2,3,4};", parser.output)
         self.assertNotIn("param VALUE := 10;", parser.output)
+        self.assertIn("param Y := 10;", parser.output)
+        self.assertIn("/*IGNORED:$SET[A]{range(5)};*/", parser.output)
+        self.assertIn("/*IGNORED:$PARAM[VALUE]{10};*/", parser.output)
+        self.assertIn("/*EVALUATED:$PARAM[Y]{10};*/", parser.output)
+
+    def test_invalid_comments(self):
+        """Tests invalid comments"""
+        parser = AMPLParser()
+        parser.input = """
+        /* ... $SET[A]{range(5)}; ... */
+        # ... $PARAM[VALUE]{10}; ...
+        /*$PARAM[X]{10};*/
+        param a := "/* ... $PARAM[Y]{10}; ... */"
+        """
+        parser.parse()
+        self.assertIn("/*EVALUATED:$SET[A]{range(5)};*/", parser.output)
+        self.assertIn("/*EVALUATED:$PARAM[VALUE]{10};*/", parser.output)
+        self.assertIn("/*EVALUATED:$PARAM[Y]{10};*/", parser.output)
 
 if __name__ == "__main__":
     unittest.main()
