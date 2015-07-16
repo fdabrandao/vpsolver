@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import re
+import sys
 from .cmd import CmdBase, CmdSet, CmdParam, CmdFlow, CmdGraph, CmdLoadVBP
 
 
@@ -103,16 +104,22 @@ class AMPLParser(object):
                 else:
                     if args1 is not None:
                         args1 = "'''{0}'''".format(args1[1:-1])
-                    call = "{0}[{1}]({2})".format(call, args1, args2)
                     locals_["_model"] = ""
-                    exec(call, globals_, locals_)
+                    exec(
+                        "{0}[{1}]({2})".format(call, args1, args2),
+                        globals_,
+                        locals_
+                    )
                     res = locals_["_model"]
             except:
-                print "Failed to evaluate (line {0:d}):".format(
-                    self.input[:match.start()].count("\n")+1
+                exctype, value, traceback = sys.exc_info()
+                msg = str(value)+"\n\t"
+                msg += "(while evaluating {0} at line {1:d} col {2:d})".format(
+                    "$"+call+("[...]" if args1 is not None else "")+"{...}",
+                    self.input[:match.start()].count("\n")+1,
+                    match.start()-self.input[:match.start()].rfind("\n"),
                 )
-                print "  "+strmatch.replace("\n", "\n  ")
-                raise
+                raise exctype, msg, traceback
 
             self.output = self.output.replace(
                 strmatch, "/*EVALUATED:{0}*/{1}".format(clean_strmatch, res), 1

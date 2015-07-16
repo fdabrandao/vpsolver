@@ -94,5 +94,15 @@ class TestAMPLParser(unittest.TestCase):
         self.assertIn("/*EVALUATED:$PARAM[VALUE]{10};*/", parser.output)
         self.assertIn("/*EVALUATED:$PARAM[Y]{10};*/", parser.output)
 
+    def test_exceptions(self):
+        """Tests if exceptions are thrown correctly"""
+        parser = AMPLParser()
+        parser.input = """$EXEC{print 1/0};"""
+        with self.assertRaises(ZeroDivisionError):
+            parser.parse()
+        parser.input = """$SET[X]{0};"""
+        with self.assertRaises(TypeError):
+            parser.parse()
+
 if __name__ == "__main__":
     unittest.main()
