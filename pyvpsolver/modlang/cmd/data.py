@@ -28,7 +28,11 @@ class CmdSet(CmdBase):
 
     def _evalcmd(self, name, values):
         """Evalutates CMD[arg1](*arg2)."""
-        self._defs += utils.ampl_set(name, values, self._sets)[0]
+        match = utils.parse_var(name)
+        assert match is not None
+        name = match
+
+        self._defs += utils.ampl_set(name, values, self._sets, self._params)[0]
 
 
 class CmdParam(CmdBase):
@@ -36,7 +40,9 @@ class CmdParam(CmdBase):
 
     def _evalcmd(self, arg1, values, i0=None):
         """Evalutates CMD[arg1](*arg2)."""
-        name, index = utils.parse_indexed(arg1)
+        match = utils.parse_indexed(arg1)
+        assert match is not None
+        name, index = match
 
         if isinstance(values, list):
             if i0 is None:
@@ -59,8 +65,12 @@ class CmdParam(CmdBase):
         if isinstance(values, dict):
             if index is None:
                 index = "%s_I" % name
-            self._defs += utils.ampl_set(index, values.keys(), self._sets)[0]
+            self._defs += utils.ampl_set(
+                index, values.keys(), self._sets, self._params
+            )[0]
 
-        pdefs, pdata = utils.ampl_param(name, index, values, self._params)
+        pdefs, pdata = utils.ampl_param(
+            name, index, values, self._sets, self._params
+        )
         self._defs += pdefs
         self._data += pdata

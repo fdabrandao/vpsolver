@@ -28,7 +28,8 @@ RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
 def parse_var(expr):
     """Matches and returns a variable name."""
     match = re.match("\\s*("+RGX_VARNAME+")\\s*$", expr)
-    assert match is not None
+    if match is None:
+        return None
     name = match.groups()[0]
     return name
 
@@ -38,7 +39,8 @@ def parse_varlist(expr):
     match = re.match(
         "\\s*(\\s*"+RGX_VARNAME+"\\s*(?:,\\s*"+RGX_VARNAME+"\\s*)*)\\s*$", expr
     )
-    assert match is not None
+    if match is None:
+        return None
     lst = match.groups()[0].split(",")
     lst = [x.strip() for x in lst]
     return lst
@@ -51,7 +53,8 @@ def parse_indexed(expr):
         "({\\s*"+RGX_VARNAME+"\\s*(?:,\\s*"+RGX_VARNAME+"\\s*)*})?\\s*$",
         expr
     )
-    assert match is not None
+    if match is None:
+        return None
     name, index = match.groups()
     if index is not None:
         index = index.strip("{} ")
@@ -85,9 +88,10 @@ def tuple2str(tuple_):
     )
 
 
-def ampl_set(name, values, sets):
+def ampl_set(name, values, sets, params):
     """Generates a definition for an AMPL set."""
     assert name not in sets
+    assert name not in params
     sets[name] = deepcopy(values)
 
     def format_entry(x):
@@ -104,8 +108,9 @@ def ampl_set(name, values, sets):
     return defs, ""
 
 
-def ampl_param(name, index, value, params):
+def ampl_param(name, index, value, sets, params):
     """Generates a definition for an AMPL parameter."""
+    assert name not in sets
     assert name not in params
     params[name] = deepcopy(value)
     if isinstance(value, dict):

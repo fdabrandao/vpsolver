@@ -23,7 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class CmdBase(object):
     """Command for creating a new AMPL set."""
 
-    def __init__(self, pyvars, sets, params):
+    def __init__(self, cmd_name, pyvars, sets, params):
+        self.cmd_name = cmd_name
         self._defs = ""
         self._data = ""
         self._pyvars = pyvars

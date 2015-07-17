@@ -65,7 +65,7 @@ class AMPLParser(object):
 
     def add_cmd(self, cmd, cmdcls):
         """Adds a new command to the parser."""
-        self._locals[cmd] = cmdcls(self._locals, self._sets, self._params)
+        self._locals[cmd] = cmdcls(cmd, self._locals, self._sets, self._params)
         self._cmds.append(cmd)
 
     def parse(self, mod_in=None, mod_out=None):

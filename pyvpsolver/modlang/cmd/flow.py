@@ -56,7 +56,8 @@ class CmdFlow(CmdBase):
 
     def _evalcmd(self, zvar, W, w, b, bounds=None):
         """Evalutates CMD[arg1](*arg2)."""
-        match = re.match("\\s*("+RGX_VARNAME+")\\s*(.*)", zvar, re.DOTALL)
+        match = re.match("\\s*("+RGX_VARNAME+")\\s*(.*)$", zvar, re.DOTALL)
+        assert match is not None
         zvar, ztype = match.groups()
         ztype = ztype.replace(",", "")
 

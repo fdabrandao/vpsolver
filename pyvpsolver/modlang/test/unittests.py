@@ -112,6 +112,13 @@ class TestAMPLParser(unittest.TestCase):
         parser.input = """$SET[X]{};"""
         with self.assertRaises(TypeError):
             parser.parse()
+        parser.input = """$SET[X]{[1,2,3]};$SET[X]{[1,2]};"""
+        with self.assertRaises(AssertionError):
+            parser.parse()
+        parser.input = """$SET[2X]{[1,2,3]};"""
+        with self.assertRaises(AssertionError):
+            parser.parse()
+
 
 
 if __name__ == "__main__":

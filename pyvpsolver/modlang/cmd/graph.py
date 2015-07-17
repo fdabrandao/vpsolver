@@ -27,10 +27,11 @@ from .base import CmdBase
 class CmdGraph(CmdBase):
     """Command for creating arc-flow graphs."""
 
-    def _evalcmd(self, arg1, W, w, labels, bounds=None):
+    def _evalcmd(self, names, W, w, labels, bounds=None):
         """Evalutates CMD[arg1](*arg2)."""
-        lst = utils.parse_varlist(arg1)
-        Vname, Aname = lst
+        match = utils.parse_varlist(names)
+        assert match is not None
+        Vname, Aname = match
 
         if isinstance(W, dict):
             W = [W[k] for k in sorted(W)]
@@ -48,8 +49,12 @@ class CmdGraph(CmdBase):
 
         graph = self._generate_graph(W, w, labels, bounds)
 
-        self._defs += utils.ampl_set(Vname, graph.V, self._sets)[0]
-        self._defs += utils.ampl_set(Aname, graph.A, self._sets)[0]
+        self._defs += utils.ampl_set(
+            Vname, graph.V, self._sets, self._params
+        )[0]
+        self._defs += utils.ampl_set(
+            Aname, graph.A, self._sets, self._params
+        )[0]
 
     def _generate_graph(self, W, w, labels, bounds):
         """Generates an arc-flow graph."""

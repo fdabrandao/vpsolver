@@ -61,42 +61,42 @@ class CmdLoadVBP(CmdBase):
         self._defs += "#BEGIN_DEFS: Instance[%s]\n" % name
         self._data += "#BEGIN_DATA: Instance[%s]\n" % name
         defs, data = utils.ampl_param(
-            "%s_m" % name, None, instance.m, params
+            "%s_m" % name, None, instance.m, sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_n" % name, None, sum(instance.b), params
+            "%s_n" % name, None, sum(instance.b), sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_p" % name, None, instance.ndims, params
+            "%s_p" % name, None, instance.ndims, sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_set(
-            index_I, range(i0, i0+instance.m), sets
+            index_I, range(i0, i0+instance.m), sets, sets
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_set(
-            index_D, range(i0, d0+instance.ndims), sets
+            index_D, range(i0, d0+instance.ndims), sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_W" % name, index_D, W, params
+            "%s_W" % name, index_D, W, sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_b" % name, index_I, b, params
+            "%s_b" % name, index_I, b, sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_w" % name, "%s,%s" % (index_I, index_D), w, params
+            "%s_w" % name, "%s,%s" % (index_I, index_D), w, sets, params
         )
         self._defs += defs
         self._data += data
