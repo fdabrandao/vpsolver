@@ -27,7 +27,7 @@ from .base import CmdBase
 class CmdGraph(CmdBase):
     """Command for creating arc-flow graphs."""
 
-    def _evalcmd(self, arg1, W=None, w=None, labels=None, bounds=None):
+    def _evalcmd(self, arg1, W, w, labels, bounds=None):
         """Evalutates CMD[arg1](*arg2)."""
         lst = utils.parse_varlist(arg1)
         Vname, Aname = lst

@@ -54,7 +54,7 @@ class CmdFlow(CmdBase):
         self._graphs = []
         self._prefixes = []
 
-    def _evalcmd(self, zvar, W=None, w=None, b=None, bounds=None):
+    def _evalcmd(self, zvar, W, w, b, bounds=None):
         """Evalutates CMD[arg1](*arg2)."""
         match = re.match("\\s*("+RGX_VARNAME+")\\s*(.*)", zvar, re.DOTALL)
         zvar, ztype = match.groups()

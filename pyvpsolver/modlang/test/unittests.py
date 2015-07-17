@@ -103,6 +103,16 @@ class TestAMPLParser(unittest.TestCase):
         parser.input = """$SET[X]{0};"""
         with self.assertRaises(TypeError):
             parser.parse()
+        parser.input = """$FLOW[Z]{100, [10, 10]};"""
+        with self.assertRaises(TypeError):
+            parser.parse()
+        parser.input = """$FLOW[Z]{100, 10};"""
+        with self.assertRaises(TypeError):
+            parser.parse()
+        parser.input = """$SET[X]{};"""
+        with self.assertRaises(TypeError):
+            parser.parse()
+
 
 if __name__ == "__main__":
     unittest.main()
