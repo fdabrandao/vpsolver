@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ app_name }}</title>
+
+    <script src="{{ url_for("static", filename="js/jquery-1.11.2.js") }}"></script>
+
+    <link href="{{ url_for("static", filename="bootstrap/css/bootstrap.min.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="bootstrap/css/bootstrap-theme.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="bootstrap/css/bootstrap-theme-readable.css") }}" rel="stylesheet">
+    <script src="{{ url_for("static", filename="bootstrap/js/bootstrap.min.js") }}"></script>
+
+    <link href="{{ url_for("static", filename="css/app.css") }}" rel="stylesheet">
+    <script src="{{ url_for("static", filename="js/app.js") }}"></script>
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="/" class="navbar-brand">{{ app_name }}</a>
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+          <ul class="nav navbar-nav">
+            {% for page, description in pages %}
+              <li {% if request.path.startswith(page) %}class="active"{% endif %}>
+                <a href="{{ page }}">{{ description }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="http://vpsolver.dcc.fc.up.pt/" target="_bank">About</a></li>
+            <li><a href="https://github.com/fdabrandao/vpsolver" target="_blank">GitHub</a></li>
+            <li><a href="http://vpsolver.dcc.fc.up.pt/contact" target="_blank">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="row">
+        <form action="{{ url_for("solve") }}" method="post" target="_blank">
+
+        {% if examples is defined %}
+        <div class="form-group">
+          <label for="examples">Load example:</label>
+          <select class="form-control my_select" id="examples" name="examples" value="{{ request.path }}">
+            {% for url, description, path in examples %}
+                <option value="{{ url }}" {% if request.path == url %}selected="selected"{% endif %}>{{ description }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+
+        <label for="input">Input:</label>
+        <textarea class="form-control" id="input" name="input" id="input" rows="20">{{ input_data }}</textarea>
+
+        {% if scripts is defined %}
+        <div class="form-group">
+          <label for="script">Solve with:</label>
+          <select class="form-control my_select" id="script" name="script">
+            {% for script, description in scripts %}
+                <option value="{{ script }}">{{ description }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+
+        <button id="solve" class="btn btn-lg btn-primary btn-block" type="submit" onclick="this.form.target='_blank';return true;">Solve</button>
+        </form>
+
+      </div>
+
+    </div>
+  </body>
+</html>

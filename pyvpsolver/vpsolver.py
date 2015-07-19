@@ -164,7 +164,10 @@ class VPSolver:
 
     @staticmethod
     def run(cmd):
-        p = subprocess.Popen(cmd, shell=True, preexec_fn=os.setsid)
+        p = subprocess.Popen(
+            cmd, shell=True,
+            stdout=sys.stdout, stderr=sys.stderr, preexec_fn=os.setsid
+        )
         VPSolver.PLIST.append(p)
         p.wait()
 

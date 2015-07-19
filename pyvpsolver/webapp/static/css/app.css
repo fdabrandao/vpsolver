@@ -1,0 +1,14 @@
+body {
+  padding-bottom: 100px;
+  padding-top: 75px;
+}
+
+#input {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+}
+
+form {
+  padding-left: 25px;
+  padding-right: 25px;
+}
