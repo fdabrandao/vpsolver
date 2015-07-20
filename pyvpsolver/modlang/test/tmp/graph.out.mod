@@ -25,7 +25,7 @@ labels = [i+1 for i in xrange(m)]
 
 /*EVALUATED:$PARAM[m]{m};*/
 
-/*
+/*IGNORED:
 set I := 1..m;
 var pi{{0} union I} >= 0, integer;
 var theta{V} >= 0;

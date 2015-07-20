@@ -110,18 +110,7 @@ class TestAMPLParser(unittest.TestCase):
         self.assertNotIn("param VALUE2 := 10;", parser.output)
         self.assertIn("param Y := 10;", parser.output)
         self.assertIn("/*IGNORED:$SET[A]{range(5)};*/", parser.output)
-        self.assertIn("/*IGNORED:$PARAM[VALUE]{10};*/", parser.output)
-        self.assertIn("/*EVALUATED:$PARAM[Y]{10};*/", parser.output)
-
-    def test_invalid_comments(self):
-        """Tests invalid comments"""
-        parser = AMPLParser()
-        parser.input = """
-        /* ... $SET[A]{range(5)}; ... */
-        param a := "/* ... $PARAM[Y]{10}; ... */"
-        """
-        parser.parse()
-        self.assertIn("/*EVALUATED:$SET[A]{range(5)};*/", parser.output)
+        self.assertIn("# $PARAM[VALUE]{10};", parser.output)
         self.assertIn("/*EVALUATED:$PARAM[Y]{10};*/", parser.output)
 
     def test_exceptions(self):

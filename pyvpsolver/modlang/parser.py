@@ -25,6 +25,8 @@ from .cmd import CmdBase, CmdSet, CmdParam
 from .cmd import CmdVar, CmdCon, CmdStmt
 from .cmd import CmdFlow, CmdGraph, CmdLoadVBP
 
+DEBUG = False
+
 
 class AMPLParser(object):
     """Class for parsing AMPL files with modlang calls"""
@@ -32,11 +34,12 @@ class AMPLParser(object):
     RGX_CMD = "[a-zA-Z_][a-zA-Z0-9_]*"
     RGX_ARG1 = "[^\\]]*"
     RGX_ARG2 = """(?:.*?(?=}\s*;))"""
+    RGX_STRINGS = """"(?:[^"]|\\\\")*"|'(?:[^']|\\\\')*'"""
+    RGX_COMMENTS = """#[^\n]*|/\\*.*?(?=\\*/)\\*/"""
     RGX_STMT = (
-        "(#[^\n]*|/\\*\\s*)?(?:"
-        "\\$("+RGX_CMD+")\\s*(\\["+RGX_ARG1+"\\])?\\s*{("+RGX_ARG2+")}\\s*;"
+        "("+RGX_STRINGS+"|"+RGX_COMMENTS+")"
+        "|\\$("+RGX_CMD+")\\s*(\\["+RGX_ARG1+"\\])?\\s*{("+RGX_ARG2+")}\\s*;"
         "|\\${("+RGX_ARG2+")}"
-        ")(?:\\s*\\*/)?"
     )
     DEFAULT_CMDS = {
         "SET": CmdSet, "PARAM": CmdParam,
@@ -88,10 +91,14 @@ class AMPLParser(object):
             strmatch = self.input[match.start():match.end()]
             clean_strmatch = strmatch.strip("/*# ")
 
+            if DEBUG:
+                print "\n---\n{0}\n---\n".format(strmatch)
+
             if comment is not None:
-                self.output = self.output.replace(
-                    strmatch, "/*IGNORED:{0}*/".format(clean_strmatch)
-                )
+                if comment.startswith("/*"):
+                    self.output = self.output.replace(
+                        strmatch, "/*IGNORED:{0}*/".format(clean_strmatch)
+                    )
                 continue
 
             try:
