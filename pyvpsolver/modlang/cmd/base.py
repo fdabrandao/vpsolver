@@ -46,6 +46,10 @@ class CmdBase(object):
         self._defs = ""
         self._data = ""
 
+    def __call__(self, *args, **kwargs):
+        """Evalutates CMD()."""
+        self._evalcmd(None, *args, **kwargs)
+
     def __getitem__(self, arg1):
         """Evalutates CMD[arg1]."""
         return lambda *args, **kwargs: self._evalcmd(arg1, *args, **kwargs)

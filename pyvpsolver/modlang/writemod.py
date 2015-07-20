@@ -83,7 +83,7 @@ def model2ampl(model, zvar, ztype, excluded_vars=None, prefix=""):
         ub = model.vars[name]["ub"]
         if name == zvar:
             if any(x in ztype for x in ("integer", "binary", ">", "<")):
-                return ampl_var(name, explicit=ztype)
+                return ampl_var(name, ztype)
             else:
                 return ampl_var(name, typ, lb, ub)
         else:

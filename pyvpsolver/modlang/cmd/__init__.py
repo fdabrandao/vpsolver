@@ -24,3 +24,4 @@ from .data import CmdSet, CmdParam
 from .flow import CmdFlow
 from .graph import CmdGraph
 from .loadvbp import CmdLoadVBP
+from .model import CmdVar, CmdCon, CmdStmt

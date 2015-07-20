@@ -40,7 +40,7 @@ def main():
     parser.parse(mod_in, mod_out)
 
     lp_out = "tmp/instance.lp"
-    glpk_mod2lp(mod_out, lp_out)
+    glpk_mod2lp(mod_out, lp_out, True)
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_gurobi.sh", lp_out, verbose=True
     )

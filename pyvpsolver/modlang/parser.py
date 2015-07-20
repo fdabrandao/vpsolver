@@ -21,7 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 import sys
-from .cmd import CmdBase, CmdSet, CmdParam, CmdFlow, CmdGraph, CmdLoadVBP
+from .cmd import CmdBase, CmdSet, CmdParam
+from .cmd import CmdVar, CmdCon, CmdStmt
+from .cmd import CmdFlow, CmdGraph, CmdLoadVBP
 
 
 class AMPLParser(object):
@@ -29,7 +31,7 @@ class AMPLParser(object):
 
     RGX_CMD = "[a-zA-Z_][a-zA-Z0-9_]*"
     RGX_ARG1 = "[^\\]]*"
-    RGX_ARG2 = """"(?:[^"]|\")*"|'(?:[^']|\')*'|{(?:[^}])*}|[^}]*"""
+    RGX_ARG2 = """"(?:[^"]|\\\\")*"|'(?:[^']|\\\\')*'|{(?:[^}])*}|[^}]*"""
     RGX_STMT = (
         "(#\\s*|/\\*\\s*)?(?:"
         "\\$("+RGX_CMD+")\\s*(\\["+RGX_ARG1+"\\])?\\s*{("+RGX_ARG2+")}\\s*;"
@@ -38,7 +40,8 @@ class AMPLParser(object):
     )
     DEFAULT_CMDS = {
         "SET": CmdSet, "PARAM": CmdParam,
-        "LOAD_VBP": CmdLoadVBP, "FLOW": CmdFlow, "GRAPH": CmdGraph
+        "VAR": CmdVar, "CON": CmdCon, "STMT": CmdStmt,
+        "LOAD_VBP": CmdLoadVBP, "FLOW": CmdFlow, "GRAPH": CmdGraph,
     }
 
     def __init__(self, locals_=None, globals_=None):

@@ -153,31 +153,31 @@ def lincomb2str(lincomb):
     def format_entry(var, coef):
         if abs(coef) != 1:
             if coef >= 0:
-                return " + {0:g} {1}".format(coef, var)
+                return "+{0:g}*{1}".format(coef, var)
             else:
-                return " - {0:g} {1}".format(abs(coef), var)
+                return "-{0:g}*{1}".format(abs(coef), var)
         else:
             if coef >= 0:
-                return " + {0}".format(var)
+                return "+{0}".format(var)
             else:
-                return " - {0}".format(var)
+                return "-{0}".format(var)
 
     return "".join(format_entry(var, coef) for var, coef in lincomb)
 
 
-def ampl_var(name, typ=None, lb=None, ub=None, explicit=None):
+def ampl_var(name, typ="", lb=None, ub=None):
     """Generates the definition for an AMPL variable."""
     defs = "var {0}".format(name)
     if typ == "I":
-        defs += ", integer"
-    if typ == "B":
-        defs += ", binary"
+        typ = "integer"
+    elif typ == "B":
+        typ = "binary"
+    if typ != "":
+        defs += ", {0}".format(typ)
     if lb is not None:
         defs += ", >= {0:g}".format(lb)
     if ub is not None:
         defs += ", <= {0:g}".format(ub)
-    if explicit is not None:
-        defs += ", {0}".format(explicit)
     defs += ";"
     return defs
 
