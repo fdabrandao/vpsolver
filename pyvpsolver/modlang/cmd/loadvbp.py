@@ -30,7 +30,8 @@ class CmdLoadVBP(CmdBase):
     def _evalcmd(self, name, fname, i0=0, d0=0):
         """Evalutates CMD[arg1](*arg2)."""
         name, index = utils.parse_indexed(name)
-        index_I, index_D = "%s_I" % name, "%s_D" % name
+        index_I = "{0}_I".format(name)
+        index_D = "{0}_D".format(name)
         if index is not None:
             assert 1 <= len(index) <= 2
             if len(index) == 2:
@@ -54,24 +55,24 @@ class CmdLoadVBP(CmdBase):
             for i in xrange(instance.m)
         }
 
-        assert "_%s" % name not in self._pyvars
-        self._pyvars["_%s" % name] = instance
+        assert "_{0}".format(name) not in self._pyvars
+        self._pyvars["_{0}".format(name)] = instance
         sets, params = self._sets, self._params
 
-        self._defs += "#BEGIN_DEFS: Instance[%s]\n" % name
-        self._data += "#BEGIN_DATA: Instance[%s]\n" % name
+        self._defs += "#BEGIN_DEFS: Instance[{0}]\n".format(name)
+        self._data += "#BEGIN_DATA: Instance[{0}]\n".format(name)
         defs, data = utils.ampl_param(
-            "%s_m" % name, None, instance.m, sets, params
+            "{0}_m".format(name), None, instance.m, sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_n" % name, None, sum(instance.b), sets, params
+            "{0}_n".format(name), None, sum(instance.b), sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_p" % name, None, instance.ndims, sets, params
+            "{0}_p".format(name), None, instance.ndims, sets, params
         )
         self._defs += defs
         self._data += data
@@ -86,19 +87,21 @@ class CmdLoadVBP(CmdBase):
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_W" % name, index_D, W, sets, params
+            "{0}_W".format(name), index_D, W, sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_b" % name, index_I, b, sets, params
+            "{0}_b".format(name), index_I, b, sets, params
         )
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_param(
-            "%s_w" % name, "%s,%s" % (index_I, index_D), w, sets, params
+            "{0}_w".format(name),
+            "{0},{1}".format(index_I, index_D),
+            w, sets, params
         )
         self._defs += defs
         self._data += data
-        self._defs += "#END_DEFS: Instance[%s]\n" % name
-        self._data += "#END_DATA: Instance[%s]\n" % name
+        self._defs += "#END_DEFS: Instance[{0}]\n".format(name)
+        self._data += "#END_DATA: Instance[{0}]\n".format(name)

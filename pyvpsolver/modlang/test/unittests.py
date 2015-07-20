@@ -120,6 +120,5 @@ class TestAMPLParser(unittest.TestCase):
             parser.parse()
 
 
-
 if __name__ == "__main__":
     unittest.main()

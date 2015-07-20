@@ -83,60 +83,113 @@ def list2dict(lst, i0=0):
 
 def tuple2str(tuple_):
     """Converts a tuple to a AMPL tuple."""
-    return ",".join(
-        [str(x) if not isinstance(x, str) else "'%s'" % x for x in tuple_]
-    )
+
+    def format_entry(e):
+        if not isinstance(e, str):
+            return str(e)
+        else:
+            return "'{0}'".format(e)
+
+    return ",".join(format_entry(e) for e in tuple_)
 
 
 def ampl_set(name, values, sets, params):
-    """Generates a definition for an AMPL set."""
+    """Generates the definition for an AMPL set."""
     assert name not in sets
     assert name not in params
     sets[name] = deepcopy(values)
 
-    def format_entry(x):
-        if isinstance(x, str):
-            return "'%s'" % x
-        elif isinstance(x, (tuple, list)):
-            return "(%s)" % tuple2str(x)
+    def format_entry(e):
+        if isinstance(e, str):
+            return "'{0}'".format(e)
+        elif isinstance(e, (tuple, list)):
+            return "({0})".format(tuple2str(e))
         else:
-            return str(x)
+            return str(e)
 
-    defs = "set %s := {" % name
-    defs += ",".join(format_entry(x) for x in values)
-    defs += "};\n"
+    defs = "set {0} := {{{1}}};\n".format(
+        name, ",".join(format_entry(e) for e in values)
+    )
     return defs, ""
 
 
 def ampl_param(name, index, value, sets, params):
-    """Generates a definition for an AMPL parameter."""
+    """Generates the definition for an AMPL parameter."""
     assert name not in sets
     assert name not in params
     params[name] = deepcopy(value)
     if isinstance(value, dict):
-        defs = "param %s{%s};\n" % (name, index)
+        defs = "param {0}{{{1}}};\n".format(name, index)
 
         def format_entry(k, v):
             if isinstance(k, str):
-                k = "'%s'" % k
+                k = "'{0}'".format(k)
             elif isinstance(k, tuple):
                 k = tuple2str(k)
             else:
                 k = str(k)
             if isinstance(v, str):
-                v = "'%s'" % v
+                v = "'{0}'".format(v)
             else:
                 v = str(v)
-            return "[%s]%s" % (k, v)
+            return "[{0}]{1}".format(k, v)
 
-        data = "param %s := " % name
-        data += "".join(format_entry(k, v) for k, v in value.items())
-        data += ";\n"
+        data = "param {0} := {1};\n".format(
+            name, "".join(format_entry(k, v) for k, v in value.items())
+        )
         return defs, data
     else:
         assert index is None
         assert isinstance(value, (str, float, int))
         if isinstance(value, str):
-            value = "'%s'" % value
-        defs = "param %s := %s;\n" % (name, str(value))
+            value = "'{0}'".format(value)
+        defs = "param {0} := {1};\n".format(name, str(value))
         return defs, ""
+
+
+def lincomb2str(lincomb):
+    """Returns the linear combination as a string."""
+
+    def format_entry(var, coef):
+        if abs(coef) != 1:
+            if coef >= 0:
+                return " + {0:g} {1}".format(coef, var)
+            else:
+                return " - {0:g} {1}".format(abs(coef), var)
+        else:
+            if coef >= 0:
+                return " + {0}".format(var)
+            else:
+                return " - {0}".format(var)
+
+    return "".join(format_entry(var, coef) for var, coef in lincomb)
+
+
+def ampl_var(name, typ=None, lb=None, ub=None, explicit=None):
+    """Generates the definition for an AMPL variable."""
+    defs = "var {0}".format(name)
+    if typ == "I":
+        defs += ", integer"
+    if typ == "B":
+        defs += ", binary"
+    if lb is not None:
+        defs += ", >= {0:g}".format(lb)
+    if ub is not None:
+        defs += ", <= {0:g}".format(ub)
+    if explicit is not None:
+        defs += ", {0}".format(explicit)
+    defs += ";"
+    return defs
+
+
+def ampl_con(name, lincomb, sign, rhs):
+    """Generates the definition for an AMPL constraint."""
+    if sign in (">", "<"):
+        sign += "="
+    defs = "s.t. {name}: {lin} {sign} {rhs};".format(
+        name=name,
+        lin=lincomb2str(lincomb),
+        sign=sign,
+        rhs=rhs
+    )
+    return defs

@@ -27,22 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # s.t. c1: x1 + 2 * x2 <= 1;
 # s.t. c2: 3 * x1 + x2 <= 2;
 
-
-def lincomb2str(lincomb):
-    """Returns the linear combination as a string."""
-    expr = ""
-    for var, coef in lincomb:
-        if abs(coef) != 1:
-            if coef >= 0:
-                expr += " + %g %s" % (coef, var)
-            elif coef < 0:
-                expr += " - %g %s" % (abs(coef), var)
-        else:
-            if coef >= 0:
-                expr += " + %s" % (var)
-            elif coef < 0:
-                expr += " - %s" % (var)
-    return expr
+from .utils import lincomb2str, ampl_var, ampl_con
 
 
 def write_mod(model, filename):
@@ -52,84 +37,74 @@ def write_mod(model, filename):
     # variables
 
     for var in model.vars:
+        typ = model.vars[var]["vtype"]
         lb = model.vars[var]["lb"]
         ub = model.vars[var]["ub"]
-        typ = ""
-        if model.vars[var]["vtype"] == "I":
-            typ = ", integer"
-        if lb is not None and ub is not None:
-            print >>fout, "var %s%s, >= %g, <= %g;" % (var, typ, lb, ub)
-        elif lb is not None:
-            print >>fout, "var %s%s, >= %g;" % (var, typ, lb)
-        elif ub is not None:
-            print >>fout, "var %s%s, <= %g;" % (var, typ, ub)
-        else:
-            print >>fout, "var %s%s;" % (var, typ)
+        print >>fout, ampl_var(var, typ, lb, ub)
 
     # objective
 
     if model.obj != []:
         if model.objdir == "min":
-            print >>fout, "minimize obj:",
+            print >>fout, "minimize obj: {0};".format(lincomb2str(model.obj))
         else:
-            print >>fout, "maximize obj:",
-        print >>fout, lincomb2str(model.obj)+";"
+            print >>fout, "maximize obj: {0};".format(lincomb2str(model.obj))
 
     # constraints
 
     for name in model.cons_list:
         lincomb, sign, rhs = model.cons[name]
-        if sign in (">", "<"):
-            sign += "="
-        print >>fout, "s.t. %s:%s %s %s;" % (
-            name, lincomb2str(lincomb), sign, rhs
-        )
+        print >>fout, ampl_con(name, lincomb, sign, rhs)
 
     print >>fout, "end;"
     fout.close()
 
 
-def model2ampl(model, zvar, ztype, excluded_vars=[], prefix=""):
+def model2ampl(model, zvar, ztype, excluded_vars=None, prefix=""):
     """Returns the model in AMPL format as a string."""
     res = ""
 
     # variables
 
-    excluded_vars = set(excluded_vars)
-    for var in model.vars:
-        if var in excluded_vars:
-            continue
-        lb = model.vars[var]["lb"]
-        ub = model.vars[var]["ub"]
-        typ = ""
-        pref = prefix
-        if model.vars[var]["vtype"] == "I":
-            typ = ", integer"
-        if var == zvar:
-            pref = ""
-            if any(x in ztype for x in ("integer", "binary", ">", "<")):
-                typ = ztype
-                lb, ub = None, None
-        if lb is not None and ub is not None:
-            res += "var %s%s%s, >= %g, <= %g;" % (pref, var, typ, lb, ub)
-        elif lb is not None:
-            res += "var %s%s%s, >= %g;" % (pref, var, typ, lb)
-        elif ub is not None:
-            res += "var %s%s%s, <= %g;" % (pref, var, typ, ub)
+    if excluded_vars is not None:
+        excluded_vars = set(excluded_vars)
+    else:
+        excluded_vars = set()
+
+    def var_name(name):
+        if name == zvar or name in excluded_vars:
+            return name
         else:
-            res += "var %s%s%s;" % (pref, var, typ)
+            return prefix+name
+
+    def format_var(name):
+        typ = model.vars[name]["vtype"]
+        lb = model.vars[name]["lb"]
+        ub = model.vars[name]["ub"]
+        if name == zvar:
+            if any(x in ztype for x in ("integer", "binary", ">", "<")):
+                return ampl_var(name, explicit=ztype)
+            else:
+                return ampl_var(name, typ, lb, ub)
+        else:
+            return ampl_var(var_name(name), typ, lb, ub)
+
+    res += "".join(
+        format_var(name)
+        for name in model.vars
+        if name not in excluded_vars
+    )
 
     # constraints
 
-    for name in model.cons_list:
+    def format_con(name):
         lincomb, sign, rhs = model.cons[name]
-        if sign in [">", "<"]:
-            sign += "="
-        for i in xrange(len(lincomb)):
-            if lincomb[i][0] != zvar and lincomb[i][0] not in excluded_vars:
-                lincomb[i] = (prefix+lincomb[i][0], lincomb[i][1])
-        res += "s.t. %s%s:%s %s %s;" % (
-            prefix, name, lincomb2str(lincomb), sign, rhs
-        )
+        lincomb = [(var_name(var), coef) for (var, coef) in lincomb]
+        return ampl_con(name, lincomb, sign, rhs)
+
+    res += "".join(
+        format_con(name)
+        for name in model.cons_list
+    )
 
     return res

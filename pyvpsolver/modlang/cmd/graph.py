@@ -70,7 +70,7 @@ class CmdGraph(CmdBase):
         instance = VBP(W, w, b, verbose=False)
         graph = AFG(instance, verbose=False).graph()
         graph.relabel(
-            lambda u: u if isinstance(u, str) else "%s" % u,
+            lambda u: u if isinstance(u, str) else str(u),
             lambda i: labels[i] if isinstance(i, int) and i < m else "LOSS"
         )
         return graph

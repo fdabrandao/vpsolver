@@ -64,7 +64,7 @@ class CmdParam(CmdBase):
 
         if isinstance(values, dict):
             if index is None:
-                index = "%s_I" % name
+                index = "{0}_I".format(name)
             self._defs += utils.ampl_set(
                 index, values.keys(), self._sets, self._params
             )[0]

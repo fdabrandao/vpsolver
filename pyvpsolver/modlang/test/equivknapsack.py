@@ -26,6 +26,7 @@ if sdir != "":
     os.chdir(sdir)
 import sys
 sys.path.insert(0, "../../../")
+os.environ["PATH"] = "../../../scripts"+":"+os.environ["PATH"]
 
 from pyvpsolver.modlang import AMPLParser, glpk_mod2lp
 from pyvpsolver import VPSolver
@@ -68,10 +69,10 @@ def main():
         glpk_mod2lp(mod_out, lp_out)
         # os.system("glpsol --math " + mod_out + "| grep -v Generating")
         out, varvalues = VPSolver.script_wsol(
-            "vpsolver_gurobi.sh", lp_out, verbose=False
+            "vpsolver_gurobi.sh", lp_out, verbose=True
         )
 
-        b = [varvalues.get("pi(%d)" % (i+1), 0) for i in xrange(len(a))]
+        b = [varvalues.get("pi({0})".format(i+1), 0) for i in xrange(len(a))]
         b0 = varvalues.get("pi(0)", 0)
 
         # print a, a0
@@ -89,13 +90,16 @@ def main():
     print "Original knapsack inequalities:"
     for a, a0, bounds in sorted(kp_cons, key=lambda x: (x[1], x[0])):
         # print a, a0
-        print " + ".join("%2g x%d" % (a[i], i+1) for i in xrange(len(a))),
-        print "<=", a0
+        print " + ".join(
+            "{0:2g} x{1:d}".format(a[i], i+1) for i in xrange(len(a))
+        ), "<=", a0
     print "Minimal equivalent knapsack inequalities:"
     for b, b0, bounds in sorted(cons, key=lambda x: (x[1], x[0])):
         # print b, b0
-        print " + ".join("%2g x%d" % (b[i], i+1) for i in xrange(len(b))),
-        print "<=", b0, bounds[:-1]
+        print " + ".join(
+            "{0:2g} x{1:d}".format(b[i], i+1) for i in xrange(len(b))
+        ), "<=", b0, bounds[:-1]
+
 
 if __name__ == "__main__":
     main()

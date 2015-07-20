@@ -23,26 +23,10 @@ import re
 from ...vpsolver import VBP, AFG
 from ...model import Model
 from ..writemod import model2ampl
+from ..utils import lincomb2str
 from .base import CmdBase
 
 RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
-
-
-def lincomb2str(lincomb):
-    """Returns the linear combination as a string."""
-    expr = ""
-    for var, coef in lincomb:
-        if abs(coef) != 1:
-            if coef >= 0:
-                expr += " + %g %s" % (coef, var)
-            elif coef < 0:
-                expr += " - %g %s" % (abs(coef), var)
-        else:
-            if coef >= 0:
-                expr += " + %s" % (var)
-            elif coef < 0:
-                expr += " - %s" % (var)
-    return expr
 
 
 class CmdFlow(CmdBase):
@@ -80,7 +64,7 @@ class CmdFlow(CmdBase):
         graph, model, excluded_vars = self._generate_model(
             zvar, W, w, b, bounds, noobj=True
         )
-        prefix = "_%s_" % zvar
+        prefix = "_{0}_".format(zvar)
         self._zvars.append(zvar)
         self._graphs.append(graph)
         self._prefixes.append(prefix)
@@ -140,7 +124,7 @@ class CmdFlow(CmdBase):
             model.setObj("min", objlincomb)
 
         labels = {
-            (u, v, i): ["i=%d" % (i+1)]
+            (u, v, i): ["i={0}".format(i+1)]
             for (u, v, i) in graph.A
             if isinstance(i, int) and i < m
         }
@@ -165,6 +149,8 @@ class CmdFlow(CmdBase):
             sol = graph.extract_solution(graph.S, "<-", graph.T)
             lst_sol.append((zvar, varvalues.get(zvar, 0), sol))
             if verbose:
-                print "Graph: %s (flow=%d)" % (zvar, varvalues.get(zvar, 0))
+                print "Graph: {0} (flow={1:d})".format(
+                    zvar, varvalues.get(zvar, 0)
+                )
                 print "\t", sol
         return lst_sol, newvv
