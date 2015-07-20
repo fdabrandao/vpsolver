@@ -25,30 +25,32 @@ import os
 def glpk_mod2lp(fname_mod, fname_lp, verbose=False):
     """Converts a GMPL file into an LP file using GLPK."""
     if verbose:
-        os.system(
+        exit_code = os.system(
             "glpsol --math {0} --check --wlp {1} | grep -v Generating".format(
                 fname_mod, fname_lp
             )
         )
     else:
-        os.system(
+        exit_code = os.system(
             "glpsol --math {0} --check --wlp {1} >> /dev/null".format(
                 fname_mod, fname_lp
             )
         )
+    assert exit_code == 0
 
 
 def glpk_mod2mps(fname_mod, fname_mps, verbose=False):
     """Converts a GMPL file into an MPS file using GLPK."""
     if verbose:
-        os.system(
+        exit_code = os.system(
             "glpsol --math {0} --check --wmps {1} | grep -v Generating".format(
                 fname_mod, fname_mps
             )
         )
     else:
-        os.system(
+        exit_code = os.system(
             "glpsol --math {0} --check --wmps {1} >> /dev/null".format(
                 fname_mod, fname_mps
             )
         )
+    assert exit_code == 0
