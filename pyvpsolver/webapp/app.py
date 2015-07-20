@@ -31,10 +31,13 @@ from flask import Flask, Response
 from flask import render_template, json, request, redirect, url_for
 from multiprocessing import Process
 from pyvpsolver import VPSolver, VBP, AFG, LP
+from pyvpsolver.modlang import AMPLParser
 import signal
 
 app = Flask(__name__)
 app.debug = True
+
+DEBUG = False
 
 
 @app.context_processor
@@ -44,6 +47,7 @@ def inject_globals():
         app_name="VPSolver APP",
         pages=[
             ("/vbp", "Vector Packing"),
+            ("/modlang", "ModLang"),
         ],
     )
     return data
@@ -64,28 +68,31 @@ def index():
     return redirect(url_for("vbp"))
 
 
+def load(fname):
+    """Loads a text file as a string."""
+    with open(fname, "r") as f:
+        return f.read().strip("\n")
+
+
 @app.route("/vbp/", defaults={"example": None})
-@app.route("/vbp/<example>/")
+@app.route("/vbp/<example>")
 def vbp(example):
     """Renders the input page."""
     title = "Vector Packing"
 
-    def load(fname):
-        """Loads a text file as a string."""
-        with open(fname, "r") as f:
-            return f.read().strip("\n")
-
+    example_folder = "data/examples/vbp/"
     examples = [
-        ("/vbp/", "", ""),
-        ("/vbp/bpp/", "BPP", load("data/examples/vbp/bpp")),
-        ("/vbp/csp/", "CSP", load("data/examples/vbp/csp")),
-        ("/vbp/vbp/", "VBP", load("data/examples/vbp/vbp")),
+        ("/vbp/", "", None),
+        ("/vbp/bpp", "BPP", "bpp.vbp"),
+        ("/vbp/csp", "CSP", "csp.vbp"),
+        ("/vbp/vbp", "VBP", "vbp.vbp"),
     ]
 
     input_data = ""
-    for url, description, data in examples:
+    for url, description, fname in examples:
         if request.path == url:
-            input_data = data
+            if fname is not None:
+                input_data = load(example_folder+fname)
             break
 
     scripts = [
@@ -98,13 +105,45 @@ def vbp(example):
     ]
 
     return render_template(
-        "input.html", title=title,
-        examples=examples, scripts=scripts,
-        input_data=input_data
+        "input.html",
+        title=title,
+        examples=examples,
+        scripts=scripts,
+        input_data=input_data,
+        solver_url="/solve/vbp",
     )
 
 
-def solve_worker(method, form, args, output=sys.stdout):
+@app.route("/modlang/", defaults={"example": None})
+@app.route("/modlang/<example>")
+def modlang(example):
+    """Renders the input page."""
+    title = "ModLang: AMPL extension"
+
+    example_folder = "data/examples/modlang/"
+    examples = [
+        ("/modlang/", "", None),
+        ("/modlang/example1", "example1", "example1.mod"),
+        ("/modlang/example2", "example2", "example2.mod"),
+    ]
+
+    input_data = ""
+    for url, description, fname in examples:
+        if request.path == url:
+            if fname is not None:
+                input_data = load(example_folder+fname)
+            break
+
+    return render_template(
+        "input.html",
+        title=title,
+        examples=examples,
+        input_data=input_data,
+        solver_url="/solve/modlang",
+    )
+
+
+def solve_worker(app_name, method, form, args, output=sys.stdout):
     """Worker for solving the problem in a separate process."""
     VPSolver.PLIST = []
 
@@ -121,23 +160,27 @@ def solve_worker(method, form, args, output=sys.stdout):
     sys.stdout = output
     sys.stderr = output
     input_ = form["input"].strip("\n")
-    print "Input:"
-    print input_
-    print
-    print "Solver:"
-    print form["script"]
-    print
-    print "Output:"
-    sys.stdout.flush()
-    sys.stderr.flush()
+    if DEBUG:
+        print "Input:\n{0}\n\nOutput:".format(input_)
+        sys.stdout.flush()
+        sys.stderr.flush()
 
-    tmpfile = VPSolver.new_tmp_file(ext=".vbp")
-    with open(tmpfile, "w") as f:
-        f.write(input_)
-    instance = VBP.fromFile(tmpfile, verbose=False)
-    afg = AFG(instance, verbose=True)
-    lp_model = LP(afg, verbose=False)
-    out, sol = VPSolver.script(form["script"], lp_model, afg, verbose=True)
+    if app_name == "vbp":
+        tmpfile = VPSolver.new_tmp_file(ext=".vbp")
+        with open(tmpfile, "w") as f:
+            f.write(input_)
+        instance = VBP.fromFile(tmpfile, verbose=False)
+        afg = AFG(instance, verbose=True)
+        lp_model = LP(afg, verbose=False)
+        out, sol = VPSolver.script(form["script"], lp_model, afg, verbose=True)
+    elif app_name == "modlang":
+        tmpfile = VPSolver.new_tmp_file(ext=".mod")
+        parser = AMPLParser()
+        parser.input = input_
+        parser.parse()
+        parser.write(tmpfile)
+        VPSolver.run("glpsol --math {0} | grep -v Generating".format(tmpfile))
+
     print "EOF"
 
 
@@ -163,11 +206,11 @@ class IterativeOutput(object):
         # self.proc.terminate()
 
 
-@app.route("/solve", methods=["POST"])
-def solve():
+@app.route("/solve/<app_name>", methods=["POST"])
+def solve(app_name):
     """Renders the solver page."""
     try:
-        args = (request.method, request.form, request.args)
+        args = (app_name, request.method, request.form, request.args)
         return Response(
             IterativeOutput(solve_worker, args), mimetype="text/plain"
         )
@@ -175,6 +218,7 @@ def solve():
         return json.dumps({"error": str(e)})
     finally:
         pass
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5555, threaded=True)

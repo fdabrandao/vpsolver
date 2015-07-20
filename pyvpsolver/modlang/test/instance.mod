@@ -1,5 +1,4 @@
 $LOAD_VBP[instance1{I,D}]{"instance.vbp",1};
-$PARAM[P]{{'a': 1, 'b': 2}};
 var x{I}, >= 0;
 
 $FLOW[Z]{

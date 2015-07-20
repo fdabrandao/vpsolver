@@ -49,7 +49,7 @@
     <div class="container">
 
       <div class="row">
-        <form action="{{ url_for("solve") }}" method="post" target="_blank">
+        <form action="{{ solver_url }}" method="post" target="_blank">
 
         {% if examples is defined %}
         <div class="form-group">
@@ -63,7 +63,7 @@
         {% endif %}
 
         <label for="input">Input:</label>
-        <textarea class="form-control" id="input" name="input" id="input" rows="20">{{ input_data }}</textarea>
+        <textarea class="form-control" id="input" name="input" rows="20">{{ input_data }}</textarea>
 
         {% if scripts is defined %}
         <div class="form-group">
