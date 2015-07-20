@@ -62,12 +62,44 @@ class TestAMPLParser(unittest.TestCase):
         self.assertIn("param VALUE := 10;", parser.output)
         self.assertIn("param P := ['a']1['b']2;", parser.output)
 
+    def test_var(self):
+        """Tests $VAR[name]{typ, lb, ub} calls"""
+        parser = AMPLParser()
+        parser.input = """
+        $VAR[x]{"integer", 0, 10};
+        $EXEC{VAR['y']("binary")};
+        """
+        parser.parse()
+        self.assertIn("var x, integer, >= 0, <= 10;", parser.output)
+        self.assertIn("var y, binary;", parser.output)
+
+    def test_con(self):
+        """Tests $CON[name]{lincomb, sign, rhs} calls"""
+        parser = AMPLParser()
+        parser.input = """
+        $VAR[x1]{}; $VAR[x2]{}; $VAR[x3]{};
+        $CON[xyz]{[("x1",5),("x2",15),("x3",10)],">=",20};
+        """
+        parser.parse()
+        self.assertIn("s.t. xyz: +5*x1+15*x2+10*x3 >= 20;", parser.output)
+
+    def test_stmt(self):
+        """Tests $STMT{stmt} calls"""
+        parser = AMPLParser()
+        parser.input = """
+        $EXEC{stmt = "s.t. {0}: x1 >= 10;".format("test")};
+        $STMT{stmt};
+        """
+        parser.parse()
+        self.assertIn("s.t. test: x1 >= 10;", parser.output)
+
     def test_comments(self):
         """Tests valid comments"""
         parser = AMPLParser()
         parser.input = """
         /* $SET[A]{range(5)};*/
         # $PARAM[VALUE]{10};
+        # ... $PARAM[VALUE2]{10}; ...
         param a := "/*";
         $PARAM[Y]{10};
         param b := "*/";
@@ -75,6 +107,7 @@ class TestAMPLParser(unittest.TestCase):
         parser.parse()
         self.assertNotIn("set A := {0,1,2,3,4};", parser.output)
         self.assertNotIn("param VALUE := 10;", parser.output)
+        self.assertNotIn("param VALUE2 := 10;", parser.output)
         self.assertIn("param Y := 10;", parser.output)
         self.assertIn("/*IGNORED:$SET[A]{range(5)};*/", parser.output)
         self.assertIn("/*IGNORED:$PARAM[VALUE]{10};*/", parser.output)
@@ -85,13 +118,10 @@ class TestAMPLParser(unittest.TestCase):
         parser = AMPLParser()
         parser.input = """
         /* ... $SET[A]{range(5)}; ... */
-        # ... $PARAM[VALUE]{10}; ...
-        /*$PARAM[X]{10};*/
         param a := "/* ... $PARAM[Y]{10}; ... */"
         """
         parser.parse()
         self.assertIn("/*EVALUATED:$SET[A]{range(5)};*/", parser.output)
-        self.assertIn("/*EVALUATED:$PARAM[VALUE]{10};*/", parser.output)
         self.assertIn("/*EVALUATED:$PARAM[Y]{10};*/", parser.output)
 
     def test_exceptions(self):
