@@ -21,6 +21,7 @@
 set -e
 echo "Copyright (C) 2013-2015, Filipe Brandao"
 
+CMD="$0 $*"
 BASEDIR=`dirname $0`
 BIN_DIR=$BASEDIR/../bin/
 TMP_DIR=`mktemp -d -t XXXXXXXXXX`
@@ -34,6 +35,7 @@ usage(){
 }
 
 error(){
+    echo "Command line: "$CMD
     echo "Error: invalid arguments."
     usage
     exit 1
@@ -141,4 +143,3 @@ fi
 if [[ -n "$sol_file" ]]; then
     cp $TMP_DIR/vars.sol $sol_file
 fi
-
