@@ -28,7 +28,7 @@ class CmdLoadVBP(CmdBase):
     """Command for loading VBP instances."""
 
     def _evalcmd(self, name, fname, i0=0, d0=0):
-        """Evalutates CMD[arg1](*arg2)."""
+        """Evalutates CMD[name](*args)."""
         name, index = utils.parse_indexed(name)
         index_I = "{0}_I".format(name)
         index_D = "{0}_D".format(name)

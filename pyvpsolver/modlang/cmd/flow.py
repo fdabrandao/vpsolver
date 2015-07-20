@@ -39,7 +39,7 @@ class CmdFlow(CmdBase):
         self._prefixes = []
 
     def _evalcmd(self, zvar, W, w, b, bounds=None):
-        """Evalutates CMD[arg1](*arg2)."""
+        """Evalutates CMD[zvar](*args)."""
         match = re.match("\\s*("+RGX_VARNAME+")\\s*(.*)$", zvar, re.DOTALL)
         assert match is not None
         zvar, ztype = match.groups()

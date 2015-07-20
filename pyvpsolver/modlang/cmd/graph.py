@@ -28,7 +28,7 @@ class CmdGraph(CmdBase):
     """Command for creating arc-flow graphs."""
 
     def _evalcmd(self, names, W, w, labels, bounds=None):
-        """Evalutates CMD[arg1](*arg2)."""
+        """Evalutates CMD[names](*args)."""
         match = utils.parse_varlist(names)
         assert match is not None
         Vname, Aname = match

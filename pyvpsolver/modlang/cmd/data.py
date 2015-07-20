@@ -27,7 +27,7 @@ class CmdSet(CmdBase):
     """Command for creating a new AMPL set."""
 
     def _evalcmd(self, name, values):
-        """Evalutates CMD[arg1](*arg2)."""
+        """Evalutates CMD[name](*args)."""
         match = utils.parse_var(name)
         assert match is not None
         name = match
@@ -39,7 +39,7 @@ class CmdParam(CmdBase):
     """Command for creating a new AMPL parameter."""
 
     def _evalcmd(self, arg1, values, i0=None):
-        """Evalutates CMD[arg1](*arg2)."""
+        """Evalutates CMD[arg1](*args)."""
         match = utils.parse_indexed(arg1)
         assert match is not None
         name, index = match
