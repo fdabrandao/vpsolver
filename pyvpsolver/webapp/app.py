@@ -123,8 +123,8 @@ def modlang(example):
     example_folder = "data/examples/modlang/"
     examples = [
         ("/modlang/", "", None),
-        ("/modlang/example1", "example1", "example1.mod"),
-        ("/modlang/example2", "example2", "example2.mod"),
+        ("/modlang/example1", "Cutting Stock", "example1.mod"),
+        ("/modlang/example2", "Variable Sized Bin Packing", "example2.mod"),
     ]
 
     input_data = ""
@@ -201,9 +201,12 @@ class IterativeOutput(object):
             yield "DONE!\n"
 
     def __del__(self):
-        print "TERMINATE %d!" % self.proc.pid
-        os.kill(self.proc.pid, signal.SIGTERM)
-        # self.proc.terminate()
+        try:
+            print "TERMINATE %d!" % self.proc.pid
+            os.kill(self.proc.pid, signal.SIGTERM)
+            # self.proc.terminate()
+        except:
+            pass
 
 
 @app.route("/solve/<app_name>", methods=["POST"])
