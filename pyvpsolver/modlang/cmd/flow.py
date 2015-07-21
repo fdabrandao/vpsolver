@@ -23,10 +23,11 @@ import re
 from ...vpsolver import VBP, AFG
 from ...model import Model
 from ..writemod import model2ampl
-from ..utils import lincomb2str
+from ..utils import RGX_VARNAME, lincomb2str
 from .base import CmdBase
 
-RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
+RGX_INDEX = "(?:\\[[^\\]]*\\])?"
+RGX_VARINDEX = RGX_VARNAME+RGX_INDEX
 
 
 class CmdFlow(CmdBase):
@@ -40,7 +41,7 @@ class CmdFlow(CmdBase):
 
     def _evalcmd(self, zvar, W, w, b, bounds=None):
         """Evalutates CMD[zvar](*args)."""
-        match = re.match("\\s*("+RGX_VARNAME+")\\s*(.*)$", zvar, re.DOTALL)
+        match = re.match("\\s*("+RGX_VARINDEX+")\\s*(.*)$", zvar, re.DOTALL)
         assert match is not None
         zvar, ztype = match.groups()
         ztype = ztype.replace(",", "")
@@ -64,7 +65,9 @@ class CmdFlow(CmdBase):
         graph, model, excluded_vars = self._generate_model(
             zvar, W, w, b, bounds, noobj=True
         )
-        prefix = "_{0}_".format(zvar)
+        prefix = "_{0}_".format(zvar.lstrip("^"))
+        prefix = prefix.replace("[","_").replace("]","_")
+
         self._zvars.append(zvar)
         self._graphs.append(graph)
         self._prefixes.append(prefix)

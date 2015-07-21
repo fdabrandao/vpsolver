@@ -32,7 +32,7 @@ class AMPLParser(object):
     """Class for parsing AMPL files with modlang calls"""
 
     RGX_CMD = "[a-zA-Z_][a-zA-Z0-9_]*"
-    RGX_ARG1 = "[^\\]]*"
+    RGX_ARG1 = "(?:.*?(?=]\s*{))"
     RGX_ARG2 = """(?:.*?(?=}\s*;))"""
     RGX_STRINGS = """"(?:[^"]|\\\\")*"|'(?:[^']|\\\\')*'"""
     RGX_COMMENTS = """#[^\n]*|/\\*.*?(?=\\*/)\\*/"""

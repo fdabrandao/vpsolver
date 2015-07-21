@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 from copy import deepcopy
 
-RGX_VARNAME = "[a-zA-Z_][a-zA-Z0-9_]*"
+RGX_VARNAME = "\\^?[a-zA-Z_][a-zA-Z0-9_]*"
 
 
 def parse_var(expr):
@@ -98,6 +98,8 @@ def ampl_set(name, values, sets, params):
     assert name not in sets
     assert name not in params
     sets[name] = deepcopy(values)
+    if name.startswith("^"):
+        return "", ""
 
     def format_entry(e):
         if isinstance(e, str):
@@ -118,6 +120,9 @@ def ampl_param(name, index, value, sets, params):
     assert name not in sets
     assert name not in params
     params[name] = deepcopy(value)
+    if name.startswith("^"):
+        return "", ""
+
     if isinstance(value, dict):
         defs = "param {0}{{{1}}};\n".format(name, index)
 
@@ -151,6 +156,7 @@ def lincomb2str(lincomb):
     """Returns the linear combination as a string."""
 
     def format_entry(var, coef):
+        var = var.lstrip("^")
         if abs(coef) != 1:
             if coef >= 0:
                 return "+{0:g}*{1}".format(coef, var)
@@ -167,6 +173,8 @@ def lincomb2str(lincomb):
 
 def ampl_var(name, typ="", lb=None, ub=None):
     """Generates the definition for an AMPL variable."""
+    if name.startswith("^"):
+        return ""
     defs = "var {0}".format(name)
     if typ == "I":
         typ = "integer"
@@ -184,6 +192,8 @@ def ampl_var(name, typ="", lb=None, ub=None):
 
 def ampl_con(name, lincomb, sign, rhs):
     """Generates the definition for an AMPL constraint."""
+    if name.startswith("^"):
+        return ""
     if sign in (">", "<"):
         sign += "="
     defs = "s.t. {name}: {lin} {sign} {rhs};".format(
