@@ -45,20 +45,26 @@ class TestAMPLParser(unittest.TestCase):
         parser = AMPLParser()
         parser.input = """
         $SET[A]{range(5)};
+        $SET[^B]{range(5)};
         """
         parser.parse()
         self.assertIn("set A := {0,1,2,3,4};", parser.output)
+        self.assertNotIn("set B := {0,1,2,3,4};", parser.output)
+        self.assertNotIn("set ^B := {0,1,2,3,4};", parser.output)
 
     def test_param(self):
         """Tests $PARAM[name]{value} calls"""
         parser = AMPLParser()
         parser.input = """
         $PARAM[NAME]{"something"};
+        $PARAM[^NAME2]{"something"};
         $PARAM[VALUE]{10};
         $PARAM[P]{{'a': 1, 'b': 2}};
         """
         parser.parse()
         self.assertIn("param NAME := 'something';", parser.output)
+        self.assertNotIn("param NAME2 := 'something';", parser.output)
+        self.assertNotIn("param ^NAME2 := 'something';", parser.output)
         self.assertIn("param VALUE := 10;", parser.output)
         self.assertIn("param P := ['a']1['b']2;", parser.output)
 
@@ -67,10 +73,13 @@ class TestAMPLParser(unittest.TestCase):
         parser = AMPLParser()
         parser.input = """
         $VAR[x]{"integer", 0, 10};
+        $VAR[^z]{"integer", 0, 10};
         $EXEC{VAR['y']("binary")};
         """
         parser.parse()
         self.assertIn("var x, integer, >= 0, <= 10;", parser.output)
+        self.assertNotIn("var z, integer, >= 0, <= 10;", parser.output)
+        self.assertNotIn("var ^z, integer, >= 0, <= 10;", parser.output)
         self.assertIn("var y, binary;", parser.output)
 
     def test_con(self):
@@ -79,9 +88,11 @@ class TestAMPLParser(unittest.TestCase):
         parser.input = """
         $VAR[x1]{}; $VAR[x2]{}; $VAR[x3]{};
         $CON[xyz]{[("x1",5),("x2",15),("x3",10)],">=",20};
+        $CON[^xyz2]{[("x1",5),("x2",15),("x3",10)],">=",20};
         """
         parser.parse()
         self.assertIn("s.t. xyz: +5*x1+15*x2+10*x3 >= 20;", parser.output)
+        self.assertNotIn("s.t. xyz2: +5*x1+15*x2+10*x3 >= 20;", parser.output)
 
     def test_stmt(self):
         """Tests $STMT{stmt} calls"""
