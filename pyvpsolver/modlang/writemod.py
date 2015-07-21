@@ -100,7 +100,7 @@ def model2ampl(model, zvar, ztype, excluded_vars=None, prefix=""):
     def format_con(name):
         lincomb, sign, rhs = model.cons[name]
         lincomb = [(var_name(var), coef) for (var, coef) in lincomb]
-        return ampl_con(name, lincomb, sign, rhs)
+        return ampl_con(prefix+name, lincomb, sign, rhs)
 
     res += "".join(
         format_con(name)
