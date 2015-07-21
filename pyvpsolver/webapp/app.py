@@ -162,8 +162,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
     input_ = form["input"].strip("\n")
     if DEBUG:
         print "Input:\n{0}\n\nOutput:".format(input_)
-        sys.stdout.flush()
-        sys.stderr.flush()
+        output.flush()
 
     if app_name == "vbp":
         tmpfile = VPSolver.new_tmp_file(ext=".vbp")
@@ -181,7 +180,8 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
         parser.write(tmpfile)
         VPSolver.run("glpsol --math {0} | grep -v Generating".format(tmpfile))
 
-    print "EOF"
+    print "EOF\n"
+    output.flush()
 
 
 class IterativeOutput(object):
@@ -198,11 +198,11 @@ class IterativeOutput(object):
         for line in iter(self.output.readline, "EOF\n"):
             yield line.rstrip() + "\n"
         if not self.proc.is_alive():
-            yield "DONE!\n"
+            print "DONE {0}!".format(self.proc.pid)
 
     def __del__(self):
         try:
-            print "TERMINATE %d!" % self.proc.pid
+            print "TERMINATE {0}!".format(self.proc.pid)
             os.kill(self.proc.pid, signal.SIGTERM)
             # self.proc.terminate()
         except:
