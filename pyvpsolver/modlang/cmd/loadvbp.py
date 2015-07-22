@@ -55,8 +55,8 @@ class CmdLoadVBP(CmdBase):
             for i in xrange(instance.m)
         }
 
-        assert "_{0}".format(name) not in self._pyvars
-        self._pyvars["_{0}".format(name)] = instance
+        assert "_{0}".format(name.lstrip("^")) not in self._pyvars
+        self._pyvars["_{0}".format(name.lstrip("^"))] = instance
         sets, params = self._sets, self._params
 
         self._defs += "#BEGIN_DEFS: Instance[{0}]\n".format(name)
