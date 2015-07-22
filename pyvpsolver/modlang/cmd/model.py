@@ -52,4 +52,4 @@ class CmdStmt(CmdBase):
     def _evalcmd(self, arg1, statement):
         """Evalutates CMD(*args)."""
         assert arg1 is None
-        self._pyvars["_model"] += statement
+        self._pyvars["_model"] += str(statement)
