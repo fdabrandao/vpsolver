@@ -82,7 +82,7 @@ class CmdLoadVBP(CmdBase):
         self._defs += defs
         self._data += data
         defs, data = utils.ampl_set(
-            index_D, range(i0, d0+instance.ndims), sets, params
+            index_D, range(d0, d0+instance.ndims), sets, params
         )
         self._defs += defs
         self._data += data
