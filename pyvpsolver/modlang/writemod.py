@@ -60,7 +60,7 @@ def write_mod(model, filename):
     fout.close()
 
 
-def model2ampl(model, zvar, ztype, excluded_vars=None, prefix=""):
+def model2ampl(model, zvar, excluded_vars=None, prefix=""):
     """Returns the model in AMPL format as a string."""
     res = ""
 
@@ -82,10 +82,7 @@ def model2ampl(model, zvar, ztype, excluded_vars=None, prefix=""):
         lb = model.vars[name]["lb"]
         ub = model.vars[name]["ub"]
         if name == zvar:
-            if any(x in ztype for x in ("integer", "binary", ">", "<")):
-                return ampl_var(name, ztype)
-            else:
-                return ampl_var(name, typ, lb, ub)
+            return ampl_var(name, typ, lb, ub)
         else:
             return ampl_var(var_name(name), typ, lb, ub)
 

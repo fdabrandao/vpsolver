@@ -22,22 +22,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 from copy import deepcopy
 
-RGX_VARNAME = "\\^?[a-zA-Z_][a-zA-Z0-9_]*"
+RGX_SYMBNAME = "\\^?[a-zA-Z_][a-zA-Z0-9_]*"
+RGX_INDEX1 = "(?:\\s*\\[[^\\]]*\\])?" # [] index
+RGX_INDEX2 = "(?:\\s*{[^}]*})?" # {} index
+RGX_SYMBNAME_INDEX1 = RGX_SYMBNAME + RGX_INDEX1
+RGX_SYMBNAME_INDEX2 = RGX_SYMBNAME + RGX_INDEX2
 
 
-def parse_var(expr):
-    """Matches and returns a variable name."""
-    match = re.match("\\s*("+RGX_VARNAME+")\\s*$", expr)
+def parse_symbname(expr, allow_index=""):
+    """Matches and returns a symbolic name."""
+    assert allow_index in ("", "[]", "{}")
+    if allow_index == "[]":
+        rgx_symb = RGX_SYMBNAME_INDEX1
+    elif allow_index == "{}":
+        rgx_symb = RGX_SYMBNAME_INDEX2
+    else:
+        rgx_symb = RGX_SYMBNAME
+    match = re.match("\\s*("+rgx_symb+")\\s*$", expr)
     if match is None:
         return None
     name = match.groups()[0]
     return name
 
 
-def parse_varlist(expr):
-    """Matches and returns a list of variable names."""
+def parse_symblist(expr, allow_index=""):
+    """Matches and returns a list of symbolic names."""
+    assert allow_index in ("", "[]", "{}")
+    if allow_index == "[]":
+        rgx_symb = RGX_SYMBNAME_INDEX1
+    elif allow_index == "{}":
+        rgx_symb = RGX_SYMBNAME_INDEX2
+    else:
+        rgx_symb = RGX_SYMBNAME
     match = re.match(
-        "\\s*(\\s*"+RGX_VARNAME+"\\s*(?:,\\s*"+RGX_VARNAME+"\\s*)*)\\s*$", expr
+        "\\s*(\\s*"+rgx_symb+"\\s*(?:,\\s*"+rgx_symb+"\\s*)*)\\s*$", expr
     )
     if match is None:
         return None
@@ -46,18 +64,27 @@ def parse_varlist(expr):
     return lst
 
 
-def parse_indexed(expr):
-    """Matches and returns an indexed variable (i.e., variable{index})."""
-    match = re.match(
-        "\\s*("+RGX_VARNAME+")\\s*"
-        "({\\s*"+RGX_VARNAME+"\\s*(?:,\\s*"+RGX_VARNAME+"\\s*)*})?\\s*$",
-        expr
-    )
+def parse_indexed(expr, index_type):
+    """Matches and returns an indexed symbolic name (i.e., name{index})."""
+    assert index_type in ("[]", "{}")
+    if index_type == "[]":
+        match = re.match(
+            "\\s*("+RGX_SYMBNAME+")\\s*"
+            "(\\[\\s*"+RGX_SYMBNAME+"\\s*(?:,"
+            "\\s*"+RGX_SYMBNAME+"\\s*)*\\])?\\s*$",
+            expr
+        )
+    elif index_type == "{}":
+        match = re.match(
+            "\\s*("+RGX_SYMBNAME+")\\s*"
+            "({\\s*"+RGX_SYMBNAME+"\\s*(?:,\\s*"+RGX_SYMBNAME+"\\s*)*})?\\s*$",
+            expr
+        )
     if match is None:
         return None
     name, index = match.groups()
     if index is not None:
-        index = index.strip("{} ")
+        index = index.strip(index_type+" ")
         index = index.split(",")
         index = [x.strip() for x in index]
     return name, index

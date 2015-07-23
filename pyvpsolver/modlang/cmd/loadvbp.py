@@ -19,9 +19,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from .base import CmdBase
 from ...vpsolver import VBP
 from .. import utils
-from .base import CmdBase
 
 
 class CmdLoadVBP(CmdBase):
@@ -29,7 +29,7 @@ class CmdLoadVBP(CmdBase):
 
     def _evalcmd(self, name, fname, i0=0, d0=0):
         """Evalutates CMD[name](*args)."""
-        name, index = utils.parse_indexed(name)
+        name, index = utils.parse_indexed(name, "{}")
         index_I = "{0}_I".format(name)
         index_D = "{0}_D".format(name)
         if index is not None:

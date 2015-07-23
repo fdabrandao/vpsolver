@@ -20,14 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import re
+from .base import CmdBase
 from ...vpsolver import VBP, AFG
 from ...model import Model
-from ..writemod import model2ampl
-from ..utils import RGX_VARNAME, lincomb2str
-from .base import CmdBase
-
-RGX_INDEX = "(?:\\[[^\\]]*\\])?"
-RGX_VARINDEX = RGX_VARNAME+RGX_INDEX
+from .. import writemod
+from .. import utils
 
 
 class CmdFlow(CmdBase):
@@ -41,10 +38,9 @@ class CmdFlow(CmdBase):
 
     def _evalcmd(self, zvar, W, w, b, bounds=None):
         """Evalutates CMD[zvar](*args)."""
-        match = re.match("\\s*("+RGX_VARINDEX+")\\s*(.*)$", zvar, re.DOTALL)
+        match = utils.parse_symbname(zvar, allow_index="[]")
         assert match is not None
-        zvar, ztype = match.groups()
-        ztype = ztype.replace(",", "")
+        zvar = match
 
         if isinstance(W, dict):
             W = [W[k] for k in sorted(W)]
@@ -66,13 +62,13 @@ class CmdFlow(CmdBase):
             zvar, W, w, b, bounds, noobj=True
         )
         prefix = "_{0}_".format(zvar.lstrip("^"))
-        prefix = prefix.replace("[","_").replace("]","_")
+        prefix = prefix.replace("[", "_").replace("]", "_")
 
         self._zvars.append(zvar)
         self._graphs.append(graph)
         self._prefixes.append(prefix)
-        self._pyvars["_model"] += model2ampl(
-            model, zvar, ztype, excluded_vars, prefix
+        self._pyvars["_model"] += writemod.model2ampl(
+            model, zvar, excluded_vars, prefix
         )
 
     def _generate_model(self, zvar, W, w, b, bounds=None, noobj=False):

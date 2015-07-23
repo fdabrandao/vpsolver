@@ -19,8 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .. import utils
 from .base import CmdBase
+from .. import utils
 from ..utils import ampl_var, ampl_con
 
 
@@ -29,7 +29,7 @@ class CmdVar(CmdBase):
 
     def _evalcmd(self, name, typ="", lb=None, ub=None):
         """Evalutates CMD[name](*args)."""
-        match = utils.parse_var(name)
+        match = utils.parse_symbname(name)
         assert match is not None
         name = match
         self._pyvars["_model"] += ampl_var(name, typ, lb, ub)
@@ -40,7 +40,7 @@ class CmdCon(CmdBase):
 
     def _evalcmd(self, name, lincomb, sign, rhs):
         """Evalutates CMD[name](*args)."""
-        match = utils.parse_var(name)
+        match = utils.parse_symbname(name)
         assert match is not None
         name = match
         self._pyvars["_model"] += ampl_con(name, lincomb, sign, rhs)
