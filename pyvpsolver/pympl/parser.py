@@ -104,8 +104,6 @@ class PyMPL(object):
             try:
                 if call is None:
                     res = eval(args3, globals_, locals_)
-                elif call == "EVAL":
-                    res = eval(args2, globals_, locals_)
                 elif call == "EXEC":
                     assert args1 is None
                     locals_["_model"] = ""
