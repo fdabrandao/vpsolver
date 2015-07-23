@@ -26,54 +26,50 @@ if sdir != "":
     os.chdir(sdir)
 import sys
 sys.path.insert(0, "../../../")
+os.environ["PATH"] = "../../../scripts"+":"+os.environ["PATH"]
 
-from pyvpsolver.modlang import AMPLParser, glpk_mod2lp
+from pyvpsolver.pympl import PyMPL, glpk_mod2lp
 from pyvpsolver import VPSolver
 
 
 def main():
     """
-    Computes minimal equivalent knapsack inequalities
-    using 'equivknapsack01.mod'
+    Computes minimal equivalent knapsack inequalities using 'equivknapsack.mod'
     """
+
     kp_cons = [
-        ([8, 12, 13, 64, 22, 41], 80),
-        ([8, 12, 13, 75, 22, 41], 96),
-        ([3, 6, 4, 18, 6, 4], 20),
-        ([5, 10, 8, 32, 6, 12], 36),
-        ([5, 13, 8, 42, 6, 20], 44),
-        ([5, 13, 8, 48, 6, 20], 48),
-        ([0, 0, 0, 0, 8, 0], 10),
-        ([3, 0, 4, 0, 8, 0], 18),
-        ([3, 2, 4, 0, 8, 4], 22),
-        ([3, 2, 4, 8, 8, 4], 24),
-        # ([3, 3, 3, 3, 3, 5, 5, 5], 17),
+        ([3, 5], 17, None)
     ]
 
     cons = set()
     for k in xrange(len(kp_cons)):
-        a, a0 = kp_cons[k]
-        aS = abs(2*a0+1-sum(a))
-        if a0 < (sum(a)-1)/2:
+        a, a0, bounds = kp_cons[k]
+        if bounds is None:
+            bounds = [a0]*len(a)
+        for i in xrange(len(a)):
+            bounds[i] = a0/a[i] if a[i] != 0 else 0
+        sum_a = sum(x*y for x, y in zip(a, bounds))
+        aS = abs(2*a0+1-sum_a)
+        if a0 < (sum_a-1)/2:
             a0 += aS
             fix_as = 1
         else:
-            fix_as = 0
             if aS > a0:
                 continue
+            fix_as = 0
         a = a+[aS]
+        bounds = bounds+[1]
 
-        mod_in = "equivknapsack01.mod"
-        mod_out = "tmp/equivknapsack01.out.mod"
-
-        parser = AMPLParser(locals_=locals(), globals_=globals())
+        mod_in = "equivknapsack.mod"
+        mod_out = "tmp/equivknapsack.out.mod"
+        parser = PyMPL(locals_=locals())
         parser.parse(mod_in, mod_out)
 
-        lp_out = "tmp/equivknapsack01.lp"
+        lp_out = "tmp/equivknapsack.lp"
         glpk_mod2lp(mod_out, lp_out)
         # os.system("glpsol --math " + mod_out + "| grep -v Generating")
         out, varvalues = VPSolver.script_wsol(
-            "vpsolver_gurobi.sh", lp_out, verbose=False
+            "vpsolver_gurobi.sh", lp_out, verbose=True
         )
 
         b = [varvalues.get("pi({0})".format(i+1), 0) for i in xrange(len(a))]
@@ -89,20 +85,21 @@ def main():
             b = b[:-1]
 
         if sum(b) != 0:
-            cons.add((tuple(b), b0))
+            cons.add((tuple(b), b0, tuple(bounds)))
 
     print "Original knapsack inequalities:"
-    for a, a0 in sorted(kp_cons, key=lambda x: (x[1], x[0])):
+    for a, a0, bounds in sorted(kp_cons, key=lambda x: (x[1], x[0])):
         # print a, a0
         print " + ".join(
             "{0:2g} x{1:d}".format(a[i], i+1) for i in xrange(len(a))
         ), "<=", a0
     print "Minimal equivalent knapsack inequalities:"
-    for b, b0 in sorted(cons, key=lambda x: (x[1], x[0])):
+    for b, b0, bounds in sorted(cons, key=lambda x: (x[1], x[0])):
         # print b, b0
         print " + ".join(
             "{0:2g} x{1:d}".format(b[i], i+1) for i in xrange(len(b))
-        ), "<=", b0
+        ), "<=", b0, bounds[:-1]
+
 
 if __name__ == "__main__":
     main()

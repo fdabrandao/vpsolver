@@ -28,8 +28,8 @@ from .cmd import CmdFlow, CmdGraph, CmdLoadVBP
 DEBUG = False
 
 
-class AMPLParser(object):
-    """Class for parsing AMPL files with modlang calls"""
+class PyMPL(object):
+    """Class for parsing AMPL files with PyMPL calls"""
 
     RGX_CMD = "[a-zA-Z_][a-zA-Z0-9_]*"
     RGX_ARG1 = "(?:.*?(?=]\s*{))"

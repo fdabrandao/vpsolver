@@ -27,25 +27,25 @@ if sdir != "":
 import sys
 sys.path.insert(0, "../../../")
 
-from pyvpsolver.modlang import AMPLParser, glpk_mod2lp
+from pyvpsolver.pympl import PyMPL, glpk_mod2lp
 from pyvpsolver import VPSolver
 
 
 def main():
-    """Parses 'instance.mod'"""
+    """Parses 'graph.mod'"""
 
-    mod_in = "instance.mod"
-    mod_out = "tmp/instance.out.mod"
-    parser = AMPLParser()
+    mod_in = "graph.mod"
+    mod_out = "tmp/graph.out.mod"
+    parser = PyMPL()
     parser.parse(mod_in, mod_out)
 
-    lp_out = "tmp/instance.lp"
-    glpk_mod2lp(mod_out, lp_out, True)
+    lp_out = "tmp/graph.lp"
+    glpk_mod2lp(mod_out, lp_out)
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_gurobi.sh", lp_out, verbose=True
     )
-    sol, varvalues = parser["FLOW"].extract(varvalues, verbose=True)
 
+    sol, varvalues = parser["FLOW"].extract(varvalues, verbose=True)
     print
     print "sol:", sol
     print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]

@@ -27,22 +27,22 @@ if sdir != "":
 import sys
 sys.path.insert(0, "../../../")
 
-from pyvpsolver.modlang import AMPLParser
+from pyvpsolver.pympl import PyMPL
 
 
-class TestAMPLParser(unittest.TestCase):
-    """Unittests for the AMPLParser class"""
+class TestPyMPL(unittest.TestCase):
+    """Unittests for the PyMPL class"""
 
     def test_empty(self):
         """Tests empty files"""
-        parser = AMPLParser()
+        parser = PyMPL()
         parser.input = ""
         parser.parse()
         self.assertEqual(parser.output, "")
 
     def test_set(self):
         """Tests $SET[name]{values} calls"""
-        parser = AMPLParser()
+        parser = PyMPL()
         parser.input = """
         $SET[A]{range(5)};
         $SET[^B]{range(5)};
@@ -54,7 +54,7 @@ class TestAMPLParser(unittest.TestCase):
 
     def test_param(self):
         """Tests $PARAM[name]{value} calls"""
-        parser = AMPLParser()
+        parser = PyMPL()
         parser.input = """
         $PARAM[NAME]{"something"};
         $PARAM[^NAME2]{"something"};
@@ -70,7 +70,7 @@ class TestAMPLParser(unittest.TestCase):
 
     def test_var(self):
         """Tests $VAR[name]{typ, lb, ub} calls"""
-        parser = AMPLParser()
+        parser = PyMPL()
         parser.input = """
         $VAR[x]{"integer", 0, 10};
         $VAR[^z]{"integer", 0, 10};
@@ -84,7 +84,7 @@ class TestAMPLParser(unittest.TestCase):
 
     def test_con(self):
         """Tests $CON[name]{lincomb, sign, rhs} calls"""
-        parser = AMPLParser()
+        parser = PyMPL()
         parser.input = """
         $VAR[x1]{}; $VAR[x2]{}; $VAR[x3]{};
         $CON[xyz]{[("x1",5),("x2",15),("x3",10)],">=",20};
@@ -96,7 +96,7 @@ class TestAMPLParser(unittest.TestCase):
 
     def test_stmt(self):
         """Tests $STMT{stmt} calls"""
-        parser = AMPLParser()
+        parser = PyMPL()
         parser.input = """
         $EXEC{stmt = "s.t. {0}: x1 >= 10;".format("test")};
         $STMT{stmt};
@@ -106,7 +106,7 @@ class TestAMPLParser(unittest.TestCase):
 
     def test_comments(self):
         """Tests valid comments"""
-        parser = AMPLParser()
+        parser = PyMPL()
         parser.input = """
         /* $SET[A]{range(5)};*/
         # $PARAM[VALUE]{10};
@@ -126,7 +126,7 @@ class TestAMPLParser(unittest.TestCase):
 
     def test_exceptions(self):
         """Tests if exceptions are thrown correctly"""
-        parser = AMPLParser()
+        parser = PyMPL()
         parser.input = """$EXEC{print 1/0};"""
         with self.assertRaises(ZeroDivisionError):
             parser.parse()
