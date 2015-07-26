@@ -37,7 +37,7 @@ class TestPyMPL(unittest.TestCase):
         """Tests empty files"""
         parser = PyMPL()
         parser.input = ""
-        parser.parse()
+        parser.parse(comment_cmds=False)
         self.assertEqual(parser.output, "")
 
     def test_set(self):
@@ -47,7 +47,7 @@ class TestPyMPL(unittest.TestCase):
         $SET[A]{range(5)};
         $SET[^B]{range(5)};
         """
-        parser.parse()
+        parser.parse(comment_cmds=False)
         self.assertIn("set A := {0,1,2,3,4};", parser.output)
         self.assertNotIn("set B := {0,1,2,3,4};", parser.output)
         self.assertNotIn("set ^B := {0,1,2,3,4};", parser.output)
@@ -61,7 +61,7 @@ class TestPyMPL(unittest.TestCase):
         $PARAM[VALUE]{10};
         $PARAM[P]{{'a': 1, 'b': 2}};
         """
-        parser.parse()
+        parser.parse(comment_cmds=False)
         self.assertIn("param NAME := 'something';", parser.output)
         self.assertNotIn("param NAME2 := 'something';", parser.output)
         self.assertNotIn("param ^NAME2 := 'something';", parser.output)
@@ -76,7 +76,7 @@ class TestPyMPL(unittest.TestCase):
         $VAR[^z]{"integer", 0, 10};
         $EXEC{VAR['y']("binary")};
         """
-        parser.parse()
+        parser.parse(comment_cmds=False)
         self.assertIn("var x, integer, >= 0, <= 10;", parser.output)
         self.assertNotIn("var z, integer, >= 0, <= 10;", parser.output)
         self.assertNotIn("var ^z, integer, >= 0, <= 10;", parser.output)
@@ -90,7 +90,7 @@ class TestPyMPL(unittest.TestCase):
         $CON[xyz]{[("x1",5),("x2",15),("x3",10)],">=",20};
         $CON[^xyz2]{[("x1",5),("x2",15),("x3",10)],">=",20};
         """
-        parser.parse()
+        parser.parse(comment_cmds=False)
         self.assertIn("s.t. xyz: +5*x1+15*x2+10*x3 >= 20;", parser.output)
         self.assertNotIn("s.t. xyz2: +5*x1+15*x2+10*x3 >= 20;", parser.output)
 
@@ -101,7 +101,7 @@ class TestPyMPL(unittest.TestCase):
         $EXEC{stmt = "s.t. {0}: x1 >= 10;".format("test")};
         $STMT{stmt};
         """
-        parser.parse()
+        parser.parse(comment_cmds=False)
         self.assertIn("s.t. test: x1 >= 10;", parser.output)
 
     def test_eval(self):
@@ -117,19 +117,18 @@ class TestPyMPL(unittest.TestCase):
         """Tests valid comments"""
         parser = PyMPL()
         parser.input = """
-        /* $SET[A]{range(5)};*/
+        /* ... $SET[A]{range(5)}; ... */
         # $PARAM[VALUE]{10};
         # ... $PARAM[VALUE2]{10}; ...
-        param a := "/*";
+        param a := "\\"/*";
         $PARAM[Y]{10};
         param b := "*/";
         """
-        parser.parse()
+        parser.parse(comment_cmds=True)
         self.assertNotIn("set A := {0,1,2,3,4};", parser.output)
         self.assertNotIn("param VALUE := 10;", parser.output)
         self.assertNotIn("param VALUE2 := 10;", parser.output)
         self.assertIn("param Y := 10;", parser.output)
-        self.assertIn("/*IGNORED:$SET[A]{range(5)};*/", parser.output)
         self.assertIn("# $PARAM[VALUE]{10};", parser.output)
         self.assertIn("/*EVALUATED:$PARAM[Y]{10};*/", parser.output)
 
@@ -138,25 +137,25 @@ class TestPyMPL(unittest.TestCase):
         parser = PyMPL()
         parser.input = """$EXEC{print 1/0};"""
         with self.assertRaises(ZeroDivisionError):
-            parser.parse()
+            parser.parse(comment_cmds=False)
         parser.input = """$SET[X]{0};"""
         with self.assertRaises(TypeError):
-            parser.parse()
+            parser.parse(comment_cmds=False)
         parser.input = """$FLOW[Z]{100, [10, 10]};"""
         with self.assertRaises(TypeError):
-            parser.parse()
+            parser.parse(comment_cmds=False)
         parser.input = """$FLOW[Z]{100, 10};"""
         with self.assertRaises(TypeError):
-            parser.parse()
+            parser.parse(comment_cmds=False)
         parser.input = """$SET[X]{};"""
         with self.assertRaises(TypeError):
-            parser.parse()
+            parser.parse(comment_cmds=False)
         parser.input = """$SET[X]{[1,2,3]};$SET[X]{[1,2]};"""
         with self.assertRaises(AssertionError):
-            parser.parse()
+            parser.parse(comment_cmds=False)
         parser.input = """$SET[2X]{[1,2,3]};"""
         with self.assertRaises(AssertionError):
-            parser.parse()
+            parser.parse(comment_cmds=False)
 
 
 if __name__ == "__main__":

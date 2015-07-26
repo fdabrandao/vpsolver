@@ -22,23 +22,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 from copy import deepcopy
 
-RGX_SYMBNAME = "\\^?[a-zA-Z_][a-zA-Z0-9_]*"
-RGX_INDEX1 = "(?:\\s*\\[[^\\]]*\\])?" # [] index
-RGX_INDEX2 = "(?:\\s*{[^}]*})?" # {} index
-RGX_SYMBNAME_INDEX1 = RGX_SYMBNAME + RGX_INDEX1
-RGX_SYMBNAME_INDEX2 = RGX_SYMBNAME + RGX_INDEX2
+t_SYMBNAME = r'\^?[a-zA-Z_][a-zA-Z0-9_]*'
+t_INDEX1 = r'(?:\s*\[[^\]]*\])?' # [] index
+t_INDEX2 = r'(?:\s*{[^}]*})?' # {} index
+t_SYMBNAME_INDEX1 = t_SYMBNAME + t_INDEX1
+t_SYMBNAME_INDEX2 = t_SYMBNAME + t_INDEX2
 
 
 def parse_symbname(expr, allow_index=""):
     """Matches and returns a symbolic name."""
     assert allow_index in ("", "[]", "{}")
     if allow_index == "[]":
-        rgx_symb = RGX_SYMBNAME_INDEX1
+        t_symb = t_SYMBNAME_INDEX1
     elif allow_index == "{}":
-        rgx_symb = RGX_SYMBNAME_INDEX2
+        t_symb = t_SYMBNAME_INDEX2
     else:
-        rgx_symb = RGX_SYMBNAME
-    match = re.match("\\s*("+rgx_symb+")\\s*$", expr)
+        t_symb = t_SYMBNAME
+    match = re.match(r'\s*('+t_symb+r')\s*$', expr)
     if match is None:
         return None
     name = match.groups()[0]
@@ -49,13 +49,13 @@ def parse_symblist(expr, allow_index=""):
     """Matches and returns a list of symbolic names."""
     assert allow_index in ("", "[]", "{}")
     if allow_index == "[]":
-        rgx_symb = RGX_SYMBNAME_INDEX1
+        t_symb = t_SYMBNAME_INDEX1
     elif allow_index == "{}":
-        rgx_symb = RGX_SYMBNAME_INDEX2
+        t_symb = t_SYMBNAME_INDEX2
     else:
-        rgx_symb = RGX_SYMBNAME
+        t_symb = t_SYMBNAME
     match = re.match(
-        "\\s*(\\s*"+rgx_symb+"\\s*(?:,\\s*"+rgx_symb+"\\s*)*)\\s*$", expr
+        r'\s*(\s*'+t_symb+r'\s*(?:,\s*'+t_symb+r'\s*)*)\s*$', expr
     )
     if match is None:
         return None
@@ -69,15 +69,15 @@ def parse_indexed(expr, index_type):
     assert index_type in ("[]", "{}")
     if index_type == "[]":
         match = re.match(
-            "\\s*("+RGX_SYMBNAME+")\\s*"
-            "(\\[\\s*"+RGX_SYMBNAME+"\\s*(?:,"
-            "\\s*"+RGX_SYMBNAME+"\\s*)*\\])?\\s*$",
+            r'\s*('+t_SYMBNAME+r')\s*'
+            r'(\[\s*'+t_SYMBNAME+r'\s*(?:,'
+            r'\s*'+t_SYMBNAME+r'\s*)*\])?\s*$',
             expr
         )
     elif index_type == "{}":
         match = re.match(
-            "\\s*("+RGX_SYMBNAME+")\\s*"
-            "({\\s*"+RGX_SYMBNAME+"\\s*(?:,\\s*"+RGX_SYMBNAME+"\\s*)*})?\\s*$",
+            r'\s*('+t_SYMBNAME+r')\s*'
+            r'({\s*'+t_SYMBNAME+r'\s*(?:,\s*'+t_SYMBNAME+r'\s*)*})?\s*$',
             expr
         )
     if match is None:
@@ -122,11 +122,13 @@ def tuple2str(tuple_):
 
 def ampl_set(name, values, sets, params):
     """Generates the definition for an AMPL set."""
-    assert name not in sets
-    assert name not in params
-    sets[name] = deepcopy(values)
     if name.startswith("^"):
+        sets[name] = deepcopy(values)
         return "", ""
+    else:
+        assert name not in sets
+        assert name not in params
+        sets[name] = deepcopy(values)
 
     def format_entry(e):
         if isinstance(e, str):
@@ -144,11 +146,13 @@ def ampl_set(name, values, sets, params):
 
 def ampl_param(name, index, value, sets, params):
     """Generates the definition for an AMPL parameter."""
-    assert name not in sets
-    assert name not in params
-    params[name] = deepcopy(value)
     if name.startswith("^"):
+        params[name] = deepcopy(value)
         return "", ""
+    else:
+        assert name not in sets
+        assert name not in params
+        params[name] = deepcopy(value)
 
     if isinstance(value, dict):
         defs = "param {0}{{{1}}};\n".format(name, index)

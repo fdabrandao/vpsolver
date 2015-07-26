@@ -34,11 +34,11 @@ class PyMPL(object):
     t_ARGS1 = r'(?:.*?(?=]\s*{))'
     t_ARGS2 = r'(?:.*?(?=}\s*;))'
     t_ARGS3 = r'(?:.*?(?=}))'
-    t_STRING1 = r'(?:"(?:\\"|[^"])*")'
-    t_STRING2 = r"(?:'(?:\\'|[^'])*')"
+    t_STRING1 = r'(?:"(?:[^"\\]|\\.)*")'
+    t_STRING2 = r"(?:'(?:[^'\\]|\\.)*')"
     t_STRING = t_STRING1+r'|'+t_STRING2
     t_COMMENT = r'#[^\n]*|/\*.*?(?=\*/)\*/'
-    RGX_STMT = (
+    t_CMD = (
         r'('+t_STRING+r'|'+t_COMMENT+r')'
         r'|\$('+t_CMD+r')\s*(\['+t_ARGS1+r'\])?\s*{('+t_ARGS2+r')}\s*;'
         r'|\${('+t_ARGS3+r')}\$'
@@ -88,7 +88,7 @@ class PyMPL(object):
         locals_ = self._locals
         globals_ = self._globals
 
-        rgx = re.compile(self.RGX_STMT, re.DOTALL)
+        rgx = re.compile(PyMPL.t_CMD, re.DOTALL)
         for match in rgx.finditer(self.input):
             comment, call, args1, args2, args3 = match.groups()
             assert call in self._cmds
