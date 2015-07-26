@@ -31,7 +31,7 @@ from flask import Flask, Response
 from flask import render_template, json, request, redirect, url_for
 from multiprocessing import Process
 from pyvpsolver import VPSolver, VBP, AFG, LP
-from pyvpsolver.modlang import AMPLParser
+from pyvpsolver.pympl import PyMPL
 import signal
 
 app = Flask(__name__)
@@ -174,7 +174,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
         out, sol = VPSolver.script(form["script"], lp_model, afg, verbose=True)
     elif app_name == "modlang":
         tmpfile = VPSolver.new_tmp_file(ext=".mod")
-        parser = AMPLParser()
+        parser = PyMPL()
         parser.input = input_
         parser.parse()
         parser.write(tmpfile)
