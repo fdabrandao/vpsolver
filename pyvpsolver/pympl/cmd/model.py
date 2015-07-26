@@ -38,11 +38,12 @@ class CmdVar(CmdBase):
 class CmdCon(CmdBase):
     """Command for creating a new AMPL constraint."""
 
-    def _evalcmd(self, name, lincomb, sign, rhs):
+    def _evalcmd(self, name, left, sign, right):
         """Evalutates CMD[name](*args)."""
         match = utils.parse_symbname(name)
         assert match is not None
         name = match
+        lincomb, sign, rhs = utils.linear_constraint(left, sign, right)
         self._pyvars["_model"] += ampl_con(name, lincomb, sign, rhs)
 
 
