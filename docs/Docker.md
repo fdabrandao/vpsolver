@@ -1,3 +1,7 @@
+# Docker
+
+Docker is an open platform for building, shipping and running applications. Docker allows VPSolver to run on a large variety of platforms with very little effort.
+
 ## Docker Setup
 Install Docker [[Docker installation instructions](https://docs.docker.com/installation/)].
 
