@@ -45,40 +45,52 @@ class TestPyMPL(unittest.TestCase):
         parser = PyMPL()
         parser.input = """
         $SET[A]{range(5)};
-        $SET[^B]{range(5)};
+        $SET[B]{zip(range(5),range(5))};
+        $SET[^C]{range(5)};
         """
         parser.parse(comment_cmds=False)
         self.assertIn("set A := {0,1,2,3,4};", parser.output)
-        self.assertNotIn("set B := {0,1,2,3,4};", parser.output)
-        self.assertNotIn("set ^B := {0,1,2,3,4};", parser.output)
+        self.assertIn(
+            "set B := {(0,0),(1,1),(2,2),(3,3),(4,4)};",
+            parser.output
+        )
+        self.assertNotIn("set C := {0,1,2,3,4};", parser.output)
+        self.assertNotIn("set ^C := {0,1,2,3,4};", parser.output)
 
     def test_param(self):
         """Tests $PARAM[name]{value} calls"""
         parser = PyMPL()
         parser.input = """
-        $PARAM[NAME]{"something"};
-        $PARAM[^NAME2]{"something"};
+        $PARAM[NAME]{"name"};
         $PARAM[VALUE]{10};
-        $PARAM[P]{{'a': 1, 'b': 2}};
+        $PARAM[D]{{'a': 1, 'b': 2}};
+        $PARAM[L0]{[1,2,3], i0=0};
+        $PARAM[L1]{[1,2,3], i0=1};
+        $PARAM[^NAME2]{"something"};
         """
         parser.parse(comment_cmds=False)
-        self.assertIn("param NAME := 'something';", parser.output)
+        self.assertIn("param NAME := 'name';", parser.output)
+        self.assertIn("param VALUE := 10;", parser.output)
+        self.assertIn("param D := ['a']1['b']2;", parser.output)
+        self.assertIn("param L0 := [0]1[1]2[2]3;", parser.output)
+        self.assertIn("param L1 := [1]1[2]2[3]3;", parser.output)
         self.assertNotIn("param NAME2 := 'something';", parser.output)
         self.assertNotIn("param ^NAME2 := 'something';", parser.output)
-        self.assertIn("param VALUE := 10;", parser.output)
-        self.assertIn("param P := ['a']1['b']2;", parser.output)
 
     def test_var(self):
         """Tests $VAR[name]{typ, lb, ub} calls"""
         parser = PyMPL()
         parser.input = """
         $VAR[x]{"integer", 0, 10};
+        $VAR[y]{"binary"};
+        $VAR[z]{ub=abs((2**7)/5-135)};
         $VAR[^z]{"integer", 0, 10};
         $EXEC{VAR['y']("binary")};
         """
         parser.parse(comment_cmds=False)
         self.assertIn("var x, integer, >= 0, <= 10;", parser.output)
-        self.assertNotIn("var z, integer, >= 0, <= 10;", parser.output)
+        self.assertIn("var y, binary;", parser.output)
+        self.assertIn("var z, <= 110;", parser.output)
         self.assertNotIn("var ^z, integer, >= 0, <= 10;", parser.output)
         self.assertIn("var y, binary;", parser.output)
 
@@ -108,19 +120,23 @@ class TestPyMPL(unittest.TestCase):
         """Tests $STMT{stmt} calls"""
         parser = PyMPL()
         parser.input = """
-        $EXEC{stmt = "s.t. {0}: x1 >= 10;".format("test")};
+        $STMT{"s.t. con1: x + y <= {0} * z;".format(abs((2**7)/5-135))};
+        $EXEC{stmt = "s.t. {0}: x >= 10;".format("test")};
         $STMT{stmt};
         """
         parser.parse(comment_cmds=False)
-        self.assertIn("s.t. test: x1 >= 10;", parser.output)
+        self.assertIn("s.t. con1: x + y <= 110 * z;", parser.output)
+        self.assertIn("s.t. test: x >= 10;", parser.output)
 
     def test_eval(self):
         """Tests ${expression}$ calls"""
         parser = PyMPL()
         parser.input = """
+        s.t. con1: x + y <= ${abs((2**7)/5-135)}$ * z;
         var x1, >= ${2+6}$, <= ${10*5}$;
         """
         parser.parse(comment_cmds=False)
+        self.assertIn("s.t. con1: x + y <= 110 * z;", parser.output)
         self.assertIn("var x1, >= 8, <= 50;", parser.output)
 
     def test_comments(self):
