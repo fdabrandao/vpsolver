@@ -104,6 +104,15 @@ class TestPyMPL(unittest.TestCase):
         parser.parse()
         self.assertIn("s.t. test: x1 >= 10;", parser.output)
 
+    def test_eval(self):
+        """Tests ${expression}$ calls"""
+        parser = PyMPL()
+        parser.input = """
+        var x1, >= ${2+6}$, <= ${10*5}$;
+        """
+        parser.parse(comment_cmds=False)
+        self.assertIn("var x1, >= 8, <= 50;", parser.output)
+
     def test_comments(self):
         """Tests valid comments"""
         parser = PyMPL()

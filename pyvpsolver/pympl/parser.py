@@ -25,21 +25,24 @@ from .cmd import CmdBase, CmdSet, CmdParam
 from .cmd import CmdVar, CmdCon, CmdStmt
 from .cmd import CmdFlow, CmdGraph, CmdLoadVBP
 
-DEBUG = False
-
 
 class PyMPL(object):
     """Class for parsing AMPL files with PyMPL calls"""
 
-    RGX_CMD = "[a-zA-Z_][a-zA-Z0-9_]*"
-    RGX_ARG1 = "(?:.*?(?=]\s*{))"
-    RGX_ARG2 = """(?:.*?(?=}\s*;))"""
-    RGX_STRINGS = """"(?:[^"]|\\\\")*"|'(?:[^']|\\\\')*'"""
-    RGX_COMMENTS = """#[^\n]*|/\\*.*?(?=\\*/)\\*/"""
+    DEBUG = False
+    t_CMD = r'[a-zA-Z_][a-zA-Z0-9_]*'
+    t_ARGS1 = r'(?:.*?(?=]\s*{))'
+    t_ARGS2 = r'(?:.*?(?=}\s*;))'
+    t_ARGS3 = r'(?:.*?(?=}))'
+    t_STRING1 = r'(?:"(?:\\"|[^"])*")'
+    t_STRING2 = r"(?:'(?:\\'|[^'])*')"
+    t_STRING = t_STRING1+r'|'+t_STRING2
+    t_COMMENT = r'#[^\n]*|/\*.*?(?=\*/)\*/'
     RGX_STMT = (
-        "("+RGX_STRINGS+"|"+RGX_COMMENTS+")"
-        "|\\$("+RGX_CMD+")\\s*(\\["+RGX_ARG1+"\\])?\\s*{("+RGX_ARG2+")}\\s*;"
-        "|\\${("+RGX_ARG2+")}"
+        r'('+t_STRING+r'|'+t_COMMENT+r')'
+        r'|\$('+t_CMD+r')\s*(\['+t_ARGS1+r'\])?\s*'
+        r'{('+t_ARGS2+r')}\s*;'
+        r'|\${('+t_ARGS3+r')}\$'
     )
     DEFAULT_CMDS = {
         "SET": CmdSet, "PARAM": CmdParam,
@@ -74,7 +77,7 @@ class PyMPL(object):
         self._locals[cmd] = cmdcls(cmd, self._locals, self._sets, self._params)
         self._cmds.append(cmd)
 
-    def parse(self, mod_in=None, mod_out=None):
+    def parse(self, mod_in=None, mod_out=None, comment_cmds=True):
         """Parses the input file."""
         self._clear()
         if mod_in is not None:
@@ -92,10 +95,10 @@ class PyMPL(object):
             clean_strmatch = strmatch.strip("/*# ")
 
             if DEBUG:
-                print "\n---\n{0}\n---\n".format(strmatch)
+                print "\n---\n{0}\n{1}\n---\n".format(strmatch, match.groups())
 
             if comment is not None:
-                if comment.startswith("/*"):
+                if comment_cmds and comment.startswith("/*"):
                     self.output = self.output.replace(
                         strmatch, "/*IGNORED:{0}*/".format(clean_strmatch)
                     )
@@ -103,12 +106,12 @@ class PyMPL(object):
 
             try:
                 if call is None:
-                    res = eval(args3, globals_, locals_)
+                    res = str(eval(args3, globals_, locals_))
                 elif call == "EXEC":
                     assert args1 is None
                     locals_["_model"] = ""
                     exec(args2, globals_, locals_)
-                    res = locals_["_model"]
+                    res = str(locals_["_model"])
                 else:
                     if args1 is not None:
                         args1 = "'''{0}'''".format(args1[1:-1])
@@ -118,7 +121,7 @@ class PyMPL(object):
                         globals_,
                         locals_
                     )
-                    res = locals_["_model"]
+                    res = str(locals_["_model"])
             except:
                 exctype, value, traceback = sys.exc_info()
                 msg = str(value)+"\n\t"
@@ -129,9 +132,12 @@ class PyMPL(object):
                 )
                 raise exctype, msg, traceback
 
-            self.output = self.output.replace(
-                strmatch, "/*EVALUATED:{0}*/{1}".format(clean_strmatch, res), 1
-            )
+            if comment_cmds:
+                res = "/*EVALUATED:{0}*/{1}".format(
+                    clean_strmatch, res
+                )
+
+            self.output = self.output.replace(strmatch, res, 1)
 
         self._finalize()
         if mod_out is not None:
