@@ -40,8 +40,7 @@ class PyMPL(object):
     t_COMMENT = r'#[^\n]*|/\*.*?(?=\*/)\*/'
     RGX_STMT = (
         r'('+t_STRING+r'|'+t_COMMENT+r')'
-        r'|\$('+t_CMD+r')\s*(\['+t_ARGS1+r'\])?\s*'
-        r'{('+t_ARGS2+r')}\s*;'
+        r'|\$('+t_CMD+r')\s*(\['+t_ARGS1+r'\])?\s*{('+t_ARGS2+r')}\s*;'
         r'|\${('+t_ARGS3+r')}\$'
     )
 
@@ -109,7 +108,7 @@ class PyMPL(object):
             try:
                 if call is None:
                     res = str(eval(args3, globals_, locals_))
-                elif call == "EXEC":
+                elif call == PyMPL.EXEC_CMD:
                     assert args1 is None
                     locals_["_model"] = ""
                     exec(args2, globals_, locals_)
