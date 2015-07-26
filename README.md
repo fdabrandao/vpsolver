@@ -49,11 +49,14 @@ $ bash compile.sh
 With the python interface: 
 
 ```bash
-$ pip install -r requirements.txt
+$ sudo pip install -r requirements.txt
 $ sudo python setup.py install  
 ```
 
 ## Alternative setup using Docker
+
+Docker is an open platform for building, shipping and running applications. Docker allows VPSolver to run on a large variety of platforms with very little effort.
+
 Install Docker [[Docker installation instructions](https://docs.docker.com/installation/)].
 
 Option 1: simply `pull` VPSolver from Docker repository (without building):
