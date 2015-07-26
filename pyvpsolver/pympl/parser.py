@@ -44,6 +44,8 @@ class PyMPL(object):
         r'{('+t_ARGS2+r')}\s*;'
         r'|\${('+t_ARGS3+r')}\$'
     )
+
+    EXEC_CMD = "EXEC"
     DEFAULT_CMDS = {
         "SET": CmdSet, "PARAM": CmdParam,
         "VAR": CmdVar, "CON": CmdCon, "STMT": CmdStmt,
@@ -65,7 +67,7 @@ class PyMPL(object):
         self._locals["_sets"] = self._sets
         self._locals["_params"] = self._params
 
-        self._cmds = ["EXEC", "EVAL", None]
+        self._cmds = [PyMPL.EXEC_CMD, None]
         for cmd, cls in self.DEFAULT_CMDS.items():
             self.add_cmd(cmd, cls)
 
@@ -94,7 +96,7 @@ class PyMPL(object):
             strmatch = self.input[match.start():match.end()]
             clean_strmatch = strmatch.strip("/*# ")
 
-            if DEBUG:
+            if PyMPL.DEBUG:
                 print "\n---\n{0}\n{1}\n---\n".format(strmatch, match.groups())
 
             if comment is not None:
