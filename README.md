@@ -12,11 +12,13 @@ solvers such as Gurobi and GLPK. VPSolver does not explicitly require any MIP
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.
 
-For more details, please refer to the manual.
+For more details, please refer to the manual or to the project wiki [<https://github.com/fdabrandao/vpsolver/wiki>].
 
 ## Repositories:
-Project Homepage: https://github.com/fdabrandao/vpsolver  
-Bitbucket Mirror: https://bitbucket.org/fdabrandao/vpsolver  
+* Project Homepage: <http://vpsolver.dcc.fc.up.pt/>
+* GiHub repository: <https://github.com/fdabrandao/vpsolver>
+* BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>
+* Docker repository: <https://registry.hub.docker.com/u/fdabrandao/vpsolver/>
 
 ## Requirements:
 #### Mandatory:
@@ -71,6 +73,8 @@ Option 2: `clone` VPSolver and `build` locally:
 user@locahost ~$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
 user@locahost ~$ docker build -t fdabrandao/vpsolver vpsolver
 ```
+
+For more details, please refer to the project wiki [https://github.com/fdabrandao/vpsolver/wiki/docker].
 
 ## Scripts
 VPSolver includes several scripts for solving arc-flow models using different
