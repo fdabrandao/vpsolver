@@ -51,11 +51,6 @@ make bin/vpsolver >>compile.log 2>&1
 if [[ $? == 0 ]]; then echo "[OK]";
 else echo "[Failed]"; fi
 
-echo -n "  gg_afg   "
-make bin/gg_afg >>compile.log 2>&1
-if [[ $? == 0 ]]; then echo "[OK]";
-else echo "[Failed]"; fi
-
 echo -n "  solve_gurobi "
 make bin/solve_gurobi >>compile.log 2>&1
 if [[ $? == 0 ]]; then echo "[OK]";
