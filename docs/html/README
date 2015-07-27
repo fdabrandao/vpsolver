@@ -64,13 +64,21 @@ solvers such as Gurobi and GLPK. VPSolver does not explicitly require any MIP
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.</p>
 
-<p>For more details, please refer to the manual.</p>
+<p>For more details, please refer to the manual or to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki">https://github.com/fdabrandao/vpsolver/wiki</a>].</p>
 
 <h2>
 <a id="user-content-repositories" class="anchor" href="#repositories" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repositories:</h2>
 
-<p>Project Homepage: <a href="https://github.com/fdabrandao/vpsolver">https://github.com/fdabrandao/vpsolver</a><br>
-Bitbucket Mirror: <a href="https://bitbucket.org/fdabrandao/vpsolver">https://bitbucket.org/fdabrandao/vpsolver</a>  </p>
+<ul>
+<li>Project Homepage: <a href="http://vpsolver.dcc.fc.up.pt/">http://vpsolver.dcc.fc.up.pt/</a>
+</li>
+<li>GiHub repository: <a href="https://github.com/fdabrandao/vpsolver">https://github.com/fdabrandao/vpsolver</a>
+</li>
+<li>BitBucket repository: <a href="https://bitbucket.org/fdabrandao/vpsolver">https://bitbucket.org/fdabrandao/vpsolver</a>
+</li>
+<li>Docker repository: <a href="https://registry.hub.docker.com/u/fdabrandao/vpsolver/">https://registry.hub.docker.com/u/fdabrandao/vpsolver/</a>
+</li>
+</ul>
 
 <h2>
 <a id="user-content-requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements:</h2>
@@ -134,6 +142,8 @@ $ sudo python setup.py install  </pre></div>
 
 <div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
 user@locahost <span class="pl-k">~</span>$ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
+
+<p>For more details, please refer to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki/docker">https://github.com/fdabrandao/vpsolver/wiki/docker</a>].</p>
 
 <h2>
 <a id="user-content-scripts" class="anchor" href="#scripts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scripts</h2>

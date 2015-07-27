@@ -10,11 +10,10 @@ VPSolver is a vector packing solver based on an arc-flow formulation with graph 
 * [PyMPL documentation](PyMPL)
 
 ## Useful links
-* Project Homepage: [http://vpsolver.dcc.fc.up.pt/](http://vpsolver.dcc.fc.up.pt/)  
-* GiHub repository: [https://github.com/fdabrandao/vpsolver](https://github.com/fdabrandao/vpsolver)  
-* BitBucket repository: [https://bitbucket.org/fdabrandao/vpsolver](https://bitbucket.org/fdabrandao/vpsolver)  
-* Docker repository: [https://registry.hub.docker.com/u/fdabrandao/vpsolver/](https://registry.hub.docker.com/u/fdabrandao/vpsolver/)
-
+* Project Homepage: <http://vpsolver.dcc.fc.up.pt/>
+* GiHub repository: <https://github.com/fdabrandao/vpsolver>
+* BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>
+* Docker repository: <https://registry.hub.docker.com/u/fdabrandao/vpsolver/>
 
 ***
 Copyright © Filipe Brandão. All rights reserved.  
