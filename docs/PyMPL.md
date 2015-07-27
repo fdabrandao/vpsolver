@@ -2,6 +2,10 @@
 
 PyMPL is a python extension to the AMPL modelling language that adds new statements for evaluating python code within AMPL models.
 
+## Table of Contents
+  * [Examples](#examples)
+  * [PyMPL statements](#pympl-statements)
+
 ## Examples
 
 ``vector_packing.mod``:

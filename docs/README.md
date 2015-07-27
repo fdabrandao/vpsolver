@@ -12,23 +12,35 @@ solvers such as Gurobi and GLPK. VPSolver does not explicitly require any MIP
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.
 
-For more details, please refer to the manual or to the project wiki [<https://github.com/fdabrandao/vpsolver/wiki>].
+For more details, please refer to the project wiki [<https://github.com/fdabrandao/vpsolver/wiki>] or to the manual.
 
-## Repositories:
+## Repositories
 * Project Homepage: <http://vpsolver.dcc.fc.up.pt/>
 * GiHub repository: <https://github.com/fdabrandao/vpsolver>
 * BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>
 * Docker repository: <https://registry.hub.docker.com/u/fdabrandao/vpsolver/>
 
-## Requirements:
-#### Mandatory:
+## Table of Contents
+* [Requirements](#requirements)
+* [Setup](#setup)
+* [Docker](#docker)
+    * [Docker Setup](#docker-setup)
+    * [Usage](#usage)
+* [Scripts](#scripts)
+* [Examples](#examples)
+* [Folders](#folders)
+* [Reports](#reports)
+
+## Requirements
+#### Mandatory
 
 * MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...  
 * `g++ >= 4.8`
 * `make >= 3.81`
       
-#### Optional (for the python interface):
+#### Optional
 
+For the python interface:
 * `python 2.7`
 * `python-pip`
 * `python-dev`
@@ -55,7 +67,9 @@ $ sudo pip install -r requirements.txt
 $ sudo python setup.py install  
 ```
 
-## Alternative setup using Docker
+## Docker
+
+### Docker Setup
 
 Docker is an open platform for building, shipping and running applications. Docker allows VPSolver to run on a large variety of platforms with very little effort.
 
@@ -74,6 +88,32 @@ user@locahost ~$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
 user@locahost ~$ docker build -t fdabrandao/vpsolver vpsolver
 ```
 
+### Usage
+Directly using the command line interface:
+
+```bash
+user@locahost ~$ docker run -it fdabrandao/vpsolver bash
+root@55d14f6b6f32:~# python examples/example.py
+...
+```
+
+or through the VPSolver Web APP (example URL: `http://172.17.0.60:5555/`):
+
+```bash
+user@locahost ~$ docker run -it -p 5555 fdabrandao/vpsolver 
+eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
+          inet addr:*172.17.0.60*  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
+          UP BROADCAST  MTU:1500  Metric:1
+          RX packets:2 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
+
+ * Running on http://0.0.0.0:5555/
+...
+```
+
 For more details, please refer to the project wiki [https://github.com/fdabrandao/vpsolver/wiki/docker].
 
 ## Scripts
@@ -87,7 +127,7 @@ solvers:
 * `scripts/vpsolver_scip.sh`    - SCIP
 * `scripts/vpsolver_lpsolve.sh` - lp_solve
 
-## Examples:
+## Examples
 VPSolver includes several examples:
 
 * `examples/example.sh` - shell commands
@@ -96,7 +136,7 @@ VPSolver includes several examples:
 * `examples/example_mvbp.py` - solves multiple-choice vector packing instances
 * `examples/example_vsbpp.py` - solves variable-sized bin packing instances
 
-## Folders:
+## Folders
 
 * `docs/`       - documentation
 * `bin/`        - vpsolver executables
