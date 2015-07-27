@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
@@ -24,8 +24,15 @@ import os
 sdir = os.path.dirname(__file__)
 if sdir != "":
     os.chdir(sdir)
-import sys
-sys.path.insert(0, "../../../")
+
+INSTALLED = False
+if not INSTALLED:
+    import sys
+    project_dir = "../../../"
+    sys.path.insert(0, project_dir)
+    os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
+        project_dir, os.environ["PATH"]
+    )
 
 from pyvpsolver.pympl import PyMPL, glpk_mod2lp
 from pyvpsolver import VPSolver
@@ -51,7 +58,7 @@ def main():
     print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
     print
 
-    os.system("glpsol --math " + mod_out + "| grep -v Generating")
+    os.system("glpsol --math {0} | grep -v Generating".format(mod_out))
 
 if __name__ == "__main__":
     main()

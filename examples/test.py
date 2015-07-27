@@ -20,21 +20,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import equivknapsack01
-import equivknapsack
-import graph
-import instance
+import example
+import example_vbp
+import example_vsbpp
+import example_mvbp
 
 
 if __name__ == "__main__":
-    print "equivknapsack:"
-    equivknapsack.main()
+    print "example:"
+    example.main()
 
-    print "equivknapsack01:"
-    equivknapsack01.main()
+    print "example_vbp:"
+    example_vbp.main()
 
-    print "graph:"
-    graph.main()
+    print "example_vsbpp:"
+    example_vsbpp.main()
 
-    print "instance:"
-    instance.main()
+    print "example_mvbp:"
+    example_mvbp.main()

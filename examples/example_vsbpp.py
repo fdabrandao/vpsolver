@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
@@ -19,43 +19,62 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import sys, os
+
+import os
 sdir = os.path.dirname(__file__)
-if sdir != '': os.chdir(sdir)
+if sdir != "":
+    os.chdir(sdir)
 
-""" Add VPSolver folders to path """
+INSTALLED = False
+if not INSTALLED:
+    import sys
+    project_dir = "../"
+    sys.path.insert(0, project_dir)
+    os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
+        project_dir, os.environ["PATH"]
+    )
 
-#add vpsolver folder to sys.path
-sys.path.insert(0, "../")
+from pyvpsolver import solvers
 
-#add vpsolver/bin folder to path
-os.environ["PATH"] = "../bin"+":"+os.environ["PATH"]
 
-#add vpsolver/scripts folder to path
-os.environ["PATH"] = "../scripts"+":"+os.environ["PATH"]
+def main():
+    """ Variable-sized Bin Packing Example """
 
-""" Variable-sized Bin Packing Example """
+    """
+    'solvers.mvbp' the method proposed in:
+    Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
+    Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
+    Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
+    """
 
-"""
-Uses the method proposed in:
-Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
-Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
-Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
-"""
+    inf = float("inf")
 
-from pyvpsolver import *
+    # Capacities:
+    Ws = [[100], [120], [150]]
 
-inf = float('inf')
+    # Cots:
+    Cs = [100, 120, 150]
 
-Ws = [[100], [120], [150]] # capacities
-Cs = [100, 120, 150] # costs
-Qs = [inf, inf, inf] # number of bins available of each type (note: the model may become infeasible)
-ws = [[[10]], [[14]], [[17]], [[19]], [[24]], [[29]], [[32]], [[33]], [[36]],
-      [[38]], [[40]], [[50]], [[54]], [[55]], [[63]], [[66]], [[71]], [[77]],
-      [[79]], [[83]], [[92]], [[95]], [[99]]]
-b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
+    # Number of bins available of each type:
+    Qs = [inf, inf, inf]
 
-obj, sol = solvers.mvbp.solve(Ws, Cs, Qs, ws, b, svg_file="tmp/graph_vsbpp.svg", verbose=True, script="vpsolver_glpk.sh")
-print "obj:", obj
-print "sol:", sol
-solvers.mvbp.print_solution(obj, sol)
+    # Item weights:
+    ws = [[[10]], [[14]], [[17]], [[19]], [[24]], [[29]], [[32]], [[33]], [[36]],
+          [[38]], [[40]], [[50]], [[54]], [[55]], [[63]], [[66]], [[71]], [[77]],
+          [[79]], [[83]], [[92]], [[95]], [[99]]]
+
+    # Item demands:
+    b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
+
+    # Solve the variable-sized bin packing instance:
+    obj, sol = solvers.mvbp.solve(
+        Ws, Cs, Qs, ws, b,
+        svg_file="tmp/graph_vsbpp.svg",
+        verbose=True, script="vpsolver_glpk.sh")
+    print "obj:", obj
+    print "sol:", sol
+    solvers.mvbp.print_solution(obj, sol)
+
+
+if __name__ == "__main__":
+    main()
