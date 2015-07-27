@@ -40,7 +40,7 @@ class CustomInstallCommand(install):
 
 setup(
     name='VPSolver',
-    version='1.3.0-alpha',
+    version='1.3.0',
     description='Cutting and Packing Exact Solver Based on an Arc-Flow Formulation',
     author='',
     author_email='',
