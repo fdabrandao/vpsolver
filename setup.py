@@ -32,8 +32,7 @@ class CustomInstallCommand(install):
 
     def run(self):
         try:
-            os.system("/bin/bash ./compile.sh")
-            os.system("/bin/cp bin/* " + self.install_scripts)
+            os.system("/bin/cp " + self.install_scripts)
         except IOError:
             pass
         install.run(self)
@@ -42,7 +41,10 @@ class CustomInstallCommand(install):
 def copy_dir(base_dir):
     for (dirpath, dirnames, files) in os.walk(base_dir):
         for f in files:
-            if not f.endswith(("~", ".pyc", ".pyo", ".log")):
+            if (
+                not f.endswith(("~", ".pyc", ".pyo", ".log"))
+                and not f.startswith(".")
+            ):
                 yield os.path.join(dirpath.split("/", 1)[1], f)
 
 
@@ -60,14 +62,8 @@ setup(
         "" : [f for f in copy_dir("pyvpsolver/")]
     },
     include_package_data=True,
-    scripts=[
-        "scripts/vpsolver_gurobi.sh",
-        "scripts/vpsolver_cplex.sh",
-        "scripts/vpsolver_coinor.sh",
-        "scripts/vpsolver_glpk.sh",
-        "scripts/vpsolver_lpsolve.sh",
-        "scripts/vpsolver_scip.sh",
-    ],
+    scripts=[os.path.join("scripts/", f) for f in copy_dir("scripts/")] + \
+            [os.path.join("bin/", f) for f in copy_dir("bin/")],
     install_requires=[],
     classifiers=[
         "Development Status :: 1 - Planning",
