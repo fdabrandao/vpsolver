@@ -55,7 +55,7 @@ def main():
     W3 = (150, 25)
     Ws = [W1, W2, W3]    # Capacities
     Cs = [3, 7, 2]       # Costs
-    Qs = [inf, inf, inf] # Available quantities
+    Qs = [inf, inf, inf] # Number of available bins
     # Items:
     ws1, b1 = [(50, 25), (25, 50), (0, 75)], 1
     ws2, b2 = [(40, 40), (60, 25), (25, 60)], 1
