@@ -22,7 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import shutil
 import tempfile
-from model import *
-from afgraph import *
-from vpsolver import *
-import solvers
+from .model import *
+from .afgraph import *
+from .vpsolver import *
+from . import solvers
+from . import pympl
+from . import webapp

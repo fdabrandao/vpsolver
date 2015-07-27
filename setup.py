@@ -22,48 +22,59 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from os import system
-
+import os
 from setuptools import setup
 from setuptools.command.install import install
+
 
 class CustomInstallCommand(install):
     """ Custom Install Command """
 
     def run(self):
         try:
-            system('/bin/bash ./compile.sh')
-            system('/bin/cp bin/* ' + self.install_scripts)
+            os.system("/bin/bash ./compile.sh")
+            os.system("/bin/cp bin/* " + self.install_scripts)
         except IOError:
             pass
         install.run(self)
 
+
+def copy_dir(base_dir):
+    for (dirpath, dirnames, files) in os.walk(base_dir):
+        for f in files:
+            if not f.endswith(("~", ".pyc", ".pyo", ".log")):
+                yield os.path.join(dirpath.split("/", 1)[1], f)
+
+
 setup(
-    name='VPSolver',
-    version='1.3.0',
-    description='Cutting and Packing Exact Solver Based on an Arc-Flow Formulation',
-    author='',
-    author_email='',
-    packages=['pyvpsolver'],
+    name="VPSolver",
+    version="1.3.0",
+    license="GPLv3+",
+    author="Filipe Brandao",
+    author_email="fdabrandao@dcc.fc.up.pt",
+    url="https://github.com/fdabrandao/vpsolver",
+    description="Cutting and Packing Exact Solver Based on an Arc-Flow Formulation",
+    long_description=open("README.md").read(),
+    packages=["pyvpsolver"],
+    package_data = {
+        "" : [f for f in copy_dir("pyvpsolver/")]
+    },
     include_package_data=True,
     scripts=[
-      'scripts/vpsolver_gurobi.sh',
-      'scripts/vpsolver_cplex.sh',
-      'scripts/vpsolver_coinor.sh',
-      'scripts/vpsolver_glpk.sh',
-      'scripts/vpsolver_lpsolve.sh',
-      'scripts/vpsolver_scip.sh',
+        "scripts/vpsolver_gurobi.sh",
+        "scripts/vpsolver_cplex.sh",
+        "scripts/vpsolver_coinor.sh",
+        "scripts/vpsolver_glpk.sh",
+        "scripts/vpsolver_lpsolve.sh",
+        "scripts/vpsolver_scip.sh",
     ],
-    url='',
-    license='LICENSE',
-    long_description=open('README.md').read(),
-    keywords='',
+    install_requires=[],
     classifiers=[
-      'Development Status :: 1 - Planning',
-      'Intended Audience :: Science/Research',
-      'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-      'Topic :: Scientific/Engineering'
+        "Development Status :: 1 - Planning",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "Topic :: Scientific/Engineering"
     ],
-    cmdclass = { 'install' : CustomInstallCommand },
+    cmdclass = { "install" : CustomInstallCommand },
     use_2to3 = True
 )
