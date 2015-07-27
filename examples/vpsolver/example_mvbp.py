@@ -34,7 +34,7 @@ if not INSTALLED:
         project_dir, os.environ["PATH"]
     )
 
-from pyvpsolver import solvers
+from pyvpsolver.solvers import mvbpsolver
 
 def main():
     """Examples: Multiple-choice Vector Bin Packing"""
@@ -64,14 +64,14 @@ def main():
     ws = [ws1, ws2, ws3]
 
     # Solve Example 1:
-    obj, sol = solvers.mvbp.solve(
+    obj, sol = mvbpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graphA_mvbp.svg",
         verbose=True, script="vpsolver_glpk.sh"
     )
     print "obj:", obj
     print "sol:", sol
-    solvers.mvbp.print_solution(obj, sol)
+    mvbpsolver.print_solution(obj, sol)
 
     ## Example 2
     # Bins:
@@ -87,14 +87,14 @@ def main():
     ws = [ws1, ws2]
 
     # Solve Example 2:
-    obj, sol = solvers.mvbp.solve(
+    obj, sol = mvbpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graphB_mvbp.svg",
         verbose=True, script="vpsolver_glpk.sh"
     )
     print "obj:", obj
     print "sol:", sol
-    solvers.mvbp.print_solution(obj, sol)
+    mvbpsolver.print_solution(obj, sol)
 
 
 if __name__ == "__main__":

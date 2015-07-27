@@ -34,7 +34,7 @@ if not INSTALLED:
         project_dir, os.environ["PATH"]
     )
 
-from pyvpsolver import solvers
+from pyvpsolver.solvers import mvbpsolver
 
 
 def main():
@@ -67,13 +67,13 @@ def main():
     b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
 
     # Solve the variable-sized bin packing instance:
-    obj, sol = solvers.mvbp.solve(
+    obj, sol = mvbpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graph_vsbpp.svg",
         verbose=True, script="vpsolver_glpk.sh")
     print "obj:", obj
     print "sol:", sol
-    solvers.mvbp.print_solution(obj, sol)
+    mvbpsolver.print_solution(obj, sol)
 
 
 if __name__ == "__main__":

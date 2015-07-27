@@ -34,7 +34,7 @@ if not INSTALLED:
         project_dir, os.environ["PATH"]
     )
 
-from pyvpsolver import solvers
+from pyvpsolver.solvers import vbpsolver
 
 
 def main():
@@ -45,14 +45,14 @@ def main():
     b = [9, 5, 91, 18, 11, 64]
 
     # Solve:
-    obj, sol = solvers.vbp.solve(
+    obj, sol = vbpsolver.solve(
         W, w, b,
         svg_file="tmp/graph_vbp.svg",
         verbose=False, script="vpsolver_glpk.sh"
     )
     print "obj:", obj
     print "sol:", sol
-    solvers.vbp.print_solution(obj, sol)
+    vbpsolver.print_solution(obj, sol)
 
 
 if __name__ == "__main__":

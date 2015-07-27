@@ -22,8 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .. import *
 import sys
 
-def solve(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file="",
-          verbose=False, script="vpsolver_gurobi.sh"):
+def solve(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="",
+          verbose=False, script="vpsolver_glpk.sh"):
     """
     Solves multiple-choice vector bin packing instances using the method
     proposed in Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
@@ -195,14 +195,11 @@ def solve(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file="",
     out, varvalues = VPSolver.script_wsol(script, model_file, verbose=verbose)
     os.remove(model_file)
 
-    if log_file != "":
-        f = open(log_file, "w")
-        print >>f, "#V1: %d #A1: %d" % (nv1, na1)
-        print >>f, "#V2: %d #A2: %d" % (nv2, na2)
-        print >>f, "#V3: %d #A3: %d" % (nv3, na3)
-        print >>f, "#V3/#V1: %.2f #A3/#A1: %.1f" % (nv3/float(nv1), na3/float(na1))
-        print >>f, out
-        f.close()
+    if verbose:
+        print "#V1: %d #A1: %d" % (nv1, na1)
+        print "#V2: %d #A2: %d" % (nv2, na2)
+        print "#V3: %d #A3: %d" % (nv3, na3)
+        print "#V3/#V1: %.2f #A3/#A1: %.1f" % (nv3/float(nv1), na3/float(na1))
 
     labels = {}
     for (u,v,i) in A:
@@ -223,11 +220,11 @@ def solve(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="", log_file="",
 
     return c1, lst_sol
 
-def print_solution(obj, lst_sol, f=sys.stdout):
-    if obj != None: print >>f, "Objective:", obj
-    print >>f, "Solution:"
+def print_solution(obj, lst_sol, fout=sys.stdout):
+    if obj != None: print >>fout, "Objective:", obj
+    print >>fout, "Solution:"
     for i, sol in enumerate(lst_sol):
         cnt = sum(m for m,p in sol)
-        print >>f, "Bins of type %d: %d %s" % (i+1, cnt, ["bins","bin"][cnt==1])
+        print >>fout, "Bins of type %d: %d %s" % (i+1, cnt, ["bins","bin"][cnt==1])
         for mult, patt in sol:
-            print >>f, "%d x [%s]" % (mult, ", ".join(["i=%d opt=%d" % (it+1, opt+1) for it, opt in patt]))
+            print >>fout, "%d x [%s]" % (mult, ", ".join(["i=%d opt=%d" % (it+1, opt+1) for it, opt in patt]))

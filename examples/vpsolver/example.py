@@ -34,8 +34,8 @@ if not INSTALLED:
         project_dir, os.environ["PATH"]
     )
 
-from pyvpsolver import VPSolver, VBP, AFG, MPS, LP, solvers
-
+from pyvpsolver import VPSolver, VBP, AFG, MPS, LP
+from pyvpsolver.solvers import vbpsolver
 
 def main():
     """Examples: how to use VBP, AFG, MPS, LP and VPSolver"""
@@ -81,7 +81,7 @@ def main():
     print "Solution:", patterns
 
     # Pretty-print the solution:
-    solvers.vbp.print_solution(obj, patterns)
+    vbpsolver.print_solution(obj, patterns)
 
 
 if __name__ == "__main__":

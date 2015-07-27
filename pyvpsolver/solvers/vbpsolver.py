@@ -23,7 +23,7 @@ from .. import *
 import sys
 
 def solve(W, w, b, svg_file="", lp_file="", mps_file="",
-          verbose=False, script="vpsolver_gurobi.sh"):
+          verbose=False, script="vpsolver_glpk.sh"):
     assert svg_file=="" or svg_file.endswith(".svg")
     instance = VBP(W, w, b, verbose=False)
     if svg_file == "" and lp_file == "" and mps_file == "":
@@ -43,8 +43,8 @@ def solve(W, w, b, svg_file="", lp_file="", mps_file="",
         out, (obj, sol) = VPSolver.script(script, mps_model, afg, verbose=verbose)
     return obj, sol
 
-def print_solution(obj, sol, f=sys.stdout):
-    if obj != None: print >>f, "Objective:", obj
-    print >>f, "Solution:"
+def print_solution(obj, sol, fout=sys.stdout):
+    if obj != None: print >>fout, "Objective:", obj
+    print >>fout, "Solution:"
     for mult, patt in sol:
-        print >>f, "%d x [%s]" % (mult, ", ".join(["i=%d" % (it+1) for it in patt]))
+        print >>fout, "%d x [%s]" % (mult, ", ".join(["i=%d" % (it+1) for it in patt]))
