@@ -75,7 +75,7 @@ def main():
         glpk_mod2lp(mod_out, lp_out)
         # os.system("glpsol --math {0} | grep -v Generating".format(mod_out))
         out, varvalues = VPSolver.script_wsol(
-            "vpsolver_gurobi.sh", lp_out, verbose=True
+            "vpsolver_glpk.sh", lp_out, verbose=True
         )
 
         b = [varvalues.get("pi({0})".format(i+1), 0) for i in xrange(len(a))]

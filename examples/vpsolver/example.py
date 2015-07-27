@@ -58,13 +58,19 @@ def main():
     afg.graph().draw("tmp/graph.svg")
 
     # Solve instanceA using bin/vpsolver (requires Gurobi)
-    out, sol = VPSolver.vpsolver(instanceA, verbose=True)
+    try:
+        out, sol = VPSolver.vpsolver(instanceA, verbose=True)
+    except:
+        print "Failed to call vpsolver"
 
     # Solve instanceA using any vpsolver script (i.e., any MIP solver):
     #   The scripts accept models with and without the underlying graphs.
     #   However, the graphs are required to extract the solution.
     out, sol = VPSolver.script("vpsolver_glpk.sh", lp_model, afg, verbose=True)
-    out, sol = VPSolver.script("vpsolver_gurobi.sh", mps_model, verbose=True)
+    try:
+        out, sol = VPSolver.script("vpsolver_gurobi.sh", mps_model, verbose=True)
+    except:
+        print "Failed to call vpsolver_gurobi.sh"
 
     # Solve an instance directly without creating AFG, MPS or LP objects:
     out, sol = VPSolver.script("vpsolver_glpk.sh", instanceB, verbose=True)

@@ -49,7 +49,7 @@ def main():
     lp_out = "tmp/graph.lp"
     glpk_mod2lp(mod_out, lp_out)
     out, varvalues = VPSolver.script_wsol(
-        "vpsolver_gurobi.sh", lp_out, verbose=True
+        "vpsolver_glpk.sh", lp_out, verbose=True
     )
 
     sol, varvalues = parser["FLOW"].extract(varvalues, verbose=True)

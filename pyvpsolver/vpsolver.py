@@ -131,16 +131,13 @@ class VPSolver:
 
     TMP_DIR = tempfile.mkdtemp()
     TMP_CNT = 0
-    REDIRECT = "2>&1"
     PLIST = []
+    VERBOSE=True
 
     @staticmethod
     def set_verbose(verbose):
-        if verbose != None:
-            if verbose:
-                VPSolver.REDIRECT = "2>&1"
-            else:
-                VPSolver.REDIRECT = "> /dev/null 2>&1"
+        if verbose is not None:
+            VPSolver.VERBOSE=verbose
 
     @staticmethod
     def new_tmp_file(ext = "tmp"):
@@ -163,13 +160,30 @@ class VPSolver:
             pass
 
     @staticmethod
-    def run(cmd):
+    def run(cmd, verbose=None, tee=None):
+        if verbose is None:
+            verbose = VPSolver.VERBOSE
+
         p = subprocess.Popen(
             cmd, shell=True,
-            stdout=sys.stdout, stderr=sys.stderr, preexec_fn=os.setsid
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid
         )
         VPSolver.PLIST.append(p)
-        p.wait()
+
+        if tee is None:
+            if verbose:
+                for line in p.stdout:
+                    sys.stdout.write(line)
+        else:
+            with open(tee, "w") as f:
+                for line in p.stdout:
+                    if verbose:
+                        sys.stdout.write(line)
+                    f.write(line)
+
+        exit_code = p.wait()
+        if exit_code != 0:
+            raise Exception("failed to run '{0}'".format(cmd))
 
     @staticmethod
     def parse_vbpsol(vpsol_output):
@@ -193,11 +207,14 @@ class VPSolver:
 
     @staticmethod
     def vbpsol(afg_file, sol_file, opts="", verbose=None):
-        VPSolver.set_verbose(verbose)
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
-        VPSolver.run("%s %s %s %s | tee %s %s" % (VPSolver.VBPSOL, afg_file, sol_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run(
+            "{0} {1} {2} {3}".format(VPSolver.VBPSOL, afg_file, sol_file, opts),
+            verbose=verbose,
+            tee=out_file
+        )
         f = open(out_file)
         output = f.read()
         f.close()
@@ -206,12 +223,15 @@ class VPSolver:
 
     @staticmethod
     def vpsolver(vbp_file, compress=-2, binary=False, vtype="I", verbose=None):
-        VPSolver.set_verbose(verbose)
         if isinstance(vbp_file, VBP):
             vbp_file = vbp_file.vbp_file
         out_file = VPSolver.new_tmp_file()
         opts = "%d %d %s" % (compress, binary, vtype)
-        VPSolver.run("%s %s %s | tee %s %s" % (VPSolver.VPSOLVER, vbp_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run(
+            "{0} {1} {2}".format(VPSolver.VPSOLVER, vbp_file, opts),
+            verbose=verbose,
+            tee=out_file
+        )
         f = open(out_file)
         output = f.read()
         f.close()
@@ -220,12 +240,15 @@ class VPSolver:
 
     @staticmethod
     def vbp2afg(vbp_file, afg_file, compress=-2, binary=False, vtype="I", verbose=None):
-        VPSolver.set_verbose(verbose)
         if isinstance(vbp_file, VBP):
             vbp_file = vbp_file.vbp_file
         out_file = VPSolver.new_tmp_file()
         opts = "%d %d %s" % (compress, binary, vtype)
-        VPSolver.run("%s %s %s %s | tee %s %s" % (VPSolver.VBP2AFG, vbp_file, afg_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run(
+            "{0} {1} {2} {3}".format(VPSolver.VBP2AFG, vbp_file, afg_file, opts),
+            verbose=verbose,
+            tee=out_file
+        )
         f = open(out_file)
         output = f.read()
         f.close()
@@ -234,11 +257,14 @@ class VPSolver:
 
     @staticmethod
     def afg2mps(afg_file, mps_file, opts="", verbose=None):
-        VPSolver.set_verbose(verbose)
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
-        VPSolver.run("%s %s %s %s | tee %s %s" % (VPSolver.AFG2MPS, afg_file, mps_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run(
+            "{0} {1} {2} {3}".format(VPSolver.AFG2MPS, afg_file, mps_file, opts),
+            verbose=verbose,
+            tee=out_file
+        )
         f = open(out_file)
         output = f.read()
         f.close()
@@ -247,11 +273,14 @@ class VPSolver:
 
     @staticmethod
     def afg2lp(afg_file, lp_file, opts="", verbose=None):
-        VPSolver.set_verbose(verbose)
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
-        VPSolver.run("%s %s %s %s | tee %s %s" % (VPSolver.AFG2LP, afg_file, lp_file, opts, out_file, VPSolver.REDIRECT))
+        VPSolver.run(
+            "{0} {1} {2} {3}".format(VPSolver.AFG2LP, afg_file, lp_file, opts),
+            verbose=verbose,
+            tee=out_file
+        )
         f = open(out_file)
         output = f.read()
         f.close()
@@ -260,7 +289,6 @@ class VPSolver:
 
     @staticmethod
     def script(script_name, arg1=None, arg2=None, verbose=None):
-        VPSolver.set_verbose(verbose)
         cmd = script_name
         for arg in [arg1, arg2]:
             if isinstance(arg, MPS):
@@ -283,7 +311,7 @@ class VPSolver:
                 else:
                     raise Exception("Invalid file extension!")
         out_file = VPSolver.new_tmp_file()
-        VPSolver.run("%s | tee %s %s" % (cmd, out_file, VPSolver.REDIRECT))
+        VPSolver.run(cmd, verbose=verbose, tee=out_file)
         f = open(out_file)
         output = f.read()
         f.close()
@@ -292,7 +320,6 @@ class VPSolver:
 
     @staticmethod
     def script_wsol(script_name, model, verbose=None):
-        VPSolver.set_verbose(verbose)
         cmd = script_name
         if isinstance(model, MPS):
             cmd += " --mps " + model.mps_file
@@ -307,7 +334,11 @@ class VPSolver:
                 raise Exception("Invalid file extension!")
         out_file = VPSolver.new_tmp_file()
         sol_file = VPSolver.new_tmp_file(".sol")
-        VPSolver.run("%s --wsol %s | tee %s %s" % (cmd, sol_file, out_file, VPSolver.REDIRECT))
+        VPSolver.run(
+            "{0} --wsol {1}".format(cmd, sol_file),
+            verbose=verbose,
+            tee=out_file
+        )
         f = open(out_file)
         output = f.read()
         f.close()
