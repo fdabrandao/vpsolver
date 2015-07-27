@@ -28,37 +28,53 @@ if sdir != "":
 INSTALLED = False
 if not INSTALLED:
     import sys
-    project_dir = "../../../"
+    project_dir = "../../"
     sys.path.insert(0, project_dir)
     os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
         project_dir, os.environ["PATH"]
     )
 
-from pyvpsolver.pympl import PyMPL, glpk_mod2lp
-from pyvpsolver import VPSolver
+from pyvpsolver import solvers
 
 
 def main():
-    """Parses 'instance.mod'"""
+    """ Variable-sized Bin Packing Example """
 
-    mod_in = "instance.mod"
-    mod_out = "tmp/instance.out.mod"
-    parser = PyMPL()
-    parser.parse(mod_in, mod_out)
+    """
+    'solvers.mvbp' the method proposed in:
+    Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
+    Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
+    Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
+    """
 
-    lp_out = "tmp/instance.lp"
-    glpk_mod2lp(mod_out, lp_out, True)
-    out, varvalues = VPSolver.script_wsol(
-        "vpsolver_gurobi.sh", lp_out, verbose=True
-    )
-    sol, varvalues = parser["FLOW"].extract(varvalues, verbose=True)
+    inf = float("inf")
 
-    print
+    # Capacities:
+    Ws = [[100], [120], [150]]
+
+    # Cots:
+    Cs = [100, 120, 150]
+
+    # Number of bins available of each type:
+    Qs = [inf, inf, inf]
+
+    # Item weights:
+    ws = [[[10]], [[14]], [[17]], [[19]], [[24]], [[29]], [[32]], [[33]], [[36]],
+          [[38]], [[40]], [[50]], [[54]], [[55]], [[63]], [[66]], [[71]], [[77]],
+          [[79]], [[83]], [[92]], [[95]], [[99]]]
+
+    # Item demands:
+    b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
+
+    # Solve the variable-sized bin packing instance:
+    obj, sol = solvers.mvbp.solve(
+        Ws, Cs, Qs, ws, b,
+        svg_file="tmp/graph_vsbpp.svg",
+        verbose=True, script="vpsolver_glpk.sh")
+    print "obj:", obj
     print "sol:", sol
-    print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
-    print
+    solvers.mvbp.print_solution(obj, sol)
 
-    os.system("glpsol --math {0} | grep -v Generating".format(mod_out))
 
 if __name__ == "__main__":
     main()

@@ -28,7 +28,7 @@ if sdir != "":
 INSTALLED = False
 if not INSTALLED:
     import sys
-    project_dir = "../"
+    project_dir = "../../"
     sys.path.insert(0, project_dir)
     os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
         project_dir, os.environ["PATH"]
@@ -36,12 +36,11 @@ if not INSTALLED:
 
 from pyvpsolver import solvers
 
-
 def main():
-    """ Variable-sized Bin Packing Example """
+    """Examples: Multiple-choice Vector Bin Packing"""
 
     """
-    'solvers.mvbp' the method proposed in:
+    'solvers.mvbp' uses the method proposed in:
     Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
     Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
     Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
@@ -49,28 +48,50 @@ def main():
 
     inf = float("inf")
 
-    # Capacities:
-    Ws = [[100], [120], [150]]
+    # Example 1:
+    # Bins:
+    W1 = (100, 100)
+    W2 = (50, 120)
+    W3 = (150, 25)
+    Ws = [W1, W2, W3]    # Capacities
+    Cs = [3, 7, 2]       # Costs
+    Qs = [inf, inf, inf] # Available quantities
+    # Items:
+    ws1, b1 = [(50, 25), (25, 50), (0, 75)], 1
+    ws2, b2 = [(40, 40), (60, 25), (25, 60)], 1
+    ws3, b3 = [(30, 10), (20, 40), (10, 50)], 1
+    b = [b1, b2, b3]
+    ws = [ws1, ws2, ws3]
 
-    # Cots:
-    Cs = [100, 120, 150]
-
-    # Number of bins available of each type:
-    Qs = [inf, inf, inf]
-
-    # Item weights:
-    ws = [[[10]], [[14]], [[17]], [[19]], [[24]], [[29]], [[32]], [[33]], [[36]],
-          [[38]], [[40]], [[50]], [[54]], [[55]], [[63]], [[66]], [[71]], [[77]],
-          [[79]], [[83]], [[92]], [[95]], [[99]]]
-
-    # Item demands:
-    b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
-
-    # Solve the variable-sized bin packing instance:
+    # Solve Example 1:
     obj, sol = solvers.mvbp.solve(
         Ws, Cs, Qs, ws, b,
-        svg_file="tmp/graph_vsbpp.svg",
-        verbose=True, script="vpsolver_glpk.sh")
+        svg_file="tmp/graphA_mvbp.svg",
+        verbose=True, script="vpsolver_glpk.sh"
+    )
+    print "obj:", obj
+    print "sol:", sol
+    solvers.mvbp.print_solution(obj, sol)
+
+    ## Example 2
+    # Bins:
+    W1 = (100, 75)
+    W2 = (75, 50)
+    Ws = [W1, W2]
+    Cs = [3, 2]
+    Qs = [inf, inf]
+    # Items
+    ws1, b1 = [(75, 50)], 2
+    ws2, b2 = [(40, 15), (25, 25)], 1
+    b = [b1, b2]
+    ws = [ws1, ws2]
+
+    # Solve Example 2:
+    obj, sol = solvers.mvbp.solve(
+        Ws, Cs, Qs, ws, b,
+        svg_file="tmp/graphB_mvbp.svg",
+        verbose=True, script="vpsolver_glpk.sh"
+    )
     print "obj:", obj
     print "sol:", sol
     solvers.mvbp.print_solution(obj, sol)

@@ -28,7 +28,7 @@ if sdir != "":
 INSTALLED = False
 if not INSTALLED:
     import sys
-    project_dir = "../../../"
+    project_dir = "../../"
     sys.path.insert(0, project_dir)
     os.environ["PATH"] = project_dir+"/scripts"+":"+os.environ["PATH"]
     os.environ["PATH"] = project_dir+"/bin"+":"+os.environ["PATH"]

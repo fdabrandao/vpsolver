@@ -19,12 +19,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
-sdir = os.path.dirname(__file__)
-if sdir != "":
-    os.chdir(sdir)
 import sys
-sys.path.insert(0, "../../")
+if __name__ == "__main__":
+    import os
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
+    sys.path.insert(0, "../../")
 
 import flask
 from flask import Flask, Response

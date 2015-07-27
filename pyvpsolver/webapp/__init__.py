@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
@@ -20,21 +19,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import example
-import example_vbp
-import example_vsbpp
-import example_mvbp
-
-
-if __name__ == "__main__":
-    print "example:"
-    example.main()
-
-    print "example_vbp:"
-    example_vbp.main()
-
-    print "example_vsbpp:"
-    example_vsbpp.main()
-
-    print "example_mvbp:"
-    example_mvbp.main()
+from . import app

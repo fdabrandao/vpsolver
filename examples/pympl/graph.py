@@ -28,32 +28,37 @@ if sdir != "":
 INSTALLED = False
 if not INSTALLED:
     import sys
-    project_dir = "../"
+    project_dir = "../../"
     sys.path.insert(0, project_dir)
     os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
         project_dir, os.environ["PATH"]
     )
 
-from pyvpsolver import solvers
+from pyvpsolver.pympl import PyMPL, glpk_mod2lp
+from pyvpsolver import VPSolver
 
 
 def main():
-    """Example: solve a vector packing instance using 'solvers.vbp'"""
+    """Parses 'graph.mod'"""
 
-    W = (5180, 2)
-    w = [(1120,1), (1250,1), (520,1), (1066,1), (1000,1), (1150,1)]
-    b = [9, 5, 91, 18, 11, 64]
+    mod_in = "graph.mod"
+    mod_out = "tmp/graph.out.mod"
+    parser = PyMPL()
+    parser.parse(mod_in, mod_out)
 
-    # Solve:
-    obj, sol = solvers.vbp.solve(
-        W, w, b,
-        svg_file="tmp/graph_vbp.svg",
-        verbose=False, script="vpsolver_glpk.sh"
+    lp_out = "tmp/graph.lp"
+    glpk_mod2lp(mod_out, lp_out)
+    out, varvalues = VPSolver.script_wsol(
+        "vpsolver_gurobi.sh", lp_out, verbose=True
     )
-    print "obj:", obj
-    print "sol:", sol
-    solvers.vbp.print_solution(obj, sol)
 
+    sol, varvalues = parser["FLOW"].extract(varvalues, verbose=True)
+    print
+    print "sol:", sol
+    print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
+    print
+
+    os.system("glpsol --math {0} | grep -v Generating".format(mod_out))
 
 if __name__ == "__main__":
     main()
