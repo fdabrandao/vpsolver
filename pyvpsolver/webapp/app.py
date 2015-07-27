@@ -19,13 +19,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os
 import sys
+
 if __name__ == "__main__":
-    import os
     sdir = os.path.dirname(__file__)
     if sdir != "":
         os.chdir(sdir)
-    sys.path.insert(0, "../../")
+
+    INSTALLED = False
+    if not INSTALLED:
+        project_dir = "../../"
+        sys.path.insert(0, project_dir)
+        os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
+            project_dir, os.environ["PATH"]
+        )
 
 import flask
 from flask import Flask, Response

@@ -21,13 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import sys
 sdir = os.path.dirname(__file__)
 if sdir != "":
     os.chdir(sdir)
 
 INSTALLED = False
 if not INSTALLED:
-    import sys
     project_dir = "../../"
     sys.path.insert(0, project_dir)
     os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
