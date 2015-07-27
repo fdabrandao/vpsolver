@@ -21,8 +21,8 @@
 </g>
 <!-- G01&#45;&gt;G02 -->
 <g id="edge1" class="edge"><title>G01&#45;&gt;G02</title>
-<path fill="none" stroke="#3f007f" stroke-width="4" d="M177.983,-29.8908C195.911,-32.6829 220.306,-36.482 240.148,-39.5722"/>
-<polygon fill="#3f007f" stroke="#3f007f" stroke-width="4" points="239.631,-43.0338 250.05,-41.1144 240.708,-36.1172 239.631,-43.0338"/>
+<path fill="none" stroke="#bf7f00" stroke-width="4" d="M177.983,-29.8908C195.911,-32.6829 220.306,-36.482 240.148,-39.5722"/>
+<polygon fill="#bf7f00" stroke="#bf7f00" stroke-width="4" points="239.631,-43.0338 250.05,-41.1144 240.708,-36.1172 239.631,-43.0338"/>
 </g>
 <!-- G0T -->
 <g id="node3" class="node"><title>G0T</title>
@@ -46,8 +46,8 @@
 </g>
 <!-- G0S&#45;&gt;G01 -->
 <g id="edge4" class="edge"><title>G0S&#45;&gt;G01</title>
-<path fill="none" stroke="#bf7f00" stroke-width="4" d="M53.4857,-21.6501C71.4989,-20.6255 95.8765,-20.4756 115.751,-21.2005"/>
-<polygon fill="#bf7f00" stroke="#bf7f00" stroke-width="4" points="115.816,-24.7072 125.968,-21.6762 116.141,-17.7148 115.816,-24.7072"/>
+<path fill="none" stroke="#3f007f" stroke-width="4" d="M53.4857,-21.6501C71.4989,-20.6255 95.8765,-20.4756 115.751,-21.2005"/>
+<polygon fill="#3f007f" stroke="#3f007f" stroke-width="4" points="115.816,-24.7072 125.968,-21.6762 116.141,-17.7148 115.816,-24.7072"/>
 </g>
 <!-- G0S&#45;&gt;G01 -->
 <g id="edge5" class="edge"><title>G0S&#45;&gt;G01</title>

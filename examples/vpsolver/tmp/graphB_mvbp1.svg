@@ -26,8 +26,8 @@
 </g>
 <!-- G1S&#45;&gt;G11 -->
 <g id="edge2" class="edge"><title>G1S&#45;&gt;G11</title>
-<path fill="none" stroke="#bf7f00" stroke-width="4" d="M53.7848,-28.4953C71.8181,-29.0737 96.1209,-29.1549 115.916,-28.7391"/>
-<polygon fill="#bf7f00" stroke="#bf7f00" stroke-width="4" points="116.187,-32.2332 126.089,-28.4667 115.999,-25.2357 116.187,-32.2332"/>
+<path fill="none" stroke="#7fbf00" stroke-width="4" d="M53.7848,-28.4953C71.8181,-29.0737 96.1209,-29.1549 115.916,-28.7391"/>
+<polygon fill="#7fbf00" stroke="#7fbf00" stroke-width="4" points="116.187,-32.2332 126.089,-28.4667 115.999,-25.2357 116.187,-32.2332"/>
 </g>
 <!-- G12 -->
 <g id="node3" class="node"><title>G12</title>
@@ -36,13 +36,13 @@
 </g>
 <!-- G1S&#45;&gt;G12 -->
 <g id="edge3" class="edge"><title>G1S&#45;&gt;G12</title>
-<path fill="none" stroke="#3f007f" stroke-width="4" d="M52.2256,-34.5219C71.8533,-41.0352 100.361,-49.6169 126,-54 164.503,-60.5821 209.319,-62.5334 239.667,-63.0251"/>
-<polygon fill="#3f007f" stroke="#3f007f" stroke-width="4" points="239.724,-66.5259 249.764,-63.1433 239.806,-59.5264 239.724,-66.5259"/>
+<path fill="none" stroke="#bf7f00" stroke-width="4" d="M52.2256,-34.5219C71.8533,-41.0352 100.361,-49.6169 126,-54 164.503,-60.5821 209.319,-62.5334 239.667,-63.0251"/>
+<polygon fill="#bf7f00" stroke="#bf7f00" stroke-width="4" points="239.724,-66.5259 249.764,-63.1433 239.806,-59.5264 239.724,-66.5259"/>
 </g>
 <!-- G11&#45;&gt;G12 -->
 <g id="edge4" class="edge"><title>G11&#45;&gt;G12</title>
-<path fill="none" stroke="#003f7f" stroke-width="4" d="M177.103,-33.31C195.4,-38.8591 220.791,-46.5597 241.13,-52.7279"/>
-<polygon fill="#003f7f" stroke="#003f7f" stroke-width="4" points="240.361,-56.1522 250.947,-55.7052 242.393,-49.4535 240.361,-56.1522"/>
+<path fill="none" stroke="#3f007f" stroke-width="4" d="M177.103,-33.31C195.4,-38.8591 220.791,-46.5597 241.13,-52.7279"/>
+<polygon fill="#3f007f" stroke="#3f007f" stroke-width="4" points="240.361,-56.1522 250.947,-55.7052 242.393,-49.4535 240.361,-56.1522"/>
 </g>
 <!-- G1T -->
 <g id="node4" class="node"><title>G1T</title>

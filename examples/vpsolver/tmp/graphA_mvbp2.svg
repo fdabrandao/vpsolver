@@ -21,8 +21,8 @@
 </g>
 <!-- G2S&#45;&gt;G21 -->
 <g id="edge1" class="edge"><title>G2S&#45;&gt;G21</title>
-<path fill="none" stroke="#bf7f00" stroke-width="4" d="M53.4857,-21.6501C71.4989,-20.6255 95.8765,-20.4756 115.751,-21.2005"/>
-<polygon fill="#bf7f00" stroke="#bf7f00" stroke-width="4" points="115.816,-24.7072 125.968,-21.6762 116.141,-17.7148 115.816,-24.7072"/>
+<path fill="none" stroke="#7fbf00" stroke-width="4" d="M53.4857,-21.6501C71.4989,-20.6255 95.8765,-20.4756 115.751,-21.2005"/>
+<polygon fill="#7fbf00" stroke="#7fbf00" stroke-width="4" points="115.816,-24.7072 125.968,-21.6762 116.141,-17.7148 115.816,-24.7072"/>
 </g>
 <!-- G2S&#45;&gt;G21 -->
 <g id="edge2" class="edge"><title>G2S&#45;&gt;G21</title>
@@ -31,8 +31,8 @@
 </g>
 <!-- G2S&#45;&gt;G21 -->
 <g id="edge3" class="edge"><title>G2S&#45;&gt;G21</title>
-<path fill="none" stroke="#7fbf00" stroke-width="4" d="M53.4857,-30.3499C71.4989,-31.3745 95.8765,-31.5244 115.751,-30.7995"/>
-<polygon fill="#7fbf00" stroke="#7fbf00" stroke-width="4" points="116.141,-34.2852 125.968,-30.3238 115.816,-27.2928 116.141,-34.2852"/>
+<path fill="none" stroke="#bf7f00" stroke-width="4" d="M53.4857,-30.3499C71.4989,-31.3745 95.8765,-31.5244 115.751,-30.7995"/>
+<polygon fill="#bf7f00" stroke="#bf7f00" stroke-width="4" points="116.141,-34.2852 125.968,-30.3238 115.816,-27.2928 116.141,-34.2852"/>
 </g>
 <!-- G2T -->
 <g id="node3" class="node"><title>G2T</title>

@@ -21,8 +21,8 @@
 </g>
 <!-- G01&#45;&gt;G02 -->
 <g id="edge1" class="edge"><title>G01&#45;&gt;G02</title>
-<path fill="none" stroke="#66007f" stroke-width="4" d="M285.983,-28.4573C303.829,-30.2127 328.082,-32.5982 347.874,-34.545"/>
-<polygon fill="#66007f" stroke="#66007f" stroke-width="4" points="347.756,-38.0502 358.05,-35.546 348.441,-31.0838 347.756,-38.0502"/>
+<path fill="none" stroke="#007f00" stroke-width="4" d="M285.983,-28.4573C303.829,-30.2127 328.082,-32.5982 347.874,-34.545"/>
+<polygon fill="#007f00" stroke="#007f00" stroke-width="4" points="347.756,-38.0502 358.05,-35.546 348.441,-31.0838 347.756,-38.0502"/>
 </g>
 <!-- G0T -->
 <g id="node3" class="node"><title>G0T</title>
@@ -66,8 +66,8 @@
 </g>
 <!-- G1S&#45;&gt;G11 -->
 <g id="edge5" class="edge"><title>G1S&#45;&gt;G11</title>
-<path fill="none" stroke="#007f00" stroke-width="4" d="M161.785,-88.4953C179.818,-89.0737 204.121,-89.1549 223.916,-88.7391"/>
-<polygon fill="#007f00" stroke="#007f00" stroke-width="4" points="224.187,-92.2332 234.089,-88.4667 223.999,-85.2357 224.187,-92.2332"/>
+<path fill="none" stroke="#66007f" stroke-width="4" d="M161.785,-88.4953C179.818,-89.0737 204.121,-89.1549 223.916,-88.7391"/>
+<polygon fill="#66007f" stroke="#66007f" stroke-width="4" points="224.187,-92.2332 234.089,-88.4667 223.999,-85.2357 224.187,-92.2332"/>
 </g>
 <!-- G12 -->
 <g id="node6" class="node"><title>G12</title>
@@ -76,13 +76,13 @@
 </g>
 <!-- G1S&#45;&gt;G12 -->
 <g id="edge6" class="edge"><title>G1S&#45;&gt;G12</title>
-<path fill="none" stroke="#7f9900" stroke-width="4" d="M160.191,-94.8858C179.799,-101.665 208.296,-110.57 234,-115 272.479,-121.632 317.3,-123.228 347.655,-123.419"/>
-<polygon fill="#7f9900" stroke="#7f9900" stroke-width="4" points="347.749,-126.919 357.755,-123.433 347.76,-119.919 347.749,-126.919"/>
+<path fill="none" stroke="#327f00" stroke-width="4" d="M160.191,-94.8858C179.799,-101.665 208.296,-110.57 234,-115 272.479,-121.632 317.3,-123.228 347.655,-123.419"/>
+<polygon fill="#327f00" stroke="#327f00" stroke-width="4" points="347.749,-126.919 357.755,-123.433 347.76,-119.919 347.749,-126.919"/>
 </g>
 <!-- G11&#45;&gt;G12 -->
 <g id="edge7" class="edge"><title>G11&#45;&gt;G12</title>
-<path fill="none" stroke="#66007f" stroke-width="4" d="M285.103,-93.31C303.4,-98.8591 328.791,-106.56 349.13,-112.728"/>
-<polygon fill="#66007f" stroke="#66007f" stroke-width="4" points="348.361,-116.152 358.947,-115.705 350.393,-109.454 348.361,-116.152"/>
+<path fill="none" stroke="#007f00" stroke-width="4" d="M285.103,-93.31C303.4,-98.8591 328.791,-106.56 349.13,-112.728"/>
+<polygon fill="#007f00" stroke="#007f00" stroke-width="4" points="348.361,-116.152 358.947,-115.705 350.393,-109.454 348.361,-116.152"/>
 </g>
 <!-- G1T -->
 <g id="node7" class="node"><title>G1T</title>
@@ -111,13 +111,13 @@
 </g>
 <!-- G0S&#45;&gt;G01 -->
 <g id="edge12" class="edge"><title>G0S&#45;&gt;G01</title>
-<path fill="none" stroke="#007f00" stroke-width="4" d="M161.486,-21.6501C179.499,-20.6255 203.877,-20.4756 223.751,-21.2005"/>
-<polygon fill="#007f00" stroke="#007f00" stroke-width="4" points="223.816,-24.7072 233.968,-21.6762 224.141,-17.7148 223.816,-24.7072"/>
+<path fill="none" stroke="#66007f" stroke-width="4" d="M161.486,-21.6501C179.499,-20.6255 203.877,-20.4756 223.751,-21.2005"/>
+<polygon fill="#66007f" stroke="#66007f" stroke-width="4" points="223.816,-24.7072 233.968,-21.6762 224.141,-17.7148 223.816,-24.7072"/>
 </g>
 <!-- G0S&#45;&gt;G01 -->
 <g id="edge13" class="edge"><title>G0S&#45;&gt;G01</title>
-<path fill="none" stroke="#7f9900" stroke-width="4" d="M161.785,-26C179.699,-26 203.799,-26 223.522,-26"/>
-<polygon fill="#7f9900" stroke="#7f9900" stroke-width="4" points="223.67,-29.5001 233.67,-26 223.67,-22.5001 223.67,-29.5001"/>
+<path fill="none" stroke="#327f00" stroke-width="4" d="M161.785,-26C179.699,-26 203.799,-26 223.522,-26"/>
+<polygon fill="#327f00" stroke="#327f00" stroke-width="4" points="223.67,-29.5001 233.67,-26 223.67,-22.5001 223.67,-29.5001"/>
 </g>
 <!-- G0S&#45;&gt;G01 -->
 <g id="edge14" class="edge"><title>G0S&#45;&gt;G01</title>

@@ -21,33 +21,33 @@
 </g>
 <!-- 1&#45;&gt;2 -->
 <g id="edge1" class="edge"><title>1&#45;&gt;2</title>
-<path fill="none" stroke="#00247f" stroke-width="4" d="M141.739,-23.8484C158.984,-19.7543 187.802,-19.1538 208.443,-22.0469"/>
-<polygon fill="#00247f" stroke="#00247f" stroke-width="4" points="207.918,-25.5089 218.386,-23.8782 209.186,-18.6247 207.918,-25.5089"/>
+<path fill="none" stroke="#7f006d" stroke-width="4" d="M141.739,-23.8484C158.984,-19.7543 187.802,-19.1538 208.443,-22.0469"/>
+<polygon fill="#7f006d" stroke="#7f006d" stroke-width="4" points="207.918,-25.5089 218.386,-23.8782 209.186,-18.6247 207.918,-25.5089"/>
 </g>
 <!-- 1&#45;&gt;2 -->
 <g id="edge2" class="edge"><title>1&#45;&gt;2</title>
-<path fill="none" stroke="#7f006d" stroke-width="4" d="M143.562,-27.375C160.365,-25.2615 186.637,-24.9348 206.367,-26.3947"/>
-<polygon fill="#7f006d" stroke="#7f006d" stroke-width="4" points="206.261,-29.9009 216.554,-27.3897 206.941,-22.9341 206.261,-29.9009"/>
+<path fill="none" stroke="#007f00" stroke-width="4" d="M143.562,-27.375C160.365,-25.2615 186.637,-24.9348 206.367,-26.3947"/>
+<polygon fill="#007f00" stroke="#007f00" stroke-width="4" points="206.261,-29.9009 216.554,-27.3897 206.941,-22.9341 206.261,-29.9009"/>
 </g>
 <!-- 1&#45;&gt;2 -->
 <g id="edge3" class="edge"><title>1&#45;&gt;2</title>
-<path fill="none" stroke="#b6007f" stroke-width="4" d="M144.031,-31.2951C160.721,-30.6814 186.421,-30.5859 205.916,-31.0085"/>
-<polygon fill="#b6007f" stroke="#b6007f" stroke-width="4" points="205.916,-34.5098 216.012,-31.2966 206.115,-27.5127 205.916,-34.5098"/>
+<path fill="none" stroke="#7f4800" stroke-width="4" d="M144.031,-31.2951C160.721,-30.6814 186.421,-30.5859 205.916,-31.0085"/>
+<polygon fill="#7f4800" stroke="#7f4800" stroke-width="4" points="205.916,-34.5098 216.012,-31.2966 206.115,-27.5127 205.916,-34.5098"/>
 </g>
 <!-- 1&#45;&gt;2 -->
 <g id="edge4" class="edge"><title>1&#45;&gt;2</title>
-<path fill="none" stroke="#007f00" stroke-width="4" d="M144.031,-35.2733C160.721,-36.0914 186.421,-36.2188 205.916,-35.6553"/>
-<polygon fill="#007f00" stroke="#007f00" stroke-width="4" points="206.152,-39.149 216.012,-35.2712 205.886,-32.154 206.152,-39.149"/>
+<path fill="none" stroke="#00247f" stroke-width="4" d="M144.031,-35.2733C160.721,-36.0914 186.421,-36.2188 205.916,-35.6553"/>
+<polygon fill="#00247f" stroke="#00247f" stroke-width="4" points="206.152,-39.149 216.012,-35.2712 205.886,-32.154 206.152,-39.149"/>
 </g>
 <!-- 1&#45;&gt;2 -->
 <g id="edge5" class="edge"><title>1&#45;&gt;2</title>
-<path fill="none" stroke="#da7f00" stroke-width="4" d="M143.099,-39.1225C159.987,-41.5209 186.799,-41.8915 206.753,-40.2341"/>
-<polygon fill="#da7f00" stroke="#da7f00" stroke-width="4" points="207.188,-43.7075 216.749,-39.144 206.429,-36.7487 207.188,-43.7075"/>
+<path fill="none" stroke="#7f6d00" stroke-width="4" d="M143.099,-39.1225C159.987,-41.5209 186.799,-41.8915 206.753,-40.2341"/>
+<polygon fill="#7f6d00" stroke="#7f6d00" stroke-width="4" points="207.188,-43.7075 216.749,-39.144 206.429,-36.7487 207.188,-43.7075"/>
 </g>
 <!-- 1&#45;&gt;2 -->
 <g id="edge6" class="edge"><title>1&#45;&gt;2</title>
-<path fill="none" stroke="#7f4800" stroke-width="4" d="M141.296,-42.5771C158.523,-47.023 187.748,-47.69 208.575,-44.5778"/>
-<polygon fill="#7f4800" stroke="#7f4800" stroke-width="4" points="209.457,-47.9714 218.592,-42.6059 208.105,-41.1032 209.457,-47.9714"/>
+<path fill="none" stroke="#b6007f" stroke-width="4" d="M141.296,-42.5771C158.523,-47.023 187.748,-47.69 208.575,-44.5778"/>
+<polygon fill="#b6007f" stroke="#b6007f" stroke-width="4" points="209.457,-47.9714 218.592,-42.6059 208.105,-41.1032 209.457,-47.9714"/>
 </g>
 <!-- T -->
 <g id="node3" class="node"><title>T</title>
@@ -71,33 +71,33 @@
 </g>
 <!-- S&#45;&gt;1 -->
 <g id="edge9" class="edge"><title>S&#45;&gt;1</title>
-<path fill="none" stroke="#7f006d" stroke-width="4" d="M33.7388,-23.8484C50.9844,-19.7543 79.8024,-19.1538 100.443,-22.0469"/>
-<polygon fill="#7f006d" stroke="#7f006d" stroke-width="4" points="99.9178,-25.5089 110.386,-23.8782 101.186,-18.6247 99.9178,-25.5089"/>
+<path fill="none" stroke="#007f00" stroke-width="4" d="M33.7388,-23.8484C50.9844,-19.7543 79.8024,-19.1538 100.443,-22.0469"/>
+<polygon fill="#007f00" stroke="#007f00" stroke-width="4" points="99.9178,-25.5089 110.386,-23.8782 101.186,-18.6247 99.9178,-25.5089"/>
 </g>
 <!-- S&#45;&gt;1 -->
 <g id="edge10" class="edge"><title>S&#45;&gt;1</title>
-<path fill="none" stroke="#b6007f" stroke-width="4" d="M35.5625,-27.375C52.3648,-25.2615 78.6368,-24.9348 98.3672,-26.3947"/>
-<polygon fill="#b6007f" stroke="#b6007f" stroke-width="4" points="98.2609,-29.9009 108.554,-27.3897 98.9414,-22.9341 98.2609,-29.9009"/>
+<path fill="none" stroke="#7f4800" stroke-width="4" d="M35.5625,-27.375C52.3648,-25.2615 78.6368,-24.9348 98.3672,-26.3947"/>
+<polygon fill="#7f4800" stroke="#7f4800" stroke-width="4" points="98.2609,-29.9009 108.554,-27.3897 98.9414,-22.9341 98.2609,-29.9009"/>
 </g>
 <!-- S&#45;&gt;1 -->
 <g id="edge11" class="edge"><title>S&#45;&gt;1</title>
-<path fill="none" stroke="#7f4800" stroke-width="4" d="M36.0307,-31.2951C52.7207,-30.6814 78.4212,-30.5859 97.9161,-31.0085"/>
-<polygon fill="#7f4800" stroke="#7f4800" stroke-width="4" points="97.9157,-34.5098 108.012,-31.2966 98.1155,-27.5127 97.9157,-34.5098"/>
+<path fill="none" stroke="#b6007f" stroke-width="4" d="M36.0307,-31.2951C52.7207,-30.6814 78.4212,-30.5859 97.9161,-31.0085"/>
+<polygon fill="#b6007f" stroke="#b6007f" stroke-width="4" points="97.9157,-34.5098 108.012,-31.2966 98.1155,-27.5127 97.9157,-34.5098"/>
 </g>
 <!-- S&#45;&gt;1 -->
 <g id="edge12" class="edge"><title>S&#45;&gt;1</title>
-<path fill="none" stroke="#da7f00" stroke-width="4" d="M36.0307,-35.2733C52.7207,-36.0914 78.4212,-36.2188 97.9161,-35.6553"/>
-<polygon fill="#da7f00" stroke="#da7f00" stroke-width="4" points="98.1519,-39.149 108.012,-35.2712 97.8857,-32.154 98.1519,-39.149"/>
+<path fill="none" stroke="#7f6d00" stroke-width="4" d="M36.0307,-35.2733C52.7207,-36.0914 78.4212,-36.2188 97.9161,-35.6553"/>
+<polygon fill="#7f6d00" stroke="#7f6d00" stroke-width="4" points="98.1519,-39.149 108.012,-35.2712 97.8857,-32.154 98.1519,-39.149"/>
 </g>
 <!-- S&#45;&gt;1 -->
 <g id="edge13" class="edge"><title>S&#45;&gt;1</title>
-<path fill="none" stroke="#007f00" stroke-width="4" d="M35.0991,-39.1225C51.9872,-41.5209 78.7986,-41.8915 98.7527,-40.2341"/>
-<polygon fill="#007f00" stroke="#007f00" stroke-width="4" points="99.1878,-43.7075 108.749,-39.144 98.4289,-36.7487 99.1878,-43.7075"/>
+<path fill="none" stroke="#00247f" stroke-width="4" d="M35.0991,-39.1225C51.9872,-41.5209 78.7986,-41.8915 98.7527,-40.2341"/>
+<polygon fill="#00247f" stroke="#00247f" stroke-width="4" points="99.1878,-43.7075 108.749,-39.144 98.4289,-36.7487 99.1878,-43.7075"/>
 </g>
 <!-- S&#45;&gt;1 -->
 <g id="edge14" class="edge"><title>S&#45;&gt;1</title>
-<path fill="none" stroke="#00247f" stroke-width="4" d="M33.2956,-42.5771C50.5234,-47.023 79.7478,-47.69 100.575,-44.5778"/>
-<polygon fill="#00247f" stroke="#00247f" stroke-width="4" points="101.457,-47.9714 110.592,-42.6059 100.105,-41.1032 101.457,-47.9714"/>
+<path fill="none" stroke="#7f006d" stroke-width="4" d="M33.2956,-42.5771C50.5234,-47.023 79.7478,-47.69 100.575,-44.5778"/>
+<polygon fill="#7f006d" stroke="#7f006d" stroke-width="4" points="101.457,-47.9714 110.592,-42.6059 100.105,-41.1032 101.457,-47.9714"/>
 </g>
 </g>
 </svg>
