@@ -20,7 +20,8 @@ ENV HOME=/vpsolver
 WORKDIR /vpsolver
 EXPOSE 5555
 
+RUN DEBIAN_FRONTEND=noninteractive bash build.sh
 RUN DEBIAN_FRONTEND=noninteractive pip install -r requirements.txt
-RUN python setup.py install
+RUN DEBIAN_FRONTEND=noninteractive pip install . --upgrade
 
-CMD ifconfig eth0 && python /vpsolver/pyvpsolver/webapp/app.py
+CMD ifconfig eth0 && python -m pyvpsolver.webapp.app
