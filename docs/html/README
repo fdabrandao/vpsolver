@@ -122,11 +122,12 @@ large models.</p>
 
 <p>Without the python interface: </p>
 
-<div class="highlight highlight-bash"><pre>$ bash compile.sh  </pre></div>
+<div class="highlight highlight-bash"><pre>$ bash build.sh  </pre></div>
 
 <p>With the python interface: </p>
 
-<div class="highlight highlight-bash"><pre>$ sudo pip install -r requirements.txt
+<div class="highlight highlight-bash"><pre>$ bash build.sh
+$ sudo pip install -r requirements.txt
 $ sudo pip install <span class="pl-c1">.</span> --upgrade</pre></div>
 
 <h2>
@@ -141,25 +142,25 @@ $ sudo pip install <span class="pl-c1">.</span> --upgrade</pre></div>
 
 <p>Option 1: simply <code>pull</code> VPSolver from Docker repository (without building):</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker pull fdabrandao/vpsolver</pre></div>
+<div class="highlight highlight-bash"><pre>$ docker pull fdabrandao/vpsolver</pre></div>
 
 <p>Option 2: <code>clone</code> VPSolver and <code>build</code> locally:</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
-user@locahost <span class="pl-k">~</span>$ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
+<div class="highlight highlight-bash"><pre>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
+$ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
 
 <h3>
 <a id="user-content-usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
 
 <p>Directly using the command line interface:</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it fdabrandao/vpsolver bash
+<div class="highlight highlight-bash"><pre>$ docker run -it fdabrandao/vpsolver bash
 root@55d14f6b6f32:<span class="pl-k">~</span># python examples/example.py
 ...</pre></div>
 
 <p>or through the VPSolver Web APP (example URL: <code>http://172.17.0.60:5555/</code>):</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it -p 5555 fdabrandao/vpsolver 
+<div class="highlight highlight-bash"><pre>$ docker run -it -p 5555 fdabrandao/vpsolver 
 eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
           inet addr:<span class="pl-k">*</span>172.17.0.60<span class="pl-k">*</span>  Bcast:0.0.0.0  Mask:255.255.0.0
           inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
@@ -173,6 +174,16 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 ...</pre></div>
 
 <p>For more details, please refer to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki/docker">https://github.com/fdabrandao/vpsolver/wiki/docker</a>].</p>
+
+<h2>
+<a id="user-content-web-app" class="anchor" href="#web-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>Web APP</h2>
+
+<p>VPSolver includes a Web APP that can be started as follows:</p>
+
+<pre><code>$ python -m pyvpsolver.webapp.app
+</code></pre>
+
+<p>The Web APP can then be accessed on a web browser at <code>http://127.0.0.1:5555</code>.</p>
 
 <h2>
 <a id="user-content-scripts" class="anchor" href="#scripts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scripts</h2>

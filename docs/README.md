@@ -47,11 +47,12 @@ It has been successfully compiled and run on the following platforms:
 Without the python interface: 
 
 ```bash
-$ bash compile.sh  
+$ bash build.sh  
 ```
 With the python interface: 
 
 ```bash
+$ bash build.sh
 $ sudo pip install -r requirements.txt
 $ sudo pip install . --upgrade
 ```
@@ -67,21 +68,21 @@ Install Docker [[Docker installation instructions](https://docs.docker.com/insta
 Option 1: simply `pull` VPSolver from Docker repository (without building):
 
 ```bash
-user@locahost ~$ docker pull fdabrandao/vpsolver
+$ docker pull fdabrandao/vpsolver
 ```
 
 Option 2: `clone` VPSolver and `build` locally:
 
 ```bash 
-user@locahost ~$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
-user@locahost ~$ docker build -t fdabrandao/vpsolver vpsolver
+$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
+$ docker build -t fdabrandao/vpsolver vpsolver
 ```
 
 ### Usage
 Directly using the command line interface:
 
 ```bash
-user@locahost ~$ docker run -it fdabrandao/vpsolver bash
+$ docker run -it fdabrandao/vpsolver bash
 root@55d14f6b6f32:~# python examples/example.py
 ...
 ```
@@ -89,7 +90,7 @@ root@55d14f6b6f32:~# python examples/example.py
 or through the VPSolver Web APP (example URL: `http://172.17.0.60:5555/`):
 
 ```bash
-user@locahost ~$ docker run -it -p 5555 fdabrandao/vpsolver 
+$ docker run -it -p 5555 fdabrandao/vpsolver 
 eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
           inet addr:*172.17.0.60*  Bcast:0.0.0.0  Mask:255.255.0.0
           inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
@@ -104,6 +105,13 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 ```
 
 For more details, please refer to the project wiki [https://github.com/fdabrandao/vpsolver/wiki/docker].
+
+## Web APP
+VPSolver includes a Web APP that can be started as follows:
+```
+$ python -m pyvpsolver.webapp.app
+```
+The Web APP can then be accessed on a web browser at `http://127.0.0.1:5555`.
 
 ## Scripts
 VPSolver includes several scripts for solving arc-flow models using different
