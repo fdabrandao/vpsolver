@@ -1,11 +1,6 @@
 # Docker
 
-Docker is an open platform for building, shipping and running applications. Docker allows VPSolver to run on a large variety of platforms with very little effort.
-
-## Table of Contents
-* [Docker Setup](#docker-setup)
-* [Usage](#usage)
-* [Advanced](#advanced)
+Docker is an open platform for building, shipping and running applications. Docker allows [VPSolver](https://github.com/fdabrandao/vpsolver) to run on a large variety of platforms with very little effort.
 
 ## Docker Setup
 Install Docker [[Docker installation instructions](https://docs.docker.com/installation/)].

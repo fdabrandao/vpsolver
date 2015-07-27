@@ -20,17 +20,6 @@ For more details, please refer to the project wiki [<https://github.com/fdabrand
 * BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>
 * Docker repository: <https://registry.hub.docker.com/u/fdabrandao/vpsolver/>
 
-## Table of Contents
-* [Requirements](#requirements)
-* [Setup](#setup)
-* [Docker](#docker)
-    * [Docker Setup](#docker-setup)
-    * [Usage](#usage)
-* [Scripts](#scripts)
-* [Examples](#examples)
-* [Folders](#folders)
-* [Reports](#reports)
-
 ## Requirements
 #### Mandatory
 
@@ -41,7 +30,7 @@ For more details, please refer to the project wiki [<https://github.com/fdabrand
 #### Optional
 
 For the python interface:
-* `python 2.7`
+* `python-2.7`
 * `python-pip`
 * `python-dev`
 * `python-pygraphviz`
@@ -64,7 +53,7 @@ With the python interface:
 
 ```bash
 $ sudo pip install -r requirements.txt
-$ sudo python setup.py install  
+$ sudo pip install . --upgrade
 ```
 
 ## Docker

@@ -64,10 +64,10 @@ solvers such as Gurobi and GLPK. VPSolver does not explicitly require any MIP
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.</p>
 
-<p>For more details, please refer to the manual or to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki">https://github.com/fdabrandao/vpsolver/wiki</a>].</p>
+<p>For more details, please refer to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki">https://github.com/fdabrandao/vpsolver/wiki</a>] or to the manual.</p>
 
 <h2>
-<a id="user-content-repositories" class="anchor" href="#repositories" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repositories:</h2>
+<a id="user-content-repositories" class="anchor" href="#repositories" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repositories</h2>
 
 <ul>
 <li>Project Homepage: <a href="http://vpsolver.dcc.fc.up.pt/">http://vpsolver.dcc.fc.up.pt/</a>
@@ -81,10 +81,10 @@ large models.</p>
 </ul>
 
 <h2>
-<a id="user-content-requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements:</h2>
+<a id="user-content-requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
 
 <h4>
-<a id="user-content-mandatory" class="anchor" href="#mandatory" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mandatory:</h4>
+<a id="user-content-mandatory" class="anchor" href="#mandatory" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mandatory</h4>
 
 <ul>
 <li>MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...<br>
@@ -94,10 +94,12 @@ large models.</p>
 </ul>
 
 <h4>
-<a id="user-content-optional-for-the-python-interface" class="anchor" href="#optional-for-the-python-interface" aria-hidden="true"><span class="octicon octicon-link"></span></a>Optional (for the python interface):</h4>
+<a id="user-content-optional" class="anchor" href="#optional" aria-hidden="true"><span class="octicon octicon-link"></span></a>Optional</h4>
+
+<p>For the python interface:</p>
 
 <ul>
-<li><code>python 2.7</code></li>
+<li><code>python-2.7</code></li>
 <li><code>python-pip</code></li>
 <li><code>python-dev</code></li>
 <li><code>python-pygraphviz</code></li>
@@ -125,10 +127,13 @@ large models.</p>
 <p>With the python interface: </p>
 
 <div class="highlight highlight-bash"><pre>$ sudo pip install -r requirements.txt
-$ sudo python setup.py install  </pre></div>
+$ sudo pip install <span class="pl-c1">.</span> --upgrade</pre></div>
 
 <h2>
-<a id="user-content-alternative-setup-using-docker" class="anchor" href="#alternative-setup-using-docker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alternative setup using Docker</h2>
+<a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker</h2>
+
+<h3>
+<a id="user-content-docker-setup" class="anchor" href="#docker-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker Setup</h3>
 
 <p>Docker is an open platform for building, shipping and running applications. Docker allows VPSolver to run on a large variety of platforms with very little effort.</p>
 
@@ -142,6 +147,30 @@ $ sudo python setup.py install  </pre></div>
 
 <div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
 user@locahost <span class="pl-k">~</span>$ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
+
+<h3>
+<a id="user-content-usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
+
+<p>Directly using the command line interface:</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it fdabrandao/vpsolver bash
+root@55d14f6b6f32:<span class="pl-k">~</span># python examples/example.py
+...</pre></div>
+
+<p>or through the VPSolver Web APP (example URL: <code>http://172.17.0.60:5555/</code>):</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it -p 5555 fdabrandao/vpsolver 
+eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
+          inet addr:<span class="pl-k">*</span>172.17.0.60<span class="pl-k">*</span>  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
+          UP BROADCAST  MTU:1500  Metric:1
+          RX packets:2 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
+
+ <span class="pl-k">*</span> Running on http://0.0.0.0:5555/
+...</pre></div>
 
 <p>For more details, please refer to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki/docker">https://github.com/fdabrandao/vpsolver/wiki/docker</a>].</p>
 
@@ -167,7 +196,7 @@ solvers:</p>
 </ul>
 
 <h2>
-<a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples:</h2>
+<a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
 
 <p>VPSolver includes several examples:</p>
 
@@ -185,7 +214,7 @@ solvers:</p>
 </ul>
 
 <h2>
-<a id="user-content-folders" class="anchor" href="#folders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Folders:</h2>
+<a id="user-content-folders" class="anchor" href="#folders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Folders</h2>
 
 <ul>
 <li>

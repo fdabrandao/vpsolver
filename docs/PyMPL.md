@@ -122,7 +122,7 @@ There are three types of calls:
   * [VAR](#var): `$VAR[var_name]{typ="", lb=None, ub=None};`
   * [CON](#con): `$CON[constraint_name]{left, sign, right};`
 
-4. Additional statements for arc-flow models and vector packing:
+4. Additional statements for VPSolver:
 
   * [LOAD_VBP](#load_vbp): `$LOAD_VBP[name]{fname, i0=0, d0=0};`
   * [FLOW](#flow): `$FLOW[zvar]{W, w, b, bounds=None};`
@@ -397,7 +397,7 @@ s.t. con6: +5*x1+15*x2+10*x3 >= 20;
 ``` 
 Note: all the original constraints are just different representations of the same constraint.
 
-### Detailed description of vector packing and arc-flow statements
+### Detailed description of VPSolver statements
 
 #### LOAD_VBP
 Usage: `$LOAD_VBP[name]{fname, i0=0, d0=0};`

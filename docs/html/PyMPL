@@ -54,6 +54,14 @@
 <p>PyMPL is a python extension to the AMPL modelling language that adds new statements for evaluating python code within AMPL models.</p>
 
 <h2>
+<a id="user-content-table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
+
+<ul>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#pympl-statements">PyMPL statements</a></li>
+</ul>
+
+<h2>
 <a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
 
 <p><code>vector_packing.mod</code>:</p>
@@ -191,7 +199,7 @@ s.t. demand{k <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span c
 </ul>
 </li>
 <li>
-<p>Additional statements for arc-flow models and vector packing:</p>
+<p>Additional statements for VPSolver:</p>
 
 <ul>
 <li>
@@ -603,7 +611,7 @@ s.t. con6<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-
 <p>Note: all the original constraints are just different representations of the same constraint.</p>
 
 <h3>
-<a id="user-content-detailed-description-of-vector-packing-and-arc-flow-statements" class="anchor" href="#detailed-description-of-vector-packing-and-arc-flow-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detailed description of vector packing and arc-flow statements</h3>
+<a id="user-content-detailed-description-of-vpsolver-statements" class="anchor" href="#detailed-description-of-vpsolver-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detailed description of VPSolver statements</h3>
 
 <h4>
 <a id="user-content-load_vbp" class="anchor" href="#load_vbp" aria-hidden="true"><span class="octicon octicon-link"></span></a>LOAD_VBP</h4>

@@ -51,7 +51,7 @@
                 <h1>
 <a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker</h1>
 
-<p>Docker is an open platform for building, shipping and running applications. Docker allows VPSolver to run on a large variety of platforms with very little effort.</p>
+<p>Docker is an open platform for building, shipping and running applications. Docker allows <a href="https://github.com/fdabrandao/vpsolver">VPSolver</a> to run on a large variety of platforms with very little effort.</p>
 
 <h2>
 <a id="user-content-docker-setup" class="anchor" href="#docker-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker Setup</h2>
