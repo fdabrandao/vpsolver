@@ -47,7 +47,7 @@ def inject_globals():
         app_name="VPSolver APP",
         pages=[
             ("/vbp", "Vector Packing"),
-            ("/modlang", "ModLang"),
+            ("/pympl", "PyMPL"),
         ],
     )
     return data
@@ -114,17 +114,17 @@ def vbp(example):
     )
 
 
-@app.route("/modlang/", defaults={"example": None})
-@app.route("/modlang/<example>")
-def modlang(example):
+@app.route("/pympl/", defaults={"example": None})
+@app.route("/pympl/<example>")
+def pympl(example):
     """Renders the input page."""
-    title = "ModLang: AMPL extension"
+    title = "PyMPL: AMPL extension"
 
-    example_folder = "data/examples/modlang/"
+    example_folder = "data/examples/pympl/"
     examples = [
-        ("/modlang/", "", None),
-        ("/modlang/example1", "Cutting Stock", "example1.mod"),
-        ("/modlang/example2", "Variable Sized Bin Packing", "example2.mod"),
+        ("/pympl/", "", None),
+        ("/pympl/example1", "Cutting Stock", "example1.mod"),
+        ("/pympl/example2", "Variable Sized Bin Packing", "example2.mod"),
     ]
 
     input_data = ""
@@ -139,7 +139,7 @@ def modlang(example):
         title=title,
         examples=examples,
         input_data=input_data,
-        solver_url="/solve/modlang",
+        solver_url="/solve/pympl",
     )
 
 
@@ -172,7 +172,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
         afg = AFG(instance, verbose=True)
         lp_model = LP(afg, verbose=False)
         out, sol = VPSolver.script(form["script"], lp_model, afg, verbose=True)
-    elif app_name == "modlang":
+    elif app_name == "pympl":
         tmpfile = VPSolver.new_tmp_file(ext=".mod")
         parser = PyMPL()
         parser.input = input_
