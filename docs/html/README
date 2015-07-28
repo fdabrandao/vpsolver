@@ -64,7 +64,7 @@ solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MI
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.</p>
 
-<p>For modelling other problems easily, VPSolver includes a <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a>, a modelling language <a href="https://github.com/fdabrandao/vpsolver/wiki/PyMPL">PyMPL</a>, and a <a href="#vpsolver-web-app">Web APP</a>.</p>
+<p>For modelling other problems easily, VPSolver includes a <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a>, a modelling language <a href="https://github.com/fdabrandao/vpsolver/wiki/PyMPL">PyMPL</a>, and a <a href="#vpsolver-web-app">Web APP</a>. VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a <a href="#docker">Docker container</a>.</p>
 
 <p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/wiki">project wiki</a> or to the manual.</p>
 
@@ -116,7 +116,7 @@ large models.</p>
 <ul>
 <li><strong>Linux</strong></li>
 <li><strong>Mac OS X</strong></li>
-<li>On a large variety of platforms including <strong>Windows</strong> using a Docker container.</li>
+<li>On a large variety of platforms including <strong>Windows</strong> using a <a href="#docker">Docker container</a>.</li>
 </ul>
 
 <h2>
@@ -192,29 +192,32 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 
 <ul>
 <li>
-<code>bin/vbp2afg instance.vbp graph.afg</code>: builds an arc-flow graph <code>graph.afg</code> for <code>instance.vbp</code>;</li>
+<code>$ bin/vbp2afg instance.vbp graph.afg</code>: builds an arc-flow graph <code>graph.afg</code> for <code>instance.vbp</code>;</li>
 <li>
-<code>bin/afg2mps graph.afg model.mps</code>: creates a MPS model <code>model.mps</code> for <code>graph.afg</code>;</li>
+<code>$ bin/afg2mps graph.afg model.mps</code>: creates a MPS model <code>model.mps</code> for <code>graph.afg</code>;</li>
 <li>
-<code>bin/afg2lp graph.afg model.lp</code>: creates a LP model <code>model.lp</code> for <code>graph.afg</code>;</li>
+<code>$ bin/afg2lp graph.afg model.lp</code>: creates a LP model <code>model.lp</code> for <code>graph.afg</code>;</li>
 <li>
-<code>bin/solve_gurobi model.mps vars.sol</code>: solves <code>model.mps</code> using Gurobi and writes the solution to <code>vars.sol</code>;</li>
+<code>$ bin/solve_gurobi model.mps vars.sol</code>: solves <code>model.mps</code> using Gurobi and writes the solution to <code>vars.sol</code>;</li>
 <li>
-<code>bin/solve_glpk model.mps vars.sol</code>: solves <code>model.mps</code> using Glpk and writes the solution to <code>vars.sol</code>;</li>
+<code>$ bin/solve_glpk model.mps vars.sol</code>: solves <code>model.mps</code> using Glpk and writes the solution to <code>vars.sol</code>;</li>
 <li>
-<code>bin/vbpsol graph.afg vars.sol</code>: given a solution file <code>vars.sol</code> extracts a vector packing solution;</li>
+<code>$ bin/vbpsol graph.afg vars.sol</code>: given a solution file <code>vars.sol</code> extracts a vector packing solution;</li>
 <li>
-<code>bin/vpsolver intance.vbp</code>: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior.</li>
+<code>$ bin/vpsolver intance.vbp</code>: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior.</li>
 </ul>
 
 <p>Usage:</p>
 
-<div class="highlight highlight-bash"><pre>bin/vbp2afg example.vbp graph.afg   <span class="pl-c"># 1. builds the arc-flow graph (graph.afg)</span>
-bin/afg2mps graph.afg model.mps     <span class="pl-c"># 2. converts the arc-flow graph</span>
-                                    <span class="pl-c">#    into a .mps file (model.mps)</span>
-bin/solve_gurobi model.mps vars.sol <span class="pl-c"># 3. solves the MIP model and stores the </span>
-                                    <span class="pl-c">#    solution in vars.sol</span>
-bin/vbpsol graph.afg vars.sol       <span class="pl-c"># 4. outputs the vector packing solution</span></pre></div>
+<pre><code># 1. Build the arc-flow graph graph.afg for example.vbp:  
+$ bin/vbp2afg example.vbp graph.afg  
+# 2. Convert the arc-flow graph into a .mps file model.mps:  
+$ bin/afg2mps graph.afg model.mps  
+# 3. Solve the MIP model and stores the solution in vars.sol:  
+$ bin/solve_gurobi model.mps vars.sol  
+# 4. Outputs the vector packing solution:  
+$ bin/vbpsol graph.afg vars.sol  
+</code></pre>
 
 <h2>
 <a id="user-content-vpsolver-scripts" class="anchor" href="#vpsolver-scripts" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver Scripts</h2>
@@ -239,10 +242,10 @@ solvers:</p>
 
 <p>Usage:</p>
 
-<div class="highlight highlight-bash"><pre>vpsolver_X.sh --vbp instance.vbp
-vpsolver_X.sh --afg graph.afg
-vpsolver_X.sh --mps/--lp model.mps/.lp
-vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
+<div class="highlight highlight-bash"><pre>$ vpsolver_X.sh --vbp instance.vbp
+$ vpsolver_X.sh --afg graph.afg
+$ vpsolver_X.sh --mps/--lp model.mps/.lp
+$ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
 
 <h2>
 <a id="user-content-folders" class="anchor" href="#folders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Folders</h2>

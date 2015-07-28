@@ -54,18 +54,12 @@
 <p>The VPSolver Python API has 3 levels:</p>
 
 <ul>
-<li>High-level API: high level wrapper functions, easy and direct usage;</li>
-<li>Mid-level API: objects that wrap calls to VPSolver executables;</li>
-<li>Low-level API: direct calls to VPSolver scripts and executables.</li>
-</ul>
-
-<h2>
-<a id="user-content-table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
-
-<ul>
-<li><a href="#high-level-api">High-level API</a></li>
-<li><a href="#mid-level-api">Mid-level API</a></li>
-<li><a href="#low-level-api">Low-level API</a></li>
+<li>
+<a href="#high-level-api">High-level API</a>: high level wrapper functions, easy and direct usage;</li>
+<li>
+<a href="#mid-level-api">Mid-level API</a>: objects that wrap calls to VPSolver executables;</li>
+<li>
+<a href="#low-level-api">Low-level API</a>: direct calls to VPSolver scripts and executables.</li>
 </ul>
 
 <h2>
