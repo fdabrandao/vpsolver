@@ -49,7 +49,7 @@
               
               <div class="markdown-body entry-content">
                 <h1>
-<a id="user-content-vpsolver" class="anchor" href="#vpsolver" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver</h1>
+<a id="user-content-home" class="anchor" href="#home" aria-hidden="true"><span class="octicon octicon-link"></span></a>Home</h1>
 
 <p>VPSolver is a vector packing solver based on an arc-flow formulation with graph compression [<a href="http://www.dcc.fc.up.pt/%7Efdabrandao/papers/arcflow_poster.pdf">Poster</a>]. VPSolver generates very strong models (equivalent to Gilmore and Gomory's) that can be solved using general-purpose mixed-integer programming solvers such as Gurobi and GLPK [<a href="http://www.dcc.fc.up.pt/%7Efdabrandao/Vector_Packing_Solver">Paper</a>].</p>
 
@@ -59,6 +59,7 @@
 <ul>
 <li><a href="README">README</a></li>
 <li><a href="Docker">Docker setup</a></li>
+<li><a href="Python-API">Python API</a></li>
 <li><a href="PyMPL">PyMPL documentation</a></li>
 </ul>
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  Docker.md
+  Python-API.md
   
     - Grip
   
@@ -44,77 +44,459 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  Docker.md
+                  Python-API.md
                 </h3>
               
               <div class="markdown-body entry-content">
                 <h1>
-<a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker</h1>
+<a id="user-content-python-api" class="anchor" href="#python-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Python API</h1>
 
-<p>Docker is an open platform for building, shipping and running applications. Docker allows <a href="https://github.com/fdabrandao/vpsolver">VPSolver</a> to run on a large variety of platforms with very little effort.</p>
+<p>The VPSolver Python API has 3 levels:</p>
 
-<h2>
-<a id="user-content-docker-setup" class="anchor" href="#docker-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker Setup</h2>
-
-<p>Install Docker [<a href="https://docs.docker.com/installation/">Docker installation instructions</a>].</p>
-
-<p>Option 1: simply <code>pull</code> VPSolver from Docker repository (without building):</p>
-
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker pull fdabrandao/vpsolver</pre></div>
-
-<p>Option 2: <code>clone</code> VPSolver and <code>build</code> locally:</p>
-
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
-user@locahost <span class="pl-k">~</span>$ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
+<ul>
+<li>High-level API: high level wrapper functions, easy and direct usage;</li>
+<li>Mid-level API: objects that wrap calls to VPSolver executables;</li>
+<li>Low-level API: direct calls to VPSolver scripts and executables.</li>
+</ul>
 
 <h2>
-<a id="user-content-usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+<a id="user-content-table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
 
-<p>Directly using the command line interface:</p>
-
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it fdabrandao/vpsolver bash
-root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
-...</pre></div>
-
-<p>or through the VPSolver Web APP (example URL: <code>http://172.17.0.60:5555/</code>):</p>
-
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it -p 5555 fdabrandao/vpsolver 
-eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
-          inet addr:<span class="pl-k">*</span>172.17.0.60<span class="pl-k">*</span>  Bcast:0.0.0.0  Mask:255.255.0.0
-          inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
-          UP BROADCAST  MTU:1500  Metric:1
-          RX packets:2 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:2 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0 
-          RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
-
- <span class="pl-k">*</span> Running on http://0.0.0.0:5555/
-...</pre></div>
+<ul>
+<li><a href="#high-level-api">High-level API</a></li>
+<li><a href="#mid-level-api">Mid-level API</a></li>
+<li><a href="#low-level-api">Low-level API</a></li>
+</ul>
 
 <h2>
-<a id="user-content-advanced" class="anchor" href="#advanced" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced</h2>
+<a id="user-content-high-level-api" class="anchor" href="#high-level-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>High-level API</h2>
 
-<p>Run vpsolver in background:</p>
+<p>Example:</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ CID=<span class="pl-s"><span class="pl-pds">$(</span>docker run -d -p 5555 fdabrandao/vpsolver<span class="pl-pds">)</span></span>
-user@locahost <span class="pl-k">~</span>$ docker inspect --format URL:http://{{.NetworkSettings.IPAddress}}:5555/ <span class="pl-smi">$CID</span>
-URL:http://172.17.0.71:5555/</pre></div>
+<div class="highlight highlight-python"><pre><span class="pl-k">from</span> pyvpsolver.solvers <span class="pl-k">import</span> vbpsolver
 
-<p>List all running vpsolver containers:</p>
+W <span class="pl-k">=</span> (<span class="pl-c1">5180</span>, <span class="pl-c1">2</span>)
+w <span class="pl-k">=</span> [(<span class="pl-c1">1120</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">1250</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">520</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">1066</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">1000</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">1150</span>,<span class="pl-c1">1</span>)]
+b <span class="pl-k">=</span> [<span class="pl-c1">9</span>, <span class="pl-c1">5</span>, <span class="pl-c1">91</span>, <span class="pl-c1">18</span>, <span class="pl-c1">11</span>, <span class="pl-c1">64</span>]
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker ps <span class="pl-k">|</span> grep fdabrandao/vpsolver
-...</pre></div>
+<span class="pl-c"># Solve a vector packing instance:</span>
+obj, sol <span class="pl-k">=</span> vbpsolver.solve(
+    W, w, b, <span class="pl-smi">verbose</span><span class="pl-k">=</span><span class="pl-c1">False</span>, <span class="pl-smi">script</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>vpsolver_glpk.sh<span class="pl-pds">"</span></span>
+)
+<span class="pl-k">print</span> <span class="pl-s"><span class="pl-pds">"</span>obj:<span class="pl-pds">"</span></span>, obj
+<span class="pl-k">print</span> <span class="pl-s"><span class="pl-pds">"</span>sol:<span class="pl-pds">"</span></span>, sol
+vbpsolver.print_solution(obj, sol)</pre></div>
 
-<p>List URLs of all running vpsolver containers:</p>
+<p>The high level API (<code>pyvpsolver.solvers</code>) includes two solvers: <code>vbpsolver</code> (for vector packing) and <code>mvbpsolver</code> (for multiple-choice vector packing).</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ CIDs=<span class="pl-s"><span class="pl-pds">$(</span>docker ps <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
-user@locahost <span class="pl-k">~</span>$ docker inspect --format URL:http://{{.NetworkSettings.IPAddress}}:5555/ <span class="pl-smi">$CIDs</span>
-...</pre></div>
+<h4>
+<a id="user-content-vector-packing-solver-functions" class="anchor" href="#vector-packing-solver-functions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Vector Packing Solver functions</h4>
 
-<p>Stop and remove all vpsolver containers:</p>
+<p>How to import: </p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker stop <span class="pl-s"><span class="pl-pds">$(</span>docker ps -a <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
-user@locahost <span class="pl-k">~</span>$ docker rm <span class="pl-s"><span class="pl-pds">$(</span>docker ps -a <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span></pre></div>
+<ul>
+<li>
+<code>from pyvpsolver.solvers import vbpsolver</code>.</li>
+</ul>
+
+<p>How to use:</p>
+
+<ul>
+<li>
+<code>obj, sol = vbpsolver.solve(W, w, b, verbose=False, script="vpsolver_glpk.sh")</code>
+
+<ul>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>W</code>: Bin capacity;</li>
+<li>
+<code>w</code>: Item weights;</li>
+<li>
+<code>b</code>: Item demands;</li>
+<li>
+<code>script</code>: VPSolver script that will be used to solve the model.</li>
+</ul>
+</li>
+<li>Returns:
+
+<ul>
+<li>
+<code>obj</code>: objective value;</li>
+<li>
+<code>sol</code>: solution.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<code>vbpsolver.print_solution(obj, sol)</code>
+
+<ul>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>obj</code>: objective value;</li>
+<li>
+<code>sol</code>: solution.</li>
+</ul>
+</li>
+<li>Outputs:
+
+<ul>
+<li>The solution formatted.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples: <a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example_vbp.py">example_vbp.py</a>.</p>
+
+<h4>
+<a id="user-content-multiple-choice-vector-packing-solver-functions" class="anchor" href="#multiple-choice-vector-packing-solver-functions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multiple-choice Vector Packing Solver functions</h4>
+
+<p>How to import:</p>
+
+<ul>
+<li>
+<code>from pyvpsolver.solvers import mvbpsolver</code>.</li>
+</ul>
+
+<p>How to use:</p>
+
+<ul>
+<li>
+<p><code>obj, lst_sol = mvbpsolver.solve(Ws, Cs, Qs, ws, b, verbose=False, script="vpsolver_glpk.sh")</code></p>
+
+<ul>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>Ws</code>: Bin capacities;</li>
+<li>
+<code>Cs</code>: Bin costs;</li>
+<li>
+<code>Qs</code>: Number of bins available;</li>
+<li>
+<code>ws</code>: Item weights;</li>
+<li>
+<code>b</code>: Item demands;</li>
+<li>
+<code>script</code>: VPSolver script that will be used to solve the model.</li>
+</ul>
+</li>
+<li>Returns:
+
+<ul>
+<li>
+<code>obj</code>: objective value;</li>
+<li>
+<code>lst_sol</code>: a list with solutions for each bin.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>mvbpsolver.print_solution(obj, lst_sol)</code></p>
+
+<ul>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>obj</code>: objective value</li>
+<li>
+<code>sol</code>: solution</li>
+</ul>
+</li>
+<li>Outputs:
+
+<ul>
+<li>The solution formatted.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples: <a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example_mvbp.py">example_mvbp.py</a> and <a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example_vsbpp.py">example_vsbpp.py</a>.</p>
+
+<h2>
+<a id="user-content-mid-level-api" class="anchor" href="#mid-level-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mid-level API</h2>
+
+<p>Example:</p>
+
+<div class="highlight highlight-python"><pre><span class="pl-k">from</span> pyvpsolver <span class="pl-k">import</span> VPSolver          <span class="pl-c"># from low-level API</span>
+<span class="pl-k">from</span> pyvpsolver <span class="pl-k">import</span> VBP, AFG, MPS, LP <span class="pl-c"># from mid-level API</span>
+<span class="pl-k">from</span> pyvpsolver.solvers <span class="pl-k">import</span> vbpsolver <span class="pl-c"># from high-level API</span>
+
+<span class="pl-c"># Create a vector packing instance:</span>
+instance <span class="pl-k">=</span> VBP(
+    [<span class="pl-c1">5180</span>], <span class="pl-c"># bin capacity</span>
+    [<span class="pl-c1">1120</span>, <span class="pl-c1">1250</span>, <span class="pl-c1">520</span>, <span class="pl-c1">1066</span>, <span class="pl-c1">1000</span>, <span class="pl-c1">1150</span>], <span class="pl-c"># item weights</span>
+    [<span class="pl-c1">9</span>, <span class="pl-c1">5</span>, <span class="pl-c1">91</span>, <span class="pl-c1">18</span>, <span class="pl-c1">11</span>, <span class="pl-c1">64</span>], <span class="pl-c"># item demands</span>
+    <span class="pl-smi">verbose</span><span class="pl-k">=</span><span class="pl-c1">False</span>
+)
+
+<span class="pl-c"># Create an arc-flow graph for the instance:</span>
+afg <span class="pl-k">=</span> AFG(instanceA, <span class="pl-smi">verbose</span><span class="pl-k">=</span><span class="pl-c1">False</span>)
+
+<span class="pl-c"># Create .mps model for the graph:</span>
+mps_model <span class="pl-k">=</span> MPS(afg, <span class="pl-smi">verbose</span><span class="pl-k">=</span><span class="pl-c1">False</span>)
+
+<span class="pl-c"># Solve the model an extract the solution:</span>
+out, solution <span class="pl-k">=</span> VPSolver.script(<span class="pl-s"><span class="pl-pds">"</span>vpsolver_glpk.sh<span class="pl-pds">"</span></span>, mps_model, afg, <span class="pl-smi">verbose</span><span class="pl-k">=</span><span class="pl-c1">True</span>)
+
+<span class="pl-c"># Print the solution:</span>
+obj, sol <span class="pl-k">=</span> solution
+vbpsolver.print_solution(obj, sol)</pre></div>
+
+<p>How to import:</p>
+
+<ul>
+<li>
+<code>from pyvpsolver import VBP, AFG, MPS, LP</code>.</li>
+</ul>
+
+<p>Objects:</p>
+
+<ul>
+<li>
+<p><code>VBP</code> objects: <code>VBP(W, w, b, verbose=None)</code></p>
+
+<ul>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>W</code>: Bin capacity;</li>
+<li>
+<code>w</code>: Item weights;</li>
+<li>
+<code>b</code>: Item demands.<br>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>AFG</code> objects: <code>AFG(instance, verbose=None)</code></p>
+
+<ul>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>instance</code>: a <code>VBP</code> object.</li>
+</ul>
+</li>
+<li>Creates:
+
+<ul>
+<li>an arc-flow graph for the vector packing instance.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>MPS</code> objects: <code>MPS(graph, verbose=None)</code></p>
+
+<ul>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>graph</code>: an <code>AFG</code> object.</li>
+</ul>
+</li>
+<li>Creates:
+
+<ul>
+<li>an MPS model.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>LP</code> objects: <code>LP(graph, verbose=None)</code></p>
+
+<ul>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>graph</code>: an <code>AFG</code> object.</li>
+</ul>
+</li>
+<li>Creates:
+
+<ul>
+<li>a LP model.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples: <a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example.py">example.py</a>.</p>
+
+<h2>
+<a id="user-content-low-level-api" class="anchor" href="#low-level-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Low-level API</h2>
+
+<p>How to import:</p>
+
+<ul>
+<li>
+<code>from pyvpsolver import VPSolver</code>.</li>
+</ul>
+
+<p>How to use:</p>
+
+<ul>
+<li>
+<p><code>VPSolver.vbp2afg(vbp_file, afg_file, verbose=None)</code></p>
+
+<ul>
+<li>Description: creates arc-flow graphs for vector packing instances.</li>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>vbp_file</code>: a .vbp file or a <code>VBP</code> object;</li>
+<li>
+<code>afg_file</code>: a .afg file.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>bin/vbp2afg</code> to write an arc-flow graph for <code>vbp_file</code> in <code>afg_file</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>VPSolver.afg2mps(afg_file, mps_file, verbose=None)</code></p>
+
+<ul>
+<li>Description: converts arc-flow grafts to MPS models.</li>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>afg_file</code>: a .afg file or a <code>AFG</code> object;</li>
+<li>
+<code>mps_file</code>: a .mps file.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>bin/afg2mps</code> to write the MPS model for <code>afg_file</code> in <code>mps_file</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>VPSolver.afg2lp(afg_file, lp_file, verbose=None)</code></p>
+
+<ul>
+<li>Description: converts arc-flow grafts to LP models.</li>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>afg_file</code>: a .afg file or a <code>AFG</code> object;</li>
+<li>
+<code>mps_file</code>: a .lp file.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>bin/afg2lp</code> to write the LP model for <code>afg_file</code> in <code>lp_file</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>VPSolver.vpsolver(vbp_file, verbose=None)</code></p>
+
+<ul>
+<li>Description: calls VPSolver.</li>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>vbp_file</code>: a .vbp file or a <code>VBP</code> object;.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>bin/vpsolver</code> to solve an instance (requires Gurobi).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>output, solution = VPSolver.script(script_name, arg1=None, arg2=None, verbose=None)</code></p>
+
+<ul>
+<li>Description: calls VPSolver scripts.</li>
+<li>Important arguments:
+
+<ul>
+<li>
+<code>script_name</code>: vpsolver script name (e.g., <code>vpsolver_glpk.sh</code>);</li>
+<li>
+<code>arg1</code>, <code>arg2</code>: arguments to be passed to the script.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>script_name</code> to solve an instance.</li>
+</ul>
+</li>
+<li>Usage examples:
+
+<ul>
+<li>
+<code>VPSolver.script(script name, .vbp file/VBP object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, .mps file/MPS object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, .afg file/VBP object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, .lp file/LP object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, .mps file/.lp file/MPS object/LP object, .afg file/AFG object)</code>.</li>
+<li>Note: the solution can only be extracted if the graph or the original instance are provided.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>VPSolver.set_verbose(verbose)</code></p>
+
+<ul>
+<li>Description: sets the default "verbose" behaviour.</li>
+<li>Arguments:
+
+<ul>
+<li>
+<code>verbose</code>: <code>True</code> or <code>False</code>.</li>
+</ul>
+</li>
+<li>Note: The default behaviour is overridden if the <code>verbose</code> argument is set to a value different than <code>None</code> in any API call.</li>
+</ul>
+</li>
+</ul>
 
 <hr>
 

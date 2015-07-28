@@ -60,11 +60,13 @@ Porto, Portugal. All rights reserved. E-mail: <a href="mailto:fdabrandao@dcc.fc.
 <p>VPSolver is a vector packing solver based on an arc-flow formulation with graph
 compression.  VPSolver generates very strong models (equivalent to Gilmore and
 Gomory's) that can be solved using general-purpose mixed-integer programming
-solvers such as Gurobi and GLPK. VPSolver does not explicitly require any MIP
+solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MIP
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.</p>
 
-<p>For more details, please refer to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki">https://github.com/fdabrandao/vpsolver/wiki</a>] or to the manual.</p>
+<p>For modelling other problems easily, VPSolver includes a <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a>, a modelling language <a href="https://github.com/fdabrandao/vpsolver/wiki/PyMPL">PyMPL</a>, and a <a href="#vpsolver-web-app">Web APP</a>.</p>
+
+<p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/wiki">project wiki</a> or to the manual.</p>
 
 <h2>
 <a id="user-content-repositories" class="anchor" href="#repositories" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repositories</h2>
@@ -96,7 +98,7 @@ large models.</p>
 <h4>
 <a id="user-content-optional" class="anchor" href="#optional" aria-hidden="true"><span class="octicon octicon-link"></span></a>Optional</h4>
 
-<p>For the python interface:</p>
+<p>For the <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a> and <a href="#vpsolver-web-app">Web APP</a>:</p>
 
 <ul>
 <li><code>python-2.7</code></li>
@@ -155,7 +157,7 @@ $ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
 <p>Directly using the command line interface:</p>
 
 <div class="highlight highlight-bash"><pre>$ docker run -it fdabrandao/vpsolver bash
-root@55d14f6b6f32:<span class="pl-k">~</span># python examples/example.py
+root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
 ...</pre></div>
 
 <p>or through the VPSolver Web APP (example URL: <code>http://172.17.0.60:5555/</code>):</p>
@@ -176,72 +178,90 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 <p>For more details, please refer to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki/docker">https://github.com/fdabrandao/vpsolver/wiki/docker</a>].</p>
 
 <h2>
-<a id="user-content-web-app" class="anchor" href="#web-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>Web APP</h2>
+<a id="user-content-vpsolver-web-app" class="anchor" href="#vpsolver-web-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver Web APP</h2>
 
 <p>VPSolver includes a Web APP that can be started as follows:</p>
 
 <pre><code>$ python -m pyvpsolver.webapp.app
 </code></pre>
 
-<p>The Web APP can then be accessed on a web browser at <code>http://127.0.0.1:5555</code>.</p>
+<p>The Web APP can then be accessed on a web browser at <code>http://127.0.0.1:5555/</code>.</p>
 
 <h2>
-<a id="user-content-scripts" class="anchor" href="#scripts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scripts</h2>
+<a id="user-content-vpsolver-binaries" class="anchor" href="#vpsolver-binaries" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver binaries</h2>
+
+<ul>
+<li>
+<code>bin/vbp2afg instance.vbp graph.afg</code>: builds an arc-flow graph <code>graph.afg</code> for <code>instance.vbp</code>;</li>
+<li>
+<code>bin/afg2mps graph.afg model.mps</code>: creates a MPS model <code>model.mps</code> for <code>graph.afg</code>;</li>
+<li>
+<code>bin/afg2lp graph.afg model.lp</code>: creates a LP model <code>model.lp</code> for <code>graph.afg</code>;</li>
+<li>
+<code>bin/solve_gurobi model.mps vars.sol</code>: solves <code>model.mps</code> using Gurobi and writes the solution to <code>vars.sol</code>;</li>
+<li>
+<code>bin/solve_glpk model.mps vars.sol</code>: solves <code>model.mps</code> using Glpk and writes the solution to <code>vars.sol</code>;</li>
+<li>
+<code>bin/vbpsol graph.afg vars.sol</code>: given a solution file <code>vars.sol</code> extracts a vector packing solution;</li>
+<li>
+<code>bin/vpsolver intance.vbp</code>: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior.</li>
+</ul>
+
+<p>Usage:</p>
+
+<div class="highlight highlight-bash"><pre>bin/vbp2afg example.vbp graph.afg   <span class="pl-c"># 1. builds the arc-flow graph (graph.afg)</span>
+bin/afg2mps graph.afg model.mps     <span class="pl-c"># 2. converts the arc-flow graph</span>
+                                    <span class="pl-c">#    into a .mps file (model.mps)</span>
+bin/solve_gurobi model.mps vars.sol <span class="pl-c"># 3. solves the MIP model and stores the </span>
+                                    <span class="pl-c">#    solution in vars.sol</span>
+bin/vbpsol graph.afg vars.sol       <span class="pl-c"># 4. outputs the vector packing solution</span></pre></div>
+
+<h2>
+<a id="user-content-vpsolver-scripts" class="anchor" href="#vpsolver-scripts" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver Scripts</h2>
 
 <p>VPSolver includes several scripts for solving arc-flow models using different
 solvers:</p>
 
 <ul>
 <li>
-<code>scripts/vpsolver_gurobi.sh</code>  - Gurobi</li>
+<code>scripts/vpsolver_gurobi.sh</code>: Gurobi</li>
 <li>
-<code>scripts/vpsolver_cplex.sh</code>   - IBM CPLEX</li>
+<code>scripts/vpsolver_cplex.sh</code>: IBM CPLEX</li>
 <li>
-<code>scripts/vpsolver_coinor.sh</code>  - COIN-OR CBC</li>
+<code>scripts/vpsolver_coinor.sh</code>: COIN-OR CBC</li>
 <li>
-<code>scripts/vpsolver_glpk.sh</code>    - GLPK</li>
+<code>scripts/vpsolver_glpk.sh</code>: GLPK</li>
 <li>
-<code>scripts/vpsolver_scip.sh</code>    - SCIP</li>
+<code>scripts/vpsolver_scip.sh</code>: SCIP</li>
 <li>
-<code>scripts/vpsolver_lpsolve.sh</code> - lp_solve</li>
+<code>scripts/vpsolver_lpsolve.sh</code>: lp_solve</li>
 </ul>
 
-<h2>
-<a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+<p>Usage:</p>
 
-<p>VPSolver includes several examples:</p>
-
-<ul>
-<li>
-<code>examples/example.sh</code> - shell commands</li>
-<li>
-<code>examples/example.py</code> - usage examples of pyvpsolver (the python interface)</li>
-<li>
-<code>examples/example_vbp.py</code> - solves vector packing instances using pyvpsolver</li>
-<li>
-<code>examples/example_mvbp.py</code> - solves multiple-choice vector packing instances</li>
-<li>
-<code>examples/example_vsbpp.py</code> - solves variable-sized bin packing instances</li>
-</ul>
+<div class="highlight highlight-bash"><pre>vpsolver_X.sh --vbp instance.vbp
+vpsolver_X.sh --afg graph.afg
+vpsolver_X.sh --mps/--lp model.mps/.lp
+vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
 
 <h2>
 <a id="user-content-folders" class="anchor" href="#folders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Folders</h2>
 
 <ul>
 <li>
-<code>docs/</code>       - documentation</li>
+<code>docs/</code>: documentation</li>
 <li>
-<code>bin/</code>        - vpsolver executables</li>
+<code>bin/</code>: vpsolver executables</li>
 <li>
-<code>scripts/</code>    - vpsolver scripts</li>
+<code>scripts/</code>: vpsolver scripts</li>
 <li>
-<code>src/</code>        - vpsolver source code in C++</li>
+<code>src/</code>: vpsolver source code in C++</li>
 <li>
-<code>pyvpsolver/</code> - pyvpsolver source code in Python 2.7</li>
+<code>pyvpsolver/</code>: pyvpsolver source code in Python 2.7</li>
 <li>
-<code>examples/</code>   - vpsolver and pyvpsolver examples</li>
+<code>examples/</code>: vpsolver and pyvpsolver examples</li>
 <li>
-<code>reports/</code>    - technical reports on the underlying algorithms and models</li>
+<code>reports/</code>: technical reports on the underlying algorithms and models</li>
 </ul>
 
 <h2>
@@ -250,7 +270,7 @@ solvers:</p>
 <p>VPSolver was proposed in:</p>
 
 <ul>
-<li>Brandão, F. and Pedroso, J. P. (2013). Bin Packing and Related Problems:
+<li>[1] Brandão, F. and Pedroso, J. P. (2013). Bin Packing and Related Problems:
 General Arc-flow Formulation with Graph Compression. Technical Report
 DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do
 Porto, Portugal.
@@ -260,15 +280,15 @@ Available at: <a href="http://arxiv.org/abs/1310.6887">http://arxiv.org/abs/1310
 <p>See also:</p>
 
 <ul>
-<li><p>Brandão, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
+<li><p>[2] Brandão, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
 Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
 Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.</p></li>
-<li><p>Brandão, F. and Pedroso, J. P. (2013). Cutting Stock with Binary Patterns:
+<li><p>[3] Brandão, F. and Pedroso, J. P. (2013). Cutting Stock with Binary Patterns:
 Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-09,
 Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.</p></li>
-<li><p>Brandão, F. (2012). Bin Packing and Related Problems: Pattern-Based Approaches 
+<li><p>[4] Brandão, F. (2012). Bin Packing and Related Problems: Pattern-Based Approaches 
 Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.</p></li>
-<li><p>Computational results on several benchmark test data sets:<br>
+<li><p>[5] Computational results on several benchmark test data sets:<br>
 <a href="http://www.dcc.fc.up.pt/%7Efdabrandao/research/vpsolver/results/">http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/</a></p></li>
 </ul>
 

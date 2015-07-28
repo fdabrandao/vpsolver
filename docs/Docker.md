@@ -23,7 +23,7 @@ Directly using the command line interface:
 
 ```bash
 user@locahost ~$ docker run -it fdabrandao/vpsolver bash
-root@55d14f6b6f32:~# python examples/example.py
+root@55d14f6b6f32:~# python examples/vpsolver/example_vbp.py
 ...
 ```
 
