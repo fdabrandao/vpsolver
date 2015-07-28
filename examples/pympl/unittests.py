@@ -70,7 +70,7 @@ class TestPyMPL(unittest.TestCase):
         parser.input = """
         $PARAM[NAME]{"name"};
         $PARAM[VALUE]{10};
-        $PARAM[D]{{'a': 1, 'b': 2}};
+        $PARAM[D{I}]{{'a': 1, 'b': 2}};
         $PARAM[L0]{[1,2,3], i0=0};
         $PARAM[L1]{[1,2,3], i0=1};
         $PARAM[^NAME2]{"something"};
@@ -79,6 +79,7 @@ class TestPyMPL(unittest.TestCase):
         self.assertIn("param NAME := 'name';", parser.output)
         self.assertIn("param VALUE := 10;", parser.output)
         self.assertIn("param D := ['a']1['b']2;", parser.output)
+        self.assertIn("set I := {'a','b'};", parser.output)
         self.assertIn("param L0 := [0]1[1]2[2]3;", parser.output)
         self.assertIn("param L1 := [1]1[2]2[3]3;", parser.output)
         self.assertNotIn("param NAME2 := 'something';", parser.output)
