@@ -24,9 +24,8 @@ __version__ = "v1.4.0-dev"
 import os
 import shutil
 import tempfile
-from .model import Model
+from .pympl.model import Model
 from .afgraph import AFGraph
 from .vpsolver import VPSolver, VBP, AFG, MPS, LP
 from . import solvers
 from . import pympl
-from . import webapp

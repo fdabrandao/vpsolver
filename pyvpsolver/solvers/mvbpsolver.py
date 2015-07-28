@@ -19,8 +19,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .. import *
+import os
 import sys
+from .. import VPSolver, VBP, AFG
+from .. import AFGraph, Model
+
 
 def solve(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="",
           verbose=False, script="vpsolver_glpk.sh"):
