@@ -164,7 +164,7 @@ class VPSolver(object):
     def new_tmp_file(ext="tmp"):
         """Creates temporary files."""
         if not ext.startswith("."):
-            ext = "."+ext
+            ext = ".{0}".format(ext)
         fname = "{0}/{1}{2}".format(VPSolver.TMP_DIR, VPSolver.TMP_CNT, ext)
         VPSolver.TMP_CNT += 1
         return fname
@@ -184,7 +184,7 @@ class VPSolver(object):
             pass
 
     @staticmethod
-    def run(cmd, verbose=None, tee=None):
+    def run(cmd, tee=None, verbose=None):
         """Runs system commands."""
         if verbose is None:
             verbose = VPSolver.VERBOSE
@@ -243,8 +243,8 @@ class VPSolver(object):
             "{0} {1} {2} {3}".format(
                 VPSolver.VBPSOL, afg_file, sol_file, opts
             ),
-            verbose=verbose,
-            tee=out_file
+            tee=out_file,
+            verbose=verbose
         )
         with open(out_file) as f:
             output = f.read()
@@ -260,8 +260,8 @@ class VPSolver(object):
         opts = "{0} {1} {2}".format(compress, binary, vtype)
         VPSolver.run(
             "{0} {1} {2}".format(VPSolver.VPSOLVER, vbp_file, opts),
-            verbose=verbose,
-            tee=out_file
+            tee=out_file,
+            verbose=verbose
         )
         with open(out_file) as f:
             output = f.read()
@@ -281,8 +281,8 @@ class VPSolver(object):
             "{0} {1} {2} {3}".format(
                 VPSolver.VBP2AFG, vbp_file, afg_file, opts
             ),
-            verbose=verbose,
-            tee=out_file
+            tee=out_file,
+            verbose=verbose
         )
         with open(out_file) as f:
             output = f.read()
@@ -299,8 +299,8 @@ class VPSolver(object):
             "{0} {1} {2} {3}".format(
                 VPSolver.AFG2MPS, afg_file, mps_file, opts
             ),
-            verbose=verbose,
-            tee=out_file
+            tee=out_file,
+            verbose=verbose
         )
         with open(out_file) as f:
             output = f.read()
@@ -315,8 +315,8 @@ class VPSolver(object):
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
             "{0} {1} {2} {3}".format(VPSolver.AFG2LP, afg_file, lp_file, opts),
-            verbose=verbose,
-            tee=out_file
+            tee=out_file,
+            verbose=verbose
         )
         with open(out_file) as f:
             output = f.read()
@@ -329,26 +329,26 @@ class VPSolver(object):
         cmd = script_name
         for arg in [arg1, arg2]:
             if isinstance(arg, MPS):
-                cmd += " --mps " + arg.mps_file
+                cmd += " --mps {0}".format(arg.mps_file)
             elif isinstance(arg, LP):
-                cmd += " --lp " + arg.lp_file
+                cmd += " --lp {0}".format(arg.lp_file)
             elif isinstance(arg, AFG):
-                cmd += " --afg " + arg.afg_file
+                cmd += " --afg {0}".format(arg.afg_file)
             elif isinstance(arg, VBP):
-                cmd += " --vbp " + arg.vbp_file
+                cmd += " --vbp {0}".format(arg.vbp_file)
             elif isinstance(arg, str):
                 if arg.endswith(".mps"):
-                    cmd += " --mps " + arg
+                    cmd += " --mps {0}".format(arg)
                 elif arg.endswith(".lp"):
-                    cmd += " --lp " + arg
+                    cmd += " --lp {0}".format(arg)
                 elif arg.endswith(".afg"):
-                    cmd += " --afg " + arg
+                    cmd += " --afg {0}".format(arg)
                 elif arg.endswith(".vbp"):
-                    cmd += " --vbp " + arg
+                    cmd += " --vbp {0}".format(arg)
                 else:
                     raise Exception("Invalid file extension!")
         out_file = VPSolver.new_tmp_file()
-        VPSolver.run(cmd, verbose=verbose, tee=out_file)
+        VPSolver.run(cmd, tee=out_file, verbose=verbose)
         with open(out_file) as f:
             output = f.read()
         os.remove(out_file)
@@ -359,22 +359,22 @@ class VPSolver(object):
         """Calls VPSolver scripts and returns arc-flow solutions."""
         cmd = script_name
         if isinstance(model, MPS):
-            cmd += " --mps " + model.mps_file
+            cmd += " --mps {0}".format(model.mps_file)
         elif isinstance(model, LP):
-            cmd += " --lp " + model.lp_file
+            cmd += " --lp {0}".format(model.lp_file)
         elif isinstance(model, str):
             if model.endswith(".mps"):
-                cmd += " --mps " + model
+                cmd += " --mps {0}".format(model)
             elif model.endswith(".lp"):
-                cmd += " --lp " + model
+                cmd += " --lp {0}".format(model)
             else:
                 raise Exception("Invalid file extension!")
         out_file = VPSolver.new_tmp_file()
         sol_file = VPSolver.new_tmp_file(".sol")
         VPSolver.run(
             "{0} --wsol {1}".format(cmd, sol_file),
-            verbose=verbose,
-            tee=out_file
+            tee=out_file,
+            verbose=verbose
         )
         with open(out_file) as f:
             output = f.read()
