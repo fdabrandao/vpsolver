@@ -20,6 +20,6 @@
 BASEDIR=`dirname $0`
 cd $BASEDIR
 
-python vpsolver/test.py || exit 1
-python pympl/test.py || exit 1
-python pympl/unittests.py || exit 1
+python vpsolver/test.py $*   || exit 1
+python pympl/test.py $*      || exit 1
+python pympl/unittests.py $* || exit 1
