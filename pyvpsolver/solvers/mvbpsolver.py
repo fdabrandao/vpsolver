@@ -151,9 +151,9 @@ def solve(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="",
         print "  #V3/#V1 = %.2f" % (nv3/float(nv1))
         print "  #A3/#A1 = %.2f" % (na3/float(na1))
 
-    varl, cons = graph.getFlowCons()
+    varl, cons = graph.get_flow_cons()
 
-    assocs = graph.getAssocs()
+    assocs = graph.get_assocs()
     for i in xrange(len(b)):
         lincomb = [(var, 1) for it, (j, t) in enumerate(itlabel) if j==i for var in assocs[it]]
         #cons.append((lincomb,">=",b[i]))

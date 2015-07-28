@@ -95,8 +95,8 @@ class CmdFlow(CmdBase):
         vnames = {}
         vnames[feedback] = zvar
         ub = {}
-        varl, cons = graph.getFlowCons(vnames)
-        assocs = graph.getAssocs(vnames)
+        varl, cons = graph.get_flow_cons(vnames)
+        assocs = graph.get_assocs(vnames)
         graph.names = vnames
 
         for i in xrange(m):

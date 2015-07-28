@@ -95,7 +95,7 @@ class AFG(object):
 
     def graph(self):
         """Returns the graph as an AFGraph object."""
-        return AFGraph.fromFile(self.afg_file)
+        return AFGraph.from_file(self.afg_file)
 
     def __del__(self):
         try:
