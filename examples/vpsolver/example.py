@@ -47,7 +47,7 @@ def main():
                             [9, 5, 91, 18, 11, 64], verbose=False)
 
     # Create instanceB from a .vbp file
-    instanceB = VBP.fromFile("instance.vbp", verbose=False)
+    instanceB = VBP.from_file("instance.vbp", verbose=False)
 
     # Create an arc-flow graph for instanceA
     afg = AFG(instanceA, verbose=False)

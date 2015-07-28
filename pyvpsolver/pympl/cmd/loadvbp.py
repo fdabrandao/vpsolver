@@ -39,7 +39,7 @@ class CmdLoadVBP(CmdBase):
             elif len(index) == 1:
                 index_I = index[0]
 
-        instance = VBP.fromFile(fname, verbose=False)
+        instance = VBP.from_file(fname, verbose=False)
 
         W = {
             i0+i: instance.W[i]
