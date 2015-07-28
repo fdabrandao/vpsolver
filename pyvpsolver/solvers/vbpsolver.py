@@ -23,29 +23,49 @@ import sys
 from .. import VPSolver, VBP, AFG, MPS
 
 
-def solve(W, w, b, svg_file="", lp_file="", mps_file="",
-          verbose=False, script="vpsolver_glpk.sh"):
-    assert svg_file=="" or svg_file.endswith(".svg")
+def solve(
+        W, w, b, svg_file="", lp_file="", mps_file="",
+        script="vpsolver_glpk.sh", verbose=False):
+    """
+    Solves vector packing instances using the method proposed in:
+    Brandao, F. and Pedroso, J. P. (2013). Bin Packing and Related
+    Problems: General Arc-flow Formulation with Graph Compression. Technical
+    Report DCC-2013-08, Faculdade de Ciencias da Universidade do Porto,
+    Universidade do Porto, Portugal.
+    """
+    assert svg_file == "" or svg_file.endswith(".svg")
     instance = VBP(W, w, b, verbose=False)
     if svg_file == "" and lp_file == "" and mps_file == "":
         out, (obj, sol) = VPSolver.script(script, instance, verbose=verbose)
     else:
         afg = AFG(instance, verbose=verbose)
         if svg_file.endswith(".svg"):
-            if verbose: print "Generating .SVG file..."
+            if verbose:
+                print "Generating .SVG file..."
             afg.graph().draw(svg_file)
         if lp_file.endswith(".lp"):
             VPSolver.afg2lp(afg.afg_file, lp_file, verbose=False)
-            if verbose: print ".LP model successfully generated!"
+            if verbose:
+                print ".LP model successfully generated!"
         if mps_file.endswith(".mps"):
             VPSolver.afg2mps(afg.afg_file, mps_file, verbose=False)
-            if verbose: print ".MPS model successfully generated!"
+            if verbose:
+                print ".MPS model successfully generated!"
         mps_model = MPS(afg, verbose=verbose)
-        out, (obj, sol) = VPSolver.script(script, mps_model, afg, verbose=verbose)
+        out, (obj, sol) = VPSolver.script(
+            script, mps_model, afg, verbose=verbose
+        )
     return obj, sol
 
+
 def print_solution(obj, sol, fout=sys.stdout):
-    if obj != None: print >>fout, "Objective:", obj
+    """Pretty-print function for vector packing solutions."""
+    if obj is not None:
+        print >>fout, "Objective:", obj
     print >>fout, "Solution:"
     for mult, patt in sol:
-        print >>fout, "%d x [%s]" % (mult, ", ".join(["i=%d" % (it+1) for it in patt]))
+        print >>fout, "{0} x [{1}]".format(
+            mult, ", ".join(
+                ["i={0}".format(it+1) for it in patt]
+            )
+        )

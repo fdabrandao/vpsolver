@@ -64,7 +64,7 @@ class AFGraph(object):
         if (u, v, i) in vnames:
             return vnames[u, v, i]
         vnames[u, v, i] = "F{0:x}".format(len(vnames))
-        # vnames[u, v, i] = "F_%s_%s_%s" % (u, v, i)
+        # vnames[u, v, i] = "F_{0}_{1}_{2}".format(u, v, i)
         return vnames[u, v, i]
 
     def get_flow_cons(self, vnames=None):

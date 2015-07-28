@@ -49,13 +49,13 @@ class Model(object):
 
     def new_con_name(self):
         """Generate a new constraint name."""
-        name = "RC%x" % len(self.cons)
+        name = "RC{0:x}".format(len(self.cons))
         assert name not in self.cons
         return name
 
     def new_var_name(self):
         """Generate a new variable name."""
-        name = "RV%x" % len(self.vars)
+        name = "RV{0:x}".format(len(self.vars))
         assert name not in self.vars
         return name
 
