@@ -23,7 +23,7 @@ import re
 from .base import CmdBase
 from ...vpsolver import VBP, AFG
 from ..model import Model
-from .. import writemod
+from ..model import writemod
 from .. import utils
 
 
@@ -114,13 +114,13 @@ class CmdFlow(CmdBase):
 
         model = Model()
         for var in varl:
-            model.addVar(name=var, lb=0, ub=ub.get(var, None), vtype="I")
+            model.add_var(name=var, lb=0, ub=ub.get(var, None), vtype="I")
         for lincomb, sign, rhs in cons:
-            model.addCons(lincomb, sign, rhs)
+            model.add_con(lincomb, sign, rhs)
 
         if noobj is False:
             objlincomb = [(vnames[feedback], 1)]
-            model.setObj("min", objlincomb)
+            model.set_obj("min", objlincomb)
 
         labels = {
             (u, v, i): ["i={0}".format(i+1)]

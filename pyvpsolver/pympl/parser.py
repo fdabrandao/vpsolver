@@ -27,7 +27,7 @@ from .cmd import CmdFlow, CmdGraph, CmdLoadVBP
 
 
 class PyMPL(object):
-    """Class for parsing AMPL files with PyMPL calls"""
+    """Class for parsing AMPL files with PyMPL calls."""
 
     DEBUG = False
     t_CMD = r'[a-zA-Z_][a-zA-Z0-9_]*'

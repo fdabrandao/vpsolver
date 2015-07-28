@@ -27,14 +27,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # s.t. c1: x1 + 2 * x2 <= 1;
 # s.t. c2: 3 * x1 + x2 <= 2;
 
-from .utils import lincomb2str, ampl_var, ampl_con
+from ..utils import lincomb2str, ampl_var, ampl_con
 
 
 def write_mod(model, filename):
-    """Exports the model in AMPL format."""
+    """Writes models to files in AMPL format."""
     fout = open(filename, "w")
 
-    # variables
+    # Variables:
 
     for var in model.vars:
         typ = model.vars[var]["vtype"]
@@ -42,7 +42,7 @@ def write_mod(model, filename):
         ub = model.vars[var]["ub"]
         print >>fout, ampl_var(var, typ, lb, ub)
 
-    # objective
+    # Objective:
 
     if model.obj != []:
         if model.objdir == "min":
@@ -50,7 +50,7 @@ def write_mod(model, filename):
         else:
             print >>fout, "maximize obj: {0};".format(lincomb2str(model.obj))
 
-    # constraints
+    # Constraints:
 
     for name in model.cons_list:
         lincomb, sign, rhs = model.cons[name]
@@ -61,10 +61,10 @@ def write_mod(model, filename):
 
 
 def model2ampl(model, zvar, excluded_vars=None, prefix=""):
-    """Returns the model in AMPL format as a string."""
+    """Returns models as a string in AMPL format."""
     res = ""
 
-    # variables
+    # Variables:
 
     if excluded_vars is not None:
         excluded_vars = set(excluded_vars)
@@ -92,7 +92,7 @@ def model2ampl(model, zvar, excluded_vars=None, prefix=""):
         if name not in excluded_vars
     )
 
-    # constraints
+    # Constraints:
 
     def format_con(name):
         lincomb, sign, rhs = model.cons[name]

@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 from copy import deepcopy
-from collections import Iterable, defaultdict
 
 t_SYMBNAME = r'\^?[a-zA-Z_][a-zA-Z0-9_]*'
 t_INDEX1 = r'(?:\s*\[[^\]]*\])?' # [] index
@@ -184,70 +183,6 @@ def ampl_param(name, index, value, sets, params):
         return defs, ""
 
 
-def linear_constraint(left, sign, right):
-    """Transforms (left, sign, right) constraints into (lincomb, sign, rhs)."""
-    assert (
-        not isinstance(left, (int, float))
-        or not isinstance(right, (int, float))
-    )
-    pairs = defaultdict(lambda: 0)
-    rhs = 0
-
-    def add_entry(e, signal):
-        assert isinstance(e, (int, float, str, Iterable))
-        if isinstance(e, (int, float)):
-            return -signal*e
-        elif isinstance(e, str):
-            pairs[e] += signal
-            return 0
-        elif isinstance(e, Iterable):
-            a, b = e
-            assert isinstance(a, int) or isinstance(b, int)
-            assert isinstance(a, str) or isinstance(b, str)
-            if isinstance(a, str):
-                pairs[a] += signal*b
-            else:
-                pairs[b] += signal*a
-            return 0
-
-    if isinstance(left, (int, float, str)):
-        rhs += add_entry(left, 1)
-    else:
-        for e in left:
-            rhs += add_entry(e, 1)
-
-    if isinstance(right, (int, float, str)):
-        rhs += add_entry(right, -1)
-    else:
-        for e in right:
-            rhs += add_entry(e, -1)
-
-    if sign in ("<", ">"):
-        sign += "="
-
-    lincomb = sorted(pairs.items())
-    return (lincomb, sign, rhs)
-
-
-def lincomb2str(lincomb):
-    """Returns the linear combination as a string."""
-
-    def format_entry(var, coef):
-        var = var.lstrip("^")
-        if abs(coef) != 1:
-            if coef >= 0:
-                return "+{0:g}*{1}".format(coef, var)
-            else:
-                return "-{0:g}*{1}".format(abs(coef), var)
-        else:
-            if coef >= 0:
-                return "+{0}".format(var)
-            else:
-                return "-{0}".format(var)
-
-    return "".join(format_entry(var, coef) for var, coef in lincomb)
-
-
 def ampl_var(name, typ="", lb=None, ub=None):
     """Generates the definition for an AMPL variable."""
     if name.startswith("^"):
@@ -265,6 +200,25 @@ def ampl_var(name, typ="", lb=None, ub=None):
         defs += ", <= {0:g}".format(ub)
     defs += ";"
     return defs
+
+
+def lincomb2str(lincomb, mult="*"):
+    """Returns the linear combination as a string."""
+
+    def format_entry(var, coef):
+        var = var.lstrip("^")
+        if abs(coef) != 1:
+            if coef >= 0:
+                return "+{0:g}{1}{2}".format(coef, mult, var)
+            else:
+                return "-{0:g}{1}{2}".format(abs(coef), mult, var)
+        else:
+            if coef >= 0:
+                return "+{0}".format(var)
+            else:
+                return "-{0}".format(var)
+
+    return "".join(format_entry(var, coef) for var, coef in lincomb)
 
 
 def ampl_con(name, lincomb, sign, rhs):

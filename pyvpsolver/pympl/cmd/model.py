@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .base import CmdBase
 from .. import utils
 from ..utils import ampl_var, ampl_con
+from ..model.utils import linear_constraint
 
 
 class CmdVar(CmdBase):
@@ -43,7 +44,7 @@ class CmdCon(CmdBase):
         match = utils.parse_symbname(name)
         assert match is not None
         name = match
-        lincomb, sign, rhs = utils.linear_constraint(left, sign, right)
+        lincomb, sign, rhs = linear_constraint(left, sign, right)
         self._pyvars["_model"] += ampl_con(name, lincomb, sign, rhs)
 
 

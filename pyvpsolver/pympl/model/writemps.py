@@ -19,37 +19,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-MPS format
+# MPS format
+#
+# Field:     1          2          3         4         5         6
+# Columns:  2-3        5-12      15-22     25-36     40-47     50-61
+#
+# http://web.mit.edu/lpsolve/doc/mps-format.htm
 
-Field:     1          2          3         4         5         6
-Columns:  2-3        5-12      15-22     25-36     40-47     50-61
+FIELD_START = [None, 1, 4, 14, 24, 39, 49]
+FIELD_SIZE = [None, 2, 8, 8, 12, 8, 12]
 
-http://web.mit.edu/lpsolve/doc/mps-format.htm
-"""
-
-field_start =  [None, 1, 4, 14, 24, 39, 49]
-field_size = [None, 2, 8, 8, 12, 8, 12]
 
 def mps_row(lst):
+    """Formats MPS rows."""
     line = " "
     for (field, value) in lst:
         assert 1 <= field <= 6
         value = str(value)
-        if len(value) > field_size[field]:
+        if len(value) > FIELD_SIZE[field]:
             raise Exception("Failed to print the model in mps format")
-        line += " " * (field_start[field]-len(line))
+        line += " " * (FIELD_START[field]-len(line))
         line += value
     return line
 
+
 def write_mps(model, filename):
-    f = open(filename, "w")
-    print >>f, "NAME          MODEL"
+    """Writes models to files in MPS format."""
+    fout = open(filename, "w")
+    print >>fout, "NAME          MODEL"
 
-    ### constraints
+    # Constraints:
 
-    print >>f, "ROWS"
-    print >>f, mps_row([(1, "N"), (2, "OBJ")])
+    print >>fout, "ROWS"
+    print >>fout, mps_row([(1, "N"), (2, "OBJ")])
 
     for cname in model.cons_list:
         lincomb, sign, rhs = model.cons[cname]
@@ -59,11 +61,11 @@ def write_mps(model, filename):
             s = "L"
         else:
             s = "E"
-        print >>f, mps_row([(1, s), (2, cname)])
+        print >>fout, mps_row([(1, s), (2, cname)])
 
-    ### A-matrix
+    # A-matrix:
 
-    columns = {var:[] for var in model.vars}
+    columns = {var: [] for var in model.vars}
     for var, coef in model.obj:
         columns[var].append(("OBJ", coef))
     for cname in model.cons_list:
@@ -71,53 +73,56 @@ def write_mps(model, filename):
         for var, coef in lincomb:
             columns[var].append((cname, coef))
 
-    Ivars = [v for v in model.vars_list if model.vars[v]["vtype"]=="I"]
-    Cvars = [v for v in model.vars_list if model.vars[v]["vtype"]!="I"]
+    Ivars = [v for v in model.vars_list if model.vars[v]["vtype"] == "I"]
+    Cvars = [v for v in model.vars_list if model.vars[v]["vtype"] != "I"]
 
     if len(Ivars) != 0:
-        print >>f, "COLUMNS"
-        print >>f, mps_row([(2, "MARKER"),
-                             (3, "\'MARKER\'"),
-                             (5, "\'INTORG\'")])
+        print >>fout, "COLUMNS"
+        print >>fout, mps_row(
+            [(2, "MARKER"), (3, "\'MARKER\'"), (5, "\'INTORG\'")]
+        )
 
         for vname in Ivars:
             for con, coef in columns[vname]:
-                print >>f, mps_row([(2, vname), (3, con), (4, coef)])
+                print >>fout, mps_row([(2, vname), (3, con), (4, coef)])
 
-        print >>f, mps_row([(2, "MARKER"),
-                             (3, "\'MARKER\'"),
-                             (5, "\'INTEND\'")])
+        print >>fout, mps_row(
+            [(2, "MARKER"), (3, "\'MARKER\'"), (5, "\'INTEND\'")]
+        )
 
     if len(Cvars) != 0:
         for vname in Cvars:
             for con, coef in columns[vname]:
-                print >>f, mps_row([(2, vname), (3, con), (4, coef)])
+                print >>fout, mps_row([(2, vname), (3, con), (4, coef)])
 
-    ### right-hand-side vector
+    # Right-hand-side vector:
 
-    print >>f, "RHS"
+    print >>fout, "RHS"
     for cname in model.cons_list:
         lincomb, sign, rhs = model.cons[cname]
-        print >>f, mps_row([(2, "RHS1"), (3, cname), (4, rhs)])
+        print >>fout, mps_row([(2, "RHS1"), (3, cname), (4, rhs)])
 
-    ### bounds
+    # Bounds:
 
-    print >>f, "BOUNDS"
+    print >>fout, "BOUNDS"
 
     for vname in model.vars_list:
         lb = model.vars[vname]["lb"]
         ub = model.vars[vname]["ub"]
-        if lb!=None:
-            print >>f, mps_row([(1, "LO"), (2, "BND1"), (3, vname), (4, lb)])
-        #else:
-        #    print >>f, mps_row([(1, "MI"), (2, "BND1"), (3, vname)])
+        if lb is not None:
+            print >>fout, mps_row(
+                [(1, "LO"), (2, "BND1"), (3, vname), (4, lb)]
+            )
+        # else:
+        #     print >>fout, mps_row([(1, "MI"), (2, "BND1"), (3, vname)])
 
-        if ub!=None:
-            print >>f, mps_row([(1, "UP"), (2, "BND1"), (3, vname), (4, ub)])
-        #else:
-        #    print >>f, mps_row([(1, "PL"), (2, "BND1"), (3, vname)])
+        if ub is not None:
+            print >>fout, mps_row(
+                [(1, "UP"), (2, "BND1"), (3, vname), (4, ub)]
+            )
+        # else:
+        #     print >>fout, mps_row([(1, "PL"), (2, "BND1"), (3, vname)])
 
-    print >>f, "ENDATA"
+    print >>fout, "ENDATA"
 
-    f.close()
-
+    fout.close()

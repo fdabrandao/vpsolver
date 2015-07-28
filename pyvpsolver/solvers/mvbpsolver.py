@@ -178,14 +178,14 @@ def solve(Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="",
         ub[var] = min(Qs[i],n)
 
     for var in varl:
-        #model.addVar(name=var, lb=0, vtype="I")
-        model.addVar(name=var, lb=0, ub=ub.get(var,None), vtype="I")
+        #model.add_var(name=var, lb=0, vtype="I")
+        model.add_var(name=var, lb=0, ub=ub.get(var,None), vtype="I")
 
     for lincomb, sign, rhs in cons:
-        model.addCons(lincomb, sign, rhs)
+        model.add_con(lincomb, sign, rhs)
 
     lincomb = [(graph.vname(Ts[i], 'T', 'L'), Cs[i]) for i in xrange(nbtypes)]
-    model.setObj("min", lincomb)
+    model.set_obj("min", lincomb)
 
     model_file = VPSolver.new_tmp_file(".lp")
     model.write(model_file)
