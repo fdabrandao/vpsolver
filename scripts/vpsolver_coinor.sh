@@ -30,6 +30,7 @@ trap "rm -rf $TMP_DIR;" SIGHUP SIGINT SIGTERM EXIT
 usage(){
     echo -e "Usage:"
     echo -e "  $0 --vbp instance.vbp"
+    echo -e "  $0 --afg graph.afg"
     echo -e "  $0 --mps/--lp model.mps/.lp"
     echo -e "  $0 --mps/--lp model.mps/.lp --afg graph.afg"
 }
@@ -109,7 +110,7 @@ do
   esac
 done
 
-if [[ -z "$vbp_file" && -z "$model_file" ]]; then
+if [[ -z "$vbp_file" && -z "$model_file" && -z "$afg_file" ]]; then
     error
 fi
 
@@ -126,6 +127,15 @@ if [[ -n "$vbp_file" ]]; then
     pid=$!
     trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
     wait $pid
+
+    echo -e "\n>>> afg2mps..."
+    $BIN_DIR/afg2mps $afg_file $model_file
+elif [[ -n "$afg_file" ]]; then
+    if [[ -n "$vbp_file" || -n "$model_file" ]]; then
+        error
+    fi
+
+    model_file=$TMP_DIR/model.mps
 
     echo -e "\n>>> afg2mps..."
     $BIN_DIR/afg2mps $afg_file $model_file
