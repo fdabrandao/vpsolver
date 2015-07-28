@@ -187,14 +187,20 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
         instance = VBP.fromFile(tmpfile, verbose=False)
         afg = AFG(instance, verbose=True)
         lp_model = LP(afg, verbose=False)
-        out, sol = VPSolver.script(form["script"], lp_model, afg, verbose=True)
+        out, sol = VPSolver.script(
+            form["script"], lp_model, afg,
+            verbose=True
+        )
     elif app_name == "pympl":
         tmpfile = VPSolver.new_tmp_file(ext=".mod")
         parser = PyMPL()
         parser.input = input_
         parser.parse()
         parser.write(tmpfile)
-        VPSolver.run("glpsol --math {0} | grep -v Generating".format(tmpfile))
+        VPSolver.run(
+            "glpsol --math {0} | grep -v Generating".format(tmpfile),
+            verbose=True
+        )
 
     print "EOF\n"
     output.flush()
