@@ -138,14 +138,16 @@ if [[ -n "$vbp_file" ]]; then
     echo -e "\n>>> afg2mps..."
     $BIN_DIR/afg2mps $afg_file $model_file
 elif [[ -n "$afg_file" ]]; then
-    if [[ -n "$vbp_file" || -n "$model_file" ]]; then
+    if [[ -n "$vbp_file" ]]; then
         error
     fi
 
-    model_file=$TMP_DIR/model.mps
+    if [[ -z $model_file ]]; then
+      model_file=$TMP_DIR/model.mps
 
-    echo -e "\n>>> afg2mps..."
-    $BIN_DIR/afg2mps $afg_file $model_file
+      echo -e "\n>>> afg2mps..."
+      $BIN_DIR/afg2mps $afg_file $model_file
+    fi
 fi
 
 solve $model_file;
