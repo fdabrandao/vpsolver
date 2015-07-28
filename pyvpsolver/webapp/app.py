@@ -184,7 +184,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
         tmpfile = VPSolver.new_tmp_file(ext=".vbp")
         with open(tmpfile, "w") as f:
             f.write(input_)
-        instance = VBP.fromFile(tmpfile, verbose=False)
+        instance = VBP.from_file(tmpfile, verbose=False)
         afg = AFG(instance, verbose=True)
         lp_model = LP(afg, verbose=False)
         out, sol = VPSolver.script(
