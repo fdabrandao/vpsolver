@@ -200,6 +200,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
         parser.write(tmpfile)
         VPSolver.run(
             "glpsol --math {0}".format(tmpfile),
+            grepv="Generating",
             verbose=True
         )
 

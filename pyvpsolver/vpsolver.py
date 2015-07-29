@@ -184,31 +184,43 @@ class VPSolver(object):
             pass
 
     @staticmethod
-    def run(cmd, tee=None, verbose=None):
+    def run(cmd, tee=None, grep=None, grepv=None, verbose=None):
         """Runs system commands."""
         if verbose is None:
             verbose = VPSolver.VERBOSE
 
-        p = subprocess.Popen(
+        proc = subprocess.Popen(
             cmd, shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             preexec_fn=os.setsid
         )
-        VPSolver.PLIST.append(p)
+        VPSolver.PLIST.append(proc)
+
+        def pipe_output(fin, fout_list, grep=None, grepv=None):
+            while True:
+                line = fin.readline()
+                if not line:
+                    break
+                if grep is not None and grep not in line:
+                    continue
+                if grepv is not None and grepv in line:
+                    continue
+                for f in fout_list:
+                    f.write(line)
+                    f.flush()
 
         if tee is None:
             if verbose:
-                for line in p.stdout:
-                    sys.stdout.write(line)
+                pipe_output(proc.stdout, [sys.stdout], grep, grepv)
         else:
-            with open(tee, "w") as f:
-                for line in p.stdout:
-                    if verbose:
-                        sys.stdout.write(line)
-                    f.write(line)
+            with open(tee, "w") as ftee:
+                if verbose:
+                    pipe_output(proc.stdout, [sys.stdout, ftee], grep, grepv)
+                else:
+                    pipe_output(proc.stdout, [ftee], grep, grepv)
 
-        exit_code = p.wait()
+        exit_code = proc.wait()
         if exit_code != 0:
             raise Exception("failed to run '{0}'".format(cmd))
 
