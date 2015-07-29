@@ -50,7 +50,7 @@ def copy_dir(base_dir):
 
 setup(
     name="VPSolver",
-    version="1.4.0-dev",
+    version="2.0.0-dev",
     license="GPLv3+",
     author="Filipe Brandao",
     author_email="fdabrandao@dcc.fc.up.pt",
