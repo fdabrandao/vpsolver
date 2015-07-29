@@ -57,22 +57,28 @@ def main():
     lp_model = LP(afg, verbose=False)
 
     # Draw the arc-flow graph for instanceA (requires pygraphviz)
-    afg.graph().draw("tmp/graph.svg")
+    try:
+        afg.graph().draw("tmp/graph.svg")
+    except Exception as e:
+        print repr(e)
 
     # Solve instanceA using bin/vpsolver (requires Gurobi)
     try:
         out, sol = VPSolver.vpsolver(instanceA, verbose=True)
-    except:
+    except Exception as e:
         print "Failed to call vpsolver"
+        print repr(e)
 
     # Solve instanceA using any vpsolver script (i.e., any MIP solver):
     #   The scripts accept models with and without the underlying graphs.
     #   However, the graphs are required to extract the solution.
     out, sol = VPSolver.script("vpsolver_glpk.sh", lp_model, afg, verbose=True)
     try:
-        out, sol = VPSolver.script("vpsolver_gurobi.sh", mps_model, verbose=True)
-    except:
-        print "Failed to call vpsolver_gurobi.sh"
+        out, sol = VPSolver.script(
+            "vpsolver_gurobi.sh", mps_model, verbose=True
+        )
+    except Exception as e:
+        print repr(e)
 
     # Solve an instance directly without creating AFG, MPS or LP objects:
     out, sol = VPSolver.script("vpsolver_glpk.sh", instanceB, verbose=True)
@@ -84,6 +90,8 @@ def main():
 
     # Pretty-print the solution:
     vbpsolver.print_solution(obj, patterns)
+
+    assert obj == 21  # check the solution objective value
 
 
 if __name__ == "__main__":

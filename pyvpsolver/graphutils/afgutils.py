@@ -84,8 +84,7 @@ class AFGUtils(object):
         try:
             from pygraphviz.agraph import AGraph
         except:
-            print "Failed to load pygraphviz!"
-            return
+            raise Exception("Failed to load pygraphviz!")
         g = AGraph(
             rankdir="LR", directed=True, bgcolor="white", text="black",
             font_color="white", ranksep="1.0", nodesep="0.10",

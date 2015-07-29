@@ -77,6 +77,8 @@ def main():
     print "sol:", sol
     mvbpsolver.print_solution(obj, sol)
 
+    assert obj == 1280  # check the solution objective value
+
 
 if __name__ == "__main__":
     main()

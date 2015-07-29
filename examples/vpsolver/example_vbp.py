@@ -42,7 +42,7 @@ from pyvpsolver.solvers import vbpsolver
 def main():
     """Example: solve a vector packing instance using 'solvers.vbp'"""
 
-    W = (5180, 2)
+    W = (5180, 9)
     w = [(1120,1), (1250,1), (520,1), (1066,1), (1000,1), (1150,1)]
     b = [9, 5, 91, 18, 11, 64]
 
@@ -55,6 +55,8 @@ def main():
     print "obj:", obj
     print "sol:", sol
     vbpsolver.print_solution(obj, sol)
+
+    assert obj == 33  # check the solution objective value
 
 
 if __name__ == "__main__":

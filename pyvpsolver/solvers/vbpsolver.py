@@ -41,7 +41,10 @@ def solve(
         afg = AFG(instance, verbose=verbose)
         if svg_file.endswith(".svg"):
             VPSolver.log("Generating .SVG file...", verbose)
-            afg.graph().draw(svg_file)
+            try:
+                afg.graph().draw(svg_file)
+            except Exception as e:
+                VPSolver.log(e, verbose)
         if lp_file.endswith(".lp"):
             VPSolver.afg2lp(afg.afg_file, lp_file, verbose=False)
             VPSolver.log(".LP model successfully generated!", verbose)

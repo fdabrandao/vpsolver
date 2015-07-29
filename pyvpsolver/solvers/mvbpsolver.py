@@ -65,7 +65,10 @@ def solve(
         Ss[i] = symb+"S"
         Ts[i] = symb+"T"
         if svg_file.endswith(".svg"):
-            graphs[i].draw(svg_file.replace(".svg", "{0}.svg".format(i)))
+            try:
+                graphs[i].draw(svg_file.replace(".svg", "{0}.svg".format(i)))
+            except Exception as e:
+                VPSolver.log(e, verbose)
 
     V = sum([g.V for g in graphs], [])
     A = sum([g.A for g in graphs], [])
@@ -76,7 +79,10 @@ def solve(
 
     graph = AFGraph(V, A, "S", "T")
     if svg_file.endswith(".svg"):
-        graph.draw(svg_file, ignore=[("T", "S")])
+        try:
+            graph.draw(svg_file, ignore=[("T", "S")])
+        except Exception as e:
+                VPSolver.log(e, verbose)
 
     adj = {u: [] for u in V}
     for (u, v, i) in A:
@@ -140,7 +146,12 @@ def solve(
     VPSolver.log("  #A2/#A1 = {0:.2f}".format(na2/float(na1)), verbose)
 
     if svg_file.endswith(".svg"):
-        graph.draw(svg_file.replace(".svg", ".final.svg"), ignore=[("T", "S")])
+        try:
+            graph.draw(
+                svg_file.replace(".svg", ".final.svg"), ignore=[("T", "S")]
+            )
+        except Exception as e:
+                VPSolver.log(e, verbose)
 
     # remove redudant parallel arcs
     At = []
