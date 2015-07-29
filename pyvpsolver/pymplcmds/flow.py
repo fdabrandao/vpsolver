@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 from .base import CmdBase
-from ..vpsolver import VBP, AFG
+from ..vpsolver import VPSolver, VBP, AFG
 from ..model import Model
 from ..modelutils import writemod
 from .. import pymplutils
@@ -147,9 +147,9 @@ class CmdFlow(CmdBase):
             graph.set_flow(vv)
             sol = graph.extract_solution(graph.S, "<-", graph.T)
             lst_sol.append((zvar, varvalues.get(zvar, 0), sol))
-            if verbose:
-                print "Graph: {0} (flow={1:d})".format(
-                    zvar, varvalues.get(zvar, 0)
-                )
-                print "\t", sol
+            VPSolver.log("Graph: {0} (flow={1:d})\n\t{2}".format(
+                    zvar, varvalues.get(zvar, 0), sol
+                ),
+                verbose=verbose
+            )
         return lst_sol, newvv

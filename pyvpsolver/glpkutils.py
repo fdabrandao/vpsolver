@@ -23,33 +23,23 @@ import os
 from .vpsolver import VPSolver
 
 
-def mod2lp(fname_mod, fname_lp, verbose=False):
+def mod2lp(fname_mod, fname_lp, verbose=None):
     """Converts a GMPL file into an LP file using GLPK."""
-    if verbose:
-        VPSolver.run(
-            "glpsol --math {0} --check --wlp {1}".format(
-                fname_mod, fname_lp
-            )
-        )
-    else:
-        VPSolver.run(
-            "glpsol --math {0} --check --wlp {1} >> /dev/null".format(
-                fname_mod, fname_lp
-            )
-        )
+    VPSolver.run(
+        "glpsol --math {0} --check --wlp {1}".format(
+            fname_mod, fname_lp
+        ),
+        grepv="Generating",
+        verbose=verbose
+    )
 
 
-def mod2mps(fname_mod, fname_mps, verbose=False):
+def mod2mps(fname_mod, fname_mps, verbose=None):
     """Converts a GMPL file into an MPS file using GLPK."""
-    if verbose:
-        VPSolver.run(
-            "glpsol --math {0} --check --wmps {1}".format(
-                fname_mod, fname_mps
-            )
-        )
-    else:
-        VPSolver.run(
-            "glpsol --math {0} --check --wmps {1} >> /dev/null".format(
-                fname_mod, fname_mps
-            )
-        )
+    VPSolver.run(
+        "glpsol --math {0} --check --wmps {1}".format(
+            fname_mod, fname_mps
+        ),
+        grepv="Generating",
+        verbose=verbose
+    )

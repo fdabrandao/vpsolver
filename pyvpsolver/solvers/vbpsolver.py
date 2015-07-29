@@ -40,17 +40,14 @@ def solve(
     else:
         afg = AFG(instance, verbose=verbose)
         if svg_file.endswith(".svg"):
-            if verbose:
-                print "Generating .SVG file..."
+            VPSolver.log("Generating .SVG file...", verbose)
             afg.graph().draw(svg_file)
         if lp_file.endswith(".lp"):
             VPSolver.afg2lp(afg.afg_file, lp_file, verbose=False)
-            if verbose:
-                print ".LP model successfully generated!"
+            VPSolver.log(".LP model successfully generated!", verbose)
         if mps_file.endswith(".mps"):
             VPSolver.afg2mps(afg.afg_file, mps_file, verbose=False)
-            if verbose:
-                print ".MPS model successfully generated!"
+            VPSolver.log(".MPS model successfully generated!", verbose)
         mps_model = MPS(afg, verbose=verbose)
         out, (obj, sol) = VPSolver.script(
             script, mps_model, afg, verbose=verbose

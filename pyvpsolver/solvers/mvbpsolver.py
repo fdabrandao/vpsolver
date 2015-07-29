@@ -126,21 +126,18 @@ def solve(
 
     assert set([v for v in V if v not in vlbl]) == set([S, T]+Ts)
 
-    if verbose:
-        print "Final compression steps:"
+    VPSolver.log("Final compression steps:", verbose)
 
     nv1, na1 = len(V), len(A)
-    if verbose:
-        print "  #V1: {0} #A1: {1}".format(nv1, na1)
+    VPSolver.log("  #V1: {0} #A1: {1}".format(nv1, na1), verbose)
 
     graph.relabel(lambda u: vlbl.get(u, u))
     V, A = graph.V, graph.A
 
     nv2, na2 = len(V), len(A)
-    if verbose:
-        print "  #V2: {0} #A2: {1}".format(nv2, na2)
-        print "  #V2/#V1 = {0:.2f}".format(nv2/float(nv1))
-        print "  #A2/#A1 = {0:.2f}".format(na2/float(na1))
+    VPSolver.log("  #V2: {0} #A2: {1}".format(nv2, na2), verbose)
+    VPSolver.log("  #V2/#V1 = {0:.2f}".format(nv2/float(nv1)), verbose)
+    VPSolver.log("  #A2/#A1 = {0:.2f}".format(na2/float(na1)), verbose)
 
     if svg_file.endswith(".svg"):
         graph.draw(svg_file.replace(".svg", ".final.svg"), ignore=[("T", "S")])
@@ -156,11 +153,11 @@ def solve(
 
     A = At
     graph = AFGraph(V, A, "S", "T")
-    if verbose:
-        nv3, na3 = len(V), len(A)
-        print "  #V3: {0} #A3: {1}".format(nv3, na3)
-        print "  #V3/#V1 = {0:.2f}".format(nv3/float(nv1))
-        print "  #A3/#A1 = {0:.2f}".format(na3/float(na1))
+
+    nv3, na3 = len(V), len(A)
+    VPSolver.log("  #V3: {0} #A3: {1}".format(nv3, na3), verbose)
+    VPSolver.log("  #V3/#V1 = {0:.2f}".format(nv3/float(nv1)), verbose)
+    VPSolver.log("  #A3/#A1 = {0:.2f}".format(na3/float(na1)), verbose)
 
     varl, cons = graph.get_flow_cons()
 
@@ -203,22 +200,22 @@ def solve(
     model.write(model_file)
     if lp_file.endswith(".lp"):
         model.write(lp_file)
-        if verbose:
-            print ".LP model successfully generated!"
+        VPSolver.log(".LP model successfully generated!", verbose)
     if mps_file.endswith(".mps"):
         model.write(mps_file)
-        if verbose:
-            print ".MPS model successfully generated!"
+        VPSolver.log(".MPS model successfully generated!", verbose)
     out, varvalues = VPSolver.script_wsol(script, model_file, verbose=verbose)
     os.remove(model_file)
 
-    if verbose:
-        print "#V1: {0} #A1: {1}".format(nv1, na1)
-        print "#V2: {0} #A2: {1}".format(nv2, na2)
-        print "#V3: {0} #A3: {1}".format(nv3, na3)
-        print "#V3/#V1: {0:.2f} #A3/#A1: {1:.2f}".format(
+    VPSolver.log("#V1: {0} #A1: {1}".format(nv1, na1), verbose)
+    VPSolver.log("#V2: {0} #A2: {1}".format(nv2, na2), verbose)
+    VPSolver.log("#V3: {0} #A3: {1}".format(nv3, na3), verbose)
+    VPSolver.log(
+        "#V3/#V1: {0:.2f} #A3/#A1: {1:.2f}".format(
             nv3/float(nv1), na3/float(na1)
-        )
+        ),
+        verbose
+    )
 
     labels = {}
     for (u, v, i) in A:

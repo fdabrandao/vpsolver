@@ -76,7 +76,7 @@ class AFGUtils(object):
     @staticmethod
     def draw(
             svg_file, V, A, multigraph=True, showlabel=False, ignore=None,
-            loss=None):
+            loss=None, verbose=None):
         """Draws arc-flow graphs in .svg format."""
         if loss is None:
             loss = [i for (u, v, i) in A if not isinstance(i, int)]

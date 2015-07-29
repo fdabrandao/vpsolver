@@ -50,11 +50,11 @@ class AFGraph(object):
 
     def draw(
             self, svg_file, multigraph=True, showlabel=False, ignore=None,
-            loss=None):
+            loss=None, verbose=None):
         """Draws the arc-flow graph in .svg format."""
         AFGUtils.draw(
             svg_file, self.V, self.A, multigraph=multigraph,
-            showlabel=showlabel, ignore=ignore, loss=loss
+            showlabel=showlabel, ignore=ignore, loss=loss, verbose=verbose
         )
 
     def vname(self, u, v, i, vnames=None):

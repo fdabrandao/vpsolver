@@ -184,6 +184,14 @@ class VPSolver(object):
             pass
 
     @staticmethod
+    def log(msg, verbose=None):
+        """Log function."""
+        if verbose is None:
+            verbose = VPSolver.VERBOSE
+        if verbose:
+            print msg
+
+    @staticmethod
     def run(cmd, tee=None, grep=None, grepv=None, verbose=None):
         """Runs system commands."""
         if verbose is None:
