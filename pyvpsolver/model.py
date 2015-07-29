@@ -20,9 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .utils import linear_constraint
-from .writelp import write_lp
-from .writemps import write_mps
-from .writemod import write_mod
+from .modelutils import write_lp
+from .modelutils import write_mps
+from .modelutils import write_mod
 
 inf = float("inf")
 

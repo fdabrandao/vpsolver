@@ -46,15 +46,16 @@ if __name__ == "__main__":
         PORT = int(sys.argv[1])
 
 import flask
+import signal
 from flask import Flask, Response
 from flask import render_template, json, request, redirect, url_for
 from multiprocessing import Process
-from pyvpsolver import VPSolver, VBP, AFG, LP
-from pyvpsolver.pympl import PyMPL
-import signal
+from pyvpsolver import VPSolver, PyMPL, VBP, AFG, LP
+
 
 app = Flask(__name__)
 app.debug = True
+
 
 @app.context_processor
 def inject_globals():
@@ -198,7 +199,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
         parser.parse()
         parser.write(tmpfile)
         VPSolver.run(
-            "glpsol --math {0} | grep -v Generating".format(tmpfile),
+            "glpsol --math {0}".format(tmpfile),
             verbose=True
         )
 

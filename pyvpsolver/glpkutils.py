@@ -20,37 +20,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from .vpsolver import VPSolver
 
 
-def glpk_mod2lp(fname_mod, fname_lp, verbose=False):
+def mod2lp(fname_mod, fname_lp, verbose=False):
     """Converts a GMPL file into an LP file using GLPK."""
     if verbose:
-        exit_code = os.system(
-            "glpsol --math {0} --check --wlp {1} | grep -v Generating".format(
+        VPSolver.run(
+            "glpsol --math {0} --check --wlp {1}".format(
                 fname_mod, fname_lp
             )
         )
     else:
-        exit_code = os.system(
+        VPSolver.run(
             "glpsol --math {0} --check --wlp {1} >> /dev/null".format(
                 fname_mod, fname_lp
             )
         )
-    assert exit_code == 0
 
 
-def glpk_mod2mps(fname_mod, fname_mps, verbose=False):
+def mod2mps(fname_mod, fname_mps, verbose=False):
     """Converts a GMPL file into an MPS file using GLPK."""
     if verbose:
-        exit_code = os.system(
-            "glpsol --math {0} --check --wmps {1} | grep -v Generating".format(
+        VPSolver.run(
+            "glpsol --math {0} --check --wmps {1}".format(
                 fname_mod, fname_mps
             )
         )
     else:
-        exit_code = os.system(
+        VPSolver.run(
             "glpsol --math {0} --check --wmps {1} >> /dev/null".format(
                 fname_mod, fname_mps
             )
         )
-    assert exit_code == 0

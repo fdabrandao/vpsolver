@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .base import CmdBase
+from .. import pymplutils
 from .. import utils
 
 
@@ -28,11 +29,13 @@ class CmdSet(CmdBase):
 
     def _evalcmd(self, name, values):
         """Evalutates CMD[name](*args)."""
-        match = utils.parse_symbname(name)
+        match = pymplutils.parse_symbname(name)
         assert match is not None
         name = match
 
-        self._defs += utils.ampl_set(name, values, self._sets, self._params)[0]
+        self._defs += pymplutils.ampl_set(
+            name, values, self._sets, self._params
+        )[0]
 
 
 class CmdParam(CmdBase):
@@ -40,7 +43,7 @@ class CmdParam(CmdBase):
 
     def _evalcmd(self, arg1, values, i0=None):
         """Evalutates CMD[arg1](*args)."""
-        match = utils.parse_indexed(arg1, "{}")
+        match = pymplutils.parse_indexed(arg1, "{}")
         assert match is not None
         name, index = match
 
@@ -65,12 +68,44 @@ class CmdParam(CmdBase):
         if isinstance(values, dict):
             if index is None:
                 index = "{0}_I".format(name)
-            self._defs += utils.ampl_set(
+            self._defs += pymplutils.ampl_set(
                 index, values.keys(), self._sets, self._params
             )[0]
 
-        pdefs, pdata = utils.ampl_param(
+        pdefs, pdata = pymplutils.ampl_param(
             name, index, values, self._sets, self._params
         )
         self._defs += pdefs
         self._data += pdata
+
+
+class CmdVar(CmdBase):
+    """Command for creating a new AMPL variable."""
+
+    def _evalcmd(self, name, typ="", lb=None, ub=None):
+        """Evalutates CMD[name](*args)."""
+        match = pymplutils.parse_symbname(name)
+        assert match is not None
+        name = match
+        self._pyvars["_model"] += pymplutils.ampl_var(name, typ, lb, ub)
+
+
+class CmdCon(CmdBase):
+    """Command for creating a new AMPL constraint."""
+
+    def _evalcmd(self, name, left, sign, right):
+        """Evalutates CMD[name](*args)."""
+        match = pymplutils.parse_symbname(name)
+        assert match is not None
+        name = match
+        lincomb, sign, rhs = utils.linear_constraint(left, sign, right)
+        self._pyvars["_model"] += pymplutils.ampl_con(name, lincomb, sign, rhs)
+
+
+class CmdStmt(CmdBase):
+    """Command for creating new AMPL statements."""
+
+    def _evalcmd(self, arg1, statement):
+        """Evalutates CMD(*args)."""
+        assert arg1 is None
+        self._pyvars["_model"] += str(statement)

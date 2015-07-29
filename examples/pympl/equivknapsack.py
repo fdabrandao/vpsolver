@@ -36,8 +36,7 @@ if __name__ == "__main__":
             project_dir, os.environ["PATH"]
         )
 
-from pyvpsolver.pympl import PyMPL, glpk_mod2lp
-from pyvpsolver import VPSolver
+from pyvpsolver import VPSolver, PyMPL, glpkutils
 
 
 def main():
@@ -74,8 +73,9 @@ def main():
         parser.parse(mod_in, mod_out)
 
         lp_out = "tmp/equivknapsack.lp"
-        glpk_mod2lp(mod_out, lp_out)
-        # os.system("glpsol --math {0} | grep -v Generating".format(mod_out))
+        glpkutils.mod2lp(mod_out, lp_out)
+        # exit_code = os.system("glpsol --math {0}".format(mod_out))
+        # assert exit_code == 0
         out, varvalues = VPSolver.script_wsol(
             "vpsolver_glpk.sh", lp_out, verbose=True
         )

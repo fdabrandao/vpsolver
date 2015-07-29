@@ -21,10 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 from .base import CmdBase
-from ...vpsolver import VBP, AFG
+from ..vpsolver import VBP, AFG
 from ..model import Model
-from ..model import writemod
-from .. import utils
+from ..modelutils import writemod
+from .. import pymplutils
 
 
 class CmdFlow(CmdBase):
@@ -38,7 +38,7 @@ class CmdFlow(CmdBase):
 
     def _evalcmd(self, zvar, W, w, b, bounds=None):
         """Evalutates CMD[zvar](*args)."""
-        match = utils.parse_symbname(zvar, allow_index="[]")
+        match = pymplutils.parse_symbname(zvar, allow_index="[]")
         assert match is not None
         zvar = match
 

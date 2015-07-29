@@ -65,3 +65,40 @@ def linear_constraint(left, sign, right):
 
     lincomb = sorted(pairs.items())
     return (lincomb, sign, rhs)
+
+
+def lincomb2str(lincomb, mult="*"):
+    """Returns the linear combination as a string."""
+
+    def format_entry(var, coef):
+        var = var.lstrip("^")  # PyMPL special marker
+        if abs(coef) != 1:
+            if coef >= 0:
+                return "+{0:g}{1}{2}".format(coef, mult, var)
+            else:
+                return "-{0:g}{1}{2}".format(abs(coef), mult, var)
+        else:
+            if coef >= 0:
+                return "+{0}".format(var)
+            else:
+                return "-{0}".format(var)
+
+    return "".join(format_entry(var, coef) for var, coef in lincomb)
+
+
+def list2dict(lst, i0=0):
+    """Converts lists to dictionaries."""
+    dic = {}
+
+    def conv_rec(key, lst):
+        for i in xrange(len(lst)):
+            if not isinstance(lst[i], list):
+                if key == []:
+                    dic[i0+i] = lst[i]
+                else:
+                    dic[tuple(key+[i0+i])] = lst[i]
+            else:
+                conv_rec(key+[i0+i], lst[i])
+
+    conv_rec([], lst)
+    return dic

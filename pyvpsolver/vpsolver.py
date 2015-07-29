@@ -26,7 +26,7 @@ import atexit
 import shutil
 import tempfile
 import subprocess
-from .afgraph import AFGraph
+from .graphutils import AFGraph
 
 
 class VBP(object):

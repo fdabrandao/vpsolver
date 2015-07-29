@@ -19,93 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re
 from copy import deepcopy
-
-t_SYMBNAME = r'\^?[a-zA-Z_][a-zA-Z0-9_]*'
-t_INDEX1 = r'(?:\s*\[[^\]]*\])?' # [] index
-t_INDEX2 = r'(?:\s*{[^}]*})?' # {} index
-t_SYMBNAME_INDEX1 = t_SYMBNAME + t_INDEX1
-t_SYMBNAME_INDEX2 = t_SYMBNAME + t_INDEX2
-
-
-def parse_symbname(expr, allow_index=""):
-    """Matches and returns a symbolic name."""
-    assert allow_index in ("", "[]", "{}")
-    if allow_index == "[]":
-        t_symb = t_SYMBNAME_INDEX1
-    elif allow_index == "{}":
-        t_symb = t_SYMBNAME_INDEX2
-    else:
-        t_symb = t_SYMBNAME
-    match = re.match(r'\s*('+t_symb+r')\s*$', expr)
-    if match is None:
-        return None
-    name = match.groups()[0]
-    return name
-
-
-def parse_symblist(expr, allow_index=""):
-    """Matches and returns a list of symbolic names."""
-    assert allow_index in ("", "[]", "{}")
-    if allow_index == "[]":
-        t_symb = t_SYMBNAME_INDEX1
-    elif allow_index == "{}":
-        t_symb = t_SYMBNAME_INDEX2
-    else:
-        t_symb = t_SYMBNAME
-    match = re.match(
-        r'\s*(\s*'+t_symb+r'\s*(?:,\s*'+t_symb+r'\s*)*)\s*$', expr
-    )
-    if match is None:
-        return None
-    lst = match.groups()[0].split(",")
-    lst = [x.strip() for x in lst]
-    return lst
-
-
-def parse_indexed(expr, index_type):
-    """Matches and returns an indexed symbolic name (i.e., name{index})."""
-    assert index_type in ("[]", "{}")
-    if index_type == "[]":
-        match = re.match(
-            r'\s*('+t_SYMBNAME+r')\s*'
-            r'(\[\s*'+t_SYMBNAME+r'\s*(?:,'
-            r'\s*'+t_SYMBNAME+r'\s*)*\])?\s*$',
-            expr
-        )
-    elif index_type == "{}":
-        match = re.match(
-            r'\s*('+t_SYMBNAME+r')\s*'
-            r'({\s*'+t_SYMBNAME+r'\s*(?:,\s*'+t_SYMBNAME+r'\s*)*})?\s*$',
-            expr
-        )
-    if match is None:
-        return None
-    name, index = match.groups()
-    if index is not None:
-        index = index.strip(index_type+" ")
-        index = index.split(",")
-        index = [x.strip() for x in index]
-    return name, index
-
-
-def list2dict(lst, i0=0):
-    """Converts a list to a dictionary."""
-    dic = {}
-
-    def conv_rec(key, lst):
-        for i in xrange(len(lst)):
-            if not isinstance(lst[i], list):
-                if key == []:
-                    dic[i0+i] = lst[i]
-                else:
-                    dic[tuple(key+[i0+i])] = lst[i]
-            else:
-                conv_rec(key+[i0+i], lst[i])
-
-    conv_rec([], lst)
-    return dic
+from ..utils import linear_constraint, lincomb2str
 
 
 def tuple2str(tuple_):
@@ -200,25 +115,6 @@ def ampl_var(name, typ="", lb=None, ub=None):
         defs += ", <= {0:g}".format(ub)
     defs += ";"
     return defs
-
-
-def lincomb2str(lincomb, mult="*"):
-    """Returns the linear combination as a string."""
-
-    def format_entry(var, coef):
-        var = var.lstrip("^")
-        if abs(coef) != 1:
-            if coef >= 0:
-                return "+{0:g}{1}{2}".format(coef, mult, var)
-            else:
-                return "-{0:g}{1}{2}".format(abs(coef), mult, var)
-        else:
-            if coef >= 0:
-                return "+{0}".format(var)
-            else:
-                return "-{0}".format(var)
-
-    return "".join(format_entry(var, coef) for var, coef in lincomb)
 
 
 def ampl_con(name, lincomb, sign, rhs):

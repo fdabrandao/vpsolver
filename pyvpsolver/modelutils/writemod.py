@@ -27,7 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # s.t. c1: x1 + 2 * x2 <= 1;
 # s.t. c2: 3 * x1 + x2 <= 2;
 
-from ..utils import lincomb2str, ampl_var, ampl_con
+from ..utils import lincomb2str
+from ..pymplutils import ampl_var, ampl_con
 
 
 def write_mod(model, filename):

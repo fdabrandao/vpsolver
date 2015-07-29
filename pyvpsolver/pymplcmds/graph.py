@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .base import CmdBase
-from ...vpsolver import VBP, AFG
-from .. import utils
+from ..vpsolver import VBP, AFG
+from .. import pymplutils
 
 
 class CmdGraph(CmdBase):
@@ -29,7 +29,7 @@ class CmdGraph(CmdBase):
 
     def _evalcmd(self, names, W, w, labels, bounds=None):
         """Evalutates CMD[names](*args)."""
-        match = utils.parse_symblist(names)
+        match = pymplutils.parse_symblist(names)
         assert match is not None
         Vname, Aname = match
 
@@ -49,10 +49,10 @@ class CmdGraph(CmdBase):
 
         graph = self._generate_graph(W, w, labels, bounds)
 
-        self._defs += utils.ampl_set(
+        self._defs += pymplutils.ampl_set(
             Vname, graph.V, self._sets, self._params
         )[0]
-        self._defs += utils.ampl_set(
+        self._defs += pymplutils.ampl_set(
             Aname, graph.A, self._sets, self._params
         )[0]
 
