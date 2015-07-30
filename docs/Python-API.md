@@ -178,6 +178,14 @@ How to use:
     * Actions:
         * calls `bin/afg2lp` to write the LP model for `afg_file` in `lp_file`.
 
+* `VPSolver.vbpsol(afg_file, sol_file, verbose=None)`
+    * Description: extracts a vector packing solution from an arc-flow solution.
+    * Important arguments:
+        * `afg_file`: a .afg file or a `AFG` object;
+        * `sol_file`: a .sol solution file.
+    * Actions:
+        * calls `bin/vbpsol` to extract the vector packing solution from the arc-flow solution `sol_file` associated with the graph `afg_file`.
+
 * `VPSolver.vpsolver(vbp_file, verbose=None)`
     * Description: calls VPSolver.
     * Important arguments:

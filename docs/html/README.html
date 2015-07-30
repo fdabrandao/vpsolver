@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  PyMPL.md
+  .tmpfile.md
   
     - Grip
   
@@ -44,827 +44,264 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  PyMPL.md
+                  .tmpfile.md
                 </h3>
               
               <div class="markdown-body entry-content">
-                <h1>
-<a id="user-content-pympl" class="anchor" href="#pympl" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL</h1>
+                <h2>
+<a id="user-content-arc-flow-vector-packing-solver-vpsolver" class="anchor" href="#arc-flow-vector-packing-solver-vpsolver" aria-hidden="true"><span class="octicon octicon-link"></span></a>Arc-flow Vector Packing Solver (VPSolver)</h2>
 
-<p>PyMPL is a python extension to the AMPL modelling language that adds new statements for evaluating python code within AMPL models.</p>
+<p>Copyright (C) 2013-2015, Filipe Brandão<br>
+Faculdade de Ciencias, Universidade do Porto<br>
+Porto, Portugal. All rights reserved. E-mail: <a href="mailto:fdabrandao@dcc.fc.up.pt">fdabrandao@dcc.fc.up.pt</a>.</p>
 
-<h2>
-<a id="user-content-table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
+<hr>
 
-<ul>
-<li><a href="#examples">Examples</a></li>
-<li><a href="#pympl-statements">PyMPL statements</a></li>
-</ul>
+<p><a href="https://github.com/fdabrandao/vpsolver">VPSolver</a> is a vector packing solver based on an arc-flow formulation with graph
+compression.  VPSolver generates very strong models (equivalent to Gilmore and
+Gomory's) that can be solved using general-purpose mixed-integer programming
+solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MIP
+solver in particular, though a good  MIP solver may be necessary for solving
+large models.</p>
 
-<h2>
-<a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+<p>For modelling other problems easily, VPSolver includes a <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a>, a modelling language <a href="https://github.com/fdabrandao/vpsolver/wiki/PyMPL">PyMPL</a>, and a <a href="#vpsolver-web-app">Web APP</a>. VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a <a href="#docker">Docker container</a>.</p>
 
-<p><code>vector_packing.mod</code>:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-c"># Load a vector packing instance from a file:</span>
-$LOAD_VBP[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance1.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
-
-<span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
-
-<span class="pl-c"># Generate an arc-flow model for instance1:</span>
-$FLOW[Z]{_instance1.W, _instance1.w, [<span class="pl-s"><span class="pl-pds">"</span>x[%d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-<span class="pl-c"># Variable declarations and flow conservation constraints will be created here</span>
-
-<span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
-s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <span class="pl-k">&gt;=</span> instance1_b[i]; <span class="pl-c"># demand constraints</span>
-
-<span class="pl-k">solve</span>;
-<span class="pl-k">display</span> Z;
-<span class="pl-k">end</span>;</pre></div>
-
-<p><code>variable_size_bin_packing.mod</code>:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-c"># Evaluate python code:</span>
-$EXEC{
-<span class="pl-c"># Bin capacities:</span>
-W1 <span class="pl-k">=</span> [<span class="pl-c1">100</span>]
-W2 <span class="pl-k">=</span> [<span class="pl-c1">120</span>]
-W3 <span class="pl-k">=</span> [<span class="pl-c1">150</span>]
-
-<span class="pl-c"># Bin costs:</span>
-Costs <span class="pl-k">=</span> [<span class="pl-c1">100</span>, <span class="pl-c1">120</span>, <span class="pl-c1">150</span>]
-
-<span class="pl-c"># Item weights:</span>
-ws <span class="pl-k">=</span> [[<span class="pl-c1">10</span>], [<span class="pl-c1">14</span>], [<span class="pl-c1">17</span>], [<span class="pl-c1">19</span>], [<span class="pl-c1">24</span>], [<span class="pl-c1">29</span>], [<span class="pl-c1">32</span>], [<span class="pl-c1">33</span>], [<span class="pl-c1">36</span>],
-    [<span class="pl-c1">38</span>], [<span class="pl-c1">40</span>], [<span class="pl-c1">50</span>], [<span class="pl-c1">54</span>], [<span class="pl-c1">55</span>], [<span class="pl-c1">63</span>], [<span class="pl-c1">66</span>], [<span class="pl-c1">71</span>], [<span class="pl-c1">77</span>],
-    [<span class="pl-c1">79</span>], [<span class="pl-c1">83</span>], [<span class="pl-c1">92</span>], [<span class="pl-c1">95</span>], [<span class="pl-c1">99</span>]]
-
-<span class="pl-c"># Item demands:</span>
-b <span class="pl-k">=</span> [<span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>]
-};
-
-<span class="pl-c"># Generate a parameter 'b' for the demand:</span>
-$<span class="pl-k">PARAM</span>[b{I}]{b, i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
-
-<span class="pl-c"># Generate a parameter 'C' for the cost:</span>
-$<span class="pl-k">PARAM</span>[C{T}]{Costs, i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
-
-<span class="pl-c"># Feedback arcs for each graph:</span>
-<span class="pl-k">var</span> Z{T}, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
-<span class="pl-c"># Assignment variables:</span>
-<span class="pl-k">var</span> x{T, I}, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
-<span class="pl-c"># Generate an arc-flow graph for each bin type:</span>
-$FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">1</span>]]{W1, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[1, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-$FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">2</span>]]{W2, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[2, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-$FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">3</span>]]{W3, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[3, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-<span class="pl-c"># Note: the ^prefix is used to avoid the redefinition of Z</span>
-
-<span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> <span class="pl-k">sum</span>{t <span class="pl-k">in</span> T} C[t] <span class="pl-k">*</span> Z[t];
-s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span class="pl-k">sum</span>{t <span class="pl-k">in</span> T} x[t, i] <span class="pl-k">&gt;=</span> b[i];
-
-<span class="pl-k">solve</span>;
-<span class="pl-k">display</span>{t <span class="pl-k">in</span> T} Z[t]; <span class="pl-c"># number of bins of type t used</span>
-<span class="pl-k">display</span> <span class="pl-k">sum</span>{t <span class="pl-k">in</span> T} C[t] <span class="pl-k">*</span> Z[t]; <span class="pl-c"># cost</span>
-<span class="pl-k">end</span>;</pre></div>
-
-<p><code>arcflow.mod</code></p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-c"># Load a vector packing instance from a file: </span>
-$LOAD_VBP[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; 
-
-<span class="pl-c"># Generate the arc_flow graph and create sets V and A for the set of vertices and arcs, respectively:</span>
-$GRAPH[V,A]{_instance1.W, _instance1.w, _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]};
-
-<span class="pl-k">var</span> Z, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>; <span class="pl-c"># amount of flow in the feedback arc</span>
-<span class="pl-k">var</span> f{A}, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>; <span class="pl-c"># amount of flow in each arc</span>
-
-<span class="pl-c"># Objective:</span>
-<span class="pl-k">maximize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
-
-<span class="pl-c"># Flow conservation constraints:</span>
-s.t. flowcon{k <span class="pl-k">in</span> V <span class="pl-k">diff</span> {<span class="pl-s"><span class="pl-pds">'</span>S<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>T<span class="pl-pds">'</span></span>}}<span class="pl-k">:</span> 
-<span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> v <span class="pl-k">==</span> k} f[u,v,i] <span class="pl-k">-</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> u <span class="pl-k">==</span> k} f[u, v, i] <span class="pl-k">=</span> <span class="pl-c1">0</span>;
-s.t. flowconS<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> u <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>S<span class="pl-pds">'</span></span>} f[u,v,i] <span class="pl-k">=</span> Z;
-s.t. flowconT<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> v <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>T<span class="pl-pds">'</span></span>} f[u,v,i] <span class="pl-k">=</span> Z;
-
-<span class="pl-c"># Demand constraints:</span>
-s.t. demand{k <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> i <span class="pl-k">==</span> k} <span class="pl-k">&gt;=</span> instance1_b[i];
-
-<span class="pl-k">solve</span>;
-<span class="pl-k">end</span>;</pre></div>
+<p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/wiki">project wiki</a> or to the manual.</p>
 
 <h2>
-<a id="user-content-pympl-statements" class="anchor" href="#pympl-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL statements</h2>
-
-<p>There are three types of calls:</p>
-
-<ol>
-<li>
-<p><code>${python code}$</code></p>
+<a id="user-content-repositories" class="anchor" href="#repositories" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repositories</h2>
 
 <ul>
-<li>
-<a href="#eval">EVAL</a>: <code>${python expression}$</code>
+<li>Project Homepage: <a href="http://vpsolver.dcc.fc.up.pt/">http://vpsolver.dcc.fc.up.pt/</a>
+</li>
+<li>GiHub repository: <a href="https://github.com/fdabrandao/vpsolver">https://github.com/fdabrandao/vpsolver</a>
+</li>
+<li>BitBucket repository: <a href="https://bitbucket.org/fdabrandao/vpsolver">https://bitbucket.org/fdabrandao/vpsolver</a>
+</li>
+<li>Docker repository: <a href="https://registry.hub.docker.com/u/fdabrandao/vpsolver/">https://registry.hub.docker.com/u/fdabrandao/vpsolver/</a>
 </li>
 </ul>
-</li>
-<li>
-<p><code>$CMD{python parameters or code};</code></p>
 
-<ul>
-<li>
-<a href="#exec">EXEC</a>: <code>$EXEC{python code};</code>
-</li>
-<li>
-<a href="#stmt">STMT</a>: <code>$STMT{python expression};</code>
-</li>
-</ul>
-</li>
-<li>
-<p><code>$CMD[AMPL parameters]{python arguments or code};</code> </p>
-
-<ul>
-<li>
-<a href="#set">SET</a>: <code>$SET[set_name]{values};</code>
-</li>
-<li>
-<a href="#param">PARAM</a>: <code>$PARAM[param_name]{values, i0=0};</code>
-</li>
-<li>
-<a href="#var">VAR</a>: <code>$VAR[var_name]{typ="", lb=None, ub=None};</code>
-</li>
-<li>
-<a href="#con">CON</a>: <code>$CON[constraint_name]{left, sign, right};</code>
-</li>
-</ul>
-</li>
-<li>
-<p>Additional statements for VPSolver:</p>
-
-<ul>
-<li>
-<a href="#load_vbp">LOAD_VBP</a>: <code>$LOAD_VBP[name]{fname, i0=0, d0=0};</code>
-</li>
-<li>
-<a href="#flow">FLOW</a>: <code>$FLOW[zvar]{W, w, b, bounds=None};</code>
-</li>
-<li>
-<a href="#graph">GRAPH</a>: <code>$GRAPH[V_name, A_name]{W, w, labels, bounds=None};</code>
-</li>
-</ul>
-</li>
-</ol>
-
-<p><strong>Note</strong>: The values between <code>[]</code> are usually used to name new AMPL variables, constraints, sets, or parameters. Names starting with a <code>^</code> indicate that the corresponding AMPL element should not be defined by the command. This prefix is useful when the corresponding AMPL element was declared previously and we do not want to declared it again.</p>
-
-<h3>
-<a id="user-content-detailed-description-of-general-pympl-statements" class="anchor" href="#detailed-description-of-general-pympl-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detailed description of general PyMPL statements</h3>
+<h2>
+<a id="user-content-requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
 
 <h4>
-<a id="user-content-eval" class="anchor" href="#eval" aria-hidden="true"><span class="octicon octicon-link"></span></a>EVAL</h4>
-
-<p>Usage: <code>${python expression}$</code></p>
-
-<p>Description: is replaced by the result of <code>eval("python expression")</code>.  </p>
-
-<p>Parameters:</p>
+<a id="user-content-mandatory" class="anchor" href="#mandatory" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mandatory</h4>
 
 <ul>
-<li>Python:
-
-<ul>
-<li>valid python expression.</li>
-</ul>
+<li>MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...<br>
 </li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>is replaced by the result of evaluating the expression.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-<span class="pl-k">var</span> x1, <span class="pl-k">&gt;=</span> ${<span class="pl-c1">2</span><span class="pl-k">+</span><span class="pl-c1">6</span>}$, <span class="pl-k">&lt;=</span> ${<span class="pl-c1">10</span><span class="pl-k">*</span><span class="pl-c1">5</span>}$;
-s.t. con1<span class="pl-k">:</span> x <span class="pl-k">+</span> y <span class="pl-k">&lt;=</span> ${<span class="pl-k">abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>)}$ <span class="pl-k">*</span> z;
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-<span class="pl-k">var</span> x1, <span class="pl-k">&gt;=</span> <span class="pl-c1">8</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">50</span>;
-s.t. con1<span class="pl-k">:</span> x <span class="pl-k">+</span> y <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span> <span class="pl-k">*</span> z;
-<span class="pl-k">..</span>.</pre></div>
-
-<h4>
-<a id="user-content-exec" class="anchor" href="#exec" aria-hidden="true"><span class="octicon octicon-link"></span></a>EXEC</h4>
-
-<p>Usage: <code>$EXEC{python code};</code></p>
-
-<p>Description: executes python code.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>Python:
-
-<ul>
-<li>valid python code.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>May create anything that results from calls to PyMPL commands.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>May create new python variables/functions/etc. that can be used in the following statements.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-$EXEC{
-<span class="pl-k">for</span> i <span class="pl-k">in</span> range(<span class="pl-c1">3</span>)<span class="pl-k">:</span>
-    STMT(<span class="pl-s"><span class="pl-pds">"</span>var x{0}, integer, &gt;= 0, &lt;= {1};<span class="pl-pds">"</span></span>.<span class="pl-k">format</span>(i, i<span class="pl-k">+</span><span class="pl-c1">1</span>))
-};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">var</span> x0, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">1</span>;
-<span class="pl-k">var</span> x1, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">2</span>;
-<span class="pl-k">var</span> x2, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">3</span>;</pre></div>
-
-<p>Note: you call use PyMPL commands inside python code as follows:</p>
-
-<ul>
-<li>
-<code>$CMD[...]{...};</code> are equivalent to <code>CMD["..."](...)</code> in python code;</li>
-<li>
-<code>$CMD{...};</code> are equivalent to <code>CMD(...)</code> in python code.</li>
+<li><code>g++ &gt;= 4.8</code></li>
+<li><code>make &gt;= 3.81</code></li>
 </ul>
 
 <h4>
-<a id="user-content-stmt" class="anchor" href="#stmt" aria-hidden="true"><span class="octicon octicon-link"></span></a>STMT</h4>
+<a id="user-content-optional" class="anchor" href="#optional" aria-hidden="true"><span class="octicon octicon-link"></span></a>Optional</h4>
 
-<p>Usage: <code>$STMT{python expression};</code></p>
-
-<p>Description: is replaced by the result of <code>eval("python expression")</code>.  </p>
-
-<p>Parameters:</p>
+<p>For the <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a> and <a href="#vpsolver-web-app">Web APP</a>:</p>
 
 <ul>
-<li>Python:
-
-<ul>
-<li>valid python expression.</li>
+<li><code>python-2.7</code></li>
+<li><code>python-pip</code></li>
+<li><code>python-dev</code></li>
+<li><code>python-pygraphviz</code></li>
+<li><code>glpk-utils</code></li>
 </ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>is replaced by the result of evaluating the expression.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-$STMT{<span class="pl-s"><span class="pl-pds">"</span>s.t. con1: x + y &lt;= {0} * z;<span class="pl-pds">"</span></span>.<span class="pl-k">format</span>(<span class="pl-k">abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>))};
-$EXEC{stmt <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>s.t. {0}: x &gt;= 10;<span class="pl-pds">"</span></span>.<span class="pl-k">format</span>(<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>)};
-$STMT{stmt};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-s.t. con1<span class="pl-k">:</span> x <span class="pl-k">+</span> y <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span> <span class="pl-k">*</span> z;
-s.t. test<span class="pl-k">:</span> x <span class="pl-k">&gt;=</span> <span class="pl-c1">10</span>;
-<span class="pl-k">..</span>.</pre></div>
-
-<p>Note: <code>$STMT{expression};</code> is equivalent to <code>${expression}$</code> (<a href="#eval">EVAL</a>).</p>
 
 <h4>
-<a id="user-content-set" class="anchor" href="#set" aria-hidden="true"><span class="octicon octicon-link"></span></a>SET</h4>
+<a id="user-content-platforms" class="anchor" href="#platforms" aria-hidden="true"><span class="octicon octicon-link"></span></a>Platforms</h4>
 
-<p>Usage: <code>$SET[set_name]{values};</code></p>
-
-<p>Description: creates an AMPL sets.</p>
-
-<p>Parameters:</p>
+<p>It has been successfully compiled and run on the following platforms:</p>
 
 <ul>
-<li>AMPL:
-
-<ul>
-<li>
-<code>'set_name'</code>: set name.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>values</code>: list of values.</li>
-</ul>
-</li>
+<li><strong>Linux</strong></li>
+<li><strong>Mac OS X</strong></li>
+<li>On a large variety of platforms including <strong>Windows</strong> using a <a href="#docker">Docker container</a>.</li>
 </ul>
 
-<p>Creates:</p>
+<h2>
+<a id="user-content-setup" class="anchor" href="#setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup</h2>
 
-<ul>
-<li>AMPL:
+<p>Without the python interface: </p>
 
-<ul>
-<li>a set named <code>'set_name'</code>.</li>
-</ul>
-</li>
-<li>Python:
+<div class="highlight highlight-bash"><pre>$ bash build.sh  </pre></div>
 
-<ul>
-<li>
-<code>_set['set_name']</code>: list of values.</li>
-</ul>
-</li>
-</ul>
+<p>With the python interface: </p>
 
-<p>Examples:  </p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-$<span class="pl-k">SET</span>[A]{range(<span class="pl-c1">5</span>)};
-$<span class="pl-k">SET</span>[B]{zip(range(<span class="pl-c1">5</span>),range(<span class="pl-c1">5</span>))};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">set</span> A <span class="pl-k">:=</span> {<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};
-<span class="pl-k">set</span> B <span class="pl-k">:=</span> {(<span class="pl-c1">0</span>,<span class="pl-c1">0</span>),(<span class="pl-c1">1</span>,<span class="pl-c1">1</span>),(<span class="pl-c1">2</span>,<span class="pl-c1">2</span>),(<span class="pl-c1">3</span>,<span class="pl-c1">3</span>),(<span class="pl-c1">4</span>,<span class="pl-c1">4</span>)};</pre></div>
-
-<p>Note: Is is possible to call external functions (i.e., <code>$SET[X]{some_function(...)}</code>) that return the set.</p>
-
-<h4>
-<a id="user-content-param" class="anchor" href="#param" aria-hidden="true"><span class="octicon octicon-link"></span></a>PARAM</h4>
-
-<p>Usage: <code>$PARAM[param_name]{values, i0=0};</code></p>
-
-<p>Description: creates AMPL parameters.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>
-<code>'param_name'</code>: parameter name.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>values</code>: dictionary of key:value pairs or a list of values;</li>
-<li>
-<code>i0</code>: initial index if <code>values</code> is a list of values.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>a parameter named <code>'param_name'</code>.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>_param['param_name']</code>: dictionary with the parameter data.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-$<span class="pl-k">PARAM</span>[NAME]{<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>}; 
-$<span class="pl-k">PARAM</span>[VALUE]{<span class="pl-c1">10</span>};
-$<span class="pl-k">PARAM</span>[D]{{<span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span><span class="pl-k">:</span> <span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span><span class="pl-k">:</span> <span class="pl-c1">2</span>}};
-$<span class="pl-k">PARAM</span>[L0]{[<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>], i0<span class="pl-k">=</span><span class="pl-c1">0</span>};
-$<span class="pl-k">PARAM</span>[L1]{[<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>], i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; <span class="pl-c"># `i0` is the initial index if `values` is a list</span>
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">param</span> NAME <span class="pl-k">:=</span> <span class="pl-s"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>;
-<span class="pl-k">param</span> VALUE <span class="pl-k">:=</span> <span class="pl-c1">10</span>;
-<span class="pl-k">param</span> D <span class="pl-k">:=</span> [<span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span>]<span class="pl-c1">1</span>[<span class="pl-s"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span>]<span class="pl-c1">2</span>;
-<span class="pl-k">param</span> L0 <span class="pl-k">:=</span> [<span class="pl-c1">0</span>]<span class="pl-c1">1</span>[<span class="pl-c1">1</span>]<span class="pl-c1">2</span>[<span class="pl-c1">2</span>]<span class="pl-c1">3</span>;
-<span class="pl-k">param</span> L1 <span class="pl-k">:=</span> [<span class="pl-c1">1</span>]<span class="pl-c1">1</span>[<span class="pl-c1">2</span>]<span class="pl-c1">2</span>[<span class="pl-c1">3</span>]<span class="pl-c1">3</span>;</pre></div>
-
-<p>Note: Is is possible to call external functions (i.e., <code>$PARAM[X]{some_function(...)}</code>) that return the parameter.</p>
-
-<h4>
-<a id="user-content-var" class="anchor" href="#var" aria-hidden="true"><span class="octicon octicon-link"></span></a>VAR</h4>
-
-<p>Usage: <code>$VAR[var_name]{typ="", lb=None, ub=None};</code></p>
-
-<p>Description: creates AMPL variables.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>
-<code>'var_name'</code>: variable name.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>typ</code>: variable type (e.g., "integer");</li>
-<li>
-<code>lb</code>: variable lower bound;</li>
-<li>
-<code>ub</code>: variable upper bound.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>creates a variable named <code>'var_name'</code>.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-$<span class="pl-k">VAR</span>[x]{<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>, <span class="pl-c1">0</span>, <span class="pl-c1">10</span>};
-$<span class="pl-k">VAR</span>[y]{<span class="pl-s"><span class="pl-pds">"</span>binary<span class="pl-pds">"</span></span>};
-$<span class="pl-k">VAR</span>[z]{ub<span class="pl-k">=abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>)};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">var</span> x, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">10</span>;
-<span class="pl-k">var</span> y, <span class="pl-k">binary</span>; 
-<span class="pl-k">var</span> z, <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span>;</pre></div>
-
-<h4>
-<a id="user-content-con" class="anchor" href="#con" aria-hidden="true"><span class="octicon octicon-link"></span></a>CON</h4>
-
-<p>Usage: <code>$CON[constraint_name]{left, sign, right};</code></p>
-
-<p>Description: creates AMPL constraints.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>
-<code>'constraint_name'</code>: constraint name.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>left</code>: list of variable names, values, or pairs (variable name, coefficient);</li>
-<li>
-<code>sign</code>: constraint type ("&gt;=", "=", "&lt;=");</li>
-<li>
-<code>right</code>: list of variable names, values, or pairs (variable name, coefficient).</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>a constraint named <code>'constraint_name'</code>.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-$CON[con1]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-c1">10</span>)],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,<span class="pl-c1">20</span>};
-$CON[con2]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>)],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>),<span class="pl-c1">20</span>]};
-$CON[con3]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>)]};
-$CON[con4]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">5</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-$CON[con5]{[<span class="pl-k">-</span><span class="pl-c1">20</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-$CON[con6]{<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),<span class="pl-c1">20</span>,(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-ampl"><pre>s.t. con1<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con2<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con3<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con4<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con5<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con6<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;</pre></div>
-
-<p>Note: all the original constraints are just different representations of the same constraint.</p>
-
-<h3>
-<a id="user-content-detailed-description-of-vpsolver-statements" class="anchor" href="#detailed-description-of-vpsolver-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detailed description of VPSolver statements</h3>
-
-<h4>
-<a id="user-content-load_vbp" class="anchor" href="#load_vbp" aria-hidden="true"><span class="octicon octicon-link"></span></a>LOAD_VBP</h4>
-
-<p>Usage: <code>$LOAD_VBP[name]{fname, i0=0, d0=0};</code></p>
-
-<p>Description: loads vector packing instances.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>Option 1: <code>'name'</code> -&gt; symbolic name for the instance;</li>
-<li>Option 2: <code>'name{Iname}'</code> -&gt; symbolic name for the instance and for the index set;</li>
-<li>Option 3: <code>'name{Iname, Dname}'</code> -&gt; symbolic name for the instance, for the index set and for the dimension set;</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>fname</code>: file name;</li>
-<li>
-<code>i0</code>: initial index for items (default 0);</li>
-<li>
-<code>d0</code>: initial index for dimensions (default 0);</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>
-<code>param name_m</code>: number of different item types;</li>
-<li>
-<code>param name_n</code>: total number of items;</li>
-<li>
-<code>param name_p</code>: number of dimensions;</li>
-<li>
-<code>param name_W</code>: bin capacity;</li>
-<li>
-<code>param name_b</code>: item demands;</li>
-<li>
-<code>param name_w</code>: item weights;</li>
-<li>
-<code>set name_I</code>: index set for items (if no other name was specified);</li>
-<li>
-<code>set name_D</code>: index set for dimensions (if no other name was specified).</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>_set['set_name']</code> lists for each set;</li>
-<li>
-<code>_param['param_name']</code> dictionaries for each param;</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:</p>
-
-<p><code>instance.vbp</code>:</p>
-
-<pre><code>2
-10 3
-4
-3 1 4
-5 2 3
-8 1 1
-4 1 9
+<pre><code>$ bash build.sh
+$ sudo pip install -r requirements.txt
+$ sudo pip install . --upgrade
+$ bash test.sh test_install
 </code></pre>
 
-<p><code>model.mod</code>:</p>
+<p>or simply:</p>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-$LOAD_VBP[instance{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>, d0<span class="pl-k">=</span><span class="pl-c1">0</span>}
-<span class="pl-k">..</span>.</pre></div>
+<pre><code>$ bash install.sh
+$ bash test.sh test_install
+</code></pre>
 
-<p>is replaced by:</p>
+<h2>
+<a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker</h2>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-k">param</span> instance1_m <span class="pl-k">:=</span> <span class="pl-c1">4</span>; <span class="pl-c"># number of different item types</span>
-<span class="pl-k">param</span> instance1_n <span class="pl-k">:=</span> <span class="pl-c1">17</span>;<span class="pl-c"># total number of items</span>
-<span class="pl-k">param</span> instance1_p <span class="pl-k">:=</span> <span class="pl-c1">2</span>; <span class="pl-c"># number of dimensions</span>
-<span class="pl-k">set</span> I <span class="pl-k">:=</span> {<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};     <span class="pl-c"># index set for items (starting at `i0`)</span>
-<span class="pl-k">set</span> D <span class="pl-k">:=</span> {<span class="pl-c1">0</span>,<span class="pl-c1">1</span>};         <span class="pl-c"># index set for dimensions (starting at `d0`)</span>
-<span class="pl-k">param</span> instance1_W{D};   <span class="pl-c"># bin capacity</span>
-<span class="pl-k">param</span> instance1_b{I};   <span class="pl-c"># item demands</span>
-<span class="pl-k">param</span> instance1_w{I,D}; <span class="pl-c"># item weights</span></pre></div>
+<h3>
+<a id="user-content-docker-setup" class="anchor" href="#docker-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker Setup</h3>
 
-<h4>
-<a id="user-content-flow" class="anchor" href="#flow" aria-hidden="true"><span class="octicon octicon-link"></span></a>FLOW</h4>
+<p>Docker is an open platform for building, shipping and running applications. Docker allows VPSolver to run on a large variety of platforms with very little effort.</p>
 
-<p>Usage: <code>$FLOW[zvar_name]{W, w, b, bounds=None};</code></p>
+<p>Install Docker [<a href="https://docs.docker.com/installation/">Docker installation instructions</a>].</p>
 
-<p>Description: generates arc-flow models for vector packing instances.</p>
+<p>Option 1: simply <code>pull</code> VPSolver from Docker repository (without building):</p>
 
-<p>Parameters:</p>
+<div class="highlight highlight-bash"><pre>$ docker pull fdabrandao/vpsolver</pre></div>
 
-<ul>
-<li>AMPL:
+<p>Option 2: <code>clone</code> VPSolver and <code>build</code> locally:</p>
 
-<ul>
-<li>
-<code>zvar_name</code>: variable name for the amount of flow in the feedback arc (which corresponds to the number of bins used);</li>
-</ul>
-</li>
-<li>Python:
+<div class="highlight highlight-bash"><pre>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
+$ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
 
-<ul>
-<li>
-<code>W</code>: bin capacity;</li>
-<li>
-<code>w</code>: item weights;</li>
-<li>
-<code>b</code>: item demands (may include strings with variable names if the demand is not fixed);</li>
-<li>
-<code>bounds</code>: maximum demand for each item.<br>
-</li>
-</ul>
-</li>
-</ul>
+<h3>
+<a id="user-content-usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
 
-<p>Creates:</p>
+<p>Directly using the command line interface:</p>
 
-<ul>
-<li>AMPL:
+<div class="highlight highlight-bash"><pre>$ docker run -it fdabrandao/vpsolver bash
+root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
+...</pre></div>
 
-<ul>
-<li>an arc-flow model for the vector packing instance (variables and constraints);</li>
-<li>a variable <code>'zvar_name'</code> for the amount of flow in the feedback arc.</li>
-</ul>
-</li>
-<li>Python:
+<p>or through the VPSolver Web APP (example URL: <code>http://172.17.0.60:5555/</code>):</p>
 
-<ul>
-<li>stores information for solution extraction.</li>
-</ul>
-</li>
-</ul>
+<div class="highlight highlight-bash"><pre>$ docker run -it -p 5555 fdabrandao/vpsolver 
+eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
+          inet addr:<span class="pl-k">*</span>172.17.0.60<span class="pl-k">*</span>  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
+          UP BROADCAST  MTU:1500  Metric:1
+          RX packets:2 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
 
-<p>Examples:</p>
+ <span class="pl-k">*</span> Running on http://0.0.0.0:5555/
+...</pre></div>
 
-<div class="highlight highlight-ampl"><pre>$LOAD_VBP[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>};
-<span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
-$FLOW[Z]{_instance1.W, _instance1.w, [<span class="pl-s"><span class="pl-pds">"</span>x[%d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};    
+<p>For more details, please refer to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki/docker">https://github.com/fdabrandao/vpsolver/wiki/docker</a>].</p>
 
-<span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
-s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <span class="pl-k">&gt;=</span> instance1_b[i]; <span class="pl-c"># demand constraints</span>
+<h2>
+<a id="user-content-vpsolver-web-app" class="anchor" href="#vpsolver-web-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver Web APP</h2>
 
-<span class="pl-k">solve</span>;
-<span class="pl-k">end</span>;</pre></div>
+<p>VPSolver includes a Web APP that can be started as follows:</p>
 
-<p>is replaced by:</p>
+<pre><code>$ python -m pyvpsolver.webapp.app
+</code></pre>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;  
-<span class="pl-c">/*<span class="pl-c"> arc-flow model for instance.vbp </span>*/</span>
-<span class="pl-c">/*<span class="pl-c"> Z is the amount of flow on the feedback arc </span>*/</span>
-<span class="pl-c">/*<span class="pl-c"> x[i] = amount of flow on arcs associated with item i </span>*/</span>
-<span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
-s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <span class="pl-k">&gt;=</span> instance1_b[i]; <span class="pl-c"># demand constraints</span>
+<p>The Web APP can then be accessed on a web browser at <code>http://127.0.0.1:5555/</code>.</p>
 
-<span class="pl-k">solve</span>;
-<span class="pl-k">end</span>;</pre></div>
-
-<h4>
-<a id="user-content-graph" class="anchor" href="#graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>GRAPH</h4>
-
-<p>Usage: <code>$GRAPH[V_name, A_name]{W, w, labels, bounds=None};</code></p>
-
-<p>Description: generates arc-flow graphs for vector packing instances.  </p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
+<h2>
+<a id="user-content-vpsolver-binaries" class="anchor" href="#vpsolver-binaries" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver binaries</h2>
 
 <ul>
 <li>
-<code>V_name</code>: name for the set of vertices;</li>
+<code>$ bin/vbp2afg instance.vbp graph.afg</code>: builds an arc-flow graph <code>graph.afg</code> for <code>instance.vbp</code>;</li>
 <li>
-<code>A_name</code>: name for the set of arcs.</li>
+<code>$ bin/afg2mps graph.afg model.mps</code>: creates a MPS model <code>model.mps</code> for <code>graph.afg</code>;</li>
+<li>
+<code>$ bin/afg2lp graph.afg model.lp</code>: creates a LP model <code>model.lp</code> for <code>graph.afg</code>;</li>
+<li>
+<code>$ bin/solve_gurobi model.mps vars.sol</code>: solves <code>model.mps</code> using Gurobi and writes the solution to <code>vars.sol</code>;</li>
+<li>
+<code>$ bin/solve_glpk model.mps vars.sol</code>: solves <code>model.mps</code> using GLPK and writes the solution to <code>vars.sol</code>;</li>
+<li>
+<code>$ bin/vbpsol graph.afg vars.sol</code>: extracts a vector packing solution from an arc-flow solution <code>vars.sol</code> associated with the graph <code>graph.afg</code>;</li>
+<li>
+<code>$ bin/vpsolver intance.vbp</code>: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior.</li>
 </ul>
-</li>
-<li>Python:
+
+<p>Usage:</p>
+
+<pre><code># 1. Build the arc-flow graph graph.afg for example.vbp:  
+$ bin/vbp2afg example.vbp graph.afg  
+# 2. Convert the arc-flow graph into a .mps file model.mps:  
+$ bin/afg2mps graph.afg model.mps  
+# 3. Solve the MIP model and stores the solution in vars.sol:  
+$ bin/solve_gurobi model.mps vars.sol  
+# 4. Extract the vector packing solution:  
+$ bin/vbpsol graph.afg vars.sol  
+</code></pre>
+
+<h2>
+<a id="user-content-vpsolver-scripts" class="anchor" href="#vpsolver-scripts" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver Scripts</h2>
+
+<p>VPSolver includes several scripts for solving arc-flow models using different
+solvers:</p>
 
 <ul>
 <li>
-<code>W</code>: bin capacity;</li>
+<code>scripts/vpsolver_gurobi.sh</code>: Gurobi</li>
 <li>
-<code>w</code>: item weights;</li>
+<code>scripts/vpsolver_cplex.sh</code>: IBM CPLEX</li>
 <li>
-<code>labels</code>: item labels ;</li>
+<code>scripts/vpsolver_coinor.sh</code>: COIN-OR CBC</li>
 <li>
-<code>bounds</code>: maximum demand for each item.</li>
-</ul>
-</li>
+<code>scripts/vpsolver_glpk.sh</code>: GLPK</li>
+<li>
+<code>scripts/vpsolver_scip.sh</code>: SCIP</li>
+<li>
+<code>scripts/vpsolver_lpsolve.sh</code>: lp_solve</li>
 </ul>
 
-<p>Creates:</p>
+<p>Usage:</p>
 
-<ul>
-<li>AMPL:
+<div class="highlight highlight-bash"><pre>$ vpsolver_X.sh --vbp instance.vbp
+$ vpsolver_X.sh --afg graph.afg
+$ vpsolver_X.sh --mps/--lp model.mps/.lp
+$ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
 
-<ul>
-<li>
-<code>set 'V_name'</code>: set of vertices;</li>
-<li>
-<code>set 'A_name'</code>: set of arcs.</li>
-</ul>
-</li>
-<li>Python:
+<h2>
+<a id="user-content-folders" class="anchor" href="#folders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Folders</h2>
 
 <ul>
 <li>
-<code>_sets['V_name']</code>: set of vertices;</li>
+<code>docs/</code>: documentation</li>
 <li>
-<code>_sets['A_name']</code>: set of arcs;</li>
+<code>bin/</code>: vpsolver executables</li>
+<li>
+<code>scripts/</code>: vpsolver scripts</li>
+<li>
+<code>src/</code>: vpsolver source code in C++</li>
+<li>
+<code>pyvpsolver/</code>: pyvpsolver source code in Python 2.7</li>
+<li>
+<code>examples/</code>: vpsolver and pyvpsolver examples</li>
+<li>
+<code>reports/</code>: technical reports on the underlying algorithms and models</li>
 </ul>
-</li>
+
+<h2>
+<a id="user-content-reports" class="anchor" href="#reports" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reports</h2>
+
+<p>VPSolver was proposed in:</p>
+
+<ul>
+<li>[1] Brandão, F. and Pedroso, J. P. (2013). Bin Packing and Related Problems:
+General Arc-flow Formulation with Graph Compression. Technical Report
+DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do
+Porto, Portugal.
+Available at: <a href="http://arxiv.org/abs/1310.6887">http://arxiv.org/abs/1310.6887</a>.</li>
 </ul>
 
-<p>Examples:</p>
+<p>See also:</p>
 
-<div class="highlight highlight-ampl"><pre>$LOAD_VBP[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; 
-$GRAPH[V,A]{_instance1.W, _instance1.w, _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]};
-
-<span class="pl-k">var</span> Z, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>; <span class="pl-c"># amount of flow in the feedback arc</span>
-<span class="pl-k">var</span> f{A}, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>; <span class="pl-c"># amount of flow in each arc</span>
-
-<span class="pl-c"># Objective:</span>
-<span class="pl-k">maximize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
-
-<span class="pl-c"># Flow conservation constraints:</span>
-s.t. flowcon{k <span class="pl-k">in</span> V <span class="pl-k">diff</span> {<span class="pl-s"><span class="pl-pds">'</span>S<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>T<span class="pl-pds">'</span></span>}}<span class="pl-k">:</span> 
-  <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> v <span class="pl-k">==</span> k} f[u,v,i] <span class="pl-k">-</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> u <span class="pl-k">==</span> k} f[u, v, i] <span class="pl-k">=</span> <span class="pl-c1">0</span>;
-s.t. flowconS<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> u <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>S<span class="pl-pds">'</span></span>} f[u,v,i] <span class="pl-k">=</span> Z;
-s.t. flowconT<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> v <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>T<span class="pl-pds">'</span></span>} f[u,v,i] <span class="pl-k">=</span> Z;
-
-<span class="pl-c"># Demand constraints:</span>
-s.t. demand{k <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> i <span class="pl-k">==</span> k} <span class="pl-k">&gt;=</span> instance1_b[i];
-
-<span class="pl-k">solve</span>;
-<span class="pl-k">end</span>;</pre></div>
-
-<p>Note: the source vertex is <code>'S'</code>, the target is <code>'T'</code>, and loss arcs are labeled with <code>'LOSS'</code>.</p>
+<ul>
+<li><p>[2] Brandão, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
+Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
+Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.</p></li>
+<li><p>[3] Brandão, F. and Pedroso, J. P. (2013). Cutting Stock with Binary Patterns:
+Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-09,
+Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.</p></li>
+<li><p>[4] Brandão, F. (2012). Bin Packing and Related Problems: Pattern-Based Approaches 
+Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.</p></li>
+<li><p>[5] Computational results on several benchmark test data sets:<br>
+<a href="http://www.dcc.fc.up.pt/%7Efdabrandao/research/vpsolver/results/">http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/</a></p></li>
+</ul>
 
 <hr>
 

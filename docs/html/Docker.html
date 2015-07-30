@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  Home.md
+  .tmpfile.md
   
     - Grip
   
@@ -44,38 +44,77 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  Home.md
+                  .tmpfile.md
                 </h3>
               
               <div class="markdown-body entry-content">
                 <h1>
-<a id="user-content-home" class="anchor" href="#home" aria-hidden="true"><span class="octicon octicon-link"></span></a>Home</h1>
+<a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker</h1>
 
-<p>VPSolver is a vector packing solver based on an arc-flow formulation with graph compression [<a href="http://www.dcc.fc.up.pt/%7Efdabrandao/papers/arcflow_poster.pdf">Poster</a>]. VPSolver generates very strong models (equivalent to Gilmore and Gomory's) that can be solved using general-purpose mixed-integer programming solvers such as Gurobi and GLPK [<a href="http://www.dcc.fc.up.pt/%7Efdabrandao/Vector_Packing_Solver">Paper</a>].</p>
-
-<h2>
-<a id="user-content-wiki-pages" class="anchor" href="#wiki-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Wiki pages</h2>
-
-<ul>
-<li><a href="README">README</a></li>
-<li><a href="Docker">Docker setup</a></li>
-<li><a href="Python-API">Python API</a></li>
-<li><a href="PyMPL">PyMPL documentation</a></li>
-</ul>
+<p>Docker is an open platform for building, shipping and running applications. Docker allows <a href="https://github.com/fdabrandao/vpsolver">VPSolver</a> to run on a large variety of platforms with very little effort.</p>
 
 <h2>
-<a id="user-content-useful-links" class="anchor" href="#useful-links" aria-hidden="true"><span class="octicon octicon-link"></span></a>Useful links</h2>
+<a id="user-content-docker-setup" class="anchor" href="#docker-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker Setup</h2>
 
-<ul>
-<li>Project Homepage: <a href="http://vpsolver.dcc.fc.up.pt/">http://vpsolver.dcc.fc.up.pt/</a>
-</li>
-<li>GiHub repository: <a href="https://github.com/fdabrandao/vpsolver">https://github.com/fdabrandao/vpsolver</a>
-</li>
-<li>BitBucket repository: <a href="https://bitbucket.org/fdabrandao/vpsolver">https://bitbucket.org/fdabrandao/vpsolver</a>
-</li>
-<li>Docker repository: <a href="https://registry.hub.docker.com/u/fdabrandao/vpsolver/">https://registry.hub.docker.com/u/fdabrandao/vpsolver/</a>
-</li>
-</ul>
+<p>Install Docker [<a href="https://docs.docker.com/installation/">Docker installation instructions</a>].</p>
+
+<p>Option 1: simply <code>pull</code> VPSolver from Docker repository (without building):</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker pull fdabrandao/vpsolver</pre></div>
+
+<p>Option 2: <code>clone</code> VPSolver and <code>build</code> locally:</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
+user@locahost <span class="pl-k">~</span>$ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
+
+<h2>
+<a id="user-content-usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Directly using the command line interface:</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it fdabrandao/vpsolver bash
+root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
+...</pre></div>
+
+<p>or through the VPSolver Web APP (example URL: <code>http://172.17.0.60:5555/</code>):</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it -p 5555 fdabrandao/vpsolver 
+eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
+          inet addr:<span class="pl-k">*</span>172.17.0.60<span class="pl-k">*</span>  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
+          UP BROADCAST  MTU:1500  Metric:1
+          RX packets:2 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
+
+ <span class="pl-k">*</span> Running on http://0.0.0.0:5555/
+...</pre></div>
+
+<h2>
+<a id="user-content-advanced" class="anchor" href="#advanced" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced</h2>
+
+<p>Run vpsolver in background:</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ CID=<span class="pl-s"><span class="pl-pds">$(</span>docker run -d -p 5555 fdabrandao/vpsolver<span class="pl-pds">)</span></span>
+user@locahost <span class="pl-k">~</span>$ docker inspect --format URL:http://{{.NetworkSettings.IPAddress}}:5555/ <span class="pl-smi">$CID</span>
+URL:http://172.17.0.71:5555/</pre></div>
+
+<p>List all running vpsolver containers:</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker ps <span class="pl-k">|</span> grep fdabrandao/vpsolver
+...</pre></div>
+
+<p>List URLs of all running vpsolver containers:</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ CIDs=<span class="pl-s"><span class="pl-pds">$(</span>docker ps <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
+user@locahost <span class="pl-k">~</span>$ docker inspect --format URL:http://{{.NetworkSettings.IPAddress}}:5555/ <span class="pl-smi">$CIDs</span>
+...</pre></div>
+
+<p>Stop and remove all vpsolver containers:</p>
+
+<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker stop <span class="pl-s"><span class="pl-pds">$(</span>docker ps -a <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
+user@locahost <span class="pl-k">~</span>$ docker rm <span class="pl-s"><span class="pl-pds">$(</span>docker ps -a <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span></pre></div>
 
 <hr>
 

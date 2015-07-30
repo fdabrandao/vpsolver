@@ -21,7 +21,7 @@ WORKDIR /vpsolver
 EXPOSE 5555
 
 RUN DEBIAN_FRONTEND=noninteractive bash build.sh
-RUN DEBIAN_FRONTEND=noninteractive pip install -r requirements.txt
-RUN DEBIAN_FRONTEND=noninteractive pip install . --upgrade
+RUN DEBIAN_FRONTEND=noninteractive bash install.sh
+RUN DEBIAN_FRONTEND=noninteractive bash test.sh test_install
 
 CMD ifconfig eth0 && python -m pyvpsolver.webapp.app

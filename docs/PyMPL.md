@@ -43,8 +43,8 @@ Costs = [100, 120, 150]
 
 # Item weights:
 ws = [[10], [14], [17], [19], [24], [29], [32], [33], [36],
-    [38], [40], [50], [54], [55], [63], [66], [71], [77],
-    [79], [83], [92], [95], [99]]
+      [38], [40], [50], [54], [55], [63], [66], [71], [77],
+      [79], [83], [92], [95], [99]]
 
 # Item demands:
 b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
@@ -122,7 +122,7 @@ There are three types of calls:
   * [VAR](#var): `$VAR[var_name]{typ="", lb=None, ub=None};`
   * [CON](#con): `$CON[constraint_name]{left, sign, right};`
 
-4. Additional statements for VPSolver:
+4. Additional statements for [VPSolver](https://github.com/fdabrandao/vpsolver):
 
   * [LOAD_VBP](#load_vbp): `$LOAD_VBP[name]{fname, i0=0, d0=0};`
   * [FLOW](#flow): `$FLOW[zvar]{W, w, b, bounds=None};`
@@ -281,7 +281,8 @@ Description: creates AMPL parameters.
 Parameters:
 
   * AMPL:
-    * `'param_name'`: parameter name.
+    * Option 1: `'param_name'` -> parameter name;  
+    * Option 2: `'param_name{Index_name}'` -> parameter name and index name.
   * Python:
     * `values`: dictionary of key:value pairs or a list of values;
     * `i0`: initial index if `values` is a list of values.
@@ -299,7 +300,7 @@ Examples:
 ...
 $PARAM[NAME]{"name"}; 
 $PARAM[VALUE]{10};
-$PARAM[D]{{'a': 1, 'b': 2}};
+$PARAM[D{I}]{{'a': 1, 'b': 2}};
 $PARAM[L0]{[1,2,3], i0=0};
 $PARAM[L1]{[1,2,3], i0=1}; # `i0` is the initial index if `values` is a list
 ...
@@ -311,6 +312,7 @@ is replaced by:
 param NAME := 'name';
 param VALUE := 10;
 param D := ['a']1['b']2;
+set I := {'a','b'};
 param L0 := [0]1[1]2[2]3;
 param L1 := [1]1[2]2[3]3;
 ```
