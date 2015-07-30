@@ -50,7 +50,8 @@ def main():
     obj, sol = vbpsolver.solve(
         W, w, b,
         svg_file="tmp/graph_vbp.svg",
-        verbose=False, script="vpsolver_glpk.sh"
+        script="vpsolver_glpk.sh",
+        verbose=True
     )
     print "obj:", obj
     print "sol:", sol

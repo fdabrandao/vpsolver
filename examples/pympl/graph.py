@@ -51,7 +51,7 @@ def main():
     glpkutils.mod2lp(mod_out, lp_out)
     try:
         out, varvalues = VPSolver.script_wsol(
-            "vpsolver_gurobi.sh", lp_out, verbose=True
+            "vpsolver_glpk.sh", lp_out, verbose=True
         )
         print
         print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
@@ -59,6 +59,7 @@ def main():
         assert varvalues['Z0'] == 9  # check the solution objective value
     except Exception as e:
         print repr(e)
+        raise
 
     exit_code = os.system("glpsol --math {0}".format(mod_out))
     assert exit_code == 0
