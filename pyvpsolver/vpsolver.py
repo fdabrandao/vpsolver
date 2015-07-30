@@ -405,7 +405,9 @@ class VPSolver(object):
                 values = {}
                 assert len(sol) % 2 == 0
                 for i in xrange(0, len(sol), 2):
-                    var, value = sol[i], int(round(float(sol[i+1])))
+                    var, value = sol[i], float(sol[i+1])
+                    if abs(round(value)-value) < 1e-5:
+                        value = int(round(value))
                     if value != 0:
                         values[var] = value
             os.remove(sol_file)
