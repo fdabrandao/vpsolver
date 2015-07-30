@@ -51,8 +51,7 @@ solve(){
     local pid=$!
     trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
     wait $pid
-    sed '/#/d' < $TMP_DIR/vars.sol > $TMP_DIR/vars.sol2
-    mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol
+    sed -i '/#/d' $TMP_DIR/vars.sol
 }
 
 model_file=""
