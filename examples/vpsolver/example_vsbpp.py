@@ -72,7 +72,9 @@ def main():
     obj, sol = mvbpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graph_vsbpp.svg",
-        verbose=True, script="vpsolver_glpk.sh")
+        script="vpsolver_glpk.sh",
+        verbose=True
+    )
     print "obj:", obj
     print "sol:", sol
     mvbpsolver.print_solution(obj, sol)

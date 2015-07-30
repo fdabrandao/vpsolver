@@ -20,43 +20,30 @@
 BASEDIR=`dirname $0`
 cd $BASEDIR
 
-make clean >build.log 2>&1
+build(){
+    echo -n "  $1 "
+
+    make bin/$1 >> build.log 2>&1
+
+    if [[ $? == 0 ]];
+    then
+        echo "[OK]";
+    else
+        echo "[Failed]";
+    fi
+}
+
+make clean > build.log 2>&1
 
 echo "mandatory:"
 
-echo -n "  vbp2afg "
-make bin/vbp2afg >>build.log 2>&1
-if [[ $? == 0 ]]; then echo "[OK]";
-else echo "[Failed]"; fi
-
-echo -n "  afg2mps "
-make bin/afg2mps >>build.log 2>&1
-if [[ $? == 0 ]]; then echo "[OK]";
-else echo "[Failed]"; fi
-
-echo -n "  afg2lp  "
-make bin/afg2lp >>build.log 2>&1
-if [[ $? == 0 ]]; then echo "[OK]";
-else echo "[Failed]"; fi
-
-echo -n "  vbpsol  "
-make bin/vbpsol >>build.log 2>&1
-if [[ $? == 0 ]]; then echo "[OK]";
-else echo "[Failed]"; fi
+build "vbp2afg"
+build "afg2mps"
+build "afg2lp"
+build "vbpsol"
 
 echo "optional:"
 
-echo -n "  vpsolver "
-make bin/vpsolver >>build.log 2>&1
-if [[ $? == 0 ]]; then echo "[OK]";
-else echo "[Failed]"; fi
-
-echo -n "  solve_gurobi "
-make bin/solve_gurobi >>build.log 2>&1
-if [[ $? == 0 ]]; then echo "[OK]";
-else echo "[Failed]"; fi
-
-echo -n "  solve_glpk   "
-make bin/solve_glpk >>build.log 2>&1
-if [[ $? == 0 ]]; then echo "[OK]";
-else echo "[Failed]"; fi
+build "vpsolver"
+build "solve_gurobi"
+build "solve_glpk"
