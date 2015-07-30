@@ -5,7 +5,7 @@ Faculdade de Ciencias, Universidade do Porto
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
 ---
-VPSolver is a vector packing solver based on an arc-flow formulation with graph
+[VPSolver](https://github.com/fdabrandao/vpsolver) is a vector packing solver based on an arc-flow formulation with graph
 compression.  VPSolver generates very strong models (equivalent to Gilmore and
 Gomory's) that can be solved using general-purpose mixed-integer programming
 solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MIP
@@ -54,10 +54,18 @@ $ bash build.sh
 ```
 With the python interface: 
 
-```bash
+```
 $ bash build.sh
 $ sudo pip install -r requirements.txt
 $ sudo pip install . --upgrade
+$ bash test.sh test_install
+```
+or simply:
+
+
+```
+$ bash install.sh
+$ bash test.sh test_install
 ```
 
 ## Docker
@@ -124,8 +132,8 @@ The Web APP can then be accessed on a web browser at `http://127.0.0.1:5555/`.
 * `$ bin/afg2mps graph.afg model.mps`: creates a MPS model `model.mps` for `graph.afg`;
 * `$ bin/afg2lp graph.afg model.lp`: creates a LP model `model.lp` for `graph.afg`;
 * `$ bin/solve_gurobi model.mps vars.sol`: solves `model.mps` using Gurobi and writes the solution to `vars.sol`;
-* `$ bin/solve_glpk model.mps vars.sol`: solves `model.mps` using Glpk and writes the solution to `vars.sol`;
-* `$ bin/vbpsol graph.afg vars.sol`: given a solution file `vars.sol` extracts a vector packing solution;
+* `$ bin/solve_glpk model.mps vars.sol`: solves `model.mps` using GLPK and writes the solution to `vars.sol`;
+* `$ bin/vbpsol graph.afg vars.sol`: extracts a vector packing solution from an arc-flow solution `vars.sol` associated with the graph `graph.afg`;
 * `$ bin/vpsolver intance.vbp`: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior.
 
 Usage:
@@ -137,7 +145,7 @@ $ bin/vbp2afg example.vbp graph.afg
 $ bin/afg2mps graph.afg model.mps  
 # 3. Solve the MIP model and stores the solution in vars.sol:  
 $ bin/solve_gurobi model.mps vars.sol  
-# 4. Outputs the vector packing solution:  
+# 4. Extract the vector packing solution:  
 $ bin/vbpsol graph.afg vars.sol  
 ```
 
