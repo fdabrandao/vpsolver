@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
 import equivknapsack01
 import equivknapsack
-import graph
+import wolsey
 import instance
 
 
@@ -51,8 +51,8 @@ def main():
     print "equivknapsack01:"
     equivknapsack01.main()
 
-    print "graph:"
-    graph.main()
+    print "wolsey:"
+    wolsey.main()
 
     print "instance:"
     instance.main()
