@@ -39,11 +39,52 @@ if __name__ == "__main__":
 from pyvpsolver import VPSolver, PyMPL, glpkutils
 
 
-def main():
+def equivknapsack01(a, a0):
     """
     Computes minimal equivalent knapsack inequalities
     using 'equivknapsack01.mod'
     """
+    aS = abs(2*a0+1-sum(a))
+    if a0 < (sum(a)-1)/2:
+        a0 += aS
+        fix_as = 1
+    else:
+        fix_as = 0
+        if aS > a0:
+            return [0]*len(a), 0
+    a = a+[aS]
+
+    mod_in = "equivknapsack01.mod"
+    mod_out = "tmp/equivknapsack01.out.mod"
+
+    parser = PyMPL(locals_=locals(), globals_=globals())
+    parser.parse(mod_in, mod_out)
+
+    lp_out = "tmp/equivknapsack01.lp"
+    glpkutils.mod2lp(mod_out, lp_out)
+    # exit_code = os.system("glpsol --math {0}".format(mod_out))
+    # assert exit_code == 0
+    out, varvalues = VPSolver.script_wsol(
+        "vpsolver_glpk.sh", lp_out, verbose=False
+    )
+
+    b = [varvalues.get("pi({0})".format(i+1), 0) for i in xrange(len(a))]
+    b0 = varvalues.get("pi(0)", 0)
+
+    # print a, a0
+    # print b, b0
+
+    if fix_as == 1:
+        b0 -= b[-1]
+        b = b[:-1]
+    else:
+        b = b[:-1]
+
+    return b, b0
+
+
+def main():
+    """Tests equivknapsack01"""
     kp_cons = [
         ([8, 12, 13, 64, 22, 41], 80),
         ([8, 12, 13, 75, 22, 41], 96),
@@ -59,44 +100,8 @@ def main():
     ]
 
     cons = set()
-    for k in xrange(len(kp_cons)):
-        a, a0 = kp_cons[k]
-        aS = abs(2*a0+1-sum(a))
-        if a0 < (sum(a)-1)/2:
-            a0 += aS
-            fix_as = 1
-        else:
-            fix_as = 0
-            if aS > a0:
-                continue
-        a = a+[aS]
-
-        mod_in = "equivknapsack01.mod"
-        mod_out = "tmp/equivknapsack01.out.mod"
-
-        parser = PyMPL(locals_=locals(), globals_=globals())
-        parser.parse(mod_in, mod_out)
-
-        lp_out = "tmp/equivknapsack01.lp"
-        glpkutils.mod2lp(mod_out, lp_out)
-        # exit_code = os.system("glpsol --math {0}".format(mod_out))
-        # assert exit_code == 0
-        out, varvalues = VPSolver.script_wsol(
-            "vpsolver_glpk.sh", lp_out, verbose=False
-        )
-
-        b = [varvalues.get("pi({0})".format(i+1), 0) for i in xrange(len(a))]
-        b0 = varvalues.get("pi(0)", 0)
-
-        # print a, a0
-        # print b, b0
-
-        if fix_as == 1:
-            b0 -= b[-1]
-            b = b[:-1]
-        else:
-            b = b[:-1]
-
+    for a, a0 in kp_cons:
+        b, b0 = equivknapsack01(a, a0)
         if sum(b) != 0:
             cons.add((tuple(b), b0))
 
