@@ -29,7 +29,7 @@ def mod2lp(fname_mod, fname_lp, verbose=None):
         "glpsol --math {0} --check --wlp {1}".format(
             fname_mod, fname_lp
         ),
-        grepv="Generating",
+        grepv="Generating _",
         verbose=verbose
     )
 
@@ -40,6 +40,6 @@ def mod2mps(fname_mod, fname_mps, verbose=None):
         "glpsol --math {0} --check --wmps {1}".format(
             fname_mod, fname_mps
         ),
-        grepv="Generating",
+        grepv="Generating _",
         verbose=verbose
     )
