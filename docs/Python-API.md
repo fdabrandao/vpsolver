@@ -212,7 +212,7 @@ How to use:
     * Description: sets the default "verbose" behaviour.
     * Arguments:
         * `verbose`: `True` or `False`.
-    * Note: The default behaviour is overridden if the `verbose` argument is set to a value different than `None` in any API call.
+    * Note: The default behaviour is overridden if the `verbose` argument is set to a value different from `None` in any API call.
 
 ***
 Copyright © Filipe Brandão. All rights reserved.  
