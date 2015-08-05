@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 import sys
+from copy import deepcopy
 from .pymplcmds import CmdBase, CmdSet, CmdParam
 from .pymplcmds import CmdVar, CmdCon, CmdStmt
 from .pymplcmds import CmdFlow, CmdGraph, CmdLoadVBP
@@ -59,8 +60,12 @@ class PyMPL(object):
 
         self._sets = {}
         self._params = {}
-        self._locals = locals_
-        self._globals = globals_
+        self._locals = {}
+        for var in locals_:
+           self._locals[var] = locals_[var]
+        for var in globals_:
+            if var not in self._locals:
+                self._locals[var] = globals_[var]
 
         self._locals["_model"] = ""
         self._locals["_sets"] = self._sets
@@ -85,9 +90,6 @@ class PyMPL(object):
             self.read(mod_in)
         self.output = self.input
 
-        locals_ = self._locals
-        globals_ = self._globals
-
         rgx = re.compile(PyMPL.t_CMD, re.DOTALL)
         for match in rgx.finditer(self.input):
             comment, call, args1, args2, args3 = match.groups()
@@ -107,22 +109,21 @@ class PyMPL(object):
 
             try:
                 if call is None:
-                    res = str(eval(args3, globals_, locals_))
+                    res = str(eval(args3, self._locals))
                 elif call == PyMPL.EXEC_CMD:
                     assert args1 is None
-                    locals_["_model"] = ""
-                    exec(args2, globals_, locals_)
-                    res = str(locals_["_model"])
+                    self._locals["_model"] = ""
+                    exec(args2, self._locals)
+                    res = str(self._locals["_model"])
                 else:
                     if args1 is not None:
                         args1 = "'''{0}'''".format(args1[1:-1])
-                    locals_["_model"] = ""
+                    self._locals["_model"] = ""
                     exec(
                         "{0}[{1}]({2})".format(call, args1, args2),
-                        globals_,
-                        locals_
+                        self._locals
                     )
-                    res = str(locals_["_model"])
+                    res = str(self._locals["_model"])
             except:
                 exctype, value, traceback = sys.exc_info()
                 msg = str(value)+"\n\t"
