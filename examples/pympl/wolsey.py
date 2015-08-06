@@ -75,7 +75,7 @@ def main():
     print
 
     # Check the solution objective value:
-    assert abs(varvalues['Z0'] - 9) < 1e-5
+    assert abs(varvalues["Z0"] - 9) < 1e-5
 
     exit_code = os.system("glpsol --math {0}".format(mod_out))
     assert exit_code == 0

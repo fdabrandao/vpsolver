@@ -13,7 +13,7 @@ b = bounds
 labels = range(1,m+1)
 };
 
-$GRAPH[V,A]{W, w, labels, b};
+$VBP_GRAPH[V,A]{W, w, labels, b};
 
 minimize obj: pi[0];
 s.t. gamma{(u,v,i) in A}: theta[v] >= theta[u]+(if i != 'LOSS' then pi[i] else 0);

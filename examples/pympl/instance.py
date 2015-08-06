@@ -52,13 +52,13 @@ def main():
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_glpk.sh", lp_out, verbose=True
     )
-    sol, varvalues = parser["FLOW"].extract(varvalues, verbose=True)
+    sol, varvalues = parser["VBP_FLOW"].extract(varvalues, verbose=True)
 
     print
     print "sol:", sol
     print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
     print
-    assert varvalues['Z'] == 21  # check the solution objective value
+    assert varvalues["Z"] == 21  # check the solution objective value
 
     exit_code = os.system("glpsol --math {0}".format(mod_out))
     assert exit_code == 0

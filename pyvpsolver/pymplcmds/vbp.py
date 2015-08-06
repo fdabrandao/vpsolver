@@ -27,7 +27,142 @@ from ..modelutils import writemod
 from .. import pymplutils
 
 
-class CmdFlow(CmdBase):
+class CmdVBPLoad(CmdBase):
+    """Command for loading VBP instances."""
+
+    def _evalcmd(self, name, fname, i0=0, d0=0):
+        """Evalutates CMD[name](*args)."""
+        name, index = pymplutils.parse_indexed(name, "{}")
+        index_I = "{0}_I".format(name)
+        index_D = "{0}_D".format(name)
+        if index is not None:
+            assert 1 <= len(index) <= 2
+            if len(index) == 2:
+                index_I, index_D = index
+            elif len(index) == 1:
+                index_I = index[0]
+
+        instance = VBP.from_file(fname, verbose=False)
+
+        W = {
+            i0+i: instance.W[i]
+            for i in xrange(instance.ndims)
+        }
+        w = {
+            (i0+i, d0+d): instance.w[i][d]
+            for i in xrange(instance.m)
+            for d in xrange(instance.ndims)
+        }
+        b = {
+            i0+i: instance.b[i]
+            for i in xrange(instance.m)
+        }
+
+        assert "_{0}".format(name.lstrip("^")) not in self._pyvars
+        self._pyvars["_{0}".format(name.lstrip("^"))] = instance
+        sets, params = self._sets, self._params
+
+        self._defs += "#BEGIN_DEFS: Instance[{0}]\n".format(name)
+        self._data += "#BEGIN_DATA: Instance[{0}]\n".format(name)
+        defs, data = pymplutils.ampl_param(
+            "{0}_m".format(name), None, instance.m, sets, params
+        )
+        self._defs += defs
+        self._data += data
+        defs, data = pymplutils.ampl_param(
+            "{0}_n".format(name), None, sum(instance.b), sets, params
+        )
+        self._defs += defs
+        self._data += data
+        defs, data = pymplutils.ampl_param(
+            "{0}_p".format(name), None, instance.ndims, sets, params
+        )
+        self._defs += defs
+        self._data += data
+        defs, data = pymplutils.ampl_set(
+            index_I, range(i0, i0+instance.m), sets, sets
+        )
+        self._defs += defs
+        self._data += data
+        defs, data = pymplutils.ampl_set(
+            index_D, range(d0, d0+instance.ndims), sets, params
+        )
+        self._defs += defs
+        self._data += data
+        defs, data = pymplutils.ampl_param(
+            "{0}_W".format(name), index_D, W, sets, params
+        )
+        self._defs += defs
+        self._data += data
+        defs, data = pymplutils.ampl_param(
+            "{0}_b".format(name), index_I, b, sets, params
+        )
+        self._defs += defs
+        self._data += data
+        defs, data = pymplutils.ampl_param(
+            "{0}_w".format(name),
+            "{0},{1}".format(index_I, index_D),
+            w, sets, params
+        )
+        self._defs += defs
+        self._data += data
+        self._defs += "#END_DEFS: Instance[{0}]\n".format(name)
+        self._data += "#END_DATA: Instance[{0}]\n".format(name)
+
+
+class CmdVBPGraph(CmdBase):
+    """Command for creating arc-flow graphs."""
+
+    def _evalcmd(self, names, W, w, labels, bounds=None):
+        """Evalutates CMD[names](*args)."""
+        match = pymplutils.parse_symblist(names)
+        assert match is not None
+        Vname, Aname = match
+
+        if isinstance(W, dict):
+            W = [W[k] for k in sorted(W)]
+        if isinstance(w, dict):
+            i0 = min(i for i, d in w)
+            d0 = min(d for i, d in w)
+            m = max(i for i, d in w)-i0+1
+            p = max(d for i, d in w)-d0+1
+            ww = [
+                [w[i0+i, d0+d] for d in xrange(p)] for i in xrange(m)
+            ]
+            w = ww
+        if isinstance(bounds, dict):
+            bounds = [bounds[k] for k in sorted(bounds)]
+
+        graph = self._generate_graph(W, w, labels, bounds)
+
+        self._defs += pymplutils.ampl_set(
+            Vname, graph.V, self._sets, self._params
+        )[0]
+        self._defs += pymplutils.ampl_set(
+            Aname, graph.A, self._sets, self._params
+        )[0]
+
+    def _generate_graph(self, W, w, labels, bounds):
+        """Generates an arc-flow graph."""
+        m = len(w)
+        ndims = len(W)
+        if isinstance(bounds, list):
+            b = bounds
+        else:
+            b = [
+                min(W[d]/w[i][d] for d in xrange(ndims) if w[i][d] != 0)
+                for i in xrange(m)
+            ]
+        instance = VBP(W, w, b, verbose=False)
+        graph = AFG(instance, verbose=False).graph()
+        graph.relabel(
+            lambda u: u if isinstance(u, str) else str(u),
+            lambda i: labels[i] if isinstance(i, int) and i < m else "LOSS"
+        )
+        return graph
+
+
+class CmdVBPModelFlow(CmdBase):
     """Command for creating arc-flow models."""
 
     def __init__(self, *args, **kwargs):

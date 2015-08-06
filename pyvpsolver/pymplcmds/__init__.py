@@ -21,7 +21,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .base import CmdBase
 from .default import CmdSet, CmdParam, CmdVar, CmdCon, CmdStmt
-from .flow import CmdFlow
-from .graph import CmdGraph
-from .loadvbp import CmdLoadVBP
-from .tsp import CmdATSPModelSCF, CmdATSPModelMCF, CmdATSPModelMTZ
+from .vbp import CmdVBPLoad, CmdVBPModelFlow, CmdVBPGraph
+from .atsp import CmdATSPModelSCF, CmdATSPModelMCF, CmdATSPModelMTZ

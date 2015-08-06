@@ -24,7 +24,7 @@ import sys
 from copy import deepcopy
 from .pymplcmds import CmdBase, CmdSet, CmdParam
 from .pymplcmds import CmdVar, CmdCon, CmdStmt
-from .pymplcmds import CmdFlow, CmdGraph, CmdLoadVBP
+from .pymplcmds import CmdVBPModelFlow, CmdVBPGraph, CmdVBPLoad
 from .pymplcmds import CmdATSPModelMTZ, CmdATSPModelSCF, CmdATSPModelMCF
 
 
@@ -56,9 +56,9 @@ class PyMPL(object):
         "ATSP_MTZ": CmdATSPModelMTZ,
         "ATSP_SCF": CmdATSPModelSCF,
         "ATSP_MCF": CmdATSPModelMCF,
-        "LOAD_VBP": CmdLoadVBP,
-        "FLOW": CmdFlow,
-        "GRAPH": CmdGraph,
+        "VBP_LOAD": CmdVBPLoad,
+        "VBP_FLOW": CmdVBPModelFlow,
+        "VBP_GRAPH": CmdVBPGraph,
     }
 
     def __init__(self, locals_=None, globals_=None):

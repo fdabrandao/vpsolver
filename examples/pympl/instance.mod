@@ -1,7 +1,7 @@
-$LOAD_VBP[instance1{I,D}]{"data/instance.vbp",1};
+$VBP_LOAD[instance1{I,D}]{"data/instance.vbp",1};
 var x{I}, >= 0;
 
-$FLOW[Z]{
+$VBP_FLOW[Z]{
     _instance1.W,
     _instance1.w,
     ["x[%d]"%i for i in _sets['I']]

@@ -1,4 +1,4 @@
-$GRAPH[V,A]{W, w, labels, bounds};
+$VBP_GRAPH[V,A]{W, w, labels, bounds};
 
 $PARAM[m]{m};
 

@@ -12,7 +12,7 @@ b = [1 for i in xrange(m)]
 labels = [i+1 for i in xrange(m)]
 };
 
-$GRAPH[V,A]{W, w, labels, b};
+$VBP_GRAPH[V,A]{W, w, labels, b};
 
 minimize obj: pi[0];
 s.t. gamma{(u,v,i) in A}: theta[v] >= theta[u]+(if i != 'LOSS' then pi[i] else 0);
