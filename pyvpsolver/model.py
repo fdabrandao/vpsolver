@@ -68,7 +68,11 @@ class Model(object):
         if ub == inf:
             ub = None
         assert name not in self.vars
-        assert vtype in ["C", "I"]
+        assert vtype in ["C", "I", "B"]
+        if vtype == "B":
+            assert lb in (None, 0)
+            assert ub in (None, 1)
+            lb, ub = 0, 1
         self.vars_list.append(name)
         self.vars[name] = {}
         self.vars[name]["lb"] = lb

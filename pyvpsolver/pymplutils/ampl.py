@@ -107,6 +107,8 @@ def ampl_var(name, typ="", lb=None, ub=None):
         typ = "integer"
     elif typ == "B":
         typ = "binary"
+    elif typ == "C":
+        typ = ""
     if typ != "":
         defs += ", {0}".format(typ)
     if lb is not None:
