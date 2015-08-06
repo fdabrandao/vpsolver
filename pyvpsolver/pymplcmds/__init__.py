@@ -24,4 +24,4 @@ from .default import CmdSet, CmdParam, CmdVar, CmdCon, CmdStmt
 from .flow import CmdFlow
 from .graph import CmdGraph
 from .loadvbp import CmdLoadVBP
-from .tsp import CmdTSPScf
+from .tsp import CmdTSP_SCF, CmdTSP_MTZ

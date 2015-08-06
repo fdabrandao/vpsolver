@@ -25,9 +25,83 @@ from .. import pymplutils
 from ..model import Model
 from ..modelutils import writemod
 
+class CmdTSP_MTZ(CmdBase):
+    """Command for creating Single Commodity Flow models for TSP."""
 
-class CmdTSPScf(CmdBase):
-    """Command for creating single commodity flow models for TSP."""
+    def __init__(self, *args, **kwargs):
+        CmdBase.__init__(self, *args, **kwargs)
+        self._cnt = 0
+
+    def _evalcmd(self, arg1, xvars, DL=False):
+        """Evalutates CMD[arg1](*args)."""
+        """
+        Miller, Tucker and Zemlin (MTZ) (1960)
+        var u{i in V: i != n}, >= 0;
+        s.t. MTZ{(i,j) in E: i != n}:
+            u[i]-u[j]+(n-1)*x[i,j] <= n-2;
+
+        Desrochers and Laporte (1991)
+        var u{i in V: i != n}, >= 0;
+        s.t. DL{(i,j) in E: i != n}:
+            u[i]-u[j]+(n-1)*x[i,j]+(n-3)*x[j,i] <= n-2;
+        """
+        assert arg1 is None
+        self._cnt += 1
+        prefix = "_tspmtz{0}_".format(self._cnt)
+
+        A = sorted(xvars.keys())
+        V = sorted(set(u for u, v in A) | set(v for u, v in A))
+        start = V[0]
+
+        declared_vars = set(xvars.values())
+
+        def uvar(u):
+            return "{0}u_{1}".format(prefix, u)
+
+        model = Model()
+
+        # var x{E}, binary;
+        for var in declared_vars:
+            model.add_var(name=var, lb=0, ub=1, vtype="B")
+
+        # s.t. leave{i in V}: sum{(i,j) in E} x[i,j] = 1;
+        # s.t. enter{j in V}: sum{(i,j) in E} x[i,j] = 1;
+        for k in V:
+            vars_in = [xvars[u, v] for u, v in A if v == k]
+            vars_out = [xvars[u, v] for u, v in A if u == k]
+            model.add_con(vars_in, "=", 1)
+            model.add_con(vars_out, "=", 1)
+
+        # var u{i in V: i != n}, >= 0;
+        for u in V:
+            if u != start:
+                model.add_var(name=uvar(u), lb=0, vtype="C")
+
+        # Miller, Tucker and Zemlin (MTZ) (1960)
+        # s.t. MTZ{(i,j) in E: i != n}:
+        #   u[i]-u[j]+(n-1)*x[i,j] <= n-2;
+
+        # Desrochers and Laporte (1991)
+        # s.t. DL{(i,j) in E: i != n}:
+        #   u[i]-u[j]+(n-1)*x[i,j]+(n-3)*x[j,i] <= n-2;
+        for (u, v) in A:
+            if u == start or v == start:
+                continue
+            lincomb = [(uvar(u), 1), (uvar(v), -1), (xvars[u, v], len(V)-1)]
+            if DL and (v, u) in A:
+                lincomb.append((xvars[v, u], len(V)-3))
+            model.add_con(lincomb, "<=", len(V)-2)
+
+        def con_name(name):
+            return prefix+name
+
+        model.rename_cons(con_name)
+
+        self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
+
+
+class CmdTSP_SCF(CmdBase):
+    """Command for creating Single Commodity Flow models for TSP."""
 
     def __init__(self, *args, **kwargs):
         CmdBase.__init__(self, *args, **kwargs)
@@ -70,10 +144,6 @@ class CmdTSPScf(CmdBase):
         for var in declared_vars:
             model.add_var(name=var, lb=0, ub=1, vtype="B")
 
-        # var y{(i,j) in E}, >= 0;
-        for (u, v) in A:
-            model.add_var(name=yvar(u, v), lb=0, vtype="C")
-
         # s.t. leave{i in V}: sum{(i,j) in E} x[i,j] = 1;
         # s.t. enter{j in V}: sum{(i,j) in E} x[i,j] = 1;
         for k in V:
@@ -81,6 +151,10 @@ class CmdTSPScf(CmdBase):
             vars_out = [xvars[u, v] for u, v in A if u == k]
             model.add_con(vars_in, "=", 1)
             model.add_con(vars_out, "=", 1)
+
+        # var y{E}, >= 0;
+        for (u, v) in A:
+            model.add_var(name=yvar(u, v), lb=0, vtype="C")
 
         # s.t. vub1{(i,j) in E: j == n}: y[i,j] <= (n-1) * x[i,j];
         # s.t. vub2{(i,j) in E: j != n}: y[i,j] <= (n-2) * x[i,j];
@@ -107,6 +181,4 @@ class CmdTSPScf(CmdBase):
 
         model.rename_cons(con_name)
 
-        self._pyvars["_model"] += writemod.model2ampl(
-            model, declared_vars
-        )
+        self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
