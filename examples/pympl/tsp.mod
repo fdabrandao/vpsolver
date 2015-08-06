@@ -29,11 +29,11 @@ minimize total: sum{(i,j) in A} c[i,j] * x[i,j];
 
 # Single Commodity Flow Model
 # Gavish and Graves (1978)
-$ATSP_FLOW{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
+$ATSP_SCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
 
 # Multi Commodity Flow Model
 # Wong (1980) and Claus (1984)
-$ATSP_FLOW{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, multi=True};
+$ATSP_MCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
 
 # Miller, Tucker and Zemlin (MTZ) (1960)
 $ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};

@@ -25,7 +25,7 @@ from ..modelutils import writemod
 
 
 def add_assign_constraints(model, xvars, graph):
-    """Adds assignment constraints to model."""
+    """Adds TSP assignment constraints to model."""
     V, A, start = graph
 
     # var x{A}, binary;
@@ -82,7 +82,7 @@ def add_mtz_constraints(model, xvars, graph, DL=False, prefix=""):
 
 
 def add_scf_constraints(model, xvars, graph, prefix=""):
-    """Adds a Single Commodity Flow Model to model.
+    """Adds a Single-Commodity Flow Model to model.
 
     Gavish and Graves (1978)
     var y{(i,j) in A}, >= 0;
@@ -125,7 +125,7 @@ def add_scf_constraints(model, xvars, graph, prefix=""):
 
 
 def add_mcf_constraints(model, xvars, graph, prefix=""):
-    """Adds a Multi Commodity Flow Model to model.
+    """Adds a Multi-Commodity Flow Model to model.
 
     Wong (1980) and Claus (1984)
     var y{(i,j) in A, k in V: k != n}, >= 0, <= 1;
@@ -175,7 +175,7 @@ def add_mcf_constraints(model, xvars, graph, prefix=""):
                 model.add_con(lincomb, "=", 0)
 
 
-class CmdATSP_MTZ(CmdBase):
+class CmdATSPModelMTZ(CmdBase):
     """Command for creating MTZ constraints for TSP."""
 
     def __init__(self, *args, **kwargs):
@@ -202,18 +202,18 @@ class CmdATSP_MTZ(CmdBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
 
-class CmdATSP_Flow(CmdBase):
-    """Command for creating extended Flow models for TSP."""
+class CmdATSPModelSCF(CmdBase):
+    """Command for creating Single-Commodity Flow Model models for TSP."""
 
     def __init__(self, *args, **kwargs):
         CmdBase.__init__(self, *args, **kwargs)
         self._cnt = 0
 
-    def _evalcmd(self, arg1, xvars, multi=False):
+    def _evalcmd(self, arg1, xvars):
         """Evalutates CMD[arg1](*args)."""
         assert arg1 is None
         self._cnt += 1
-        prefix = "_tspflow{0}_".format(self._cnt)
+        prefix = "_tspscf{0}_".format(self._cnt)
 
         A = sorted(xvars.keys())
         V = sorted(set(u for u, v in A) | set(v for u, v in A))
@@ -222,10 +222,34 @@ class CmdATSP_Flow(CmdBase):
 
         model = Model()
         add_assign_constraints(model, xvars, graph)
-        if not multi:
-            add_scf_constraints(model, xvars, graph, prefix)
-        else:
-            add_mcf_constraints(model, xvars, graph, prefix)
+        add_scf_constraints(model, xvars, graph, prefix)
+        model.rename_cons(lambda name: prefix+name)
+
+        declared_vars = set(xvars.values())
+        self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
+
+
+class CmdATSPModelMCF(CmdBase):
+    """Command for creating Multi-Commodity Flow Model models for TSP."""
+
+    def __init__(self, *args, **kwargs):
+        CmdBase.__init__(self, *args, **kwargs)
+        self._cnt = 0
+
+    def _evalcmd(self, arg1, xvars):
+        """Evalutates CMD[arg1](*args)."""
+        assert arg1 is None
+        self._cnt += 1
+        prefix = "_tspmcf{0}_".format(self._cnt)
+
+        A = sorted(xvars.keys())
+        V = sorted(set(u for u, v in A) | set(v for u, v in A))
+        start = V[0]
+        graph = (V, A, start)
+
+        model = Model()
+        add_assign_constraints(model, xvars, graph)
+        add_mcf_constraints(model, xvars, graph, prefix)
         model.rename_cons(lambda name: prefix+name)
 
         declared_vars = set(xvars.values())
