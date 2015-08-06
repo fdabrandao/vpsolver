@@ -33,13 +33,13 @@ $ATSP_FLOW{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
 
 # Multi Commodity Flow Model
 # Wong (1980) and Claus (1984)
-#$ATSP_FLOW{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, multi=True};
+$ATSP_FLOW{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, multi=True};
 
 # Miller, Tucker and Zemlin (MTZ) (1960)
-#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
+$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
 
 # Desrochers and Laporte (1991)
-#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, DL=True};
+$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, DL=True};
 
 solve;
 display x;
