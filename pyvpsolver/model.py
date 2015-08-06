@@ -93,6 +93,29 @@ class Model(object):
         self.cons_list.append(name)
         self.cons[name] = (lincomb, sign, rhs)
 
+    def rename_vars(self, var_name):
+        """Renames variables."""
+        self.vars_list = map(var_name, self.vars_list)
+        oldvars = self.vars
+        self.vars = {}
+        for name in oldvars:
+            self.vars[var_name(name)] = oldvars[name]
+        for name in self.cons:
+            lincomb, sign, rhs = self.cons[name]
+            lincomb = [
+                (var_name(var), coef)
+                for var, coef in lincomb
+            ]
+            self.cons[name] = (lincomb, sign, rhs)
+
+    def rename_cons(self, con_name):
+        """Renames constraints."""
+        self.cons_list = map(con_name, self.cons_list)
+        oldcons = self.cons
+        self.cons = {}
+        for con in oldcons:
+            self.cons[con_name(con)] = oldcons[con]
+
     def write_lp(self, lp_file):
         """Write the model to a file in LP format."""
         write_lp(self, lp_file)

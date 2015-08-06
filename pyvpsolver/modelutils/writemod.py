@@ -61,44 +61,35 @@ def write_mod(model, filename):
     fout.close()
 
 
-def model2ampl(model, zvar, excluded_vars=None, prefix=""):
+def model2ampl(model, declared_vars=None):
     """Returns models as a string in AMPL format."""
     res = ""
 
     # Variables:
 
-    if excluded_vars is not None:
-        excluded_vars = set(excluded_vars)
+    if declared_vars is not None:
+        declared_vars = set(declared_vars)
     else:
-        excluded_vars = set()
-
-    def var_name(name):
-        if name == zvar or name in excluded_vars:
-            return name
-        else:
-            return prefix+name
+        declared_vars = set()
 
     def format_var(name):
         typ = model.vars[name]["vtype"]
         lb = model.vars[name]["lb"]
         ub = model.vars[name]["ub"]
-        if name == zvar:
-            return ampl_var(name, typ, lb, ub)
-        else:
-            return ampl_var(var_name(name), typ, lb, ub)
+        return ampl_var(name, typ, lb, ub)
 
     res += "".join(
         format_var(name)
         for name in model.vars
-        if name not in excluded_vars
+        if name not in declared_vars
     )
 
     # Constraints:
 
     def format_con(name):
         lincomb, sign, rhs = model.cons[name]
-        lincomb = [(var_name(var), coef) for (var, coef) in lincomb]
-        return ampl_con(prefix+name, lincomb, sign, rhs)
+        lincomb = [(var, coef) for (var, coef) in lincomb]
+        return ampl_con(name, lincomb, sign, rhs)
 
     res += "".join(
         format_con(name)

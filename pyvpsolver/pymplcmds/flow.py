@@ -58,20 +58,20 @@ class CmdFlow(CmdBase):
         if isinstance(bounds, dict):
             bounds = [bounds[k] for k in sorted(bounds)]
 
-        graph, model, excluded_vars = self._generate_model(
-            zvar, W, w, b, bounds, noobj=True
-        )
         prefix = "_{0}_".format(zvar.lstrip("^"))
         prefix = prefix.replace("[", "_").replace("]", "_")
+
+        graph, model, declared_vars = self._generate_model(
+            zvar, W, w, b, bounds, prefix
+        )
 
         self._zvars.append(zvar)
         self._graphs.append(graph)
         self._prefixes.append(prefix)
-        self._pyvars["_model"] += writemod.model2ampl(
-            model, zvar, excluded_vars, prefix
-        )
 
-    def _generate_model(self, zvar, W, w, b, bounds=None, noobj=False):
+        self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
+
+    def _generate_model(self, zvar, W, w, b, bounds=None, prefix=""):
         """Generates a arc-flow model."""
         m = len(w)
         bb = [0]*m
@@ -99,6 +99,13 @@ class CmdFlow(CmdBase):
         assocs = graph.get_assocs(vnames)
         graph.names = vnames
 
+        labels = {
+            (u, v, i): ["i={0}".format(i+1)]
+            for (u, v, i) in graph.A
+            if isinstance(i, int) and i < m
+        }
+        graph.set_labels(labels)
+
         for i in xrange(m):
             if bounds is not None:
                 for var in assocs[i]:
@@ -118,19 +125,23 @@ class CmdFlow(CmdBase):
         for lincomb, sign, rhs in cons:
             model.add_con(lincomb, sign, rhs)
 
-        if noobj is False:
-            objlincomb = [(vnames[feedback], 1)]
-            model.set_obj("min", objlincomb)
+        declared_vars = set(bvars)
 
-        labels = {
-            (u, v, i): ["i={0}".format(i+1)]
-            for (u, v, i) in graph.A
-            if isinstance(i, int) and i < m
-        }
-        graph.set_labels(labels)
+        def var_name(name):
+            if name == zvar:
+                return name
+            elif name in declared_vars:
+                return name
+            else:
+                return prefix+name
 
-        excluded_vars = bvars
-        return graph, model, excluded_vars
+        def con_name(name):
+            return prefix+name
+
+        model.rename_vars(var_name)
+        model.rename_cons(con_name)
+
+        return graph, model, declared_vars
 
     def extract(self, varvalues, verbose=False):
         """Extracts an arc-flow solution."""
