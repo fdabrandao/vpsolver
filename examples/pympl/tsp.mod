@@ -1,7 +1,7 @@
 $EXEC{
-n, xs, ys = read_tsp("data/tsp_51_1.txt")
+#n, xs, ys = read_tsp("data/tsp_51_1.txt")
 #n, xs, ys = read_tsp("data/tsp_5_1.txt")
-#n, xs, ys = read_tsp("data/tsp_20_1.txt")
+n, xs, ys = read_tsp("data/tsp_20_1.txt")
 #n, xs, ys = read_tsp("data/tsp_30_1.txt")
 points = zip(xs, ys)
 
@@ -29,13 +29,13 @@ minimize total: sum{(i,j) in E} c[i,j] * x[i,j];
 
 # Single Commodity Flow Model
 # Gavish and Graves (1978)
-$TSP_SCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['E']}};
+$ATSP_SCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['E']}};
 
 # Miller, Tucker and Zemlin (MTZ) (1960)
-#$TSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['E']}};
+#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['E']}};
 
 # Desrochers and Laporte (1991)
-#$TSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['E']}, DL=True};
+#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['E']}, DL=True};
 
 solve;
 display x;

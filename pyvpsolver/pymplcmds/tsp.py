@@ -25,7 +25,7 @@ from .. import pymplutils
 from ..model import Model
 from ..modelutils import writemod
 
-class CmdTSP_MTZ(CmdBase):
+class CmdATSP_MTZ(CmdBase):
     """Command for creating Single Commodity Flow models for TSP."""
 
     def __init__(self, *args, **kwargs):
@@ -100,7 +100,7 @@ class CmdTSP_MTZ(CmdBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
 
-class CmdTSP_SCF(CmdBase):
+class CmdATSP_SCF(CmdBase):
     """Command for creating Single Commodity Flow models for TSP."""
 
     def __init__(self, *args, **kwargs):
