@@ -1,4 +1,4 @@
-$LOAD_VBP[instance1{I,D}]{"instance.vbp",1};
+$LOAD_VBP[instance1{I,D}]{"data/instance.vbp",1};
 var x{I}, >= 0;
 
 $FLOW[Z]{

@@ -36,30 +36,43 @@ if __name__ == "__main__":
             project_dir, os.environ["PATH"]
         )
 
-import equivknapsack01
-import equivknapsack
-import wolsey
-import instance
-import tsp
+from pyvpsolver import VPSolver, PyMPL, glpkutils
+
+
+def read_tsp(fname):
+    """Reads TSP instances from files."""
+    xs, ys = [], []
+    with open(fname) as f:
+        lst = map(float, f.read().split())
+        n = int(lst.pop(0))
+        for i in xrange(n):
+            xs.append(lst.pop(0))
+            ys.append(lst.pop(0))
+    return n, xs, ys
 
 
 def main():
-    """Runs all PyMPL examples."""
+    """Parses 'tsp.mod'."""
 
-    print "equivknapsack:"
-    equivknapsack.main()
+    mod_in = "tsp.mod"
+    mod_out = "tmp/tsp.out.mod"
+    parser = PyMPL(locals_=locals(), globals_=globals())
+    parser.parse(mod_in, mod_out)
 
-    print "equivknapsack01:"
-    equivknapsack01.main()
+    lp_out = "tmp/tsp.lp"
+    glpkutils.mod2lp(mod_out, lp_out, True)
+    out, varvalues = VPSolver.script_wsol(
+        "vpsolver_gurobi.sh", lp_out, verbose=True
+    )
+    # out, varvalues = VPSolver.script_wsol(
+    #     "vpsolver_glpk.sh", lp_out, verbose=True
+    # )
 
-    print "wolsey:"
-    wolsey.main()
-
-    print "instance:"
-    instance.main()
-
-    print "tsp:"
-    tsp.main()
+    print "varvalues:", [
+        (k, v)
+        for k, v in sorted(varvalues.items())
+        if not k.startswith("_")
+    ]
 
 if __name__ == "__main__":
     main()
