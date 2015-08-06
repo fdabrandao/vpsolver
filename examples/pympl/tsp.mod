@@ -21,21 +21,25 @@ dist = {
 
 $PARAM[n]{n};
 $SET[V]{range(1, n+1)};
-$PARAM[c{E}]{dist};
+$PARAM[c{A}]{dist};
 
-var x{E}, binary;
+var x{A}, binary;
 
-minimize total: sum{(i,j) in E} c[i,j] * x[i,j];
+minimize total: sum{(i,j) in A} c[i,j] * x[i,j];
 
 # Single Commodity Flow Model
 # Gavish and Graves (1978)
-$ATSP_SCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['E']}};
+$ATSP_FLOW{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
+
+# Multi Commodity Flow Model
+# Wong (1980) and Claus (1984)
+#$ATSP_FLOW{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, multi=True};
 
 # Miller, Tucker and Zemlin (MTZ) (1960)
-#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['E']}};
+#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
 
 # Desrochers and Laporte (1991)
-#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['E']}, DL=True};
+#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, DL=True};
 
 solve;
 display x;

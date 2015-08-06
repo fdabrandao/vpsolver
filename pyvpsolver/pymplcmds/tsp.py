@@ -19,9 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re
 from .base import CmdBase
-from .. import pymplutils
 from ..model import Model
 from ..modelutils import writemod
 
@@ -37,12 +35,12 @@ class CmdATSP_MTZ(CmdBase):
         """
         Miller, Tucker and Zemlin (MTZ) (1960)
         var u{i in V: i != n}, >= 0;
-        s.t. MTZ{(i,j) in E: i != n}:
+        s.t. MTZ{(i,j) in A: i != n}:
             u[i]-u[j]+(n-1)*x[i,j] <= n-2;
 
         Desrochers and Laporte (1991)
         var u{i in V: i != n}, >= 0;
-        s.t. DL{(i,j) in E: i != n}:
+        s.t. DL{(i,j) in A: i != n}:
             u[i]-u[j]+(n-1)*x[i,j]+(n-3)*x[j,i] <= n-2;
         """
         assert arg1 is None
@@ -60,12 +58,12 @@ class CmdATSP_MTZ(CmdBase):
 
         model = Model()
 
-        # var x{E}, binary;
+        # var x{A}, binary;
         for var in declared_vars:
             model.add_var(name=var, lb=0, ub=1, vtype="B")
 
-        # s.t. leave{i in V}: sum{(i,j) in E} x[i,j] = 1;
-        # s.t. enter{j in V}: sum{(i,j) in E} x[i,j] = 1;
+        # s.t. leave{i in V}: sum{(i,j) in A} x[i,j] = 1;
+        # s.t. enter{j in V}: sum{(i,j) in A} x[i,j] = 1;
         for k in V:
             vars_in = [xvars[u, v] for u, v in A if v == k]
             vars_out = [xvars[u, v] for u, v in A if u == k]
@@ -78,11 +76,11 @@ class CmdATSP_MTZ(CmdBase):
                 model.add_var(name=uvar(u), lb=0, vtype="C")
 
         # Miller, Tucker and Zemlin (MTZ) (1960)
-        # s.t. MTZ{(i,j) in E: i != n}:
+        # s.t. MTZ{(i,j) in A: i != n}:
         #   u[i]-u[j]+(n-1)*x[i,j] <= n-2;
 
         # Desrochers and Laporte (1991)
-        # s.t. DL{(i,j) in E: i != n}:
+        # s.t. DL{(i,j) in A: i != n}:
         #   u[i]-u[j]+(n-1)*x[i,j]+(n-3)*x[j,i] <= n-2;
         for (u, v) in A:
             if u == start or v == start:
@@ -100,31 +98,15 @@ class CmdATSP_MTZ(CmdBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
 
-class CmdATSP_SCF(CmdBase):
-    """Command for creating Single Commodity Flow models for TSP."""
+class CmdATSP_Flow(CmdBase):
+    """Command for creating Flow models for TSP."""
 
     def __init__(self, *args, **kwargs):
         CmdBase.__init__(self, *args, **kwargs)
         self._cnt = 0
 
-    def _evalcmd(self, arg1, xvars):
+    def _evalcmd(self, arg1, xvars, multi=False):
         """Evalutates CMD[arg1](*args)."""
-        """
-        Single Commodity Flow Model
-        Gavish and Graves (1978)
-
-        set E;
-        set V;
-        var x{E}, binary;
-        s.t. leave{i in V}: sum{(i,j) in E} x[i,j] = 1;
-        s.t. enter{j in V}: sum{(i,j) in E} x[i,j] = 1;
-        var y{(i,j) in E}, >= 0;
-        s.t. vub1{(i,j) in E: j == n}: y[i,j] <= (n-1) * x[i,j];
-        s.t. vub2{(i,j) in E: j != n}: y[i,j] <= (n-2) * x[i,j];
-        s.t. afg{i in V}:
-        sum{(j,i) in E} y[j,i] - sum{(i,j) in E} y[i,j] = if i == n then n-1
-                                                          else -1;
-        """
         assert arg1 is None
         self._cnt += 1
         prefix = "_tspscf{0}_".format(self._cnt)
@@ -135,37 +117,70 @@ class CmdATSP_SCF(CmdBase):
 
         declared_vars = set(xvars.values())
 
-        def yvar(u, v):
-            return "{0}y_{1}_{2}".format(prefix, u, v)
-
         model = Model()
+        self._common(model, xvars, V, A, start)
+        if not multi:
+            self._single(model, xvars, V, A, start)
+        else:
+            self._multi(model, xvars, V, A, start)
 
-        # var x{E}, binary;
-        for var in declared_vars:
+        def var_name(name):
+            if name in declared_vars:
+                return name
+            else:
+                return prefix+name
+
+        def con_name(name):
+            return prefix+name
+
+        model.rename_vars(var_name)
+        model.rename_cons(con_name)
+
+        self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
+
+    def _common(self, model, xvars, V, A, start):
+        """Adds assignment constraints."""
+        # var x{A}, binary;
+        for var in xvars.values():
             model.add_var(name=var, lb=0, ub=1, vtype="B")
 
-        # s.t. leave{i in V}: sum{(i,j) in E} x[i,j] = 1;
-        # s.t. enter{j in V}: sum{(i,j) in E} x[i,j] = 1;
+        # s.t. leave{i in V}: sum{(i,j) in A} x[i,j] = 1;
+        # s.t. enter{j in V}: sum{(i,j) in A} x[i,j] = 1;
         for k in V:
             vars_in = [xvars[u, v] for u, v in A if v == k]
             vars_out = [xvars[u, v] for u, v in A if u == k]
             model.add_con(vars_in, "=", 1)
             model.add_con(vars_out, "=", 1)
 
-        # var y{E}, >= 0;
+    def _single(self, model, xvars, V, A, start):
+        """Add a Single Commodity Flow Model. Gavish and Graves (1978)
+
+        var y{(i,j) in A}, >= 0;
+        s.t. vub1{(i,j) in A: j == n}: y[i,j] <= (n-1) * x[i,j];
+        s.t. vub2{(i,j) in A: j != n}: y[i,j] <= (n-2) * x[i,j];
+        s.t. afg{i in V}:
+          sum{(j,i) in A} y[j,i] - sum{(i,j) in A} y[i,j]
+          = if i == n then n-1
+            else -1;
+        """
+
+        def yvar(u, v):
+            return "y_{0}_{1}".format(u, v)
+
+        # var y{A}, >= 0;
         for (u, v) in A:
             model.add_var(name=yvar(u, v), lb=0, vtype="C")
 
-        # s.t. vub1{(i,j) in E: j == n}: y[i,j] <= (n-1) * x[i,j];
-        # s.t. vub2{(i,j) in E: j != n}: y[i,j] <= (n-2) * x[i,j];
+        # s.t. vub1{(i,j) in A: j == n}: y[i,j] <= (n-1) * x[i,j];
+        # s.t. vub2{(i,j) in A: j != n}: y[i,j] <= (n-2) * x[i,j];
         for (u, v) in A:
             if v == start:
                 model.add_con(yvar(u, v), "<=", [(len(V)-1, xvars[u, v])])
             else:
                 model.add_con(yvar(u, v), "<=", [(len(V)-2, xvars[u, v])])
 
-        # s.t. afg{i in V}:
-        # sum{(j,i) in E} y[j,i] - sum{(i,j) in E} y[i,j]
+        # s.t. flowcon{i in V}:
+        # sum{(j,i) in A} y[j,i] - sum{(i,j) in A} y[i,j]
         # = if i == n then n-1
         #   else -1;
         for k in V:
@@ -176,9 +191,49 @@ class CmdATSP_SCF(CmdBase):
             else:
                 model.add_con(lincomb, "=", -1)
 
-        def con_name(name):
-            return prefix+name
+    def _multi(self, model, xvars, V, A, start):
+        """Adds a Multi Commodity Flow Model. Wong (1980) and Claus (1984)
 
-        model.rename_cons(con_name)
+        var y{(i,j) in A, k in V: k != n}, >= 0, <= 1;
+        s.t. vub{(i,j) in A, k in V: k != n}: y[i,j,k] <= x[i,j];
+        s.t. flowcon{i in V, k in V: k != n}:
+          sum{(j,i) in A} y[j,i,k]
+          - sum{(i,j) in A} y[i,j,k]
+          = if i == k then 1 else
+            if i == n then -1 else
+            0;
+        """
 
-        self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
+        def yvar(u, v, k):
+            return "y_{0}_{1}_{2}".format(u, v, k)
+
+        # var y{A}, >= 0;
+        for (u, v) in A:
+            for k in V:
+                if k != start:
+                    model.add_var(name=yvar(u, v, k), lb=0, vtype="C")
+
+        # s.t. vub{(i,j) in A, k in V: k != n}: y[i,j,k] <= x[i,j];
+        for (u, v) in A:
+            for k in V:
+                if k != start:
+                    model.add_con(yvar(u, v, k), "<=", xvars[u, v])
+
+        #s.t. flowcon{i in V, k in V: k != n}:
+        #  sum{(j,i) in A} y[j,i,k]
+        #  - sum{(i,j) in A} y[i,j,k]
+        #  = if i == k then 1 else
+        #    if i == n then -1 else
+        #    0;
+        for i in V:
+            for k in V:
+                if k == start:
+                    continue
+                lincomb = [(yvar(u, v, k), 1) for u, v in A if v == i]
+                lincomb += [(yvar(u, v, k), -1) for u, v in A if u == i]
+                if i == k:
+                    model.add_con(lincomb, "=", 1)
+                elif i == start:
+                    model.add_con(lincomb, "=", -1)
+                else:
+                    model.add_con(lincomb, "=", 0)

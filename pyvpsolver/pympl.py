@@ -25,7 +25,7 @@ from copy import deepcopy
 from .pymplcmds import CmdBase, CmdSet, CmdParam
 from .pymplcmds import CmdVar, CmdCon, CmdStmt
 from .pymplcmds import CmdFlow, CmdGraph, CmdLoadVBP
-from .pymplcmds import CmdATSP_MTZ, CmdATSP_SCF
+from .pymplcmds import CmdATSP_MTZ, CmdATSP_Flow
 
 
 class PyMPL(object):
@@ -50,7 +50,7 @@ class PyMPL(object):
     DEFAULT_CMDS = {
         "SET": CmdSet, "PARAM": CmdParam,
         "VAR": CmdVar, "CON": CmdCon, "STMT": CmdStmt,
-        "ATSP_MTZ": CmdATSP_MTZ, "ATSP_SCF": CmdATSP_SCF,
+        "ATSP_MTZ": CmdATSP_MTZ, "ATSP_FLOW": CmdATSP_Flow,
         "LOAD_VBP": CmdLoadVBP, "FLOW": CmdFlow, "GRAPH": CmdGraph,
     }
 
