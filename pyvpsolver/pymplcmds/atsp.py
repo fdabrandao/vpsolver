@@ -186,7 +186,7 @@ class CmdATSPModelMTZ(CmdBase):
         """Evalutates CMD[arg1](*args)."""
         assert arg1 is None
         self._cnt += 1
-        prefix = "_tspmtz{0}_".format(self._cnt)
+        prefix = "_atspmtz{0}_".format(self._cnt)
 
         A = sorted(xvars.keys())
         V = sorted(set(u for u, v in A) | set(v for u, v in A))
@@ -213,7 +213,7 @@ class CmdATSPModelSCF(CmdBase):
         """Evalutates CMD[arg1](*args)."""
         assert arg1 is None
         self._cnt += 1
-        prefix = "_tspscf{0}_".format(self._cnt)
+        prefix = "_atspscf{0}_".format(self._cnt)
 
         A = sorted(xvars.keys())
         V = sorted(set(u for u, v in A) | set(v for u, v in A))
@@ -240,7 +240,7 @@ class CmdATSPModelMCF(CmdBase):
         """Evalutates CMD[arg1](*args)."""
         assert arg1 is None
         self._cnt += 1
-        prefix = "_tspmcf{0}_".format(self._cnt)
+        prefix = "_atspmcf{0}_".format(self._cnt)
 
         A = sorted(xvars.keys())
         V = sorted(set(u for u, v in A) | set(v for u, v in A))
