@@ -23,4 +23,4 @@ from .base import CmdBase
 from .default import CmdSet, CmdParam, CmdVar, CmdCon, CmdStmt
 from .vbp import CmdVBPLoad, CmdVBPModelFlow, CmdVBPGraph
 from .atsp import CmdATSPModelSCF, CmdATSPModelMCF, CmdATSPModelMTZ
-from .sos import CmdSOS1Model, CmdSOS2Model
+from .sos import CmdSOS1Model, CmdSOS2Model, CmdPWLModel

@@ -26,7 +26,7 @@ from .pymplcmds import CmdBase, CmdSet, CmdParam
 from .pymplcmds import CmdVar, CmdCon, CmdStmt
 from .pymplcmds import CmdVBPModelFlow, CmdVBPGraph, CmdVBPLoad
 from .pymplcmds import CmdATSPModelMTZ, CmdATSPModelSCF, CmdATSPModelMCF
-from .pymplcmds import CmdSOS1Model, CmdSOS2Model
+from .pymplcmds import CmdSOS1Model, CmdSOS2Model, CmdPWLModel
 
 class PyMPL(object):
     """Class for parsing AMPL files with PyMPL calls."""
@@ -61,6 +61,7 @@ class PyMPL(object):
         "VBP_GRAPH": CmdVBPGraph,
         "SOS1": CmdSOS1Model,
         "SOS2": CmdSOS2Model,
+        "PWL": CmdPWLModel,
     }
 
     def __init__(self, locals_=None, globals_=None):

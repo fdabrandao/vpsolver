@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .base import CmdBase
 from ..model import Model
 from ..modelutils import writemod
+from .. import pymplutils
 
 
 def add_sos1(model, varl, ub=1, prefix=""):
@@ -101,3 +102,45 @@ class CmdSOS2Model(CmdBase):
 
         declared_vars = set(varl)
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
+
+
+class CmdPWLModel(CmdBase):
+    """Command for modeling Piecewise Linear Functions."""
+
+    def __init__(self, *args, **kwargs):
+        CmdBase.__init__(self, *args, **kwargs)
+        self._cnt = 0
+
+    def _evalcmd(self, varnames, xyvalues):
+        """Evalutates CMD[arg1](*args)."""
+        match = pymplutils.parse_symblist(varnames)
+        assert match is not None
+        xvar, yvar = match
+
+        self._cnt += 1
+        prefix = "_pwl{0}_".format(self._cnt)
+
+        n = len(xyvalues)
+        xvalues, yvalues = zip(*xyvalues)
+
+        model = Model()
+        # var x;
+        model.add_var(name=xvar, lb=min(xvalues), ub=max(xvalues), vtype="C")
+        # var y;
+        model.add_var(name=yvar, lb=min(yvalues), ub=max(yvalues), vtype="C")
+        def zvar(i):
+            return prefix+"z_{0}".format(i)
+        # var z{I}, >= 0;
+        for i in xrange(n):
+            model.add_var(name=zvar(i), lb=0, ub=1, vtype="C")
+        # s.t. convexity: sum{i in I} z[i] = 1;
+        model.add_con([zvar(i) for i in xrange(n)], "=", 1)
+        # SOS2{z};
+        add_sos2(model, [zvar(i) for i in xrange(n)], 1, prefix)
+        # s.t. fix_x: x = sum{i in I} X[i] * z[i];
+        # s.t. fix_y: y = sum{i in I} Y[i] * z[i];
+        model.add_con([(zvar(i), xvalues[i]) for i in xrange(n)], "=", xvar)
+        model.add_con([(zvar(i), yvalues[i]) for i in xrange(n)], "=", yvar)
+        model.rename_cons(lambda name: prefix+name)
+
+        self._pyvars["_model"] += writemod.model2ampl(model)
