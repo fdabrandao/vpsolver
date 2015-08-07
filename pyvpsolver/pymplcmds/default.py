@@ -80,12 +80,26 @@ class CmdParam(CmdBase):
 class CmdVar(CmdBase):
     """Command for creating a new AMPL variable."""
 
-    def _evalcmd(self, name, typ="", lb=None, ub=None):
+    def _evalcmd(self, name, typ="", lb=None, ub=None, index_set=None):
         """Evalutates CMD[name](*args)."""
-        match = pymplutils.parse_symbname(name)
+        match = pymplutils.parse_indexed(name, "{}")
         assert match is not None
-        name = match
-        self._pyvars["_model"] += pymplutils.ampl_var(name, typ, lb, ub)
+        name, index = match
+
+        if index is not None:
+            assert len(index) == 1
+            index = index[0]
+            if not index.startswith("^"):
+                assert index_set is not None
+
+        if index_set is not None:
+            if index is None:
+                index = "{0}_I".format(name)
+            self._defs += pymplutils.ampl_set(
+                index, index_set, self._sets, self._params
+            )[0]
+
+        self._pyvars["_model"] += pymplutils.ampl_var(name, index, typ, lb, ub)
 
 
 class CmdCon(CmdBase):

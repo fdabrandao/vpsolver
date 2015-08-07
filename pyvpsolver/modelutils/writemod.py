@@ -41,7 +41,7 @@ def write_mod(model, filename):
         typ = model.vars[var]["vtype"]
         lb = model.vars[var]["lb"]
         ub = model.vars[var]["ub"]
-        print >>fout, ampl_var(var, typ, lb, ub)
+        print >>fout, ampl_var(name=var, typ=typ, lb=lb, ub=ub)
 
     # Objective:
 
@@ -76,7 +76,7 @@ def model2ampl(model, declared_vars=None):
         typ = model.vars[name]["vtype"]
         lb = model.vars[name]["lb"]
         ub = model.vars[name]["ub"]
-        return ampl_var(name, typ, lb, ub)
+        return ampl_var(name=name, typ=typ, lb=lb, ub=ub)
 
     res += "".join(
         format_var(name)

@@ -95,6 +95,7 @@ class TestPyMPL(unittest.TestCase):
         $VAR[y]{"binary"};
         $VAR[z]{ub=abs((2**7)/5-135)};
         $VAR[^z]{"integer", 0, 10};
+        $VAR[xs{I}]{"integer", index_set=range(3)};
         $EXEC{VAR['y']("binary")};
         """
         parser.parse(comment_cmds=False)
@@ -103,6 +104,8 @@ class TestPyMPL(unittest.TestCase):
         self.assertIn("var z, <= 110;", parser.output)
         self.assertNotIn("var ^z, integer, >= 0, <= 10;", parser.output)
         self.assertIn("var y, binary;", parser.output)
+        self.assertIn("var xs{I}, integer;", parser.output)
+        self.assertIn("set I := {0,1,2};", parser.output)
 
     def test_con(self):
         """Tests $CON[name]{lincomb, sign, rhs} calls"""
@@ -177,10 +180,10 @@ class TestPyMPL(unittest.TestCase):
         parser.input = """$SET[X]{0};"""
         with self.assertRaises(TypeError):
             parser.parse(comment_cmds=False)
-        parser.input = """$FLOW[Z]{100, [10, 10]};"""
+        parser.input = """$VBP_FLOW[Z]{100, [10, 10]};"""
         with self.assertRaises(TypeError):
             parser.parse(comment_cmds=False)
-        parser.input = """$FLOW[Z]{100, 10};"""
+        parser.input = """$VBP_FLOW[Z]{100, 10};"""
         with self.assertRaises(TypeError):
             parser.parse(comment_cmds=False)
         parser.input = """$SET[X]{};"""

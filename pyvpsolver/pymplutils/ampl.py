@@ -98,10 +98,12 @@ def ampl_param(name, index, value, sets, params):
         return defs, ""
 
 
-def ampl_var(name, typ="", lb=None, ub=None):
+def ampl_var(name, index=None, typ="", lb=None, ub=None):
     """Generates the definition for an AMPL variable."""
     if name.startswith("^"):
         return ""
+    if index is not None:
+        name = "{0}{{{1}}}".format(name, index)
     defs = "var {0}".format(name)
     if typ == "I":
         typ = "integer"
