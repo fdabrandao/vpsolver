@@ -41,6 +41,8 @@ import equivknapsack
 import wolsey
 import instance
 import tsp
+import sos
+import pwl
 
 
 def main():
@@ -60,6 +62,12 @@ def main():
 
     print "tsp:"
     tsp.main()
+
+    print "sos:"
+    sos.main()
+
+    print "pwl:"
+    pwl.main()
 
 if __name__ == "__main__":
     main()

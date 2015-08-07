@@ -40,14 +40,14 @@ from pyvpsolver import VPSolver, PyMPL, glpkutils
 
 
 def main():
-    """Parses 'sos.mod'."""
+    """Parses 'pwl.mod'."""
 
-    mod_in = "sos.mod"
-    mod_out = "tmp/sos.out.mod"
+    mod_in = "pwl.mod"
+    mod_out = "tmp/pwl.out.mod"
     parser = PyMPL(locals_=locals(), globals_=globals())
     parser.parse(mod_in, mod_out)
 
-    lp_out = "tmp/sos.lp"
+    lp_out = "tmp/pwl.lp"
     glpkutils.mod2lp(mod_out, lp_out, True)
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_glpk.sh", lp_out, verbose=True

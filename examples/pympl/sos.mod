@@ -13,7 +13,7 @@ var u >= 0;
 var z{I}, >= 0;
 s.t. fix_x: x = sum{i in I} X[i] * z[i];
 s.t. fix_y: y = sum{i in I} Y[i] * z[i];
-s.t. conv: sum{i in I} z[i] = 1;
+s.t. convexity: sum{i in I} z[i] = 1;
 
 $SOS2{["z[%d]"%i for i in _sets['I']]};
 
