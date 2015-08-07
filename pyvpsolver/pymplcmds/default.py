@@ -54,10 +54,8 @@ class CmdParam(CmdBase):
             if index is not None:
                 assert len(index) == 1
                 index = index[0]
-        else:
+        elif isinstance(values, dict):
             assert i0 is None
-
-        if isinstance(values, dict):
             if index is not None:
                 assert len(index) == 1
                 index = index[0]

@@ -70,7 +70,7 @@ def ampl_param(name, index, value, sets, params):
         params[name] = deepcopy(value)
 
     if isinstance(value, dict):
-        defs = "param {0}{{{1}}};\n".format(name, index)
+        defs = "param {0}{{{1}}};\n".format(name, index.lstrip("^"))
 
         def format_entry(k, v):
             if isinstance(k, str):
