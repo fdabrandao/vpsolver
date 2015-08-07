@@ -61,12 +61,16 @@ def main():
 
     lp_out = "tmp/tsp.lp"
     glpkutils.mod2lp(mod_out, lp_out, True)
+    try:
+        out, varvalues = VPSolver.script_wsol(
+            "vpsolver_gurobi.sh", lp_out, verbose=True
+        )
+    except Exception as e:
+        print repr(e)
+
     out, varvalues = VPSolver.script_wsol(
-        "vpsolver_gurobi.sh", lp_out, verbose=True
+        "vpsolver_glpk.sh", lp_out, verbose=True
     )
-    # out, varvalues = VPSolver.script_wsol(
-    #     "vpsolver_glpk.sh", lp_out, verbose=True
-    # )
 
     print "varvalues:", [
         (k, v)
