@@ -53,9 +53,9 @@ def main():
         "vpsolver_gurobi.sh", lp_out, verbose=True
     )
 
-    #out, varvalues = VPSolver.script_wsol(
-    #    "vpsolver_glpk.sh", lp_out, verbose=True
-    #)
+    out, varvalues = VPSolver.script_wsol(
+        "vpsolver_glpk.sh", lp_out, verbose=True
+    )
 
     print "varvalues:", [
         (k, v)

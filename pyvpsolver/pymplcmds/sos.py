@@ -24,6 +24,39 @@ from ..model import Model
 from ..modelutils import writemod
 
 
+def add_sos1(model, varl, ub=1, prefix=""):
+    """Adds SOS1 constraints to model."""
+    def yvar(i):
+        return prefix+"y_{0}".format(i)
+
+    for i in xrange(len(varl)):
+        model.add_var(name=yvar(i), vtype="B")
+
+    for i, var in enumerate(varl):
+        model.add_con(var, "<=", [(yvar(i), ub)])
+
+    model.add_con([yvar(i) for i in xrange(len(varl))], "=", 1)
+
+
+def add_sos2(model, varl, ub=1, prefix=""):
+    """Adds SOS2 constraints to model."""
+    def yvar(i):
+        return prefix+"y_{0}".format(i)
+
+    for i in xrange(len(varl)-1):
+        model.add_var(name=yvar(i), vtype="B")
+
+    for i, var in enumerate(varl):
+        if i == 0:
+            model.add_con(var, "<=", [(yvar(i), ub)])
+        elif i == len(varl)-1:
+            model.add_con(var, "<=", [(yvar(i-1), ub)])
+        else:
+            model.add_con(var, "<=", [(yvar(i-1), ub), (yvar(i), ub)])
+
+    model.add_con([yvar(i) for i in xrange(len(varl)-1)], "=", 1)
+
+
 class CmdSOS1Model(CmdBase):
     """Command for creating SOS1 constraints."""
 
@@ -37,22 +70,13 @@ class CmdSOS1Model(CmdBase):
         self._cnt += 1
         prefix = "_sos1{0}_".format(self._cnt)
 
-        def yvar(i):
-            return prefix+"y_{0}".format(i)
-
         model = Model()
-
-        for i, var in enumerate(varl):
+        for var in varl:
             model.add_var(name=var)
-            model.add_var(name=yvar(i), lb=0, ub=1, vtype="B")
-
-        for i, var in enumerate(varl):
-            model.add_con(var, "<=", [(yvar(i), ub)])
-
-        model.add_con([yvar(i) for i in xrange(len(varl))], "=", 1)
+        add_sos1(model, varl, ub, prefix)
+        model.rename_cons(lambda name: prefix+name)
 
         declared_vars = set(varl)
-        model.rename_cons(lambda name: prefix+name)
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
 
@@ -69,27 +93,11 @@ class CmdSOS2Model(CmdBase):
         self._cnt += 1
         prefix = "_sos2{0}_".format(self._cnt)
 
-        def yvar(i):
-            return prefix+"y_{0}".format(i)
-
         model = Model()
-
         for var in varl:
             model.add_var(name=var)
-
-        for i in xrange(len(varl)-1):
-            model.add_var(name=yvar(i), lb=0, ub=1, vtype="B")
-
-        for i, var in enumerate(varl):
-            if i == 0:
-                model.add_con(var, "<=", [(yvar(i), ub)])
-            elif i == len(varl)-1:
-                model.add_con(var, "<=", [(yvar(i-1), ub)])
-            else:
-                model.add_con(var, "<=", [(yvar(i-1), ub), (yvar(i), ub)])
-
-        model.add_con([yvar(i) for i in xrange(len(varl)-1)], "=", 1)
+        add_sos2(model, varl, ub, prefix)
+        model.rename_cons(lambda name: prefix+name)
 
         declared_vars = set(varl)
-        model.rename_cons(lambda name: prefix+name)
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
