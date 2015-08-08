@@ -22,6 +22,6 @@ EXPOSE 5555
 
 RUN DEBIAN_FRONTEND=noninteractive bash build.sh
 RUN DEBIAN_FRONTEND=noninteractive bash install.sh
-RUN DEBIAN_FRONTEND=noninteractive bash test.sh test_install
+RUN DEBIAN_FRONTEND=noninteractive bash test.sh test_install quick_test
 
 CMD ifconfig eth0 && python -m pyvpsolver.webapp.app
