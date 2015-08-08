@@ -113,7 +113,7 @@ class CmdPWLModel(CmdBase):
 
     def _evalcmd(self, varnames, xyvalues):
         """Evalutates CMD[arg1](*args)."""
-        match = pymplutils.parse_symblist(varnames)
+        match = pymplutils.parse_symblist(varnames, allow_index="[]")
         assert match is not None
         xvar, yvar = match
 
