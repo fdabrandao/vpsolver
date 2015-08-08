@@ -140,8 +140,17 @@ def pympl(example):
     example_folder = "data/examples/pympl/"
     examples = [
         ("/pympl/", "", None),
-        ("/pympl/example1", "Cutting Stock", "example1.mod"),
-        ("/pympl/example2", "Variable Sized Bin Packing", "example2.mod"),
+        (
+            "/pympl/vbp", "Vector Packing", "vector_packing.mod"
+        ),
+        (
+            "/pympl/vsbpp", "Variable Sized Bin Packing",
+            "variable_size_bin_packing.mod"
+        ),
+        (
+            "/pympl/pwl", "Piecewise Linear Function",
+            "piecewise_linear.mod"
+        ),
     ]
 
     input_data = ""

@@ -21,9 +21,9 @@ $PARAM[C{T}]{Costs, i0=1};
 
 var Z{T}, integer, >= 0;
 var x{T, I}, integer, >= 0;
-$FLOW[^Z[1]]{W1, ws, ["x[1, %d]"%i for i in _sets['I']]};
-$FLOW[^Z[2]]{W2, ws, ["x[2, %d]"%i for i in _sets['I']]};
-$FLOW[^Z[3]]{W3, ws, ["x[3, %d]"%i for i in _sets['I']]};
+$VBP_FLOW[^Z[1]]{W1, ws, ["x[1, %d]"%i for i in _sets['I']]};
+$VBP_FLOW[^Z[2]]{W2, ws, ["x[2, %d]"%i for i in _sets['I']]};
+$VBP_FLOW[^Z[3]]{W3, ws, ["x[3, %d]"%i for i in _sets['I']]};
 
 minimize obj: sum{t in T} C[t] * Z[t];
 s.t. demand{i in I}: sum{t in T} x[t, i] >= b[i];
