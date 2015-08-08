@@ -14,7 +14,7 @@
 * Project Homepage: <http://vpsolver.dcc.fc.up.pt/>
 * GiHub repository: <https://github.com/fdabrandao/vpsolver>
 * BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>
-* Docker repository: <https://registry.hub.docker.com/u/fdabrandao/vpsolver/>
+* Docker repository: <https://hub.docker.com/r/fdabrandao/vpsolver/>
 
 ***
 Copyright © Filipe Brandão. All rights reserved.  

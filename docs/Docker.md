@@ -27,7 +27,7 @@ root@55d14f6b6f32:~# python examples/vpsolver/example_vbp.py
 ...
 ```
 
-or through the VPSolver Web APP (example URL: `http://172.17.0.60:5555/`):
+or through the VPSolver Web App (example URL: `http://172.17.0.60:5555/`):
 
 ```bash
 user@locahost ~$ docker run -it -p 5555 fdabrandao/vpsolver 

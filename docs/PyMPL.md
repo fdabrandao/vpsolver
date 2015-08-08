@@ -4,20 +4,44 @@ PyMPL is a python extension to the AMPL modelling language that adds new stateme
 
 ## Table of Contents
   * [Examples](#examples)
+  * [PyMPL parser](#pympl-parser)
   * [PyMPL statements](#pympl-statements)
 
 ## Examples
+
+``piecewise_linear.mod``
+
+```ampl
+# Evaluate python code:
+$EXEC{
+xvalues = [0, 10, 15, 25, 30, 35, 40, 45, 50, 55, 60, 70]
+yvalues = [0, 20, 15, 10, 0, 50, 18, 0, 15, 24, 10, 15]
+};
+
+var u >= 0;
+# Model a piecewise linear function given a list of pairs (x, y=f(x)):
+$PWL[x,y]{zip(xvalues, yvalues)};
+
+maximize obj: 2*x + 15*y;
+s.t. A: 3*x + 4*y <= 250;
+s.t. B: 7*x - 2*y + 3*u <= 170;
+
+solve;
+display x, y, u;
+display "Objective:", 2*x + 15*y;
+end;
+```
 
 ``vector_packing.mod``:
 
 ```ampl
 # Load a vector packing instance from a file:
-$LOAD_VBP[instance1{I,D}]{"instance1.vbp", i0=1};
+$VBP_LOAD[instance1{I,D}]{"instance1.vbp", i0=1};
 
 var x{I}, >= 0;
 
 # Generate an arc-flow model for instance1:
-$FLOW[Z]{_instance1.W, _instance1.w, ["x[%d]"%i for i in _sets['I']]};
+$VBP_FLOW[Z]{_instance1.W, _instance1.w, ["x[%d]"%i for i in _sets['I']]};
 # Variable declarations and flow conservation constraints will be created here
 
 minimize obj: Z;
@@ -61,9 +85,9 @@ var Z{T}, integer, >= 0;
 # Assignment variables:
 var x{T, I}, integer, >= 0;
 # Generate an arc-flow graph for each bin type:
-$FLOW[^Z[1]]{W1, ws, ["x[1, %d]"%i for i in _sets['I']]};
-$FLOW[^Z[2]]{W2, ws, ["x[2, %d]"%i for i in _sets['I']]};
-$FLOW[^Z[3]]{W3, ws, ["x[3, %d]"%i for i in _sets['I']]};
+$VBP_FLOW[^Z[1]]{W1, ws, ["x[1, %d]"%i for i in _sets['I']]};
+$VBP_FLOW[^Z[2]]{W2, ws, ["x[2, %d]"%i for i in _sets['I']]};
+$VBP_FLOW[^Z[3]]{W3, ws, ["x[3, %d]"%i for i in _sets['I']]};
 # Note: the ^prefix is used to avoid the redefinition of Z
 
 minimize obj: sum{t in T} C[t] * Z[t];
@@ -74,37 +98,35 @@ display{t in T} Z[t]; # number of bins of type t used
 display sum{t in T} C[t] * Z[t]; # cost
 end;
 ```
-``arcflow.mod``
+## PyMPL parser
 
-```ampl
-# Load a vector packing instance from a file: 
-$LOAD_VBP[instance1{I,D}]{"instance.vbp", i0=1}; 
+```python
+from pyvpsolver import PyMPL  # import the parser
 
-# Generate the arc_flow graph and create sets V and A for the set of vertices and arcs, respectively:
-$GRAPH[V,A]{_instance1.W, _instance1.w, _sets['I']};
+# Create a parser and pass local and global variables to the model:
+parser = PyMPL(locals_=locals(), globals_=globals())`
 
-var Z, integer, >= 0; # amount of flow in the feedback arc
-var f{A}, integer, >= 0; # amount of flow in each arc
+# Parse a file with PyMPL statements and produce a valid AMPL model:
+parser.parse("pympl_model.mod", "ampl_model.mod")
 
-# Objective:
-maximize obj: Z;
+# Call GLPK to solve the model if the original model uses only valid GMPL statements:
+os.system("glpsol --math ampl_model.mod")
 
-# Flow conservation constraints:
-s.t. flowcon{k in V diff {'S','T'}}: 
-sum{(u,v,i) in A: v == k} f[u,v,i] - sum{(u,v,i) in A: u == k} f[u, v, i] = 0;
-s.t. flowconS: sum{(u,v,i) in A: u == 'S'} f[u,v,i] = Z;
-s.t. flowconT: sum{(u,v,i) in A: v == 'T'} f[u,v,i] = Z;
-
-# Demand constraints:
-s.t. demand{k in I}: sum{(u,v,i) in A: i == k} >= instance1_b[i];
-
-solve;
-end;
+# Call AMPL to solve the model:
+os.system("ampl ampl_model.mod")
 ```
+
+[[Folder with examples](https://github.com/fdabrandao/vpsolver/blob/master/examples/pympl/)]
+
+Advanced features:
+* Given a function `f(varname)` that given a variable name returns its value:
+
+  * If any command used implements solution extraction you can use `parser[command_name].extract(f)`;
+  * If any command used implements cut generation you can use `parser[command_name].separate(f)` to generate cutting planes.
 
 ## PyMPL statements
 
-There are three types of calls:
+There are three types of statements:
 
 1. `${python code}$`
  
@@ -119,16 +141,30 @@ There are three types of calls:
 
   * [SET](#set): `$SET[set_name]{values};`
   * [PARAM](#param): `$PARAM[param_name]{values, i0=0};`
-  * [VAR](#var): `$VAR[var_name]{typ="", lb=None, ub=None};`
+  * [VAR](#var): `$VAR[var_name]{typ="", lb=None, ub=None, index_set=None};`
   * [CON](#con): `$CON[constraint_name]{left, sign, right};`
 
-4. Additional statements for [VPSolver](https://github.com/fdabrandao/vpsolver):
+Additional statements:
 
-  * [LOAD_VBP](#load_vbp): `$LOAD_VBP[name]{fname, i0=0, d0=0};`
-  * [FLOW](#flow): `$FLOW[zvar]{W, w, b, bounds=None};`
-  * [GRAPH](#graph): `$GRAPH[V_name, A_name]{W, w, labels, bounds=None};`
+1. Statements for [VPSolver](https://github.com/fdabrandao/vpsolver):
 
-**Note**: The values between `[]` are usually used to name new AMPL variables, constraints, sets, or parameters. Names starting with a `^` indicate that the corresponding AMPL element should not be defined by the command. This prefix is useful when the corresponding AMPL element was declared previously and we do not want to declared it again.
+  * [VBP_LOAD](#vbp_load): `$VBP_LOAD[name]{fname, i0=0, d0=0};`
+  * [VBP_FLOW](#vbp_flow): `$VBP_FLOW[zvar]{W, w, b, bounds=None};`
+  * [VBP_GRAPH](#vbp_graph): `$VBP_GRAPH[V_name, A_name]{W, w, labels, bounds=None};`
+
+2. Statements for special ordered sets and piecewise linear functions:
+
+  * [SOS1](#sos1): `$SOS1{varl, ub=1};`
+  * [SOS2](#sos2): `$SOS2{varl, ub=1};`
+  * [PWL](#pwl): `$PWL[var_x, var_y]{xyvalues};`
+
+3. Statements for TSP:
+
+  * [ATSP_MTZ](#atsp_mtz): `$ATSP_MTZ{xvars, DL=False, cuts=False};`
+  * [ATSP_SCF](#atsp_scf): `$ATSP_SCF{xvars, cuts=False};`
+  * [ATSP_MCF](#atsp_mcf): `$ATSP_SCF{xvars, cuts=False};`
+
+**Note**: The values between `[]` are usually used to name new AMPL variables, constraints, sets, or parameters. Names starting with a `^` indicate that the corresponding AMPL element should not be defined by the command. This prefix is useful when the corresponding AMPL element was declared before and we do not want to declared it again.
 
 ### Detailed description of general PyMPL statements
 
@@ -319,18 +355,20 @@ param L1 := [1]1[2]2[3]3;
 Note: Is is possible to call external functions (i.e., `$PARAM[X]{some_function(...)}`) that return the parameter.
 
 #### VAR
-Usage: `$VAR[var_name]{typ="", lb=None, ub=None};`
+Usage: `$VAR[var_name]{typ="", lb=None, ub=None, index_set=None};`
  
 Description: creates AMPL variables.
 
 Parameters:
 
   * AMPL:
-    * `'var_name'`: variable name.
+    * Option 1: `'var_name'` ->  variable name;
+    * Option 2: `'var_name{Iname}'` -> variable name and index name (`index_set` must be provided).
   * Python:
     * `typ`: variable type (e.g., "integer");
     * `lb`: variable lower bound;
-    * `ub`: variable upper bound.
+    * `ub`: variable upper bound;
+    * `index_set`: index set for the variable.
 
 Creates:
 
@@ -344,6 +382,7 @@ Examples:
 $VAR[x]{"integer", 0, 10};
 $VAR[y]{"binary"};
 $VAR[z]{ub=abs((2**7)/5-135)};
+$VAR[xs{I}]{"integer", index_set=range(3)};
 ...
 ```
  
@@ -353,6 +392,8 @@ is replaced by:
 var x, integer, >= 0, <= 10;
 var y, binary; 
 var z, <= 110;
+set I := {0,1,2};
+var xs{I}, integer;
 ```
 
 #### CON
@@ -379,11 +420,12 @@ Examples:
 ```ampl
 ...
 $CON[con1]{[("x1",5),("x2",15),("x3",10)],">=",20};
-$CON[con2]{[("x1",5)],">=",[("x2",-15),("x3",-10),20]};
-$CON[con3]{-20,">=",[("x1",-5),("x2",-15),("x3",-10)]};
-$CON[con4]{-20,">=",[(-5, "x1"),("x2",-15),(-10, "x3")]};
-$CON[con5]{[-20, "x1"],">=",[(-4, "x1"),("x2",-15),(-10, "x3")]};
-$CON[con6]{"x1",">=",[(-4, "x1"),20,("x2",-15),(-10, "x3")]};
+$CON[con2]{[("x1",5),("x2",15),-20],">=",("x3",-10)};
+$CON[con3]{[("x1",5)],">=",[("x2",-15),("x3",-10),20]};
+$CON[con4]{-20,">=",[("x1",-5),("x2",-15),("x3",-10)]};
+$CON[con5]{-20,">=",[(-5, "x1"),("x2",-15),(-10, "x3")]};
+$CON[con6]{[-20, "x1"],">=",[(-4, "x1"),("x2",-15),(-10, "x3")]};
+$CON[con7]{"x1",">=",[(-4, "x1"),20,("x2",-15),(-10, "x3")]};
 ...
 ```
  
@@ -396,13 +438,14 @@ s.t. con3: +5*x1+15*x2+10*x3 >= 20;
 s.t. con4: +5*x1+15*x2+10*x3 >= 20;
 s.t. con5: +5*x1+15*x2+10*x3 >= 20;
 s.t. con6: +5*x1+15*x2+10*x3 >= 20;
+s.t. con7: +5*x1+15*x2+10*x3 >= 20;
 ``` 
 Note: all the original constraints are just different representations of the same constraint.
 
-### Detailed description of VPSolver statements
+### Statements for VPSolver
 
-#### LOAD_VBP
-Usage: `$LOAD_VBP[name]{fname, i0=0, d0=0};`
+#### VBP_LOAD
+Usage: `$VBP_LOAD[name]{fname, i0=0, d0=0};`
 
 Description: loads vector packing instances.
 
@@ -410,8 +453,8 @@ Parameters:
 
   * AMPL:
     * Option 1: `'name'` -> symbolic name for the instance;
-    * Option 2: `'name{Iname}'` -> symbolic name for the instance and for the index set;
-    * Option 3: `'name{Iname, Dname}'` -> symbolic name for the instance, for the index set and for the dimension set;
+    * Option 2: `'name{Iname}'` -> symbolic name for the instance, and for the index set;
+    * Option 3: `'name{Iname, Dname}'` -> symbolic name for the instance, for the index set, and for the dimension set;
   * Python:
     * `fname`: file name;
     * `i0`: initial index for items (default 0);
@@ -450,25 +493,25 @@ Examples:
 
 ```ampl
 ...
-$LOAD_VBP[instance{I,D}]{"instance.vbp", i0=1, d0=0}
+$VBP_LOAD[instance{I,D}]{"instance.vbp", i0=1, d0=0}
 ...
 ```
  
 is replaced by:
 
 ```ampl
-param instance1_m := 4; # number of different item types
-param instance1_n := 17;# total number of items
-param instance1_p := 2; # number of dimensions
-set I := {1,2,3,4};     # index set for items (starting at `i0`)
-set D := {0,1};         # index set for dimensions (starting at `d0`)
-param instance1_W{D};   # bin capacity
-param instance1_b{I};   # item demands
-param instance1_w{I,D}; # item weights
+param instance_m := 4; # number of different item types
+param instance_n := 17;# total number of items
+param instance_p := 2; # number of dimensions
+set I := {1,2,3,4};    # index set for items (starting at `i0`)
+set D := {0,1};        # index set for dimensions (starting at `d0`)
+param instance_W{D};   # bin capacity
+param instance_b{I};   # item demands
+param instance_w{I,D}; # item weights
 ```
 
-#### FLOW
-Usage: `$FLOW[zvar_name]{W, w, b, bounds=None};`
+#### VBP_FLOW
+Usage: `$VBP_FLOW[zvar_name]{W, w, b, bounds=None};`
 
 Description: generates arc-flow models for vector packing instances.
 
@@ -493,9 +536,9 @@ Creates:
 Examples:
 
 ```ampl
-$LOAD_VBP[instance1{I,D}]{"instance.vbp",1};
+$VBP_LOAD[instance1{I,D}]{"instance.vbp",1};
 var x{I}, >= 0;
-$FLOW[Z]{_instance1.W, _instance1.w, ["x[%d]"%i for i in _sets['I']]};    
+$VBP_FLOW[Z]{_instance1.W, _instance1.w, ["x[%d]"%i for i in _sets['I']]};    
 
 minimize obj: Z;
 s.t. demand{i in I}: x[i] >= instance1_b[i]; # demand constraints
@@ -518,8 +561,8 @@ solve;
 end;
 ```
 
-#### GRAPH
-Usage: `$GRAPH[V_name, A_name]{W, w, labels, bounds=None};`
+#### VBP_GRAPH
+Usage: `$VBP_GRAPH[V_name, A_name]{W, w, labels, bounds=None};`
 
 Description: generates arc-flow graphs for vector packing instances.  
 
@@ -546,30 +589,201 @@ Creates:
 Examples:
 
 ```ampl
-$LOAD_VBP[instance1{I,D}]{"instance.vbp", i0=1}; 
-$GRAPH[V,A]{_instance1.W, _instance1.w, _sets['I']};
+$VBP_LOAD[instance1{I,D}]{"instance.vbp", i0=1}; 
+$VBP_GRAPH[V,A]{_instance1.W, _instance1.w, _sets['I']};
 
+# Variables:
 var Z, integer, >= 0; # amount of flow in the feedback arc
 var f{A}, integer, >= 0; # amount of flow in each arc
-
 # Objective:
 maximize obj: Z;
-
 # Flow conservation constraints:
-s.t. flowcon{k in V diff {'S','T'}}: 
-  sum{(u,v,i) in A: v == k} f[u,v,i] - sum{(u,v,i) in A: u == k} f[u, v, i] = 0;
-s.t. flowconS: sum{(u,v,i) in A: u == 'S'} f[u,v,i] = Z;
-s.t. flowconT: sum{(u,v,i) in A: v == 'T'} f[u,v,i] = Z;
-
+s.t. flowcon{k in V}: 
+    sum{(u,v,i) in A: v == k} f[u,v,i]  - sum{(u,v,i) in A: u == k} f[u, v, i] 
+    = if k == 'T' then Z else
+      if k == 'S' then -Z else
+      0;
 # Demand constraints:
 s.t. demand{k in I}: sum{(u,v,i) in A: i == k} >= instance1_b[i];
-
-solve;
-end;
 ```
 
 Note: the source vertex is `'S'`, the target is `'T'`, and loss arcs are labeled with `'LOSS'`.
 
+### Statements for special ordered sets and piecewise linear functions
+
+#### SOS1
+Usage: `$SOS1{varl, ub=1};`
+
+Description: creates a special ordered set of type 1 (SOS1) for a set of variables. At most one variable in a SOS1 can take a strictly positive value.
+
+Parameters:
+
+  * Python:
+    * `varl`: list of variable names;
+    * `ub`: largest possible value if non-zero (default 1).
+
+Creates:
+
+  * AMPL:
+    * creates a variables and constraints to model the special ordered set.
+
+Example:
+
+```ampl
+var x{1..3}, >= 0;
+$SOS1{["x[1]", "x[2]", "x[3]"]};
+```
+
+#### SOS2
+Usage: `$SOS2{varl, ub=1};`
+
+Description: creates a special ordered set of type 2 (SOS2) for a set of variables.  At most two variables in a SOS2 can take a strictly positive value, and if two are non-zero these must be consecutive in their ordering.
+
+Parameters:
+
+  * Python:
+    * `varl`: list of variable names;
+    * `ub`: largest possible value if non-zero (default 1).
+
+Creates:
+
+  * AMPL:
+    * creates a variables and constraints to model the special ordered set.
+
+Example:
+
+```ampl
+$PARAM[X{I}]{[0, 10, 15, 25, 30, 35, 40, 45, 50, 55, 60, 70]};
+$PARAM[Y{^I}]{[0, 20, 15, 10, 0, 50, 18, 0, 15, 24, 10, 15]};
+# Model a piecewise linear function
+var x;
+var y;
+# Model a piecewise linear function using a special ordered set of type 2:
+var z{I}, >= 0;
+s.t. fix_x: x = sum{i in I} X[i] * z[i];
+s.t. fix_y: y = sum{i in I} Y[i] * z[i];
+s.t. convexity: sum{i in I} z[i] = 1;
+$SOS2{["z[%d]"%i for i in _sets['I']]};
+```
+
+#### PWL
+Usage: `$PWL[var_x, var_y]{xyvalues};`
+
+Description: models a piecewise linear function given a list of pairs (x, y=f(x)).
+
+Parameters:
+
+  * AMPL:
+    * `'var_x'`: name for the first variable;
+    * `'var_y'`: name for the second variable.
+  * Python:
+    * 'xyvalues': list of pairs (x, y=f(x)) for the piecewise linear function f(x).
+
+Creates:
+
+  * AMPL:
+    * creates variables `'var_x'` and `'var_y'`;
+    * creates a variables and constraints to model the piecewise linear function (`'var_y'` = f(`'var_x'`)).
+
+Examples:
+
+```ampl
+$EXEC{
+xvalues = [0, 10, 15, 25, 30, 35, 40, 45, 50, 55, 60, 70]
+yvalues = [0, 20, 15, 10, 0, 50, 18, 0, 15, 24, 10, 15]
+};
+$PWL[x,y]{zip(xvalues, yvalues)};
+```
+
+### Statements for TSP
+
+#### ATSP_MTZ
+Usage: `$ATSP_MTZ{xvars, DL=False, cuts=False};`
+
+Description: creates a submodel for TSP using Miller, Tucker and Zemlin (MTZ) (1960) subtour elimination constraints.
+
+Parameters:
+
+  * Python:
+    * `xvars`: list of binary variables for the arcs in the graph;
+    * `DL`: if `True` uses Desrochers and Laporte (1991) lifted MTZ inequalities;
+    * `cuts`: if `True` stores information for cut generation.
+
+Creates:
+
+  * AMPL:
+    * A submodel for TSP projected on `xvars` variables.
+  * Python:
+    * stores information for cut generation if requested.
+
+Examples:
+
+```ampl
+$SET[V]{set of vertices};
+$SET[A]{set of arcs};
+$PARAM[cost{^A}]{cost of each arc};
+var x{A}, binary;
+minimize total: sum{(i,j) in A} cost[i,j] * x[i,j];
+$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, DL=True, cuts=True};
+```
+
+#### ATSP_SCF
+Usage: `$ATSP_SCF{xvars, cuts=False};`
+
+Description: creates a submodel for TSP using the single commodity flow model of Gavish and Graves (1978).
+
+Parameters:
+
+  * Python:
+    * `xvars`: list of binary variables for the arcs in the graph;
+    * `cuts`: if `True` stores information for cut generation.
+
+Creates:
+
+  * AMPL:
+    * A submodel for TSP projected on `xvars` variables.
+  * Python:
+    * stores information for cut generation if requested.
+
+Examples:
+
+```ampl
+$SET[V]{set of vertices};
+$SET[A]{set of arcs};
+$PARAM[cost{^A}]{cost of each arc};
+var x{A}, binary;
+minimize total: sum{(i,j) in A} cost[i,j] * x[i,j];
+$ATSP_SCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, cuts=True};
+```
+
+#### ATSP_MCF
+Usage: `$ATSP_SCF{xvars, cuts=False};`
+
+Description: creates a submodel for TSP using the multi commodity flow model of Wong (1980) and Claus (1984).
+
+Parameters:
+
+  * Python:
+    * `xvars`: list of binary variables for the arcs in the graph;
+    * `cuts`: if `True` stores information for cut generation.
+
+Creates:
+
+  * AMPL:
+    * A submodel for TSP projected on `xvars` variables.
+  * Python:
+    * stores information for cut generation if requested.
+
+Examples:
+
+```ampl
+$SET[V]{set of vertices};
+$SET[A]{set of arcs};
+$PARAM[cost{^A}]{cost of each arc};
+var x{A}, binary;
+minimize total: sum{(i,j) in A} cost[i,j] * x[i,j];
+$ATSP_MCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
+```
 
 ***
 Copyright © Filipe Brandão. All rights reserved.  

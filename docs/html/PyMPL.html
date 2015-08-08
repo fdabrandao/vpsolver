@@ -58,21 +58,43 @@
 
 <ul>
 <li><a href="#examples">Examples</a></li>
+<li><a href="#pympl-parser">PyMPL parser</a></li>
 <li><a href="#pympl-statements">PyMPL statements</a></li>
 </ul>
 
 <h2>
 <a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
 
+<p><code>piecewise_linear.mod</code></p>
+
+<div class="highlight highlight-ampl"><pre><span class="pl-c"># Evaluate python code:</span>
+$EXEC{
+<span class="pl-k">xval</span>ues <span class="pl-k">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>, <span class="pl-c1">25</span>, <span class="pl-c1">30</span>, <span class="pl-c1">35</span>, <span class="pl-c1">40</span>, <span class="pl-c1">45</span>, <span class="pl-c1">50</span>, <span class="pl-c1">55</span>, <span class="pl-c1">60</span>, <span class="pl-c1">70</span>]
+<span class="pl-k">yval</span>ues <span class="pl-k">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">20</span>, <span class="pl-c1">15</span>, <span class="pl-c1">10</span>, <span class="pl-c1">0</span>, <span class="pl-c1">50</span>, <span class="pl-c1">18</span>, <span class="pl-c1">0</span>, <span class="pl-c1">15</span>, <span class="pl-c1">24</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>]
+};
+
+<span class="pl-k">var</span> u <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
+<span class="pl-c"># Model a piecewise linear function given a list of pairs (x, y=f(x)):</span>
+$PWL[x,y]{zip(<span class="pl-k">xval</span>ues, <span class="pl-k">yval</span>ues)};
+
+<span class="pl-k">maximize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> <span class="pl-c1">2</span><span class="pl-k">*</span>x <span class="pl-k">+</span> <span class="pl-c1">15</span><span class="pl-k">*</span>y;
+s.t. A<span class="pl-k">:</span> <span class="pl-c1">3</span><span class="pl-k">*</span>x <span class="pl-k">+</span> <span class="pl-c1">4</span><span class="pl-k">*</span>y <span class="pl-k">&lt;=</span> <span class="pl-c1">250</span>;
+s.t. B<span class="pl-k">:</span> <span class="pl-c1">7</span><span class="pl-k">*</span>x <span class="pl-k">-</span> <span class="pl-c1">2</span><span class="pl-k">*</span>y <span class="pl-k">+</span> <span class="pl-c1">3</span><span class="pl-k">*</span>u <span class="pl-k">&lt;=</span> <span class="pl-c1">170</span>;
+
+<span class="pl-k">solve</span>;
+<span class="pl-k">display</span> x, y, u;
+<span class="pl-k">display</span> <span class="pl-s"><span class="pl-pds">"</span>Objective:<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span><span class="pl-k">*</span>x <span class="pl-k">+</span> <span class="pl-c1">15</span><span class="pl-k">*</span>y;
+<span class="pl-k">end</span>;</pre></div>
+
 <p><code>vector_packing.mod</code>:</p>
 
 <div class="highlight highlight-ampl"><pre><span class="pl-c"># Load a vector packing instance from a file:</span>
-$LOAD_VBP[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance1.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
+$VBP_LOAD[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance1.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
 
 <span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
 
 <span class="pl-c"># Generate an arc-flow model for instance1:</span>
-$FLOW[Z]{_instance1.W, _instance1.w, [<span class="pl-s"><span class="pl-pds">"</span>x[%d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
+$VBP_FLOW[Z]{_instance1.W, _instance1.w, [<span class="pl-s"><span class="pl-pds">"</span>x[%d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
 <span class="pl-c"># Variable declarations and flow conservation constraints will be created here</span>
 
 <span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
@@ -114,9 +136,9 @@ $<span class="pl-k">PARAM</span>[C{T}]{Costs, i0<span class="pl-k">=</span><span
 <span class="pl-c"># Assignment variables:</span>
 <span class="pl-k">var</span> x{T, I}, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
 <span class="pl-c"># Generate an arc-flow graph for each bin type:</span>
-$FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">1</span>]]{W1, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[1, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-$FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">2</span>]]{W2, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[2, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-$FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">3</span>]]{W3, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[3, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
+$VBP_FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">1</span>]]{W1, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[1, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
+$VBP_FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">2</span>]]{W2, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[2, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
+$VBP_FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">3</span>]]{W3, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[3, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
 <span class="pl-c"># Note: the ^prefix is used to avoid the redefinition of Z</span>
 
 <span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> <span class="pl-k">sum</span>{t <span class="pl-k">in</span> T} C[t] <span class="pl-k">*</span> Z[t];
@@ -127,36 +149,42 @@ s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span c
 <span class="pl-k">display</span> <span class="pl-k">sum</span>{t <span class="pl-k">in</span> T} C[t] <span class="pl-k">*</span> Z[t]; <span class="pl-c"># cost</span>
 <span class="pl-k">end</span>;</pre></div>
 
-<p><code>arcflow.mod</code></p>
+<h2>
+<a id="user-content-pympl-parser" class="anchor" href="#pympl-parser" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL parser</h2>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-c"># Load a vector packing instance from a file: </span>
-$LOAD_VBP[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; 
+<div class="highlight highlight-python"><pre><span class="pl-k">from</span> pyvpsolver <span class="pl-k">import</span> PyMPL  <span class="pl-c"># import the parser</span>
 
-<span class="pl-c"># Generate the arc_flow graph and create sets V and A for the set of vertices and arcs, respectively:</span>
-$GRAPH[V,A]{_instance1.W, _instance1.w, _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]};
+<span class="pl-c"># Create a parser and pass local and global variables to the model:</span>
+parser <span class="pl-k">=</span> PyMPL(<span class="pl-smi">locals_</span><span class="pl-k">=</span><span class="pl-c1">locals</span>(), <span class="pl-smi">globals_</span><span class="pl-k">=</span><span class="pl-c1">globals</span>())`
 
-<span class="pl-k">var</span> Z, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>; <span class="pl-c"># amount of flow in the feedback arc</span>
-<span class="pl-k">var</span> f{A}, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>; <span class="pl-c"># amount of flow in each arc</span>
+<span class="pl-c"># Parse a file with PyMPL statements and produce a valid AMPL model:</span>
+parser.parse(<span class="pl-s"><span class="pl-pds">"</span>pympl_model.mod<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>ampl_model.mod<span class="pl-pds">"</span></span>)
 
-<span class="pl-c"># Objective:</span>
-<span class="pl-k">maximize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
+<span class="pl-c"># Call GLPK to solve the model if the original model uses only valid GMPL statements:</span>
+os.system(<span class="pl-s"><span class="pl-pds">"</span>glpsol --math ampl_model.mod<span class="pl-pds">"</span></span>)
 
-<span class="pl-c"># Flow conservation constraints:</span>
-s.t. flowcon{k <span class="pl-k">in</span> V <span class="pl-k">diff</span> {<span class="pl-s"><span class="pl-pds">'</span>S<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>T<span class="pl-pds">'</span></span>}}<span class="pl-k">:</span> 
-<span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> v <span class="pl-k">==</span> k} f[u,v,i] <span class="pl-k">-</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> u <span class="pl-k">==</span> k} f[u, v, i] <span class="pl-k">=</span> <span class="pl-c1">0</span>;
-s.t. flowconS<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> u <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>S<span class="pl-pds">'</span></span>} f[u,v,i] <span class="pl-k">=</span> Z;
-s.t. flowconT<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> v <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>T<span class="pl-pds">'</span></span>} f[u,v,i] <span class="pl-k">=</span> Z;
+<span class="pl-c"># Call AMPL to solve the model:</span>
+os.system(<span class="pl-s"><span class="pl-pds">"</span>ampl ampl_model.mod<span class="pl-pds">"</span></span>)</pre></div>
 
-<span class="pl-c"># Demand constraints:</span>
-s.t. demand{k <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> i <span class="pl-k">==</span> k} <span class="pl-k">&gt;=</span> instance1_b[i];
+<p>[<a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/pympl/">Folder with examples</a>]</p>
 
-<span class="pl-k">solve</span>;
-<span class="pl-k">end</span>;</pre></div>
+<p>Advanced features:</p>
+
+<ul>
+<li>
+<p>Given a function <code>f(varname)</code> that given a variable name returns its value:</p>
+
+<ul>
+<li>If any command used implements solution extraction you can use <code>parser[command_name].extract(f)</code>;</li>
+<li>If any command used implements cut generation you can use <code>parser[command_name].separate(f)</code> to generate cutting planes.</li>
+</ul>
+</li>
+</ul>
 
 <h2>
 <a id="user-content-pympl-statements" class="anchor" href="#pympl-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL statements</h2>
 
-<p>There are three types of calls:</p>
+<p>There are three types of statements:</p>
 
 <ol>
 <li>
@@ -191,31 +219,66 @@ s.t. demand{k <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span c
 <a href="#param">PARAM</a>: <code>$PARAM[param_name]{values, i0=0};</code>
 </li>
 <li>
-<a href="#var">VAR</a>: <code>$VAR[var_name]{typ="", lb=None, ub=None};</code>
+<a href="#var">VAR</a>: <code>$VAR[var_name]{typ="", lb=None, ub=None, index_set=None};</code>
 </li>
 <li>
 <a href="#con">CON</a>: <code>$CON[constraint_name]{left, sign, right};</code>
 </li>
 </ul>
 </li>
+</ol>
+
+<p>Additional statements:</p>
+
+<ol>
 <li>
-<p>Additional statements for <a href="https://github.com/fdabrandao/vpsolver">VPSolver</a>:</p>
+<p>Statements for <a href="https://github.com/fdabrandao/vpsolver">VPSolver</a>:</p>
 
 <ul>
 <li>
-<a href="#load_vbp">LOAD_VBP</a>: <code>$LOAD_VBP[name]{fname, i0=0, d0=0};</code>
+<a href="#vbp_load">VBP_LOAD</a>: <code>$VBP_LOAD[name]{fname, i0=0, d0=0};</code>
 </li>
 <li>
-<a href="#flow">FLOW</a>: <code>$FLOW[zvar]{W, w, b, bounds=None};</code>
+<a href="#vbp_flow">VBP_FLOW</a>: <code>$VBP_FLOW[zvar]{W, w, b, bounds=None};</code>
 </li>
 <li>
-<a href="#graph">GRAPH</a>: <code>$GRAPH[V_name, A_name]{W, w, labels, bounds=None};</code>
+<a href="#vbp_graph">VBP_GRAPH</a>: <code>$VBP_GRAPH[V_name, A_name]{W, w, labels, bounds=None};</code>
+</li>
+</ul>
+</li>
+<li>
+<p>Statements for special ordered sets and piecewise linear functions:</p>
+
+<ul>
+<li>
+<a href="#sos1">SOS1</a>: <code>$SOS1{varl, ub=1};</code>
+</li>
+<li>
+<a href="#sos2">SOS2</a>: <code>$SOS2{varl, ub=1};</code>
+</li>
+<li>
+<a href="#pwl">PWL</a>: <code>$PWL[var_x, var_y]{xyvalues};</code>
+</li>
+</ul>
+</li>
+<li>
+<p>Statements for TSP:</p>
+
+<ul>
+<li>
+<a href="#atsp_mtz">ATSP_MTZ</a>: <code>$ATSP_MTZ{xvars, DL=False, cuts=False};</code>
+</li>
+<li>
+<a href="#atsp_scf">ATSP_SCF</a>: <code>$ATSP_SCF{xvars, cuts=False};</code>
+</li>
+<li>
+<a href="#atsp_mcf">ATSP_MCF</a>: <code>$ATSP_SCF{xvars, cuts=False};</code>
 </li>
 </ul>
 </li>
 </ol>
 
-<p><strong>Note</strong>: The values between <code>[]</code> are usually used to name new AMPL variables, constraints, sets, or parameters. Names starting with a <code>^</code> indicate that the corresponding AMPL element should not be defined by the command. This prefix is useful when the corresponding AMPL element was declared previously and we do not want to declared it again.</p>
+<p><strong>Note</strong>: The values between <code>[]</code> are usually used to name new AMPL variables, constraints, sets, or parameters. Names starting with a <code>^</code> indicate that the corresponding AMPL element should not be defined by the command. This prefix is useful when the corresponding AMPL element was declared before and we do not want to declared it again.</p>
 
 <h3>
 <a id="user-content-detailed-description-of-general-pympl-statements" class="anchor" href="#detailed-description-of-general-pympl-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detailed description of general PyMPL statements</h3>
@@ -497,7 +560,7 @@ $<span class="pl-k">PARAM</span>[L1]{[<span class="pl-c1">1</span>,<span class="
 <h4>
 <a id="user-content-var" class="anchor" href="#var" aria-hidden="true"><span class="octicon octicon-link"></span></a>VAR</h4>
 
-<p>Usage: <code>$VAR[var_name]{typ="", lb=None, ub=None};</code></p>
+<p>Usage: <code>$VAR[var_name]{typ="", lb=None, ub=None, index_set=None};</code></p>
 
 <p>Description: creates AMPL variables.</p>
 
@@ -507,8 +570,8 @@ $<span class="pl-k">PARAM</span>[L1]{[<span class="pl-c1">1</span>,<span class="
 <li>AMPL:
 
 <ul>
-<li>
-<code>'var_name'</code>: variable name.</li>
+<li>Option 1: <code>'var_name'</code> -&gt;  variable name;</li>
+<li>Option 2: <code>'var_name{Iname}'</code> -&gt; variable name and index name (<code>index_set</code> must be provided).</li>
 </ul>
 </li>
 <li>Python:
@@ -519,7 +582,9 @@ $<span class="pl-k">PARAM</span>[L1]{[<span class="pl-c1">1</span>,<span class="
 <li>
 <code>lb</code>: variable lower bound;</li>
 <li>
-<code>ub</code>: variable upper bound.</li>
+<code>ub</code>: variable upper bound;</li>
+<li>
+<code>index_set</code>: index set for the variable.</li>
 </ul>
 </li>
 </ul>
@@ -541,13 +606,16 @@ $<span class="pl-k">PARAM</span>[L1]{[<span class="pl-c1">1</span>,<span class="
 $<span class="pl-k">VAR</span>[x]{<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>, <span class="pl-c1">0</span>, <span class="pl-c1">10</span>};
 $<span class="pl-k">VAR</span>[y]{<span class="pl-s"><span class="pl-pds">"</span>binary<span class="pl-pds">"</span></span>};
 $<span class="pl-k">VAR</span>[z]{ub<span class="pl-k">=abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>)};
+$<span class="pl-k">VAR</span>[xs{I}]{<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>, index_set<span class="pl-k">=</span>range(<span class="pl-c1">3</span>)};
 <span class="pl-k">..</span>.</pre></div>
 
 <p>is replaced by:</p>
 
 <div class="highlight highlight-ampl"><pre><span class="pl-k">var</span> x, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">10</span>;
 <span class="pl-k">var</span> y, <span class="pl-k">binary</span>; 
-<span class="pl-k">var</span> z, <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span>;</pre></div>
+<span class="pl-k">var</span> z, <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span>;
+<span class="pl-k">set</span> I <span class="pl-k">:=</span> {<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>};
+<span class="pl-k">var</span> xs{I}, <span class="pl-k">integer</span>;</pre></div>
 
 <h4>
 <a id="user-content-con" class="anchor" href="#con" aria-hidden="true"><span class="octicon octicon-link"></span></a>CON</h4>
@@ -594,11 +662,12 @@ $<span class="pl-k">VAR</span>[z]{ub<span class="pl-k">=abs</span>((<span class=
 
 <div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
 $CON[con1]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-c1">10</span>)],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,<span class="pl-c1">20</span>};
-$CON[con2]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>)],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>),<span class="pl-c1">20</span>]};
-$CON[con3]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>)]};
-$CON[con4]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">5</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-$CON[con5]{[<span class="pl-k">-</span><span class="pl-c1">20</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-$CON[con6]{<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),<span class="pl-c1">20</span>,(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
+$CON[con2]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-c1">15</span>),<span class="pl-k">-</span><span class="pl-c1">20</span>],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>)};
+$CON[con3]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>)],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>),<span class="pl-c1">20</span>]};
+$CON[con4]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>)]};
+$CON[con5]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">5</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
+$CON[con6]{[<span class="pl-k">-</span><span class="pl-c1">20</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
+$CON[con7]{<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),<span class="pl-c1">20</span>,(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
 <span class="pl-k">..</span>.</pre></div>
 
 <p>is replaced by:</p>
@@ -608,17 +677,18 @@ s.t. con2<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-
 s.t. con3<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
 s.t. con4<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
 s.t. con5<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con6<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;</pre></div>
+s.t. con6<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
+s.t. con7<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;</pre></div>
 
 <p>Note: all the original constraints are just different representations of the same constraint.</p>
 
 <h3>
-<a id="user-content-detailed-description-of-vpsolver-statements" class="anchor" href="#detailed-description-of-vpsolver-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detailed description of VPSolver statements</h3>
+<a id="user-content-statements-for-vpsolver" class="anchor" href="#statements-for-vpsolver" aria-hidden="true"><span class="octicon octicon-link"></span></a>Statements for VPSolver</h3>
 
 <h4>
-<a id="user-content-load_vbp" class="anchor" href="#load_vbp" aria-hidden="true"><span class="octicon octicon-link"></span></a>LOAD_VBP</h4>
+<a id="user-content-vbp_load" class="anchor" href="#vbp_load" aria-hidden="true"><span class="octicon octicon-link"></span></a>VBP_LOAD</h4>
 
-<p>Usage: <code>$LOAD_VBP[name]{fname, i0=0, d0=0};</code></p>
+<p>Usage: <code>$VBP_LOAD[name]{fname, i0=0, d0=0};</code></p>
 
 <p>Description: loads vector packing instances.</p>
 
@@ -629,8 +699,8 @@ s.t. con6<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-
 
 <ul>
 <li>Option 1: <code>'name'</code> -&gt; symbolic name for the instance;</li>
-<li>Option 2: <code>'name{Iname}'</code> -&gt; symbolic name for the instance and for the index set;</li>
-<li>Option 3: <code>'name{Iname, Dname}'</code> -&gt; symbolic name for the instance, for the index set and for the dimension set;</li>
+<li>Option 2: <code>'name{Iname}'</code> -&gt; symbolic name for the instance, and for the index set;</li>
+<li>Option 3: <code>'name{Iname, Dname}'</code> -&gt; symbolic name for the instance, for the index set, and for the dimension set;</li>
 </ul>
 </li>
 <li>Python:
@@ -697,24 +767,24 @@ s.t. con6<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-
 <p><code>model.mod</code>:</p>
 
 <div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
-$LOAD_VBP[instance{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>, d0<span class="pl-k">=</span><span class="pl-c1">0</span>}
+$VBP_LOAD[instance{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>, d0<span class="pl-k">=</span><span class="pl-c1">0</span>}
 <span class="pl-k">..</span>.</pre></div>
 
 <p>is replaced by:</p>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-k">param</span> instance1_m <span class="pl-k">:=</span> <span class="pl-c1">4</span>; <span class="pl-c"># number of different item types</span>
-<span class="pl-k">param</span> instance1_n <span class="pl-k">:=</span> <span class="pl-c1">17</span>;<span class="pl-c"># total number of items</span>
-<span class="pl-k">param</span> instance1_p <span class="pl-k">:=</span> <span class="pl-c1">2</span>; <span class="pl-c"># number of dimensions</span>
-<span class="pl-k">set</span> I <span class="pl-k">:=</span> {<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};     <span class="pl-c"># index set for items (starting at `i0`)</span>
-<span class="pl-k">set</span> D <span class="pl-k">:=</span> {<span class="pl-c1">0</span>,<span class="pl-c1">1</span>};         <span class="pl-c"># index set for dimensions (starting at `d0`)</span>
-<span class="pl-k">param</span> instance1_W{D};   <span class="pl-c"># bin capacity</span>
-<span class="pl-k">param</span> instance1_b{I};   <span class="pl-c"># item demands</span>
-<span class="pl-k">param</span> instance1_w{I,D}; <span class="pl-c"># item weights</span></pre></div>
+<div class="highlight highlight-ampl"><pre><span class="pl-k">param</span> instance_m <span class="pl-k">:=</span> <span class="pl-c1">4</span>; <span class="pl-c"># number of different item types</span>
+<span class="pl-k">param</span> instance_n <span class="pl-k">:=</span> <span class="pl-c1">17</span>;<span class="pl-c"># total number of items</span>
+<span class="pl-k">param</span> instance_p <span class="pl-k">:=</span> <span class="pl-c1">2</span>; <span class="pl-c"># number of dimensions</span>
+<span class="pl-k">set</span> I <span class="pl-k">:=</span> {<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};    <span class="pl-c"># index set for items (starting at `i0`)</span>
+<span class="pl-k">set</span> D <span class="pl-k">:=</span> {<span class="pl-c1">0</span>,<span class="pl-c1">1</span>};        <span class="pl-c"># index set for dimensions (starting at `d0`)</span>
+<span class="pl-k">param</span> instance_W{D};   <span class="pl-c"># bin capacity</span>
+<span class="pl-k">param</span> instance_b{I};   <span class="pl-c"># item demands</span>
+<span class="pl-k">param</span> instance_w{I,D}; <span class="pl-c"># item weights</span></pre></div>
 
 <h4>
-<a id="user-content-flow" class="anchor" href="#flow" aria-hidden="true"><span class="octicon octicon-link"></span></a>FLOW</h4>
+<a id="user-content-vbp_flow" class="anchor" href="#vbp_flow" aria-hidden="true"><span class="octicon octicon-link"></span></a>VBP_FLOW</h4>
 
-<p>Usage: <code>$FLOW[zvar_name]{W, w, b, bounds=None};</code></p>
+<p>Usage: <code>$VBP_FLOW[zvar_name]{W, w, b, bounds=None};</code></p>
 
 <p>Description: generates arc-flow models for vector packing instances.</p>
 
@@ -764,9 +834,9 @@ $LOAD_VBP[instance{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instanc
 
 <p>Examples:</p>
 
-<div class="highlight highlight-ampl"><pre>$LOAD_VBP[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>};
+<div class="highlight highlight-ampl"><pre>$VBP_LOAD[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>};
 <span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
-$FLOW[Z]{_instance1.W, _instance1.w, [<span class="pl-s"><span class="pl-pds">"</span>x[%d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};    
+$VBP_FLOW[Z]{_instance1.W, _instance1.w, [<span class="pl-s"><span class="pl-pds">"</span>x[%d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};    
 
 <span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
 s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <span class="pl-k">&gt;=</span> instance1_b[i]; <span class="pl-c"># demand constraints</span>
@@ -787,9 +857,9 @@ s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <s
 <span class="pl-k">end</span>;</pre></div>
 
 <h4>
-<a id="user-content-graph" class="anchor" href="#graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>GRAPH</h4>
+<a id="user-content-vbp_graph" class="anchor" href="#vbp_graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>VBP_GRAPH</h4>
 
-<p>Usage: <code>$GRAPH[V_name, A_name]{W, w, labels, bounds=None};</code></p>
+<p>Usage: <code>$VBP_GRAPH[V_name, A_name]{W, w, labels, bounds=None};</code></p>
 
 <p>Description: generates arc-flow graphs for vector packing instances.  </p>
 
@@ -845,28 +915,303 @@ s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <s
 
 <p>Examples:</p>
 
-<div class="highlight highlight-ampl"><pre>$LOAD_VBP[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; 
-$GRAPH[V,A]{_instance1.W, _instance1.w, _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]};
+<div class="highlight highlight-ampl"><pre>$VBP_LOAD[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; 
+$VBP_GRAPH[V,A]{_instance1.W, _instance1.w, _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]};
 
+<span class="pl-c"># Variables:</span>
 <span class="pl-k">var</span> Z, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>; <span class="pl-c"># amount of flow in the feedback arc</span>
 <span class="pl-k">var</span> f{A}, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>; <span class="pl-c"># amount of flow in each arc</span>
-
 <span class="pl-c"># Objective:</span>
 <span class="pl-k">maximize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
-
 <span class="pl-c"># Flow conservation constraints:</span>
-s.t. flowcon{k <span class="pl-k">in</span> V <span class="pl-k">diff</span> {<span class="pl-s"><span class="pl-pds">'</span>S<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>T<span class="pl-pds">'</span></span>}}<span class="pl-k">:</span> 
-  <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> v <span class="pl-k">==</span> k} f[u,v,i] <span class="pl-k">-</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> u <span class="pl-k">==</span> k} f[u, v, i] <span class="pl-k">=</span> <span class="pl-c1">0</span>;
-s.t. flowconS<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> u <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>S<span class="pl-pds">'</span></span>} f[u,v,i] <span class="pl-k">=</span> Z;
-s.t. flowconT<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> v <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>T<span class="pl-pds">'</span></span>} f[u,v,i] <span class="pl-k">=</span> Z;
-
+s.t. flowcon{k <span class="pl-k">in</span> V}<span class="pl-k">:</span> 
+    <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> v <span class="pl-k">==</span> k} f[u,v,i]  <span class="pl-k">-</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> u <span class="pl-k">==</span> k} f[u, v, i] 
+    <span class="pl-k">=</span> <span class="pl-k">if</span> k <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>T<span class="pl-pds">'</span></span> <span class="pl-k">then</span> Z <span class="pl-k">else</span>
+      <span class="pl-k">if</span> k <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>S<span class="pl-pds">'</span></span> <span class="pl-k">then</span> <span class="pl-k">-</span>Z <span class="pl-k">else</span>
+      <span class="pl-c1">0</span>;
 <span class="pl-c"># Demand constraints:</span>
-s.t. demand{k <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> i <span class="pl-k">==</span> k} <span class="pl-k">&gt;=</span> instance1_b[i];
-
-<span class="pl-k">solve</span>;
-<span class="pl-k">end</span>;</pre></div>
+s.t. demand{k <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span class="pl-k">sum</span>{(u,v,i) <span class="pl-k">in</span> A<span class="pl-k">:</span> i <span class="pl-k">==</span> k} <span class="pl-k">&gt;=</span> instance1_b[i];</pre></div>
 
 <p>Note: the source vertex is <code>'S'</code>, the target is <code>'T'</code>, and loss arcs are labeled with <code>'LOSS'</code>.</p>
+
+<h3>
+<a id="user-content-statements-for-special-ordered-sets-and-piecewise-linear-functions" class="anchor" href="#statements-for-special-ordered-sets-and-piecewise-linear-functions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Statements for special ordered sets and piecewise linear functions</h3>
+
+<h4>
+<a id="user-content-sos1" class="anchor" href="#sos1" aria-hidden="true"><span class="octicon octicon-link"></span></a>SOS1</h4>
+
+<p>Usage: <code>$SOS1{varl, ub=1};</code></p>
+
+<p>Description: creates a special ordered set of type 1 (SOS1) for a set of variables. At most one variable in a SOS1 can take a strictly positive value.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>Python:
+
+<ul>
+<li>
+<code>varl</code>: list of variable names;</li>
+<li>
+<code>ub</code>: largest possible value if non-zero (default 1).</li>
+</ul>
+</li>
+</ul>
+
+<p>Creates:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>creates a variables and constraints to model the special ordered set.</li>
+</ul>
+</li>
+</ul>
+
+<p>Example:</p>
+
+<div class="highlight highlight-ampl"><pre><span class="pl-k">var</span> x{<span class="pl-c1">1</span><span class="pl-k">..</span>3}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
+$SOS1{[<span class="pl-s"><span class="pl-pds">"</span>x[1]<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>x[2]<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>x[3]<span class="pl-pds">"</span></span>]};</pre></div>
+
+<h4>
+<a id="user-content-sos2" class="anchor" href="#sos2" aria-hidden="true"><span class="octicon octicon-link"></span></a>SOS2</h4>
+
+<p>Usage: <code>$SOS2{varl, ub=1};</code></p>
+
+<p>Description: creates a special ordered set of type 2 (SOS2) for a set of variables.  At most two variables in a SOS2 can take a strictly positive value, and if two are non-zero these must be consecutive in their ordering.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>Python:
+
+<ul>
+<li>
+<code>varl</code>: list of variable names;</li>
+<li>
+<code>ub</code>: largest possible value if non-zero (default 1).</li>
+</ul>
+</li>
+</ul>
+
+<p>Creates:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>creates a variables and constraints to model the special ordered set.</li>
+</ul>
+</li>
+</ul>
+
+<p>Example:</p>
+
+<div class="highlight highlight-ampl"><pre>$<span class="pl-k">PARAM</span>[X{I}]{[<span class="pl-c1">0</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>, <span class="pl-c1">25</span>, <span class="pl-c1">30</span>, <span class="pl-c1">35</span>, <span class="pl-c1">40</span>, <span class="pl-c1">45</span>, <span class="pl-c1">50</span>, <span class="pl-c1">55</span>, <span class="pl-c1">60</span>, <span class="pl-c1">70</span>]};
+$<span class="pl-k">PARAM</span>[Y{<span class="pl-k">^</span>I}]{[<span class="pl-c1">0</span>, <span class="pl-c1">20</span>, <span class="pl-c1">15</span>, <span class="pl-c1">10</span>, <span class="pl-c1">0</span>, <span class="pl-c1">50</span>, <span class="pl-c1">18</span>, <span class="pl-c1">0</span>, <span class="pl-c1">15</span>, <span class="pl-c1">24</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>]};
+<span class="pl-c"># Model a piecewise linear function</span>
+<span class="pl-k">var</span> x;
+<span class="pl-k">var</span> y;
+<span class="pl-c"># Model a piecewise linear function using a special ordered set of type 2:</span>
+<span class="pl-k">var</span> z{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
+s.t. fix_x<span class="pl-k">:</span> x <span class="pl-k">=</span> <span class="pl-k">sum</span>{i <span class="pl-k">in</span> I} X[i] <span class="pl-k">*</span> z[i];
+s.t. fix_y<span class="pl-k">:</span> y <span class="pl-k">=</span> <span class="pl-k">sum</span>{i <span class="pl-k">in</span> I} Y[i] <span class="pl-k">*</span> z[i];
+s.t. convexity<span class="pl-k">:</span> <span class="pl-k">sum</span>{i <span class="pl-k">in</span> I} z[i] <span class="pl-k">=</span> <span class="pl-c1">1</span>;
+$SOS2{[<span class="pl-s"><span class="pl-pds">"</span>z[%d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};</pre></div>
+
+<h4>
+<a id="user-content-pwl" class="anchor" href="#pwl" aria-hidden="true"><span class="octicon octicon-link"></span></a>PWL</h4>
+
+<p>Usage: <code>$PWL[var_x, var_y]{xyvalues};</code></p>
+
+<p>Description: models a piecewise linear function given a list of pairs (x, y=f(x)).</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>
+<code>'var_x'</code>: name for the first variable;</li>
+<li>
+<code>'var_y'</code>: name for the second variable.</li>
+</ul>
+</li>
+<li>Python:
+
+<ul>
+<li>'xyvalues': list of pairs (x, y=f(x)) for the piecewise linear function f(x).</li>
+</ul>
+</li>
+</ul>
+
+<p>Creates:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>creates variables <code>'var_x'</code> and <code>'var_y'</code>;</li>
+<li>creates a variables and constraints to model the piecewise linear function (<code>'var_y'</code> = f(<code>'var_x'</code>)).</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples:</p>
+
+<div class="highlight highlight-ampl"><pre>$EXEC{
+<span class="pl-k">xval</span>ues <span class="pl-k">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>, <span class="pl-c1">25</span>, <span class="pl-c1">30</span>, <span class="pl-c1">35</span>, <span class="pl-c1">40</span>, <span class="pl-c1">45</span>, <span class="pl-c1">50</span>, <span class="pl-c1">55</span>, <span class="pl-c1">60</span>, <span class="pl-c1">70</span>]
+<span class="pl-k">yval</span>ues <span class="pl-k">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">20</span>, <span class="pl-c1">15</span>, <span class="pl-c1">10</span>, <span class="pl-c1">0</span>, <span class="pl-c1">50</span>, <span class="pl-c1">18</span>, <span class="pl-c1">0</span>, <span class="pl-c1">15</span>, <span class="pl-c1">24</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>]
+};
+$PWL[x,y]{zip(<span class="pl-k">xval</span>ues, <span class="pl-k">yval</span>ues)};</pre></div>
+
+<h3>
+<a id="user-content-statements-for-tsp" class="anchor" href="#statements-for-tsp" aria-hidden="true"><span class="octicon octicon-link"></span></a>Statements for TSP</h3>
+
+<h4>
+<a id="user-content-atsp_mtz" class="anchor" href="#atsp_mtz" aria-hidden="true"><span class="octicon octicon-link"></span></a>ATSP_MTZ</h4>
+
+<p>Usage: <code>$ATSP_MTZ{xvars, DL=False, cuts=False};</code></p>
+
+<p>Description: creates a submodel for TSP using Miller, Tucker and Zemlin (MTZ) (1960) subtour elimination constraints.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>Python:
+
+<ul>
+<li>
+<code>xvars</code>: list of binary variables for the arcs in the graph;</li>
+<li>
+<code>DL</code>: if <code>True</code> uses Desrochers and Laporte (1991) lifted MTZ inequalities;</li>
+<li>
+<code>cuts</code>: if <code>True</code> stores information for cut generation.</li>
+</ul>
+</li>
+</ul>
+
+<p>Creates:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>A submodel for TSP projected on <code>xvars</code> variables.</li>
+</ul>
+</li>
+<li>Python:
+
+<ul>
+<li>stores information for cut generation if requested.</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples:</p>
+
+<div class="highlight highlight-ampl"><pre>$<span class="pl-k">SET</span>[V]{<span class="pl-k">set</span> of vertices};
+$<span class="pl-k">SET</span>[A]{<span class="pl-k">set</span> of arcs};
+$<span class="pl-k">PARAM</span>[cost{<span class="pl-k">^</span>A}]{cost of each <span class="pl-k">arc</span>};
+<span class="pl-k">var</span> x{A}, <span class="pl-k">binary</span>;
+<span class="pl-k">minimize</span> total<span class="pl-k">:</span> <span class="pl-k">sum</span>{(i,j) <span class="pl-k">in</span> A} cost[i,j] <span class="pl-k">*</span> x[i,j];
+$ATSP_MTZ{{(i,j)<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>x[%d,%d]<span class="pl-pds">"</span></span>%(i,j) <span class="pl-k">for</span> i, j <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]}, DL<span class="pl-k">=</span>True, cuts<span class="pl-k">=</span>True};</pre></div>
+
+<h4>
+<a id="user-content-atsp_scf" class="anchor" href="#atsp_scf" aria-hidden="true"><span class="octicon octicon-link"></span></a>ATSP_SCF</h4>
+
+<p>Usage: <code>$ATSP_SCF{xvars, cuts=False};</code></p>
+
+<p>Description: creates a submodel for TSP using the single commodity flow model of Gavish and Graves (1978).</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>Python:
+
+<ul>
+<li>
+<code>xvars</code>: list of binary variables for the arcs in the graph;</li>
+<li>
+<code>cuts</code>: if <code>True</code> stores information for cut generation.</li>
+</ul>
+</li>
+</ul>
+
+<p>Creates:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>A submodel for TSP projected on <code>xvars</code> variables.</li>
+</ul>
+</li>
+<li>Python:
+
+<ul>
+<li>stores information for cut generation if requested.</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples:</p>
+
+<div class="highlight highlight-ampl"><pre>$<span class="pl-k">SET</span>[V]{<span class="pl-k">set</span> of vertices};
+$<span class="pl-k">SET</span>[A]{<span class="pl-k">set</span> of arcs};
+$<span class="pl-k">PARAM</span>[cost{<span class="pl-k">^</span>A}]{cost of each <span class="pl-k">arc</span>};
+<span class="pl-k">var</span> x{A}, <span class="pl-k">binary</span>;
+<span class="pl-k">minimize</span> total<span class="pl-k">:</span> <span class="pl-k">sum</span>{(i,j) <span class="pl-k">in</span> A} cost[i,j] <span class="pl-k">*</span> x[i,j];
+$ATSP_SCF{{(i,j)<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>x[%d,%d]<span class="pl-pds">"</span></span>%(i,j) <span class="pl-k">for</span> i, j <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]}, cuts<span class="pl-k">=</span>True};</pre></div>
+
+<h4>
+<a id="user-content-atsp_mcf" class="anchor" href="#atsp_mcf" aria-hidden="true"><span class="octicon octicon-link"></span></a>ATSP_MCF</h4>
+
+<p>Usage: <code>$ATSP_SCF{xvars, cuts=False};</code></p>
+
+<p>Description: creates a submodel for TSP using the multi commodity flow model of Wong (1980) and Claus (1984).</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>Python:
+
+<ul>
+<li>
+<code>xvars</code>: list of binary variables for the arcs in the graph;</li>
+<li>
+<code>cuts</code>: if <code>True</code> stores information for cut generation.</li>
+</ul>
+</li>
+</ul>
+
+<p>Creates:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>A submodel for TSP projected on <code>xvars</code> variables.</li>
+</ul>
+</li>
+<li>Python:
+
+<ul>
+<li>stores information for cut generation if requested.</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples:</p>
+
+<div class="highlight highlight-ampl"><pre>$<span class="pl-k">SET</span>[V]{<span class="pl-k">set</span> of vertices};
+$<span class="pl-k">SET</span>[A]{<span class="pl-k">set</span> of arcs};
+$<span class="pl-k">PARAM</span>[cost{<span class="pl-k">^</span>A}]{cost of each <span class="pl-k">arc</span>};
+<span class="pl-k">var</span> x{A}, <span class="pl-k">binary</span>;
+<span class="pl-k">minimize</span> total<span class="pl-k">:</span> <span class="pl-k">sum</span>{(i,j) <span class="pl-k">in</span> A} cost[i,j] <span class="pl-k">*</span> x[i,j];
+$ATSP_MCF{{(i,j)<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>x[%d,%d]<span class="pl-pds">"</span></span>%(i,j) <span class="pl-k">for</span> i, j <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]}};</pre></div>
 
 <hr>
 

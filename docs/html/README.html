@@ -64,7 +64,7 @@ solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MI
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.</p>
 
-<p>For modelling other problems easily, VPSolver includes a <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a>, a modelling language <a href="https://github.com/fdabrandao/vpsolver/wiki/PyMPL">PyMPL</a>, and a <a href="#vpsolver-web-app">Web APP</a>. VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a <a href="#docker">Docker container</a>.</p>
+<p>For modelling other problems easily, VPSolver includes a <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a>, a modelling language <a href="https://github.com/fdabrandao/vpsolver/wiki/PyMPL">PyMPL</a>, and a <a href="#vpsolver-web-app">Web App</a>. VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a <a href="#docker">Docker container</a>.</p>
 
 <p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/wiki">project wiki</a> or to the manual.</p>
 
@@ -78,7 +78,7 @@ large models.</p>
 </li>
 <li>BitBucket repository: <a href="https://bitbucket.org/fdabrandao/vpsolver">https://bitbucket.org/fdabrandao/vpsolver</a>
 </li>
-<li>Docker repository: <a href="https://registry.hub.docker.com/u/fdabrandao/vpsolver/">https://registry.hub.docker.com/u/fdabrandao/vpsolver/</a>
+<li>Docker repository: <a href="https://hub.docker.com/r/fdabrandao/vpsolver/">https://hub.docker.com/r/fdabrandao/vpsolver/</a>
 </li>
 </ul>
 
@@ -98,7 +98,7 @@ large models.</p>
 <h4>
 <a id="user-content-optional" class="anchor" href="#optional" aria-hidden="true"><span class="octicon octicon-link"></span></a>Optional</h4>
 
-<p>For the <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a> and <a href="#vpsolver-web-app">Web APP</a>:</p>
+<p>For the <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a> and <a href="#vpsolver-web-app">Web App</a>:</p>
 
 <ul>
 <li><code>python-2.7</code></li>
@@ -168,7 +168,7 @@ $ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
 root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
 ...</pre></div>
 
-<p>or through the VPSolver Web APP (example URL: <code>http://172.17.0.60:5555/</code>):</p>
+<p>or through the VPSolver Web App (example URL: <code>http://172.17.0.60:5555/</code>):</p>
 
 <div class="highlight highlight-bash"><pre>$ docker run -it -p 5555 fdabrandao/vpsolver 
 eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
@@ -186,14 +186,14 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 <p>For more details, please refer to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki/docker">https://github.com/fdabrandao/vpsolver/wiki/docker</a>].</p>
 
 <h2>
-<a id="user-content-vpsolver-web-app" class="anchor" href="#vpsolver-web-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver Web APP</h2>
+<a id="user-content-vpsolver-web-app" class="anchor" href="#vpsolver-web-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver Web App</h2>
 
-<p>VPSolver includes a Web APP that can be started as follows:</p>
+<p>VPSolver includes a Web App that can be started as follows:</p>
 
 <pre><code>$ python -m pyvpsolver.webapp.app
 </code></pre>
 
-<p>The Web APP can then be accessed on a web browser at <code>http://127.0.0.1:5555/</code>.</p>
+<p>The Web App can then be accessed on a web browser at <code>http://127.0.0.1:5555/</code>.</p>
 
 <h2>
 <a id="user-content-vpsolver-binaries" class="anchor" href="#vpsolver-binaries" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver binaries</h2>
