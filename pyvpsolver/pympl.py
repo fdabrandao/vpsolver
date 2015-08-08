@@ -22,15 +22,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 import sys
 from copy import deepcopy
-from .pymplcmds import CmdBase, CmdSet, CmdParam
-from .pymplcmds import CmdVar, CmdCon, CmdStmt
+from .pymplcmds import CmdBase, SubModelBase
+from .pymplcmds import CmdSet, CmdParam, CmdVar, CmdCon, CmdStmt
 from .pymplcmds import SubVBPModelFlow, CmdVBPGraph, CmdVBPLoad
 from .pymplcmds import SubATSPModelMTZ, SubATSPModelSCF, SubATSPModelMCF
 from .pymplcmds import SubSOS1Model, SubSOS2Model, SubPWLModel
 
 
 class PyMPL(object):
-    """Class for parsing AMPL files with PyMPL calls."""
+    """PyMPL parser."""
 
     DEBUG = False
     t_CMD = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -79,6 +79,7 @@ class PyMPL(object):
         for var in globals_:
             if var not in self._locals:
                 self._locals[var] = globals_[var]
+        self._submodels = set()
 
         self._locals["_model"] = ""
         self._locals["_sets"] = self._sets
@@ -129,6 +130,9 @@ class PyMPL(object):
                     exec(args2, self._locals)
                     res = str(self._locals["_model"])
                 else:
+                    if call in self._locals:
+                        if issubclass(type(self._locals[call]), SubModelBase):
+                            self._submodels.add(call)
                     if args1 is not None:
                         args1 = "'''{0}'''".format(args1[1:-1])
                     self._locals["_model"] = ""
@@ -204,6 +208,10 @@ class PyMPL(object):
         """Writes the output to a file."""
         with open(mod_out, "w") as fout:
             print >>fout, self.output
+
+    def submodels(self):
+        """Returns the names of submodels used."""
+        return self._submodels
 
     def __getitem__(self, varname):
         """Returns the internal variable varname."""

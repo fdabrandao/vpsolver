@@ -69,14 +69,22 @@ def main():
     m.params.MIPGapAbs = 1-1e-5
 
     def sep_callback(model, where):
+        """Gurobi callback function"""
         if where == GRB.callback.MIPNODE:
             model._cnt += 1
             if model._cnt - model._lastrun < 10:
                 return
             model._lastrun = model._cnt
+
+            # check if the submodel was used
+            assert "ATSP_SCF" in parser.submodels()
+
+            # calls the separate method to compute valid inequalities
             cuts = parser["ATSP_SCF"].separate(
                 lambda name: model.cbGetSolution(model.getVarByName(name))
             )
+
+            # add the cuts to the model
             for cut in cuts:
                 lincomb, sign, rhs = cut
                 print "add cut"
