@@ -115,11 +115,12 @@ class TestPyMPL(unittest.TestCase):
         parser.input = """
         $VAR[x1]{}; $VAR[x2]{}; $VAR[x3]{};
         $CON[con1]{[("x1",5),("x2",15),("x3",10)],">=",20};
-        $CON[con2]{[("x1",5)],">=",[("x2",-15),("x3",-10),20]};
-        $CON[con3]{-20,">=",[("x1",-5),("x2",-15),("x3",-10)]};
-        $CON[con4]{-20,">=",[(-5, "x1"),("x2",-15),(-10, "x3")]};
-        $CON[con5]{[-20, "x1"],">=",[(-4, "x1"),("x2",-15),(-10, "x3")]};
-        $CON[con6]{"x1",">=",[(-4, "x1"),20,("x2",-15),(-10, "x3")]};
+        $CON[con2]{[("x1",5),("x2",15),-20],">=",("x3",-10)};
+        $CON[con3]{[("x1",5)],">=",[("x2",-15),("x3",-10),20]};
+        $CON[con4]{-20,">=",[("x1",-5),("x2",-15),("x3",-10)]};
+        $CON[con5]{-20,">=",[(-5, "x1"),("x2",-15),(-10, "x3")]};
+        $CON[con6]{[-20, "x1"],">=",[(-4, "x1"),("x2",-15),(-10, "x3")]};
+        $CON[con7]{"x1",">=",[(-4, "x1"),20,("x2",-15),(-10, "x3")]};
         $CON[^xyz]{[("x1",5),("x2",15),("x3",10)],">=",20};
         """
         parser.parse(comment_cmds=False)
@@ -129,6 +130,7 @@ class TestPyMPL(unittest.TestCase):
         self.assertIn("s.t. con4: +5*x1+15*x2+10*x3 >= 20;", parser.output)
         self.assertIn("s.t. con5: +5*x1+15*x2+10*x3 >= 20;", parser.output)
         self.assertIn("s.t. con6: +5*x1+15*x2+10*x3 >= 20;", parser.output)
+        self.assertIn("s.t. con7: +5*x1+15*x2+10*x3 >= 20;", parser.output)
         self.assertNotIn("s.t. xyz: +5*x1+15*x2+10*x3 >= 20;", parser.output)
 
     def test_stmt(self):
