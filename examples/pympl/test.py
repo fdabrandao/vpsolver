@@ -61,20 +61,21 @@ def main():
     print "instance:"
     instance.main()
 
-    print "tsp:"
-    tsp.main()
-
-    print "tsp_gurobi:"
-    try:
-        tsp_gurobi.main()
-    except ImportError as e:
-        print repr(e)
-
     print "sos:"
     sos.main()
 
     print "pwl:"
     pwl.main()
+
+    if "quick_test" not in sys.argv:
+        print "tsp:"
+        tsp.main()
+
+        print "tsp_gurobi:"
+        try:
+            tsp_gurobi.main()
+        except ImportError as e:
+            print repr(e)
 
 if __name__ == "__main__":
     main()

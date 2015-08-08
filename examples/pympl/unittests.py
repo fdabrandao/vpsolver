@@ -27,6 +27,8 @@ if sdir != "":
     os.chdir(sdir)
 
 if __name__ == "__main__":
+    if "quick_test" in sys.argv:
+        sys.argv.remove("quick_test")
     if "test_install" in sys.argv:
         sys.argv.remove("test_install")
     else:
