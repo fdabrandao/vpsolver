@@ -52,7 +52,10 @@ def main():
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_glpk.sh", lp_out, verbose=True
     )
-    sol, varvalues = parser["VBP_FLOW"].extract(varvalues, verbose=True)
+    sol = parser["VBP_FLOW"].extract(
+        lambda varname: varvalues.get(varname, 0),
+        verbose=True
+    )
 
     print
     print "sol:", sol

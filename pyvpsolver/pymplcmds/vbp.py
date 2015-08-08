@@ -168,6 +168,7 @@ class SubVBPModelFlow(SubModelBase):
     def __init__(self, *args, **kwargs):
         SubModelBase.__init__(self, *args, **kwargs)
         self._zvars = []
+        self._models = []
         self._graphs = []
         self._prefixes = []
 
@@ -201,6 +202,7 @@ class SubVBPModelFlow(SubModelBase):
         )
 
         self._zvars.append(zvar)
+        self._models.append(model)
         self._graphs.append(graph)
         self._prefixes.append(prefix)
 
@@ -278,19 +280,16 @@ class SubVBPModelFlow(SubModelBase):
 
         return graph, model, declared_vars
 
-    def extract(self, varvalues, verbose=False):
-        """Extracts an arc-flow solution."""
+    def extract(self, get_var_value, verbose=False):
+        """Extracts arc-flow solutions."""
         lst_sol = []
-        newvv = varvalues.copy()
-        for zvar, graph, prefix in zip(
-                self._zvars, self._graphs, self._prefixes):
-            vv = {
-                k.replace(prefix, "", 1): v
-                for k, v in varvalues.items() if k.startswith(prefix)
+        for zvar, model, graph, prefix in zip(
+                self._zvars, self._models, self._graphs, self._prefixes):
+            varvalues = {
+                var.replace(prefix, "", 1): get_var_value(var)
+                for var in model.vars if var.startswith(prefix)
             }
-            for k in vv:
-                del newvv[prefix+k]
-            graph.set_flow(vv)
+            graph.set_flow(varvalues)
             sol = graph.extract_solution(graph.S, "<-", graph.T)
             lst_sol.append((zvar, varvalues.get(zvar, 0), sol))
             VPSolver.log("Graph: {0} (flow={1:d})\n\t{2}".format(
@@ -298,4 +297,4 @@ class SubVBPModelFlow(SubModelBase):
                 ),
                 verbose=verbose
             )
-        return lst_sol, newvv
+        return lst_sol
