@@ -56,6 +56,7 @@ def main():
 
     mod_in = "tsp.mod"
     mod_out = "tmp/tsp.out.mod"
+    graph_size = "small"
     parser = PyMPL(locals_=locals(), globals_=globals())
     parser.parse(mod_in, mod_out)
 

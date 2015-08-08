@@ -1,8 +1,11 @@
 $EXEC{
-n, xs, ys = read_tsp("data/tsp_51_1.txt")
-#n, xs, ys = read_tsp("data/tsp_5_1.txt")
-#n, xs, ys = read_tsp("data/tsp_20_1.txt")
-#n, xs, ys = read_tsp("data/tsp_30_1.txt")
+if graph_size == "small":
+    # n, xs, ys = read_tsp("data/tsp_5_1.txt")
+    # n, xs, ys = read_tsp("data/tsp_20_1.txt")
+    n, xs, ys = read_tsp("data/tsp_30_1.txt")
+else:
+    n, xs, ys = read_tsp("data/tsp_51_1.txt")
+
 points = zip(xs, ys)
 
 def length(point1, point2):

@@ -59,7 +59,7 @@ def main():
     # Draw the arc-flow graph for instanceA (requires pygraphviz)
     try:
         afg.graph().draw("tmp/graph.svg")
-    except Exception as e:
+    except ImportError as e:
         print repr(e)
 
     # Solve instanceA using bin/vpsolver (requires Gurobi)
