@@ -12,7 +12,7 @@ solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MI
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.
 
-For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling language [PyMPL](https://github.com/fdabrandao/vpsolver/wiki/PyMPL), and a [Web APP](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a [Docker container](#docker).
+For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling language [PyMPL](https://github.com/fdabrandao/vpsolver/wiki/PyMPL), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a [Docker container](#docker).
 
 For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki) or to the manual.
 
@@ -20,7 +20,7 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 * Project Homepage: <http://vpsolver.dcc.fc.up.pt/>
 * GiHub repository: <https://github.com/fdabrandao/vpsolver>
 * BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>
-* Docker repository: <https://registry.hub.docker.com/u/fdabrandao/vpsolver/>
+* Docker repository: <https://hub.docker.com/r/fdabrandao/vpsolver/>
 
 ## Requirements
 #### Mandatory
@@ -31,7 +31,7 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
       
 #### Optional
 
-For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and [Web APP](#vpsolver-web-app):
+For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and [Web App](#vpsolver-web-app):
 
 * `python-2.7`
 * `python-pip`
@@ -98,7 +98,7 @@ root@55d14f6b6f32:~# python examples/vpsolver/example_vbp.py
 ...
 ```
 
-or through the VPSolver Web APP (example URL: `http://172.17.0.60:5555/`):
+or through the VPSolver Web App (example URL: `http://172.17.0.60:5555/`):
 
 ```bash
 $ docker run -it -p 5555 fdabrandao/vpsolver 
@@ -117,14 +117,14 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 
 For more details, please refer to the project wiki [https://github.com/fdabrandao/vpsolver/wiki/docker].
 
-## VPSolver Web APP
-VPSolver includes a Web APP that can be started as follows:
+## VPSolver Web App
+VPSolver includes a Web App that can be started as follows:
 
 ```
 $ python -m pyvpsolver.webapp.app
 ```
 
-The Web APP can then be accessed on a web browser at `http://127.0.0.1:5555/`.
+The Web App can then be accessed on a web browser at `http://127.0.0.1:5555/`.
 
 ## VPSolver binaries
 
