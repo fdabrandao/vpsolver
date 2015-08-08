@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .base import CmdBase
+from .base import SubModelBase
 from ..model import Model
 from ..modelutils import writemod
 from ..utils import UnionFind
@@ -43,7 +43,7 @@ def add_assign_constraints(model, xvars, graph):
 
 
 def add_cut_variables(model, xvars, graph, prefix=""):
-    """Adds variables for computing cutting planes."""
+    """Adds variables for computing valid inequalities."""
     V, A, start = graph
 
     def yvar(u, v):
@@ -228,11 +228,11 @@ def tsp_cut_generator(graph, cutvars, get_var_value):
     return cuts
 
 
-class CmdATSPModelMTZ(CmdBase):
+class SubATSPModelMTZ(SubModelBase):
     """Command for creating MTZ constraints for TSP."""
 
     def __init__(self, *args, **kwargs):
-        CmdBase.__init__(self, *args, **kwargs)
+        SubModelBase.__init__(self, *args, **kwargs)
         self._cnt = 0
         self._graph_lst = []
         self._cutvars_lst = []
@@ -261,18 +261,18 @@ class CmdATSPModelMTZ(CmdBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
     def separate(self, get_var_value):
-        """Computes cutting planes for TSP."""
+        """Computes valid inequalities for TSP."""
         cuts = []
         for graph, cutvars in zip(self._graph_lst, self._cutvars_lst):
             cuts += tsp_cut_generator(graph, cutvars, get_var_value)
         return cuts
 
 
-class CmdATSPModelSCF(CmdBase):
+class SubATSPModelSCF(SubModelBase):
     """Command for creating Single-Commodity Flow Model models for TSP."""
 
     def __init__(self, *args, **kwargs):
-        CmdBase.__init__(self, *args, **kwargs)
+        SubModelBase.__init__(self, *args, **kwargs)
         self._cnt = 0
         self._graph_lst = []
         self._cutvars_lst = []
@@ -301,18 +301,18 @@ class CmdATSPModelSCF(CmdBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
     def separate(self, get_var_value):
-        """Computes cutting planes for TSP."""
+        """Computes valid inequalities for TSP."""
         cuts = []
         for graph, cutvars in zip(self._graph_lst, self._cutvars_lst):
             cuts += tsp_cut_generator(graph, cutvars, get_var_value)
         return cuts
 
 
-class CmdATSPModelMCF(CmdBase):
+class SubATSPModelMCF(SubModelBase):
     """Command for creating Multi-Commodity Flow Model models for TSP."""
 
     def __init__(self, *args, **kwargs):
-        CmdBase.__init__(self, *args, **kwargs)
+        SubModelBase.__init__(self, *args, **kwargs)
         self._cnt = 0
         self._graph_lst = []
         self._cutvars_lst = []
@@ -341,7 +341,7 @@ class CmdATSPModelMCF(CmdBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
     def separate(self, get_var_value):
-        """Computes cutting planes for TSP."""
+        """Computes valid inequalities for TSP."""
         cuts = []
         for graph, cutvars in zip(self._graph_lst, self._cutvars_lst):
             cuts += tsp_cut_generator(graph, cutvars, get_var_value)

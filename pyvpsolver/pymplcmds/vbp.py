@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import re
-from .base import CmdBase
+from .base import CmdBase, SubModelBase
 from ..vpsolver import VPSolver, VBP, AFG
 from ..model import Model
 from ..modelutils import writemod
@@ -162,11 +162,11 @@ class CmdVBPGraph(CmdBase):
         return graph
 
 
-class CmdVBPModelFlow(CmdBase):
+class SubVBPModelFlow(SubModelBase):
     """Command for creating arc-flow models."""
 
     def __init__(self, *args, **kwargs):
-        CmdBase.__init__(self, *args, **kwargs)
+        SubModelBase.__init__(self, *args, **kwargs)
         self._zvars = []
         self._graphs = []
         self._prefixes = []

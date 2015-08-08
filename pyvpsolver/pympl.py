@@ -24,9 +24,10 @@ import sys
 from copy import deepcopy
 from .pymplcmds import CmdBase, CmdSet, CmdParam
 from .pymplcmds import CmdVar, CmdCon, CmdStmt
-from .pymplcmds import CmdVBPModelFlow, CmdVBPGraph, CmdVBPLoad
-from .pymplcmds import CmdATSPModelMTZ, CmdATSPModelSCF, CmdATSPModelMCF
-from .pymplcmds import CmdSOS1Model, CmdSOS2Model, CmdPWLModel
+from .pymplcmds import SubVBPModelFlow, CmdVBPGraph, CmdVBPLoad
+from .pymplcmds import SubATSPModelMTZ, SubATSPModelSCF, SubATSPModelMCF
+from .pymplcmds import SubSOS1Model, SubSOS2Model, SubPWLModel
+
 
 class PyMPL(object):
     """Class for parsing AMPL files with PyMPL calls."""
@@ -53,15 +54,15 @@ class PyMPL(object):
         "VAR": CmdVar,
         "CON": CmdCon,
         "STMT": CmdStmt,
-        "ATSP_MTZ": CmdATSPModelMTZ,
-        "ATSP_SCF": CmdATSPModelSCF,
-        "ATSP_MCF": CmdATSPModelMCF,
+        "ATSP_MTZ": SubATSPModelMTZ,
+        "ATSP_SCF": SubATSPModelSCF,
+        "ATSP_MCF": SubATSPModelMCF,
         "VBP_LOAD": CmdVBPLoad,
-        "VBP_FLOW": CmdVBPModelFlow,
+        "VBP_FLOW": SubVBPModelFlow,
         "VBP_GRAPH": CmdVBPGraph,
-        "SOS1": CmdSOS1Model,
-        "SOS2": CmdSOS2Model,
-        "PWL": CmdPWLModel,
+        "SOS1": SubSOS1Model,
+        "SOS2": SubSOS2Model,
+        "PWL": SubPWLModel,
     }
 
     def __init__(self, locals_=None, globals_=None):

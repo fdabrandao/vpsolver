@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 class CmdBase(object):
-    """Command for creating a new AMPL set."""
+    """Base class for PyMPL commands."""
 
     def __init__(self, cmd_name, pyvars, sets, params):
         self.cmd_name = cmd_name
@@ -55,9 +55,21 @@ class CmdBase(object):
         return lambda *args, **kwargs: self._evalcmd(arg1, *args, **kwargs)
 
     def _evalcmd(self, arg1, *args, **kwargs):
-        """Evalutates CMD[arg1](*arg2)."""
-        pass
+        """Evalutates CMD[arg1](*args)."""
+        raise NotImplementedError("CMD[arg1](*args)")
 
     def separate(self, get_var_value):
         """Computes valid inequalities."""
+        pass
+
+
+class SubModelBase(CmdBase):
+    """Base class for PyMPL submodels."""
+
+    def separate(self, get_var_value, *args, **kwargs):
+        """Compute valid inequalities for the submodel."""
+        pass
+
+    def extract(self, get_var_value, *args, **kwargs):
+        """Extract the solution of the submodel."""
         pass

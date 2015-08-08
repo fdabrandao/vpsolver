@@ -19,8 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .base import CmdBase
+from .base import CmdBase, SubModelBase
 from .default import CmdSet, CmdParam, CmdVar, CmdCon, CmdStmt
-from .vbp import CmdVBPLoad, CmdVBPModelFlow, CmdVBPGraph
-from .atsp import CmdATSPModelSCF, CmdATSPModelMCF, CmdATSPModelMTZ
-from .sos import CmdSOS1Model, CmdSOS2Model, CmdPWLModel
+from .vbp import CmdVBPLoad, SubVBPModelFlow, CmdVBPGraph
+from .atsp import SubATSPModelSCF, SubATSPModelMCF, SubATSPModelMTZ
+from .sos import SubSOS1Model, SubSOS2Model, SubPWLModel

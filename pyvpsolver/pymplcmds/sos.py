@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .base import CmdBase
+from .base import SubModelBase
 from ..model import Model
 from ..modelutils import writemod
 from .. import pymplutils
@@ -58,11 +58,11 @@ def add_sos2(model, varl, ub=1, prefix=""):
     model.add_con([yvar(i) for i in xrange(len(varl)-1)], "=", 1)
 
 
-class CmdSOS1Model(CmdBase):
+class SubSOS1Model(SubModelBase):
     """Command for creating SOS1 constraints."""
 
     def __init__(self, *args, **kwargs):
-        CmdBase.__init__(self, *args, **kwargs)
+        SubModelBase.__init__(self, *args, **kwargs)
         self._cnt = 0
 
     def _evalcmd(self, arg1, varl, ub=1):
@@ -81,11 +81,11 @@ class CmdSOS1Model(CmdBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
 
-class CmdSOS2Model(CmdBase):
+class SubSOS2Model(SubModelBase):
     """Command for creating SOS2 constraints."""
 
     def __init__(self, *args, **kwargs):
-        CmdBase.__init__(self, *args, **kwargs)
+        SubModelBase.__init__(self, *args, **kwargs)
         self._cnt = 0
 
     def _evalcmd(self, arg1, varl, ub=1):
@@ -104,11 +104,11 @@ class CmdSOS2Model(CmdBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
 
-class CmdPWLModel(CmdBase):
+class SubPWLModel(SubModelBase):
     """Command for modeling Piecewise Linear Functions."""
 
     def __init__(self, *args, **kwargs):
-        CmdBase.__init__(self, *args, **kwargs)
+        SubModelBase.__init__(self, *args, **kwargs)
         self._cnt = 0
 
     def _evalcmd(self, varnames, xyvalues):
