@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from collections import Iterable, defaultdict
+from collections import defaultdict
 
 
 def linear_constraint(left, sign, right):
@@ -32,13 +32,13 @@ def linear_constraint(left, sign, right):
     rhs = 0
 
     def add_entry(e, signal):
-        assert isinstance(e, (int, float, str, Iterable))
+        assert isinstance(e, (int, float, str, tuple))
         if isinstance(e, (int, float)):
             return -signal*e
         elif isinstance(e, str):
             pairs[e] += signal
             return 0
-        elif isinstance(e, Iterable):
+        elif isinstance(e, tuple):
             a, b = e
             assert isinstance(a, int) or isinstance(b, int)
             assert isinstance(a, str) or isinstance(b, str)
@@ -48,13 +48,13 @@ def linear_constraint(left, sign, right):
                 pairs[b] += signal*a
             return 0
 
-    if isinstance(left, (int, float, str)):
+    if isinstance(left, (int, float, str, tuple)):
         rhs += add_entry(left, 1)
     else:
         for e in left:
             rhs += add_entry(e, 1)
 
-    if isinstance(right, (int, float, str)):
+    if isinstance(right, (int, float, str, tuple)):
         rhs += add_entry(right, -1)
     else:
         for e in right:

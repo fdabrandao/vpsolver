@@ -34,7 +34,7 @@ def add_sos1(model, varl, ub=1, prefix=""):
         model.add_var(name=yvar(i), vtype="B")
 
     for i, var in enumerate(varl):
-        model.add_con(var, "<=", [(yvar(i), ub)])
+        model.add_con(var, "<=", (yvar(i), ub))
 
     model.add_con([yvar(i) for i in xrange(len(varl))], "=", 1)
 
@@ -49,9 +49,9 @@ def add_sos2(model, varl, ub=1, prefix=""):
 
     for i, var in enumerate(varl):
         if i == 0:
-            model.add_con(var, "<=", [(yvar(i), ub)])
+            model.add_con(var, "<=", (yvar(i), ub))
         elif i == len(varl)-1:
-            model.add_con(var, "<=", [(yvar(i-1), ub)])
+            model.add_con(var, "<=", (yvar(i-1), ub))
         else:
             model.add_con(var, "<=", [(yvar(i-1), ub), (yvar(i), ub)])
 

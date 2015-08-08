@@ -132,9 +132,9 @@ def add_scf_constraints(model, xvars, graph, prefix=""):
     # s.t. vub2{(i,j) in A: j != n}: y[i,j] <= (n-2) * x[i,j];
     for (u, v) in A:
         if v == start:
-            model.add_con(yvar(u, v), "<=", [(len(V)-1, xvars[u, v])])
+            model.add_con(yvar(u, v), "<=", (len(V)-1, xvars[u, v]))
         else:
-            model.add_con(yvar(u, v), "<=", [(len(V)-2, xvars[u, v])])
+            model.add_con(yvar(u, v), "<=", (len(V)-2, xvars[u, v]))
 
     # s.t. flowcon{i in V}:
     # sum{(j,i) in A} y[j,i] - sum{(i,j) in A} y[i,j]
