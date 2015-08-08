@@ -1,8 +1,8 @@
 $EXEC{
-#n, xs, ys = read_tsp("data/tsp_51_1.txt")
+n, xs, ys = read_tsp("data/tsp_51_1.txt")
 #n, xs, ys = read_tsp("data/tsp_5_1.txt")
 #n, xs, ys = read_tsp("data/tsp_20_1.txt")
-n, xs, ys = read_tsp("data/tsp_30_1.txt")
+#n, xs, ys = read_tsp("data/tsp_30_1.txt")
 points = zip(xs, ys)
 
 def length(point1, point2):
@@ -50,17 +50,17 @@ minimize total: sum{(i,j) in A} c[i,j] * x[i,j];
 
 # Single Commodity Flow Model
 # Gavish and Graves (1978)
-$ATSP_SCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, cuts=True};
+#$ATSP_SCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, cuts=False};
 
 # Multi Commodity Flow Model
 # Wong (1980) and Claus (1984)
-#$ATSP_MCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, cuts=True};
+#$ATSP_MCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, cuts=False};
 
 # Miller, Tucker and Zemlin (MTZ) (1960)
-#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
+#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, cuts=True};
 
 # Desrochers and Laporte (1991)
-#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, DL=True, cuts=False};
+$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, DL=True, cuts=True};
 
 # Time Windows:
 var s{V}, >= 0;

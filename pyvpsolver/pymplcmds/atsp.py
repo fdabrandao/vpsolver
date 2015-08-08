@@ -55,12 +55,12 @@ def add_cut_variables(model, xvars, graph, prefix=""):
         cutvars[cu, cv] = yvar(cu, cv)
 
     for u, v in cutvars:
-        model.add_var(name=cutvars[u, v])
+        model.add_var(name=cutvars[u, v], lb=0, ub=1)
         lincomb = []
         if (u, v) in xvars:
             lincomb.append(xvars[u, v])
         if (v, u) in xvars:
-            lincomb.append(xvars[u, v])
+            lincomb.append(xvars[v, u])
         model.add_con(lincomb, "=", cutvars[u, v])
 
     return cutvars
@@ -209,7 +209,7 @@ def tsp_cut_generator(graph, cutvars, get_var_value):
 
     for (u, v) in cutvars:
         value = get_var_value(cutvars[u, v])
-        if value > 0:
+        if abs(1-value) < 1e-5:
             ds.link(ind[u], ind[v])
 
     if ds.ngroups > 1:
@@ -261,7 +261,7 @@ class SubATSPModelMTZ(SubModelBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
     def separate(self, get_var_value):
-        """Computes valid inequalities for TSP."""
+        """Computes valid inequalities for TSP submodels."""
         cuts = []
         for graph, cutvars in zip(self._graph_lst, self._cutvars_lst):
             cuts += tsp_cut_generator(graph, cutvars, get_var_value)
@@ -301,7 +301,7 @@ class SubATSPModelSCF(SubModelBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
     def separate(self, get_var_value):
-        """Computes valid inequalities for TSP."""
+        """Computes valid inequalities for TSP submodels."""
         cuts = []
         for graph, cutvars in zip(self._graph_lst, self._cutvars_lst):
             cuts += tsp_cut_generator(graph, cutvars, get_var_value)
@@ -341,7 +341,7 @@ class SubATSPModelMCF(SubModelBase):
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
 
     def separate(self, get_var_value):
-        """Computes valid inequalities for TSP."""
+        """Computes valid inequalities for TSP submodels."""
         cuts = []
         for graph, cutvars in zip(self._graph_lst, self._cutvars_lst):
             cuts += tsp_cut_generator(graph, cutvars, get_var_value)

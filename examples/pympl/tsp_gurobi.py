@@ -77,17 +77,20 @@ def main():
             model._lastrun = model._cnt
 
             # check if the submodel was used
-            assert "ATSP_SCF" in parser.submodels()
+            assert "ATSP_MTZ" in parser.submodels()
 
             # calls the separate method to compute valid inequalities
-            cuts = parser["ATSP_SCF"].separate(
-                lambda name: model.cbGetSolution(model.getVarByName(name))
+            cuts = parser["ATSP_MTZ"].separate(
+                lambda name: model.cbGetNodeRel(model.getVarByName(name))
             )
 
             # add the cuts to the model
+            if len(cuts) > 0:
+                print "add {0} {1}".format(
+                    len(cuts), "cuts" if len(cuts) > 1 else "cut"
+                )
             for cut in cuts:
                 lincomb, sign, rhs = cut
-                print "add cut"
                 expr = LinExpr([
                     (coef, model.getVarByName(var))
                     for var, coef in lincomb
@@ -103,7 +106,7 @@ def main():
     m._lastrun = float("-inf")
     m.optimize(sep_callback)
 
-    print "Obecjtive:", m.ObjVal
+    print "Objective:", m.ObjVal
 
 if __name__ == "__main__":
     main()

@@ -67,9 +67,9 @@ class SubModelBase(CmdBase):
     """Base class for PyMPL submodels."""
 
     def separate(self, get_var_value, *args, **kwargs):
-        """Compute valid inequalities for the submodel."""
+        """Compute valid inequalities for the submodels."""
         pass
 
     def extract(self, get_var_value, *args, **kwargs):
-        """Extract the solution of the submodel."""
+        """Extract solutions of submodels."""
         pass
