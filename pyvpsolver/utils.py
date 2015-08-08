@@ -102,3 +102,45 @@ def list2dict(lst, i0=0):
 
     conv_rec([], lst)
     return dic
+
+
+class UnionFind:
+    """Union-find data structure."""
+
+    def __init__(self, N):
+        """Create a new empty union-find structure."""
+        self.N = N
+        self.init()
+
+    def init(self):
+        """Initialize data."""
+        self.ngroups = self.N
+        self.p = range(self.N)
+        self.rank = [0]*self.N
+
+    def find(self, x):
+        """Find root of x."""
+        if self.p[x] != x:
+            self.p[x] = self.find(self.p[x])
+        return self.p[x]
+
+    def link(self, x, y):
+        """Link x and y."""
+        x = self.find(x)
+        y = self.find(y)
+        if x != y:
+            self.ngroups -= 1;
+            if self.rank[x] > self.rank[y]:
+                self.p[y] = x
+            else:
+                self.p[x] = y
+                if self.rank[x] == self.rank[y]:
+                    self.rank[y] += 1
+
+    def groups(self):
+        """Retrieve groups."""
+        from collections import defaultdict
+        grps = defaultdict(list)
+        for x in xrange(self.N):
+            grps[self.find(x)].append(x)
+        return grps.values()

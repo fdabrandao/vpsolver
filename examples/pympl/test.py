@@ -41,6 +41,7 @@ import equivknapsack
 import wolsey
 import instance
 import tsp
+import tsp_gurobi
 import sos
 import pwl
 
@@ -62,6 +63,12 @@ def main():
 
     print "tsp:"
     tsp.main()
+
+    print "tsp_gurobi:"
+    try:
+        tsp_gurobi.main()
+    except ImportError as e:
+        print repr(e)
 
     print "sos:"
     sos.main()

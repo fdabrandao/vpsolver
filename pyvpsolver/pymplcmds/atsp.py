@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .base import CmdBase
 from ..model import Model
 from ..modelutils import writemod
+from ..utils import UnionFind
 
 
 def add_assign_constraints(model, xvars, graph):
@@ -39,6 +40,30 @@ def add_assign_constraints(model, xvars, graph):
         vars_out = [xvars[u, v] for u, v in A if u == k]
         model.add_con(vars_in, "=", 1)
         model.add_con(vars_out, "=", 1)
+
+
+def add_cut_variables(model, xvars, graph, prefix=""):
+    """Adds variables for computing cutting planes."""
+    V, A, start = graph
+
+    def yvar(u, v):
+        return "{0}c_{1}_{2}".format(prefix, u, v)
+
+    cutvars = {}
+    for (u, v) in xvars:
+        cu, cv = min(u, v), max(u, v)
+        cutvars[cu, cv] = yvar(cu, cv)
+
+    for u, v in cutvars:
+        model.add_var(name=cutvars[u, v])
+        lincomb = []
+        if (u, v) in xvars:
+            lincomb.append(xvars[u, v])
+        if (v, u) in xvars:
+            lincomb.append(xvars[u, v])
+        model.add_con(lincomb, "=", cutvars[u, v])
+
+    return cutvars
 
 
 def add_mtz_constraints(model, xvars, graph, DL=False, prefix=""):
@@ -175,14 +200,44 @@ def add_mcf_constraints(model, xvars, graph, prefix=""):
                 model.add_con(lincomb, "=", 0)
 
 
+def tsp_cut_generator(graph, cutvars, get_var_value):
+    """Heuristic computing subtour elimination constraints."""
+    cuts = []
+    V, A, start = graph
+    ds = UnionFind(len(V))
+    ind = {v: i for i, v in enumerate(V)}
+
+    for (u, v) in cutvars:
+        value = get_var_value(cutvars[u, v])
+        if value > 0:
+            ds.link(ind[u], ind[v])
+
+    if ds.ngroups > 1:
+        groups = ds.groups()
+        for group in groups:
+            if len(group) <= 2:
+                continue
+            grp = set(map(lambda id_: V[id_], group))
+            cuts.append((
+                [
+                   (cutvars[u, v], 1)
+                   for u in grp for v in grp if u < v
+                ], "<=", len(grp)-1
+            ))
+
+    return cuts
+
+
 class CmdATSPModelMTZ(CmdBase):
     """Command for creating MTZ constraints for TSP."""
 
     def __init__(self, *args, **kwargs):
         CmdBase.__init__(self, *args, **kwargs)
         self._cnt = 0
+        self._graph_lst = []
+        self._cutvars_lst = []
 
-    def _evalcmd(self, arg1, xvars, DL=False):
+    def _evalcmd(self, arg1, xvars, cuts=False, DL=False):
         """Evalutates CMD[arg1](*args)."""
         assert arg1 is None
         self._cnt += 1
@@ -196,10 +251,21 @@ class CmdATSPModelMTZ(CmdBase):
         model = Model()
         add_assign_constraints(model, xvars, graph)
         add_mtz_constraints(model, xvars, graph, DL, prefix)
+        if cuts:
+            cutvars = add_cut_variables(model, xvars, graph, prefix)
+            self._graph_lst.append(graph)
+            self._cutvars_lst.append(cutvars)
         model.rename_cons(lambda name: prefix+name)
 
         declared_vars = set(xvars.values())
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
+
+    def separate(self, get_var_value):
+        """Computes cutting planes for TSP."""
+        cuts = []
+        for graph, cutvars in zip(self._graph_lst, self._cutvars_lst):
+            cuts += tsp_cut_generator(graph, cutvars, get_var_value)
+        return cuts
 
 
 class CmdATSPModelSCF(CmdBase):
@@ -208,8 +274,10 @@ class CmdATSPModelSCF(CmdBase):
     def __init__(self, *args, **kwargs):
         CmdBase.__init__(self, *args, **kwargs)
         self._cnt = 0
+        self._graph_lst = []
+        self._cutvars_lst = []
 
-    def _evalcmd(self, arg1, xvars):
+    def _evalcmd(self, arg1, xvars, cuts=False):
         """Evalutates CMD[arg1](*args)."""
         assert arg1 is None
         self._cnt += 1
@@ -223,10 +291,21 @@ class CmdATSPModelSCF(CmdBase):
         model = Model()
         add_assign_constraints(model, xvars, graph)
         add_scf_constraints(model, xvars, graph, prefix)
+        if cuts:
+            cutvars = add_cut_variables(model, xvars, graph, prefix)
+            self._graph_lst.append(graph)
+            self._cutvars_lst.append(cutvars)
         model.rename_cons(lambda name: prefix+name)
 
         declared_vars = set(xvars.values())
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
+
+    def separate(self, get_var_value):
+        """Computes cutting planes for TSP."""
+        cuts = []
+        for graph, cutvars in zip(self._graph_lst, self._cutvars_lst):
+            cuts += tsp_cut_generator(graph, cutvars, get_var_value)
+        return cuts
 
 
 class CmdATSPModelMCF(CmdBase):
@@ -235,8 +314,10 @@ class CmdATSPModelMCF(CmdBase):
     def __init__(self, *args, **kwargs):
         CmdBase.__init__(self, *args, **kwargs)
         self._cnt = 0
+        self._graph_lst = []
+        self._cutvars_lst = []
 
-    def _evalcmd(self, arg1, xvars):
+    def _evalcmd(self, arg1, xvars, cuts=False):
         """Evalutates CMD[arg1](*args)."""
         assert arg1 is None
         self._cnt += 1
@@ -250,7 +331,18 @@ class CmdATSPModelMCF(CmdBase):
         model = Model()
         add_assign_constraints(model, xvars, graph)
         add_mcf_constraints(model, xvars, graph, prefix)
+        if cuts:
+            cutvars = add_cut_variables(model, xvars, graph, prefix)
+            self._graph_lst.append(graph)
+            self._cutvars_lst.append(cutvars)
         model.rename_cons(lambda name: prefix+name)
 
         declared_vars = set(xvars.values())
         self._pyvars["_model"] += writemod.model2ampl(model, declared_vars)
+
+    def separate(self, get_var_value):
+        """Computes cutting planes for TSP."""
+        cuts = []
+        for graph, cutvars in zip(self._graph_lst, self._cutvars_lst):
+            cuts += tsp_cut_generator(graph, cutvars, get_var_value)
+        return cuts

@@ -50,17 +50,17 @@ minimize total: sum{(i,j) in A} c[i,j] * x[i,j];
 
 # Single Commodity Flow Model
 # Gavish and Graves (1978)
-#$ATSP_SCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
+$ATSP_SCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, cuts=True};
 
 # Multi Commodity Flow Model
 # Wong (1980) and Claus (1984)
-#$ATSP_MCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
+#$ATSP_MCF{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, cuts=True};
 
 # Miller, Tucker and Zemlin (MTZ) (1960)
 #$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}};
 
 # Desrochers and Laporte (1991)
-$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, DL=True};
+#$ATSP_MTZ{{(i,j): "x[%d,%d]"%(i,j) for i, j in _sets['A']}, DL=True, cuts=False};
 
 # Time Windows:
 var s{V}, >= 0;
@@ -74,5 +74,4 @@ s.t. tw3{i in V: i != start_node}:
 
 solve;
 display x;
-display s;
 end;

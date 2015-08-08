@@ -57,3 +57,7 @@ class CmdBase(object):
     def _evalcmd(self, arg1, *args, **kwargs):
         """Evalutates CMD[arg1](*arg2)."""
         pass
+
+    def separate(self, get_var_value):
+        """Computes valid inequalities."""
+        pass
