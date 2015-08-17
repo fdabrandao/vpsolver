@@ -2,16 +2,15 @@ FROM ubuntu:trusty
 
 MAINTAINER Filipe Brandao <fdabrandao@dcc.fc.up.pt>
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install \
     make \
     g++-4.8 \
     python2.7 \
     python-pip \
     python-dev \
     python-pygraphviz \
-    glpk-utils
+    glpk-utils \
+    libglpk-dev
 
 USER root
 RUN mkdir -p /vpsolver
