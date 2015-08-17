@@ -28,24 +28,25 @@ from setuptools.command.install import install
 
 
 class CustomInstallCommand(install):
-    """ Custom Install Command """
+    """Custom Install Command."""
 
     def run(self):
-        try:
-            os.system("/bin/cp " + self.install_scripts)
-        except IOError:
-            pass
+        os.system("/bin/cp " + self.install_scripts)
         install.run(self)
 
 
-def copy_dir(base_dir):
-    for (dirpath, dirnames, files) in os.walk(base_dir):
-        for f in files:
-            if (
-                not f.endswith(("~", ".pyc", ".pyo", ".log"))
-                and not f.startswith(".")
-            ):
-                yield os.path.join(dirpath.split("/", 1)[1], f)
+def ls_dir(base_dir):
+    """List files recursively."""
+    base_dir = os.path.join(base_dir, "")
+    return [
+        os.path.join(dirpath.replace(base_dir, "", 1), f)
+        for (dirpath, dirnames, files) in os.walk(base_dir)
+        for f in files
+        if (
+            not f.endswith(("~", ".pyc", ".pyo", ".log")) and
+            not f.startswith(".")
+        )
+    ]
 
 
 setup(
@@ -55,15 +56,13 @@ setup(
     author="Filipe Brandao",
     author_email="fdabrandao@dcc.fc.up.pt",
     url="https://github.com/fdabrandao/vpsolver",
-    description="Cutting and Packing Exact Solver Based on an Arc-Flow Formulation",
+    description="Arc-flow Vector Packing Solver (VPSolver)",
     long_description=open("README.md").read(),
     packages=["pyvpsolver"],
-    package_data = {
-        "" : [f for f in copy_dir("pyvpsolver/")]
-    },
+    package_data={"": ls_dir("pyvpsolver/")},
     include_package_data=True,
-    scripts=[os.path.join("scripts/", f) for f in copy_dir("scripts/")] + \
-            [os.path.join("bin/", f) for f in copy_dir("bin/")],
+    scripts=[os.path.join("scripts", f) for f in ls_dir("scripts/")] +
+            [os.path.join("bin", f) for f in ls_dir("bin/")],
     install_requires=[],
     classifiers=[
         "Development Status :: 1 - Planning",
@@ -71,6 +70,6 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Topic :: Scientific/Engineering"
     ],
-    cmdclass = { "install" : CustomInstallCommand },
-    use_2to3 = True
+    cmdclass={"install": CustomInstallCommand},
+    use_2to3=True
 )
