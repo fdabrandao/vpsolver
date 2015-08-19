@@ -201,7 +201,7 @@ class SubVBPModelFlow(SubModelBase):
             zvar, W, w, b, bounds, prefix
         )
 
-        self._zvars.append(zvar)
+        self._zvars.append(zvar.lstrip("^"))
         self._models.append(model)
         self._graphs.append(graph)
         self._prefixes.append(prefix)
@@ -244,6 +244,8 @@ class SubVBPModelFlow(SubModelBase):
         graph.set_labels(labels)
 
         for i in xrange(m):
+            if i not in assocs:
+                assocs[i] = []
             if bounds is not None:
                 for var in assocs[i]:
                     ub[var] = bounds[i]
@@ -261,6 +263,9 @@ class SubVBPModelFlow(SubModelBase):
             model.add_var(name=var, lb=0, ub=ub.get(var, None), vtype="I")
         for lincomb, sign, rhs in cons:
             model.add_con(lincomb, sign, rhs)
+
+        model.add_var(name="_total_flow", vtype="I")
+        model.add_con("_total_flow", "=", vnames[feedback])
 
         declared_vars = set(bvars)
 
@@ -292,8 +297,9 @@ class SubVBPModelFlow(SubModelBase):
             graph.set_flow(varvalues)
             sol = graph.extract_solution(graph.S, "<-", graph.T)
             lst_sol.append((zvar, varvalues.get(zvar, 0), sol))
-            VPSolver.log("Graph: {0} (flow={1:d})\n\t{2}".format(
-                    zvar, varvalues.get(zvar, 0), sol
+            VPSolver.log(
+                "Graph: {0} (flow={1:d})\n\t{2}".format(
+                    zvar, varvalues.get("_total_flow", 0), sol
                 ),
                 verbose=verbose
             )
