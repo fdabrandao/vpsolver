@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = "v2.0.0-rc1"
+__version__ = "v2.0.0-rc2"
 
 import os
 import shutil

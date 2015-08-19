@@ -51,7 +51,7 @@ def ls_dir(base_dir):
 
 setup(
     name="VPSolver",
-    version="2.0.0-rc1",
+    version="2.0.0-rc2",
     license="GPLv3+",
     author="Filipe Brandao",
     author_email="fdabrandao@dcc.fc.up.pt",
