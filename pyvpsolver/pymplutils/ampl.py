@@ -127,7 +127,7 @@ def ampl_con(name, lincomb, sign, rhs):
         return ""
     if sign in (">", "<"):
         sign += "="
-    defs = "s.t. {name}: {lin} {sign} {rhs};".format(
+    defs = "s.t. {name}:{lin} {sign} {rhs};".format(
         name=name,
         lin=lincomb2str(lincomb),
         sign=sign,

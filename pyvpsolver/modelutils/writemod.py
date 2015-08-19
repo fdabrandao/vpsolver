@@ -47,9 +47,9 @@ def write_mod(model, filename):
 
     if model.obj != []:
         if model.objdir == "min":
-            print >>fout, "minimize obj: {0};".format(lincomb2str(model.obj))
+            print >>fout, "minimize obj:{0};".format(lincomb2str(model.obj))
         else:
-            print >>fout, "maximize obj: {0};".format(lincomb2str(model.obj))
+            print >>fout, "maximize obj:{0};".format(lincomb2str(model.obj))
 
     # Constraints:
 

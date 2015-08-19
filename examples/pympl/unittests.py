@@ -124,14 +124,14 @@ class TestPyMPL(unittest.TestCase):
         $CON[^xyz]{[("x1",5),("x2",15),("x3",10)],">=",20};
         """
         parser.parse(comment_cmds=False)
-        self.assertIn("s.t. con1: +5*x1+15*x2+10*x3 >= 20;", parser.output)
-        self.assertIn("s.t. con2: +5*x1+15*x2+10*x3 >= 20;", parser.output)
-        self.assertIn("s.t. con3: +5*x1+15*x2+10*x3 >= 20;", parser.output)
-        self.assertIn("s.t. con4: +5*x1+15*x2+10*x3 >= 20;", parser.output)
-        self.assertIn("s.t. con5: +5*x1+15*x2+10*x3 >= 20;", parser.output)
-        self.assertIn("s.t. con6: +5*x1+15*x2+10*x3 >= 20;", parser.output)
-        self.assertIn("s.t. con7: +5*x1+15*x2+10*x3 >= 20;", parser.output)
-        self.assertNotIn("s.t. xyz: +5*x1+15*x2+10*x3 >= 20;", parser.output)
+        self.assertIn("s.t. con1: +5*x1 +15*x2 +10*x3 >= 20;", parser.output)
+        self.assertIn("s.t. con2: +5*x1 +15*x2 +10*x3 >= 20;", parser.output)
+        self.assertIn("s.t. con3: +5*x1 +15*x2 +10*x3 >= 20;", parser.output)
+        self.assertIn("s.t. con4: +5*x1 +15*x2 +10*x3 >= 20;", parser.output)
+        self.assertIn("s.t. con5: +5*x1 +15*x2 +10*x3 >= 20;", parser.output)
+        self.assertIn("s.t. con6: +5*x1 +15*x2 +10*x3 >= 20;", parser.output)
+        self.assertIn("s.t. con7: +5*x1 +15*x2 +10*x3 >= 20;", parser.output)
+        self.assertNotIn("s.t. xyz: +5*x1 +15*x2 +10*x3 >= 20;", parser.output)
 
     def test_stmt(self):
         """Tests $STMT{stmt} calls"""
