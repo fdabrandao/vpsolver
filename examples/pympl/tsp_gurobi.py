@@ -40,7 +40,7 @@ from pyvpsolver import VPSolver, PyMPL, glpkutils
 
 
 def read_tsp(fname):
-    """Reads TSP instances from files."""
+    """Loads TSP instances."""
     xs, ys = [], []
     with open(fname) as f:
         lst = map(float, f.read().split())

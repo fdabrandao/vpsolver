@@ -39,45 +39,48 @@ if __name__ == "__main__":
 from pyvpsolver import VPSolver, PyMPL, glpkutils
 
 
-def read_tsp(fname):
-    """Loads TSP instances."""
-    xs, ys = [], []
+def read_twostage(fname):
+    """Loads two-stage instances."""
     with open(fname) as f:
-        lst = map(float, f.read().split())
-        n = int(lst.pop(0))
-        for i in xrange(n):
-            xs.append(lst.pop(0))
-            ys.append(lst.pop(0))
-    return n, xs, ys
+        lst = map(int, f.read().split())
+        W = lst.pop(0)
+        H = lst.pop(0)
+        m = lst.pop(0)
+        w, h, b = [], [], []
+        for i in xrange(m):
+            w.append(lst.pop(0))
+            h.append(lst.pop(0))
+            b.append(lst.pop(0))
+        return W, H, w, h, b
 
 
 def main():
-    """Parses 'tsp.mod'."""
+    """Parses 'twostage.mod'."""
 
-    mod_in = "tsp.mod"
-    mod_out = "tmp/tsp.out.mod"
-    graph_size = "small"
+    mod_in = "twostage.mod"
+    mod_out = "tmp/twostage.out.mod"
     parser = PyMPL(locals_=locals(), globals_=globals())
     parser.parse(mod_in, mod_out)
 
-    lp_out = "tmp/tsp.lp"
+    lp_out = "tmp/twostage.lp"
     glpkutils.mod2lp(mod_out, lp_out, True)
-    try:
-        out, varvalues = VPSolver.script_wsol(
-            "vpsolver_gurobi.sh", lp_out, verbose=True
-        )
-    except Exception as e:
-        print repr(e)
 
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_glpk.sh", lp_out, verbose=True
     )
 
+    print
     print "varvalues:", [
         (k, v)
         for k, v in sorted(varvalues.items())
         if not k.startswith("_")
     ]
+    print
+
+    parser["VBP_FLOW"].extract(
+        lambda name: varvalues.get(name, 0),
+        verbose=True
+    )
 
 if __name__ == "__main__":
     main()
