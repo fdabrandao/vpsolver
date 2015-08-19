@@ -76,6 +76,7 @@ def main():
         if not k.startswith("_")
     ]
     print
+    assert varvalues["Z"] == 15  # check the solution objective value
 
     parser["VBP_FLOW"].extract(
         lambda name: varvalues.get(name, 0),

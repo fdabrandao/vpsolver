@@ -44,6 +44,7 @@ import tsp
 import tsp_gurobi
 import sos
 import pwl
+import twostage
 
 
 def main():
@@ -66,6 +67,9 @@ def main():
 
     print "pwl:"
     pwl.main()
+
+    print "twostage:"
+    twostage.main()
 
     if "quick_test" not in sys.argv:
         print "tsp:"
