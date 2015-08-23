@@ -44,16 +44,16 @@ error(){
 
 solve(){
     local model_file=$1
-    GRB_PARAMS="Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0 MIPGapAbs=0.99999"
     echo -e "\n>>> solving the MIP model using Gurobi..."
     echo -e "Note: different parameter settings may improve the performance substantially!"
-    gurobi_cl $GRB_PARAMS ResultFile=$TMP_DIR/vars.sol $model_file &
+    gurobi_cl $options ResultFile=$TMP_DIR/vars.sol $model_file &
     local pid=$!
     trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
     wait $pid
     sed -i '/#/d' $TMP_DIR/vars.sol
 }
 
+options="Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0 MIPGapAbs=0.99999"
 model_file=""
 afg_file=""
 vbp_file=""
@@ -97,6 +97,14 @@ do
     --wsol)
         if [[ -n "$2" ]]; then
             sol_file=$2
+        else
+            error
+        fi
+        shift 2;;
+
+    --options)
+        if [[ -n "$2" ]]; then
+            options=$2
         else
             error
         fi

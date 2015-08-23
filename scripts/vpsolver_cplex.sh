@@ -49,6 +49,7 @@ solve(){
     rm -rf $TMP_DIR/vars.sol;
     (
         echo "read $model_file"
+        echo $options
         echo "optimize"
         echo "write $TMP_DIR/vars.sol"
     ) | cplex &
@@ -60,6 +61,7 @@ solve(){
     mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol
 }
 
+options=""
 model_file=""
 afg_file=""
 vbp_file=""
@@ -103,6 +105,14 @@ do
     --wsol)
         if [[ -n "$2" ]]; then
             sol_file=$2
+        else
+            error
+        fi
+        shift 2;;
+
+    --options)
+        if [[ -n "$2" ]]; then
+            options=$2
         else
             error
         fi

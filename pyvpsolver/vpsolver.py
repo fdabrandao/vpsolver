@@ -344,7 +344,7 @@ class VPSolver(object):
         return output
 
     @staticmethod
-    def script(script_name, arg1=None, arg2=None, verbose=None):
+    def script(script_name, arg1=None, arg2=None, options=None, verbose=None):
         """Calls VPSolver scripts and returns vector packing solutions."""
         cmd = script_name
         for arg in [arg1, arg2]:
@@ -367,6 +367,8 @@ class VPSolver(object):
                     cmd += " --vbp {0}".format(arg)
                 else:
                     raise Exception("Invalid file extension!")
+        if options is not None:
+            cmd += " --options \"{0}\"".format(options)
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(cmd, tee=out_file, verbose=verbose)
         with open(out_file) as f:
@@ -375,7 +377,7 @@ class VPSolver(object):
         return output, VPSolver.parse_vbpsol(output)
 
     @staticmethod
-    def script_wsol(script_name, model, verbose=None):
+    def script_wsol(script_name, model, options=None, verbose=None):
         """Calls VPSolver scripts and returns arc-flow solutions."""
         cmd = script_name
         if isinstance(model, MPS):
@@ -389,6 +391,8 @@ class VPSolver(object):
                 cmd += " --lp {0}".format(model)
             else:
                 raise Exception("Invalid file extension!")
+        if options is not None:
+            cmd += " --options \"{0}\"".format(options)
         out_file = VPSolver.new_tmp_file()
         sol_file = VPSolver.new_tmp_file(".sol")
         VPSolver.run(

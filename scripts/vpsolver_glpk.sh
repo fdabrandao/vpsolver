@@ -47,12 +47,12 @@ solve(){
     echo -e "\n>>> solving the MIP model using GLPK..."
     echo -e "Note: different parameter settings may improve the performance substantially!"
     if [[ $model_file =~ \.mps$ ]]; then
-        glpsol --mps $model_file -o $TMP_DIR/sol.out &
+        glpsol --mps $model_file $options -o $TMP_DIR/sol.out &
         local pid=$!
         trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
         wait $pid
     else
-        glpsol --lp $model_file -o $TMP_DIR/sol.out &
+        glpsol --lp $model_file $options -o $TMP_DIR/sol.out &
         local pid=$!
         trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
         wait $pid
@@ -65,6 +65,7 @@ solve(){
     awk '{ if ( $3 ~ /^[0-9][^\s]*$/  ){ print $2, $3 }else{ print $2, $4 } } ' $TMP_DIR/sol.out > $TMP_DIR/vars.sol
 }
 
+options=""
 model_file=""
 afg_file=""
 vbp_file=""
@@ -108,6 +109,14 @@ do
     --wsol)
         if [[ -n "$2" ]]; then
             sol_file=$2
+        else
+            error
+        fi
+        shift 2;;
+
+    --options)
+        if [[ -n "$2" ]]; then
+            options=$2
         else
             error
         fi

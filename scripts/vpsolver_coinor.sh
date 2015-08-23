@@ -46,13 +46,14 @@ solve(){
     local model_file=$1
     echo -e "\n>>> solving the MIP model using COIN-OR CBC..."
     echo -e "Note: different parameter settings may improve the performance substantially!"
-    stdbuf -i0 -o0 -e0 cbc $model_file -cuts off -solve -solu $TMP_DIR/sol.out &
+    stdbuf -i0 -o0 -e0 cbc $model_file $options -solve -solu $TMP_DIR/sol.out &
     local pid=$!
     trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
     wait $pid
     tail -n +2 $TMP_DIR/sol.out | awk '{ print $2, $3 }' > $TMP_DIR/vars.sol
 }
 
+options="-cuts off"
 model_file=""
 afg_file=""
 vbp_file=""
@@ -96,6 +97,14 @@ do
     --wsol)
         if [[ -n "$2" ]]; then
             sol_file=$2
+        else
+            error
+        fi
+        shift 2;;
+
+    --options)
+        if [[ -n "$2" ]]; then
+            options=$2
         else
             error
         fi
