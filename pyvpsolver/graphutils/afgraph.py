@@ -72,13 +72,13 @@ class AFGraph(object):
         Ain = {u: [] for u in self.V}
         Aout = {u: [] for u in self.V}
         varl = []
-        for (u, v, i) in self.A:
+        for (u, v, i) in sorted(self.A):
             name = self.vname(u, v, i, vnames)
             Aout[u].append(name)
             Ain[v].append(name)
             varl.append(name)
         cons = []
-        for u in self.V:
+        for u in sorted(self.V):
             if Ain[u] != [] and Aout[u] != []:
                 lincomb = []
                 if u in Ain:
@@ -92,7 +92,7 @@ class AFGraph(object):
     def get_assocs(self, vnames=None):
         """Returns the arc variables grouped by label."""
         assocs = {}
-        for (u, v, i) in self.A:
+        for (u, v, i) in sorted(self.A):
             if i not in assocs:
                 assocs[i] = []
             name = self.vname(u, v, i, vnames)
@@ -102,7 +102,7 @@ class AFGraph(object):
     def get_assocs_multi(self, vnames=None):
         """Returns the arc variables grouped by label (multi-label variant)."""
         assocs = {}
-        for (u, v, l) in self.A:
+        for (u, v, l) in sorted(self.A):
             if not isinstance(l, (list, tuple)):
                 lst = [l]
             else:
@@ -115,11 +115,11 @@ class AFGraph(object):
                 assocs[i].append((name, coef))
         return assocs
 
-    def set_flow(self, varvalues):
+    def set_flow(self, varvalues, vnames=None):
         """Sets arc flows."""
         flow = {}
         for (u, v, i) in self.A:
-            name = self.vname(u, v, i)
+            name = self.vname(u, v, i, vnames)
             f = varvalues.get(name, 0)
             if f != 0:
                 flow[u, v, i] = f
