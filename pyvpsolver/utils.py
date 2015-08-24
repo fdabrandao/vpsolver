@@ -74,9 +74,9 @@ def lincomb2str(lincomb, mult="*"):
         var = var.lstrip("^")  # PyMPL special marker
         if abs(coef) != 1:
             if coef >= 0:
-                return " +{0:g}{1}{2}".format(coef, mult, var)
+                return " +{0}{1}{2}".format(repr(coef), mult, var)
             else:
-                return " -{0:g}{1}{2}".format(abs(coef), mult, var)
+                return " -{0}{1}{2}".format(repr(abs(coef)), mult, var)
         else:
             if coef >= 0:
                 return " +{0}".format(var)
