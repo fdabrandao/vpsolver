@@ -22,3 +22,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .writelp import write_lp
 from .writemps import write_mps
 from .writemod import write_mod
+from .model import Model

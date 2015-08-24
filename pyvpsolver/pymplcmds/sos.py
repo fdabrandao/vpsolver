@@ -20,8 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .base import SubModelBase
-from ..model import Model
-from ..modelutils import writemod
+from ..model import Model, writemod
 from .. import pymplutils
 
 

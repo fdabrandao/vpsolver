@@ -22,8 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 from .base import CmdBase, SubModelBase
 from ..vpsolver import VPSolver, VBP, AFG
-from ..model import Model
-from ..modelutils import writemod
+from ..model import Model, writemod
 from .. import pymplutils
 
 
