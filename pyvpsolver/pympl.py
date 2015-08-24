@@ -27,7 +27,7 @@ from .pymplcmds import CmdSet, CmdParam, CmdVar, CmdCon, CmdStmt
 from .pymplcmds import SubVBPModelFlow, CmdVBPGraph, CmdVBPLoad
 from .pymplcmds import SubATSPModelMTZ, SubATSPModelSCF, SubATSPModelMCF
 from .pymplcmds import SubSOS1Model, SubSOS2Model, SubPWLModel
-
+from .pymplcmds import SubWWUSCModel, SubWWCCModel
 
 class PyMPL(object):
     """PyMPL parser."""
@@ -63,6 +63,8 @@ class PyMPL(object):
         "SOS1": SubSOS1Model,
         "SOS2": SubSOS2Model,
         "PWL": SubPWLModel,
+        "WW_U_SC": SubWWUSCModel,
+        "WW_CC": SubWWCCModel,
     }
 
     def __init__(self, locals_=None, globals_=None):

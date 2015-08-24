@@ -24,3 +24,4 @@ from .default import CmdSet, CmdParam, CmdVar, CmdCon, CmdStmt
 from .vbp import CmdVBPLoad, SubVBPModelFlow, CmdVBPGraph
 from .atsp import SubATSPModelSCF, SubATSPModelMCF, SubATSPModelMTZ
 from .sos import SubSOS1Model, SubSOS2Model, SubPWLModel
+from .xform import SubWWUSCModel, SubWWCCModel
