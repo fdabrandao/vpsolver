@@ -40,7 +40,7 @@ def linear_constraint(left, sign, right):
             return 0
         elif isinstance(e, tuple):
             a, b = e
-            assert isinstance(a, int) or isinstance(b, int)
+            assert isinstance(a, (int, float)) or isinstance(b, (int, float))
             assert isinstance(a, str) or isinstance(b, str)
             if isinstance(a, str):
                 pairs[a] += signal*b
