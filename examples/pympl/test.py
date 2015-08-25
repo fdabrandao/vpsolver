@@ -36,25 +36,13 @@ if __name__ == "__main__":
             project_dir, os.environ["PATH"]
         )
 
-import equivknapsack01
-import equivknapsack
 import wolsey
 import instance
-import tsp
-import tsp_gurobi
-import sos
-import pwl
 import twostage
 
 
 def main():
     """Runs all PyMPL examples."""
-
-    print "equivknapsack:"
-    equivknapsack.main()
-
-    print "equivknapsack01:"
-    equivknapsack01.main()
 
     print "wolsey:"
     wolsey.main()
@@ -62,24 +50,9 @@ def main():
     print "instance:"
     instance.main()
 
-    print "sos:"
-    sos.main()
-
-    print "pwl:"
-    pwl.main()
-
     print "twostage:"
     twostage.main()
 
-    if "quick_test" not in sys.argv:
-        print "tsp:"
-        tsp.main()
-
-        print "tsp_gurobi:"
-        try:
-            tsp_gurobi.main()
-        except ImportError as e:
-            print repr(e)
 
 if __name__ == "__main__":
     main()
