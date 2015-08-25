@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 """
-Basic Setup Script
-
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
 Copyright (C) 2013-2015, Filipe Brandao
@@ -51,7 +49,7 @@ def ls_dir(base_dir):
 
 setup(
     name="VPSolver",
-    version="2.0.0-rc2",
+    version="2.0.0-rc3",
     license="GPLv3+",
     author="Filipe Brandao",
     author_email="fdabrandao@dcc.fc.up.pt",
