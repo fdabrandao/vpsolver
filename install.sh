@@ -25,5 +25,5 @@ if [ $nfiles -lt 4 ];
 then
     bash build.sh
 fi;
-sudo pip install -r requirements.txt
-sudo pip install . --upgrade
+sudo -H pip install -r requirements.txt
+sudo -H pip install . --upgrade
