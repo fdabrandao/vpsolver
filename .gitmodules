@@ -1,0 +1,4 @@
+[submodule "submodules/PyMPL-git"]
+	path = submodules/PyMPL-git
+	url = git@github.com:fdabrandao/pympl.git
+	ignore = dirty
