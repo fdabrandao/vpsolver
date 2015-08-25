@@ -8,4 +8,5 @@
 /build/
 /git_push.sh
 /git_fetch.sh
+/update_pympl.sh
 /workspace_private
