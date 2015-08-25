@@ -10,7 +10,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install \
     python-dev \
     python-pygraphviz \
     glpk-utils \
-    libglpk-dev
+    libglpk-dev \
+    libffi-dev \
+    libssl-dev
+
+RUN DEBIAN_FRONTEND=noninteractive pip install --upgrade pip
+RUN DEBIAN_FRONTEND=noninteractive pip install --upgrade requests[security]
 
 USER root
 RUN mkdir -p /vpsolver
