@@ -4,13 +4,13 @@
    [poster]: http://www.dcc.fc.up.pt/~fdabrandao/papers/arcflow_poster.pdf
    [paper]: http://www.dcc.fc.up.pt/~fdabrandao/Vector_Packing_Solver
 
-## Wiki pages
+### Wiki pages
 * [README](README)
 * [Docker setup](Docker)
 * [Python API](Python-API)
-* [PyMPL documentation](PyMPL)
+* [PyMPL modelling toolbox](PyMPL)
 
-## Useful links
+### Useful links
 * Project Homepage: <http://vpsolver.dcc.fc.up.pt/>
 * GiHub repository: <https://github.com/fdabrandao/vpsolver>
 * BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>

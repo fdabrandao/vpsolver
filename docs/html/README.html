@@ -200,6 +200,8 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 
 <ul>
 <li>
+<code>$ bin/vpsolver intance.vbp</code>: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior;</li>
+<li>
 <code>$ bin/vbp2afg instance.vbp graph.afg</code>: builds an arc-flow graph <code>graph.afg</code> for <code>instance.vbp</code>;</li>
 <li>
 <code>$ bin/afg2mps graph.afg model.mps</code>: creates a MPS model <code>model.mps</code> for <code>graph.afg</code>;</li>
@@ -210,9 +212,7 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 <li>
 <code>$ bin/solve_glpk model.mps vars.sol</code>: solves <code>model.mps</code> using GLPK and writes the solution to <code>vars.sol</code>;</li>
 <li>
-<code>$ bin/vbpsol graph.afg vars.sol</code>: extracts a vector packing solution from an arc-flow solution <code>vars.sol</code> associated with the graph <code>graph.afg</code>;</li>
-<li>
-<code>$ bin/vpsolver intance.vbp</code>: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior.</li>
+<code>$ bin/vbpsol graph.afg vars.sol</code>: extracts a vector packing solution from an arc-flow solution <code>vars.sol</code> associated with the graph <code>graph.afg</code>.</li>
 </ul>
 
 <p>Usage:</p>
