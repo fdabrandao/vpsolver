@@ -128,13 +128,13 @@ The Web App can then be accessed on a web browser at `http://127.0.0.1:5555/`.
 
 ## VPSolver binaries
 
+* `$ bin/vpsolver intance.vbp`: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior;
 * `$ bin/vbp2afg instance.vbp graph.afg`: builds an arc-flow graph `graph.afg` for `instance.vbp`;
 * `$ bin/afg2mps graph.afg model.mps`: creates a MPS model `model.mps` for `graph.afg`;
 * `$ bin/afg2lp graph.afg model.lp`: creates a LP model `model.lp` for `graph.afg`;
 * `$ bin/solve_gurobi model.mps vars.sol`: solves `model.mps` using Gurobi and writes the solution to `vars.sol`;
 * `$ bin/solve_glpk model.mps vars.sol`: solves `model.mps` using GLPK and writes the solution to `vars.sol`;
-* `$ bin/vbpsol graph.afg vars.sol`: extracts a vector packing solution from an arc-flow solution `vars.sol` associated with the graph `graph.afg`;
-* `$ bin/vpsolver intance.vbp`: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior.
+* `$ bin/vbpsol graph.afg vars.sol`: extracts a vector packing solution from an arc-flow solution `vars.sol` associated with the graph `graph.afg`.
 
 Usage:
 
