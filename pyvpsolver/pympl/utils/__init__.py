@@ -21,3 +21,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .parsing import parse_symbname, parse_symblist, parse_indexed
 from .ampl import ampl_set, ampl_param, ampl_var, ampl_con
+from .common import linear_constraint, lincomb2str, list2dict

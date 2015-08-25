@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from copy import deepcopy
-from ..utils import linear_constraint, lincomb2str
+from .common import linear_constraint, lincomb2str
 
 
 def tuple2str(tuple_):

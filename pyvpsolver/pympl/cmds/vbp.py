@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import re
+from pyvpsolver import VPSolver, VBP, AFG
 from .base import CmdBase, SubModelBase
-from ..vpsolver import VPSolver, VBP, AFG
 from ..model import Model, writemod
-from .. import pymplutils
+from .. import utils
 
 
 class CmdVBPLoad(CmdBase):
@@ -31,7 +31,7 @@ class CmdVBPLoad(CmdBase):
 
     def _evalcmd(self, name, fname, i0=0, d0=0):
         """Evalutates CMD[name](*args)."""
-        name, index = pymplutils.parse_indexed(name, "{}")
+        name, index = utils.parse_indexed(name, "{}")
         index_I = "{0}_I".format(name)
         index_D = "{0}_D".format(name)
         if index is not None:
@@ -63,49 +63,49 @@ class CmdVBPLoad(CmdBase):
 
         defs, data = "", ""
 
-        pdefs, pdata = pymplutils.ampl_param(
+        pdefs, pdata = utils.ampl_param(
             "{0}_m".format(name), None, instance.m, sets, params
         )
         defs += pdefs
         data += pdata
 
-        pdefs, pdata = pymplutils.ampl_param(
+        pdefs, pdata = utils.ampl_param(
             "{0}_n".format(name), None, sum(instance.b), sets, params
         )
         defs += pdefs
         data += pdata
 
-        pdefs, pdata = pymplutils.ampl_param(
+        pdefs, pdata = utils.ampl_param(
             "{0}_p".format(name), None, instance.ndims, sets, params
         )
         defs += pdefs
         data += pdata
 
-        sdefs, sdata = pymplutils.ampl_set(
+        sdefs, sdata = utils.ampl_set(
             index_I, range(i0, i0+instance.m), sets, sets
         )
         defs += sdefs
         data += sdata
 
-        sdefs, sdata = pymplutils.ampl_set(
+        sdefs, sdata = utils.ampl_set(
             index_D, range(d0, d0+instance.ndims), sets, params
         )
         defs += sdefs
         data += sdata
 
-        pdefs, pdata = pymplutils.ampl_param(
+        pdefs, pdata = utils.ampl_param(
             "{0}_W".format(name), index_D, W, sets, params
         )
         defs += pdefs
         data += pdata
 
-        pdefs, pdata = pymplutils.ampl_param(
+        pdefs, pdata = utils.ampl_param(
             "{0}_b".format(name), index_I, b, sets, params
         )
         defs += pdefs
         data += pdata
 
-        pdefs, pdata = pymplutils.ampl_param(
+        pdefs, pdata = utils.ampl_param(
             "{0}_w".format(name),
             "{0},{1}".format(index_I, index_D),
             w, sets, params
@@ -124,7 +124,7 @@ class CmdVBPGraph(CmdBase):
 
     def _evalcmd(self, names, W, w, labels, bounds=None):
         """Evalutates CMD[names](*args)."""
-        match = pymplutils.parse_symblist(names)
+        match = utils.parse_symblist(names)
         assert match is not None
         Vname, Aname = match
 
@@ -145,10 +145,10 @@ class CmdVBPGraph(CmdBase):
         graph = self._generate_graph(W, w, labels, bounds)
 
         defs = ""
-        defs += pymplutils.ampl_set(
+        defs += utils.ampl_set(
             Vname, graph.V, self._sets, self._params
         )[0]
-        defs += pymplutils.ampl_set(
+        defs += utils.ampl_set(
             Aname, graph.A, self._sets, self._params
         )[0]
         self._pyvars["_defs"] += defs
@@ -185,7 +185,7 @@ class SubVBPModelFlow(SubModelBase):
 
     def _evalcmd(self, zvar, W, w, b, bounds=None):
         """Evalutates CMD[zvar](*args)."""
-        match = pymplutils.parse_symbname(zvar, allow_index="[]")
+        match = utils.parse_symbname(zvar, allow_index="[]")
         assert match is not None
         zvar = match
 

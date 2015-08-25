@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .base import SubModelBase
 from ..model import Model, writemod
-from .. import pymplutils
+from .. import utils
 
 
 def add_sos1(model, varl, ub=1, prefix=""):
@@ -112,7 +112,7 @@ class SubPWLModel(SubModelBase):
 
     def _evalcmd(self, varnames, xyvalues):
         """Evalutates CMD[arg1](*args)."""
-        match = pymplutils.parse_symblist(varnames, allow_index="[]")
+        match = utils.parse_symblist(varnames, allow_index="[]")
         assert match is not None
         xvar, yvar = match
 

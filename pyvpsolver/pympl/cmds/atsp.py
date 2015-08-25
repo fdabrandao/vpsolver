@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .base import SubModelBase
 from ..model import Model, writemod
-from ..utils import UnionFind
+from ..utils.common import UnionFind
 
 
 def add_assign_constraints(model, xvars, graph):

@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .base import CmdBase
-from .. import pymplutils
 from .. import utils
 
 
@@ -29,11 +28,11 @@ class CmdSet(CmdBase):
 
     def _evalcmd(self, name, values):
         """Evalutates CMD[name](*args)."""
-        match = pymplutils.parse_symbname(name)
+        match = utils.parse_symbname(name)
         assert match is not None
         name = match
 
-        self._pyvars["_defs"] += pymplutils.ampl_set(
+        self._pyvars["_defs"] += utils.ampl_set(
             name, values, self._sets, self._params
         )[0]
 
@@ -43,7 +42,7 @@ class CmdParam(CmdBase):
 
     def _evalcmd(self, arg1, values, i0=None):
         """Evalutates CMD[arg1](*args)."""
-        match = pymplutils.parse_indexed(arg1, "{}")
+        match = utils.parse_indexed(arg1, "{}")
         assert match is not None
         name, index = match
 
@@ -66,11 +65,11 @@ class CmdParam(CmdBase):
         if isinstance(values, dict):
             if index is None:
                 index = "{0}_I".format(name)
-            self._pyvars["_defs"] += pymplutils.ampl_set(
+            self._pyvars["_defs"] += utils.ampl_set(
                 index, values.keys(), self._sets, self._params
             )[0]
 
-        pdefs, pdata = pymplutils.ampl_param(
+        pdefs, pdata = utils.ampl_param(
             name, index, values, self._sets, self._params
         )
         self._pyvars["_defs"] += pdefs
@@ -82,7 +81,7 @@ class CmdVar(CmdBase):
 
     def _evalcmd(self, name, typ="", lb=None, ub=None, index_set=None):
         """Evalutates CMD[name](*args)."""
-        match = pymplutils.parse_indexed(name, "{}")
+        match = utils.parse_indexed(name, "{}")
         assert match is not None
         name, index = match
 
@@ -95,11 +94,11 @@ class CmdVar(CmdBase):
         if index_set is not None:
             if index is None:
                 index = "{0}_I".format(name)
-            self._pyvars["_defs"] += pymplutils.ampl_set(
+            self._pyvars["_defs"] += utils.ampl_set(
                 index, index_set, self._sets, self._params
             )[0]
 
-        self._pyvars["_model"] += pymplutils.ampl_var(name, index, typ, lb, ub)
+        self._pyvars["_model"] += utils.ampl_var(name, index, typ, lb, ub)
 
 
 class CmdCon(CmdBase):
@@ -107,11 +106,11 @@ class CmdCon(CmdBase):
 
     def _evalcmd(self, name, left, sign, right):
         """Evalutates CMD[name](*args)."""
-        match = pymplutils.parse_symbname(name)
+        match = utils.parse_symbname(name)
         assert match is not None
         name = match
         lincomb, sign, rhs = utils.linear_constraint(left, sign, right)
-        self._pyvars["_model"] += pymplutils.ampl_con(name, lincomb, sign, rhs)
+        self._pyvars["_model"] += utils.ampl_con(name, lincomb, sign, rhs)
 
 
 class CmdStmt(CmdBase):

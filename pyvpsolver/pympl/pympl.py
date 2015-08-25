@@ -22,14 +22,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 import sys
 from copy import deepcopy
-from .pymplcmds import CmdBase, SubModelBase
-from .pymplcmds import CmdSet, CmdParam, CmdVar, CmdCon, CmdStmt
-from .pymplcmds import SubVBPModelFlow, CmdVBPGraph, CmdVBPLoad
-from .pymplcmds import SubATSPModelMTZ, SubATSPModelSCF, SubATSPModelMCF
-from .pymplcmds import SubSOS1Model, SubSOS2Model, SubPWLModel
-from .pymplcmds import SubWW_U_Model, SubWW_U_B_Model
-from .pymplcmds import SubWW_U_SC_Model, SubWW_U_SCB_Model, SubWW_U_LB_Model
-from .pymplcmds import SubWW_CC_Model, SubWW_CC_B_Model
+from .cmds import CmdBase, SubModelBase
+from .cmds import CmdSet, CmdParam, CmdVar, CmdCon, CmdStmt
+from .cmds import SubVBPModelFlow, CmdVBPGraph, CmdVBPLoad
+from .cmds import SubATSPModelMTZ, SubATSPModelSCF, SubATSPModelMCF
+from .cmds import SubSOS1Model, SubSOS2Model, SubPWLModel
+from .cmds import SubWW_U_Model, SubWW_U_B_Model
+from .cmds import SubWW_U_SC_Model, SubWW_U_SCB_Model, SubWW_U_LB_Model
+from .cmds import SubWW_CC_Model, SubWW_CC_B_Model
 
 
 class PyMPL(object):
