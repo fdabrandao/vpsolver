@@ -61,7 +61,7 @@ app.debug = True
 def inject_globals():
     """Sends global data to templates."""
     data = dict(
-        app_name="VPSolver APP",
+        app_name="VPSolver App",
         pages=[
             ("/vbp", "Vector Packing"),
             ("/pympl", "PyMPL"),
