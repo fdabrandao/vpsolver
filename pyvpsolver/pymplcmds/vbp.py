@@ -61,52 +61,62 @@ class CmdVBPLoad(CmdBase):
         self._pyvars["_{0}".format(name.lstrip("^"))] = instance
         sets, params = self._sets, self._params
 
-        self._defs += "#BEGIN_DEFS: Instance[{0}]\n".format(name)
-        self._data += "#BEGIN_DATA: Instance[{0}]\n".format(name)
-        defs, data = pymplutils.ampl_param(
+        defs, data = "", ""
+
+        pdefs, pdata = pymplutils.ampl_param(
             "{0}_m".format(name), None, instance.m, sets, params
         )
-        self._defs += defs
-        self._data += data
-        defs, data = pymplutils.ampl_param(
+        defs += pdefs
+        data += pdata
+
+        pdefs, pdata = pymplutils.ampl_param(
             "{0}_n".format(name), None, sum(instance.b), sets, params
         )
-        self._defs += defs
-        self._data += data
-        defs, data = pymplutils.ampl_param(
+        defs += pdefs
+        data += pdata
+
+        pdefs, pdata = pymplutils.ampl_param(
             "{0}_p".format(name), None, instance.ndims, sets, params
         )
-        self._defs += defs
-        self._data += data
-        defs, data = pymplutils.ampl_set(
+        defs += pdefs
+        data += pdata
+
+        sdefs, sdata = pymplutils.ampl_set(
             index_I, range(i0, i0+instance.m), sets, sets
         )
-        self._defs += defs
-        self._data += data
-        defs, data = pymplutils.ampl_set(
+        defs += sdefs
+        data += sdata
+
+        sdefs, sdata = pymplutils.ampl_set(
             index_D, range(d0, d0+instance.ndims), sets, params
         )
-        self._defs += defs
-        self._data += data
-        defs, data = pymplutils.ampl_param(
+        defs += sdefs
+        data += sdata
+
+        pdefs, pdata = pymplutils.ampl_param(
             "{0}_W".format(name), index_D, W, sets, params
         )
-        self._defs += defs
-        self._data += data
-        defs, data = pymplutils.ampl_param(
+        defs += pdefs
+        data += pdata
+
+        pdefs, pdata = pymplutils.ampl_param(
             "{0}_b".format(name), index_I, b, sets, params
         )
-        self._defs += defs
-        self._data += data
-        defs, data = pymplutils.ampl_param(
+        defs += pdefs
+        data += pdata
+
+        pdefs, pdata = pymplutils.ampl_param(
             "{0}_w".format(name),
             "{0},{1}".format(index_I, index_D),
             w, sets, params
         )
-        self._defs += defs
-        self._data += data
-        self._defs += "#END_DEFS: Instance[{0}]\n".format(name)
-        self._data += "#END_DATA: Instance[{0}]\n".format(name)
+        defs += pdefs
+        data += pdata
+
+        self._pyvars["_defs"] += defs
+        self._pyvars["_data"] += "#BEGIN_DATA: Instance[{0}]\n".format(name)
+        self._pyvars["_data"] += data
+        self._pyvars["_data"] += "#END_DATA: Instance[{0}]\n".format(name)
 
 
 class CmdVBPGraph(CmdBase):
@@ -134,12 +144,14 @@ class CmdVBPGraph(CmdBase):
 
         graph = self._generate_graph(W, w, labels, bounds)
 
-        self._defs += pymplutils.ampl_set(
+        defs = ""
+        defs += pymplutils.ampl_set(
             Vname, graph.V, self._sets, self._params
         )[0]
-        self._defs += pymplutils.ampl_set(
+        defs += pymplutils.ampl_set(
             Aname, graph.A, self._sets, self._params
         )[0]
+        self._pyvars["_defs"] += defs
 
     def _generate_graph(self, W, w, labels, bounds):
         """Generates an arc-flow graph."""

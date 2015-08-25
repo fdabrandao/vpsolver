@@ -33,7 +33,7 @@ class CmdSet(CmdBase):
         assert match is not None
         name = match
 
-        self._defs += pymplutils.ampl_set(
+        self._pyvars["_defs"] += pymplutils.ampl_set(
             name, values, self._sets, self._params
         )[0]
 
@@ -66,15 +66,15 @@ class CmdParam(CmdBase):
         if isinstance(values, dict):
             if index is None:
                 index = "{0}_I".format(name)
-            self._defs += pymplutils.ampl_set(
+            self._pyvars["_defs"] += pymplutils.ampl_set(
                 index, values.keys(), self._sets, self._params
             )[0]
 
         pdefs, pdata = pymplutils.ampl_param(
             name, index, values, self._sets, self._params
         )
-        self._defs += pdefs
-        self._data += pdata
+        self._pyvars["_defs"] += pdefs
+        self._pyvars["_data"] += pdata
 
 
 class CmdVar(CmdBase):
@@ -95,7 +95,7 @@ class CmdVar(CmdBase):
         if index_set is not None:
             if index is None:
                 index = "{0}_I".format(name)
-            self._defs += pymplutils.ampl_set(
+            self._pyvars["_defs"] += pymplutils.ampl_set(
                 index, index_set, self._sets, self._params
             )[0]
 

@@ -25,26 +25,9 @@ class CmdBase(object):
 
     def __init__(self, cmd_name, pyvars, sets, params):
         self.cmd_name = cmd_name
-        self._defs = ""
-        self._data = ""
         self._pyvars = pyvars
         self._sets = sets
         self._params = params
-
-    @property
-    def defs(self):
-        """Returns definitions."""
-        return self._defs
-
-    @property
-    def data(self):
-        """Returns data."""
-        return self._data
-
-    def clear(self):
-        """Clears definitions and data."""
-        self._defs = ""
-        self._data = ""
 
     def __call__(self, *args, **kwargs):
         """Evalutates CMD()."""

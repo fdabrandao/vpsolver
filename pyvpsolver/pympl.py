@@ -92,6 +92,8 @@ class PyMPL(object):
         self._submodels = set()
 
         self._locals["_model"] = ""
+        self._locals["_defs"] = ""
+        self._locals["_data"] = ""
         self._locals["_sets"] = self._sets
         self._locals["_params"] = self._params
 
@@ -109,7 +111,6 @@ class PyMPL(object):
 
     def parse(self, mod_in=None, mod_out=None, comment_cmds=True):
         """Parses the input file."""
-        self._clear()
         if mod_in is not None:
             self.read(mod_in)
         self.output = self.input
@@ -132,11 +133,13 @@ class PyMPL(object):
                 continue
 
             try:
+                self._locals["_model"] = ""
+                self._locals["_defs"] = ""
+                self._locals["_data"] = ""
                 if call is None:
                     res = str(eval(args3, self._locals))
                 elif call == PyMPL.EXEC_CMD:
                     assert args1 is None
-                    self._locals["_model"] = ""
                     exec(args2, self._locals)
                     res = str(self._locals["_model"])
                 else:
@@ -145,12 +148,13 @@ class PyMPL(object):
                             self._submodels.add(call)
                     if args1 is not None:
                         args1 = "'''{0}'''".format(args1[1:-1])
-                    self._locals["_model"] = ""
                     exec(
                         "{0}[{1}]({2})".format(call, args1, args2),
                         self._locals
                     )
                     res = str(self._locals["_model"])
+                res += self._locals["_defs"]
+                self._add_data(self._locals["_data"])
             except:
                 exctype, value, traceback = sys.exc_info()
                 msg = str(value)+"\n\t"
@@ -168,29 +172,8 @@ class PyMPL(object):
 
             self.output = self.output.replace(strmatch, res, 1)
 
-        self._finalize()
         if mod_out is not None:
             self.write(mod_out)
-
-    def _clear(self):
-        """Clears definitions from previous models."""
-        for cmd_name in self._cmds:
-            cmd_obj = self._locals.get(cmd_name, None)
-            if issubclass(type(cmd_obj), CmdBase):
-                cmd_obj.clear()
-
-    def _finalize(self):
-        """Adds definitions to the model."""
-        for cmd_name in self._cmds:
-            cmd_obj = self._locals.get(cmd_name, None)
-            if issubclass(type(cmd_obj), CmdBase):
-                self._add_defs(cmd_obj.defs)
-                self._add_data(cmd_obj.data)
-
-    def _add_defs(self, defs):
-        """Adds definitions to the model."""
-        if defs != "":
-            self.output = defs + self.output
 
     def _add_data(self, data):
         """Adds data to the model."""

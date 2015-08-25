@@ -1,9 +1,5 @@
 $PARAM[m]{len(a)};
 
-set I := 1..m;
-var pi{{0} union I} >= 0;
-var theta{V} >= 0;
-
 $EXEC{
 m = len(a)
 W = [a0]+[1]*len(a)
@@ -13,6 +9,10 @@ labels = [i+1 for i in xrange(m)]
 };
 
 $VBP_GRAPH[V,A]{W, w, labels, b};
+
+set I := 1..m;
+var pi{{0} union I} >= 0;
+var theta{V} >= 0;
 
 minimize obj: pi[0];
 s.t. gamma{(u,v,i) in A}: theta[v] >= theta[u]+(if i != 'LOSS' then pi[i] else 0);
