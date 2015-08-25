@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-from .vpsolver import VPSolver
+from pyvpsolver import VPSolver
 
 
 def mod2lp(fname_mod, fname_lp, verbose=None):

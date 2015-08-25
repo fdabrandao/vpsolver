@@ -26,7 +26,6 @@ import shutil
 import tempfile
 from .graphutils import AFGraph
 from .vpsolver import VPSolver, VBP, AFG, MPS, LP
-from .pympl import PyMPL, Model
+from .pympl import PyMPL, Model, glpkutils
 from . import solvers
 from . import pympl
-from . import glpkutils
