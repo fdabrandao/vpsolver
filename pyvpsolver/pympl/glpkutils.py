@@ -1,7 +1,7 @@
 """
-This code is part of the Arc-flow Vector Packing Solver (VPSolver).
+This code is part of the Mathematical Modelling Toolbox PyMPL.
 
-Copyright (C) 2013-2015, Filipe Brandao
+Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
@@ -20,12 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-from pyvpsolver import VPSolver
+from .solver import Solver
 
 
 def mod2lp(fname_mod, fname_lp, verbose=None):
     """Converts a GMPL file into an LP file using GLPK."""
-    VPSolver.run(
+    Solver.run(
         "glpsol --math {0} --check --wlp {1}".format(
             fname_mod, fname_lp
         ),
@@ -36,7 +36,7 @@ def mod2lp(fname_mod, fname_lp, verbose=None):
 
 def mod2mps(fname_mod, fname_mps, verbose=None):
     """Converts a GMPL file into an MPS file using GLPK."""
-    VPSolver.run(
+    Solver.run(
         "glpsol --math {0} --check --wmps {1}".format(
             fname_mod, fname_mps
         ),

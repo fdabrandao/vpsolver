@@ -1,7 +1,7 @@
 """
-This code is part of the Arc-flow Vector Packing Solver (VPSolver).
+This code is part of the Mathematical Modelling Toolbox PyMPL.
 
-Copyright (C) 2013-2015, Filipe Brandao
+Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
