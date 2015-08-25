@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  Home.md
+  STMTS_TSP.md
   
     - Grip
   
@@ -44,154 +44,162 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  Home.md
+                  STMTS_TSP.md
                 </h3>
               
               <div class="markdown-body entry-content">
-                <h1>
-<a id="user-content-home" class="anchor" href="#home" aria-hidden="true"><span class="octicon octicon-link"></span></a>Home</h1>
-
-<p>PyMPL is a python extension to the AMPL modelling language that adds new statements for evaluating python code within AMPL models. PyMPL includes, among others, procedures for modelling piecewise linear functions, arc-flow graphs for vector packing, and sub-tour elimination constraints for TSP.</p>
-
-<h2>
-<a id="user-content-table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
+                <h2>
+<a id="user-content-travelling-salesman-problem-tsp" class="anchor" href="#travelling-salesman-problem-tsp" aria-hidden="true"><span class="octicon octicon-link"></span></a>Travelling Salesman Problem (TSP)</h2>
 
 <ul>
-<li><a href="#useful-links">Useful links</a></li>
-<li><a href="#examples">Examples</a></li>
-<li><a href="#pympl-parser">PyMPL Parser</a></li>
-<li><a href="STMTS.html">PyMPL Statements</a></li>
+<li><a href="#atsp_mtz">$ATSP_MTZ{...};</a></li>
+<li><a href="#atsp_scf">$ATSP_SCF{...};</a></li>
+<li><a href="#atsp_mcf">$ATSP_MCF{...};</a></li>
+<li><a href="STMTS.html">Return to the index</a></li>
 </ul>
 
-<h2>
-<a id="user-content-useful-links" class="anchor" href="#useful-links" aria-hidden="true"><span class="octicon octicon-link"></span></a>Useful links</h2>
+<h4>
+<a id="user-content-atsp_mtz" class="anchor" href="#atsp_mtz" aria-hidden="true"><span class="octicon octicon-link"></span></a>ATSP_MTZ</h4>
+
+<p>Usage: <code>$ATSP_MTZ{xvars, DL=False, cuts=False};</code></p>
+
+<p>Description: creates a submodel for TSP using Miller, Tucker and Zemlin (MTZ) (1960) subtour elimination constraints.</p>
+
+<p>Parameters:</p>
 
 <ul>
-<li>GiHub repository: <a href="https://github.com/fdabrandao/pympl">https://github.com/fdabrandao/pympl</a>
-</li>
-<li>BitBucket repository: <a href="https://bitbucket.org/fdabrandao/pympl">https://bitbucket.org/fdabrandao/pympl</a>
-</li>
-</ul>
-
-<h2>
-<a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
-
-<p><code>piecewise_linear.mod</code></p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-c"># Evaluate python code:</span>
-$EXEC{
-<span class="pl-k">xval</span>ues <span class="pl-k">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>, <span class="pl-c1">25</span>, <span class="pl-c1">30</span>, <span class="pl-c1">35</span>, <span class="pl-c1">40</span>, <span class="pl-c1">45</span>, <span class="pl-c1">50</span>, <span class="pl-c1">55</span>, <span class="pl-c1">60</span>, <span class="pl-c1">70</span>]
-<span class="pl-k">yval</span>ues <span class="pl-k">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">20</span>, <span class="pl-c1">15</span>, <span class="pl-c1">10</span>, <span class="pl-c1">0</span>, <span class="pl-c1">50</span>, <span class="pl-c1">18</span>, <span class="pl-c1">0</span>, <span class="pl-c1">15</span>, <span class="pl-c1">24</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>]
-};
-
-<span class="pl-k">var</span> u <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
-<span class="pl-c"># Model a piecewise linear function given a list of pairs (x, y=f(x)):</span>
-$PWL[x,y]{zip(<span class="pl-k">xval</span>ues, <span class="pl-k">yval</span>ues)};
-
-<span class="pl-k">maximize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> <span class="pl-c1">2</span><span class="pl-k">*</span>x <span class="pl-k">+</span> <span class="pl-c1">15</span><span class="pl-k">*</span>y;
-s.t. A<span class="pl-k">:</span> <span class="pl-c1">3</span><span class="pl-k">*</span>x <span class="pl-k">+</span> <span class="pl-c1">4</span><span class="pl-k">*</span>y <span class="pl-k">&lt;=</span> <span class="pl-c1">250</span>;
-s.t. B<span class="pl-k">:</span> <span class="pl-c1">7</span><span class="pl-k">*</span>x <span class="pl-k">-</span> <span class="pl-c1">2</span><span class="pl-k">*</span>y <span class="pl-k">+</span> <span class="pl-c1">3</span><span class="pl-k">*</span>u <span class="pl-k">&lt;=</span> <span class="pl-c1">170</span>;
-
-<span class="pl-k">solve</span>;
-<span class="pl-k">display</span> x, y, u;
-<span class="pl-k">display</span> <span class="pl-s"><span class="pl-pds">"</span>Objective:<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span><span class="pl-k">*</span>x <span class="pl-k">+</span> <span class="pl-c1">15</span><span class="pl-k">*</span>y;
-<span class="pl-k">end</span>;</pre></div>
-
-<p><code>vector_packing.mod</code>:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-c"># Load a vector packing instance from a file:</span>
-$VBP_LOAD[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance1.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
-
-<span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
-
-<span class="pl-c"># Generate an arc-flow model for instance1:</span>
-$VBP_FLOW[Z]{_instance1.W, _instance1.w, [<span class="pl-s"><span class="pl-pds">"</span>x[%d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-<span class="pl-c"># Variable declarations and flow conservation constraints will be created here</span>
-
-<span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
-s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <span class="pl-k">&gt;=</span> instance1_b[i]; <span class="pl-c"># demand constraints</span>
-
-<span class="pl-k">solve</span>;
-<span class="pl-k">display</span> Z;
-<span class="pl-k">end</span>;</pre></div>
-
-<p><code>variable_size_bin_packing.mod</code>:</p>
-
-<div class="highlight highlight-ampl"><pre><span class="pl-c"># Evaluate python code:</span>
-$EXEC{
-<span class="pl-c"># Bin capacities:</span>
-W1 <span class="pl-k">=</span> [<span class="pl-c1">100</span>]
-W2 <span class="pl-k">=</span> [<span class="pl-c1">120</span>]
-W3 <span class="pl-k">=</span> [<span class="pl-c1">150</span>]
-
-<span class="pl-c"># Bin costs:</span>
-Costs <span class="pl-k">=</span> [<span class="pl-c1">100</span>, <span class="pl-c1">120</span>, <span class="pl-c1">150</span>]
-
-<span class="pl-c"># Item weights:</span>
-ws <span class="pl-k">=</span> [[<span class="pl-c1">10</span>], [<span class="pl-c1">14</span>], [<span class="pl-c1">17</span>], [<span class="pl-c1">19</span>], [<span class="pl-c1">24</span>], [<span class="pl-c1">29</span>], [<span class="pl-c1">32</span>], [<span class="pl-c1">33</span>], [<span class="pl-c1">36</span>],
-      [<span class="pl-c1">38</span>], [<span class="pl-c1">40</span>], [<span class="pl-c1">50</span>], [<span class="pl-c1">54</span>], [<span class="pl-c1">55</span>], [<span class="pl-c1">63</span>], [<span class="pl-c1">66</span>], [<span class="pl-c1">71</span>], [<span class="pl-c1">77</span>],
-      [<span class="pl-c1">79</span>], [<span class="pl-c1">83</span>], [<span class="pl-c1">92</span>], [<span class="pl-c1">95</span>], [<span class="pl-c1">99</span>]]
-
-<span class="pl-c"># Item demands:</span>
-b <span class="pl-k">=</span> [<span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>]
-};
-
-<span class="pl-c"># Generate a parameter 'b' for the demand:</span>
-$<span class="pl-k">PARAM</span>[b{I}]{b, i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
-
-<span class="pl-c"># Generate a parameter 'C' for the cost:</span>
-$<span class="pl-k">PARAM</span>[C{T}]{Costs, i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
-
-<span class="pl-c"># Feedback arcs for each graph:</span>
-<span class="pl-k">var</span> Z{T}, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
-<span class="pl-c"># Assignment variables:</span>
-<span class="pl-k">var</span> x{T, I}, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
-<span class="pl-c"># Generate an arc-flow graph for each bin type:</span>
-$VBP_FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">1</span>]]{W1, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[1, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-$VBP_FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">2</span>]]{W2, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[2, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-$VBP_FLOW[<span class="pl-k">^</span>Z[<span class="pl-c1">3</span>]]{W3, ws, [<span class="pl-s"><span class="pl-pds">"</span>x[3, %d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};
-<span class="pl-c"># Note: the ^prefix is used to avoid the redefinition of Z</span>
-
-<span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> <span class="pl-k">sum</span>{t <span class="pl-k">in</span> T} C[t] <span class="pl-k">*</span> Z[t];
-s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> <span class="pl-k">sum</span>{t <span class="pl-k">in</span> T} x[t, i] <span class="pl-k">&gt;=</span> b[i];
-
-<span class="pl-k">solve</span>;
-<span class="pl-k">display</span>{t <span class="pl-k">in</span> T} Z[t]; <span class="pl-c"># number of bins of type t used</span>
-<span class="pl-k">display</span> <span class="pl-k">sum</span>{t <span class="pl-k">in</span> T} C[t] <span class="pl-k">*</span> Z[t]; <span class="pl-c"># cost</span>
-<span class="pl-k">end</span>;</pre></div>
-
-<h2>
-<a id="user-content-pympl-parser" class="anchor" href="#pympl-parser" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL Parser</h2>
-
-<div class="highlight highlight-python"><pre><span class="pl-k">import</span> os
-<span class="pl-k">from</span> pympl <span class="pl-k">import</span> PyMPL  <span class="pl-c"># import the parser</span>
-
-<span class="pl-c"># Create a parser and pass local and global variables to the model:</span>
-parser <span class="pl-k">=</span> PyMPL(<span class="pl-smi">locals_</span><span class="pl-k">=</span><span class="pl-c1">locals</span>(), <span class="pl-smi">globals_</span><span class="pl-k">=</span><span class="pl-c1">globals</span>())`
-
-<span class="pl-c"># Parse a file with PyMPL statements and produce a valid AMPL model:</span>
-parser.parse(<span class="pl-s"><span class="pl-pds">"</span>pympl_model.mod<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>ampl_model.mod<span class="pl-pds">"</span></span>)
-
-<span class="pl-c"># Call GLPK to solve the model (if the original model uses only valid GMPL statements):</span>
-os.system(<span class="pl-s"><span class="pl-pds">"</span>glpsol --math ampl_model.mod<span class="pl-pds">"</span></span>)
-
-<span class="pl-c"># Call AMPL to solve the model:</span>
-os.system(<span class="pl-s"><span class="pl-pds">"</span>ampl ampl_model.mod<span class="pl-pds">"</span></span>)</pre></div>
-
-<p>[<a href="https://github.com/fdabrandao/pympl/tree/master/examples">Folder with examples</a>]</p>
-
-<p>Advanced features:</p>
+<li>Python:
 
 <ul>
 <li>
-<p>Given a function <code>f(varname)</code> that given a variable name returns its value:</p>
-
-<ul>
-<li>If any command used implements solution extraction you can use <code>parser[command_name].extract(f)</code> to extract the solution;</li>
-<li>If any command used implements cut generation you can use <code>parser[command_name].separate(f)</code> to generate cutting planes.</li>
+<code>xvars</code>: list of binary variables for the arcs in the graph;</li>
+<li>
+<code>DL</code>: if <code>True</code> uses Desrochers and Laporte (1991) lifted MTZ inequalities;</li>
+<li>
+<code>cuts</code>: if <code>True</code> stores information for cut generation.</li>
 </ul>
 </li>
 </ul>
+
+<p>Creates:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>A submodel for TSP projected on <code>xvars</code> variables.</li>
+</ul>
+</li>
+<li>Python:
+
+<ul>
+<li>stores information for cut generation if requested.</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples:</p>
+
+<div class="highlight highlight-ampl"><pre>$<span class="pl-k">SET</span>[V]{<span class="pl-k">set</span> of vertices};
+$<span class="pl-k">SET</span>[A]{<span class="pl-k">set</span> of arcs};
+$<span class="pl-k">PARAM</span>[cost{<span class="pl-k">^</span>A}]{cost of each <span class="pl-k">arc</span>};
+<span class="pl-k">var</span> x{A}, <span class="pl-k">binary</span>;
+<span class="pl-k">minimize</span> total<span class="pl-k">:</span> <span class="pl-k">sum</span>{(i,j) <span class="pl-k">in</span> A} cost[i,j] <span class="pl-k">*</span> x[i,j];
+$ATSP_MTZ{{(i,j)<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>x[%d,%d]<span class="pl-pds">"</span></span>%(i,j) <span class="pl-k">for</span> i, j <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]}, DL<span class="pl-k">=</span>True, cuts<span class="pl-k">=</span>True};</pre></div>
+
+<h4>
+<a id="user-content-atsp_scf" class="anchor" href="#atsp_scf" aria-hidden="true"><span class="octicon octicon-link"></span></a>ATSP_SCF</h4>
+
+<p>Usage: <code>$ATSP_SCF{xvars, cuts=False};</code></p>
+
+<p>Description: creates a submodel for TSP using the single commodity flow model of Gavish and Graves (1978).</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>Python:
+
+<ul>
+<li>
+<code>xvars</code>: list of binary variables for the arcs in the graph;</li>
+<li>
+<code>cuts</code>: if <code>True</code> stores information for cut generation.</li>
+</ul>
+</li>
+</ul>
+
+<p>Creates:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>A submodel for TSP projected on <code>xvars</code> variables.</li>
+</ul>
+</li>
+<li>Python:
+
+<ul>
+<li>stores information for cut generation if requested.</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples:</p>
+
+<div class="highlight highlight-ampl"><pre>$<span class="pl-k">SET</span>[V]{<span class="pl-k">set</span> of vertices};
+$<span class="pl-k">SET</span>[A]{<span class="pl-k">set</span> of arcs};
+$<span class="pl-k">PARAM</span>[cost{<span class="pl-k">^</span>A}]{cost of each <span class="pl-k">arc</span>};
+<span class="pl-k">var</span> x{A}, <span class="pl-k">binary</span>;
+<span class="pl-k">minimize</span> total<span class="pl-k">:</span> <span class="pl-k">sum</span>{(i,j) <span class="pl-k">in</span> A} cost[i,j] <span class="pl-k">*</span> x[i,j];
+$ATSP_SCF{{(i,j)<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>x[%d,%d]<span class="pl-pds">"</span></span>%(i,j) <span class="pl-k">for</span> i, j <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]}, cuts<span class="pl-k">=</span>True};</pre></div>
+
+<h4>
+<a id="user-content-atsp_mcf" class="anchor" href="#atsp_mcf" aria-hidden="true"><span class="octicon octicon-link"></span></a>ATSP_MCF</h4>
+
+<p>Usage: <code>$ATSP_SCF{xvars, cuts=False};</code></p>
+
+<p>Description: creates a submodel for TSP using the multi commodity flow model of Wong (1980) and Claus (1984).</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>Python:
+
+<ul>
+<li>
+<code>xvars</code>: list of binary variables for the arcs in the graph;</li>
+<li>
+<code>cuts</code>: if <code>True</code> stores information for cut generation.</li>
+</ul>
+</li>
+</ul>
+
+<p>Creates:</p>
+
+<ul>
+<li>AMPL:
+
+<ul>
+<li>A submodel for TSP projected on <code>xvars</code> variables.</li>
+</ul>
+</li>
+<li>Python:
+
+<ul>
+<li>stores information for cut generation if requested.</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples:</p>
+
+<div class="highlight highlight-ampl"><pre>$<span class="pl-k">SET</span>[V]{<span class="pl-k">set</span> of vertices};
+$<span class="pl-k">SET</span>[A]{<span class="pl-k">set</span> of arcs};
+$<span class="pl-k">PARAM</span>[cost{<span class="pl-k">^</span>A}]{cost of each <span class="pl-k">arc</span>};
+<span class="pl-k">var</span> x{A}, <span class="pl-k">binary</span>;
+<span class="pl-k">minimize</span> total<span class="pl-k">:</span> <span class="pl-k">sum</span>{(i,j) <span class="pl-k">in</span> A} cost[i,j] <span class="pl-k">*</span> x[i,j];
+$ATSP_MCF{{(i,j)<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>x[%d,%d]<span class="pl-pds">"</span></span>%(i,j) <span class="pl-k">for</span> i, j <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]}};</pre></div>
 
 <hr>
 
