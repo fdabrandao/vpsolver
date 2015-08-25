@@ -1,3 +1,4 @@
 setuptools >= 3.3
 flask >= 0.10.1
 pygraphviz >= 1.2
+pympl >= 0.1.0-alpha
