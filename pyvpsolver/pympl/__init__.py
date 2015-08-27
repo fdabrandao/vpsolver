@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = "v0.3.0"
+__version__ = "v0.4.0"
 
 from .pympl import PyMPL
 from .model import Model

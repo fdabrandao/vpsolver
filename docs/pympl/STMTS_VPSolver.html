@@ -65,6 +65,8 @@
 
 <p>Description: loads vector packing instances.</p>
 
+<p>Requirements: <a href="https://github.com/fdabrandao/vpsolver">VPSolver</a></p>
+
 <p>Parameters:</p>
 
 <ul>
@@ -159,7 +161,9 @@ $VBP_LOAD[instance{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instanc
 
 <p>Usage: <code>$VBP_FLOW[zvar_name]{W, w, b, bounds=None};</code></p>
 
-<p>Description: generates arc-flow models for vector packing instances.</p>
+<p>Description: generates arc-flow models with graph compression for vector packing instances.</p>
+
+<p>Requirements: <a href="https://github.com/fdabrandao/vpsolver">VPSolver</a></p>
 
 <p>Parameters:</p>
 
@@ -193,7 +197,7 @@ $VBP_LOAD[instance{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instanc
 <li>AMPL:
 
 <ul>
-<li>an arc-flow model for the vector packing instance (variables and constraints);</li>
+<li>an arc-flow model with graph compression for the vector packing instance (variables and constraints);</li>
 <li>a variable <code>'zvar_name'</code> for the amount of flow in the feedback arc.</li>
 </ul>
 </li>
@@ -220,7 +224,7 @@ s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <s
 <p>is replaced by:</p>
 
 <div class="highlight highlight-ampl"><pre><span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;  
-<span class="pl-c">/*<span class="pl-c"> arc-flow model for instance.vbp </span>*/</span>
+<span class="pl-c">/*<span class="pl-c"> arc-flow model with graph compression for instance.vbp </span>*/</span>
 <span class="pl-c">/*<span class="pl-c"> Z is the amount of flow on the feedback arc </span>*/</span>
 <span class="pl-c">/*<span class="pl-c"> x[i] = amount of flow on arcs associated with item i </span>*/</span>
 <span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
@@ -234,7 +238,9 @@ s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <s
 
 <p>Usage: <code>$VBP_GRAPH[V_name, A_name]{W, w, labels, bounds=None};</code></p>
 
-<p>Description: generates arc-flow graphs for vector packing instances.  </p>
+<p>Requirements: <a href="https://github.com/fdabrandao/vpsolver">VPSolver</a></p>
+
+<p>Description: generates compressed arc-flow graphs for vector packing instances.  </p>
 
 <p>Parameters:</p>
 

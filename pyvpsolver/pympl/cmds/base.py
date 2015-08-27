@@ -46,7 +46,7 @@ class CmdBase(object):
         pass
 
 
-class SubModelBase(CmdBase):
+class SubmodBase(CmdBase):
     """Base class for PyMPL submodels."""
 
     def separate(self, get_var_value, *args, **kwargs):

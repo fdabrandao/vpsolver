@@ -49,18 +49,18 @@
               
               <div class="markdown-body entry-content">
                 <h2>
-<a id="user-content-mathematical-modelling-toolbox-pympl" class="anchor" href="#mathematical-modelling-toolbox-pympl" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mathematical Modelling Toolbox PyMPL</h2>
+<a id="user-content-pympl-mathematical-modelling-toolbox" class="anchor" href="#pympl-mathematical-modelling-toolbox" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL Mathematical Modelling Toolbox</h2>
 
-<p>Copyright (C) 2013-2015, Filipe Brandão<br>
+<p>Copyright (C) 2015-2015, Filipe Brandão<br>
 Faculdade de Ciencias, Universidade do Porto<br>
 Porto, Portugal. All rights reserved. E-mail: <a href="mailto:fdabrandao@dcc.fc.up.pt">fdabrandao@dcc.fc.up.pt</a>.</p>
 
 <hr>
 
-<p><a href="https://github.com/fdabrandao/pympl">PyMPL</a> is a python extension to the AMPL modelling language that adds new statements for evaluating python code within AMPL models. PyMPL includes, among others, procedures for modelling piecewise linear functions, arc-flow graphs for vector packing, and sub-tour elimination constraints for TSP.</p>
+<p><a href="https://github.com/fdabrandao/pympl">PyMPL</a> is a python extension to the AMPL modelling language that adds new statements for evaluating python code within AMPL models. PyMPL also includes, among others, procedures for modelling piecewise linear functions, compressed arc-flow graphs for vector packing, lot-sizing reformulations, and sub-tour elimination constraints for TSP.</p>
 
-<h2>
-<a id="user-content-useful-links" class="anchor" href="#useful-links" aria-hidden="true"><span class="octicon octicon-link"></span></a>Useful links</h2>
+<h3>
+<a id="user-content-useful-links" class="anchor" href="#useful-links" aria-hidden="true"><span class="octicon octicon-link"></span></a>Useful links</h3>
 
 <ul>
 <li>PyMPL documentation: <a href="https://github.com/fdabrandao/pympl/wiki">https://github.com/fdabrandao/pympl/wiki</a>
@@ -71,8 +71,8 @@ Porto, Portugal. All rights reserved. E-mail: <a href="mailto:fdabrandao@dcc.fc.
 </li>
 </ul>
 
-<h2>
-<a id="user-content-setup" class="anchor" href="#setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup</h2>
+<h3>
+<a id="user-content-setup" class="anchor" href="#setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup</h3>
 
 <p>Install from the repository:</p>
 
@@ -85,8 +85,8 @@ $ sudo pip install . --upgrade
 $ bash test.sh test_install
 </code></pre>
 
-<h2>
-<a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+<h3>
+<a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h3>
 
 <p><code>piecewise_linear.mod</code></p>
 
@@ -127,8 +127,8 @@ s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <s
 <span class="pl-k">display</span> Z;
 <span class="pl-k">end</span>;</pre></div>
 
-<h2>
-<a id="user-content-pympl-parser" class="anchor" href="#pympl-parser" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL Parser</h2>
+<h3>
+<a id="user-content-pympl-parser" class="anchor" href="#pympl-parser" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL Parser</h3>
 
 <div class="highlight highlight-python"><pre><span class="pl-k">import</span> os
 <span class="pl-k">from</span> pympl <span class="pl-k">import</span> PyMPL  <span class="pl-c"># import the parser</span>

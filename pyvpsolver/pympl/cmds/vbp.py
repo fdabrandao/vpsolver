@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 from pyvpsolver import VPSolver, VBP, AFG
-from .base import CmdBase, SubModelBase
+from .base import CmdBase, SubmodBase
 from ..model import Model, writemod
 from .. import utils
 
@@ -173,11 +173,11 @@ class CmdVBPGraph(CmdBase):
         return graph
 
 
-class SubVBPModelFlow(SubModelBase):
+class SubmodVBPFlow(SubmodBase):
     """Command for creating arc-flow models."""
 
     def __init__(self, *args, **kwargs):
-        SubModelBase.__init__(self, *args, **kwargs)
+        SubmodBase.__init__(self, *args, **kwargs)
         self._zvars = []
         self._models = []
         self._graphs = []

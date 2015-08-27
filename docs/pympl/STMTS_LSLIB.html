@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  STMTS.md
+  STMTS_LSLIB.md
   
     - Grip
   
@@ -44,120 +44,312 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  STMTS.md
+                  STMTS_LSLIB.md
                 </h3>
               
               <div class="markdown-body entry-content">
                 <h2>
-<a id="user-content-pympl-statements" class="anchor" href="#pympl-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL Statements</h2>
-
-<p>There are three types of statements:</p>
-
-<ol>
-<li>
-<p><code>${python code}$</code></p>
+<a id="user-content-library-of-reformulations-for-lot-sizing-problems-ls-lib" class="anchor" href="#library-of-reformulations-for-lot-sizing-problems-ls-lib" aria-hidden="true"><span class="octicon octicon-link"></span></a>Library of reformulations for Lot-sizing problems (LS-LIB)</h2>
 
 <ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#parameters">Parameters</a></li>
 <li>
-<a href="STMTS_General.html#eval">EVAL</a>: <code>${python expression}$</code>
-</li>
+<a href="#wagner-whitin-models">Wagner-Whitin models</a>
+
+<ul>
+<li><a href="#ww_u">$WW_U{...};</a></li>
+<li><a href="#ww_u_b">$WW_U_B{...};</a></li>
+<li><a href="#ww_u_sc">$WW_U_SC{...};</a></li>
+<li><a href="#ww_u_scb">$WW_U_SCB{...};</a></li>
+<li><a href="#ww_u_lb">$WW_U_LB{...};</a></li>
+<li><a href="#ww_cc">$WW_CC{...};</a></li>
+<li><a href="#ww_cc_b">$WW_CC_B{...};</a></li>
 </ul>
 </li>
 <li>
-<p><code>$CMD{python parameters or code};</code></p>
+<a href="#lot-sizing-models">Lot-sizing models</a>
+
+<ul>
+<li><a href="#ls_u-or-ls_u1">$LS_U or LS_U1{...};</a></li>
+<li><a href="#ls_u2">$LS_U2{...};</a></li>
+<li><a href="#ls_u_b">$LS_U_B{...};</a></li>
+<li><a href="STMTS.html">Return to the index</a></li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="user-content-introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h3>
+
+<p>The set of statements presented in this page come from the library of reformulations LS-LIB proposed in Production Planning by Mixed Integer Programming (<a href="http://www.springer.com/us/book/9780387299594">Pochet and Wolsey 2006</a>). For more details please refer to the book.</p>
+
+<h3>
+<a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h3>
+
+<p><code>bike.mod</code></p>
+
+<div class="highlight highlight-ampl"><pre><span class="pl-c"># PPbyMIP: A Tiny Planning Model (Section 1.1, pag. 9)</span>
+<span class="pl-c"># LS-U Model (4.1)-(4.5) (Section 4.1, pag. 117)</span>
+$<span class="pl-k">PARAM</span>[NT]{<span class="pl-c1">8</span>};
+<span class="pl-k">param</span> p <span class="pl-k">:=</span> <span class="pl-c1">100</span>;
+<span class="pl-k">param</span> q <span class="pl-k">:=</span> <span class="pl-c1">5000</span>;
+<span class="pl-k">param</span> h <span class="pl-k">:=</span> <span class="pl-c1">5</span>;
+<span class="pl-k">param</span> s_ini <span class="pl-k">:=</span> <span class="pl-c1">200</span>;
+$<span class="pl-k">PARAM</span>[d]{[<span class="pl-c1">400</span>, <span class="pl-c1">400</span>, <span class="pl-c1">800</span>, <span class="pl-c1">800</span>, <span class="pl-c1">1200</span>, <span class="pl-c1">1200</span>, <span class="pl-c1">1200</span>, <span class="pl-c1">1200</span>],i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
+
+<span class="pl-k">var</span> x{<span class="pl-c1">1</span><span class="pl-k">..</span>NT}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
+<span class="pl-k">var</span> y{<span class="pl-c1">1</span><span class="pl-k">..</span>NT}, <span class="pl-k">binary</span>;
+<span class="pl-k">var</span> s{<span class="pl-c1">0</span><span class="pl-k">..</span>NT}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
+<span class="pl-k">param</span> C{t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT} <span class="pl-k">:=</span> <span class="pl-k">sum</span>{tt <span class="pl-k">in</span> t<span class="pl-k">..</span>NT} d[tt]; 
+<span class="pl-c"># enough capacity to procude everything =&gt; LS-U problem</span>
+
+<span class="pl-k">minimize</span> cost<span class="pl-k">:</span>
+    <span class="pl-k">sum</span>{t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT} (p <span class="pl-k">*</span> x[t] <span class="pl-k">+</span> q <span class="pl-k">*</span> y[t]) <span class="pl-k">+</span> <span class="pl-k">sum</span>{t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT<span class="pl-k">-</span><span class="pl-c1">1</span>} (h <span class="pl-k">*</span> s[t]);
+
+s.t. dem_sat{t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT}<span class="pl-k">:</span> s[t<span class="pl-k">-</span><span class="pl-c1">1</span>] <span class="pl-k">+</span> x[t] <span class="pl-k">=</span> d[t] <span class="pl-k">+</span> s[t];
+s.t. s0<span class="pl-k">:</span> s[<span class="pl-c1">0</span>] <span class="pl-k">=</span> s_ini;
+s.t. sNT<span class="pl-k">:</span> s[NT] <span class="pl-k">=</span> <span class="pl-c1">0</span>;
+s.t. <span class="pl-k">vub</span>{t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT}<span class="pl-k">:</span> x[t] <span class="pl-k">&lt;=</span> C[t] <span class="pl-k">*</span> y[t];
+
+$EXEC{
+def mrange(a, b)<span class="pl-k">:</span>
+    return range(a, b<span class="pl-k">+</span><span class="pl-c1">1</span>)
+
+NT <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pds">"</span>NT<span class="pl-pds">"</span></span>]
+demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pds">"</span>d<span class="pl-pds">"</span></span>]
+
+s <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>s[%d]<span class="pl-pds">"</span></span>%(t) <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">0</span>, NT)]
+x <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>x[%d]<span class="pl-pds">"</span></span>%(t) <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+y <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>y[%d]<span class="pl-pds">"</span></span>%(t) <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+d <span class="pl-k">=</span> [demand[t] <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+LS_U(s, x, y, d, NT)
+};
+
+<span class="pl-k">solve</span>;
+<span class="pl-k">display</span> x;
+<span class="pl-k">display</span> y;
+<span class="pl-k">display</span> s;
+<span class="pl-k">end</span>;</pre></div>
+
+<p><code>clb.mod</code></p>
+
+<div class="highlight highlight-ampl"><pre><span class="pl-c"># Consumer Goods Production (pag. 195)</span>
+$EXEC{
+def mrange(a, b)<span class="pl-k">:</span>
+    return range(a, b<span class="pl-k">+</span><span class="pl-c1">1</span>)
+
+BACKLOG <span class="pl-k">=</span> True
+};
+
+$<span class="pl-k">PARAM</span>[NI]{<span class="pl-c1">4</span>}; <span class="pl-c"># number of items</span>
+$<span class="pl-k">PARAM</span>[NT]{<span class="pl-c1">30</span>}; <span class="pl-c"># number of shifts</span>
+
+<span class="pl-c"># set-up costs for each period:</span>
+$<span class="pl-k">PARAM</span>[q]{[<span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">9999</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">9999</span>,
+           <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">9999</span>, <span class="pl-c1">100</span>,
+           <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">9999</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>, <span class="pl-c1">100</span>], i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
+
+<span class="pl-c"># production per hour for each item:</span>
+$<span class="pl-k">PARAM</span>[a]{[<span class="pl-c1">807</span>, <span class="pl-c1">608</span>, <span class="pl-c1">1559</span>, <span class="pl-c1">1622</span>], i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
+
+<span class="pl-c"># storage costs per hour for each item:</span>
+$<span class="pl-k">PARAM</span>[h]{[<span class="pl-c1">0.0025</span>, <span class="pl-c1">0.0030</span>, <span class="pl-c1">0.0022</span>, <span class="pl-c1">0.0022</span>], i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
+
+$<span class="pl-k">PARAM</span>[g]{<span class="pl-c1">50</span>};     <span class="pl-c"># start-up cost</span>
+$<span class="pl-k">PARAM</span>[<span class="pl-k">gamma</span>]{<span class="pl-c1">50</span>}; <span class="pl-c"># switch-off cost</span>
+$<span class="pl-k">PARAM</span>[rho]{<span class="pl-c1">2</span>};    <span class="pl-c"># backlog cost/storage cost ratio</span>
+
+$<span class="pl-k">PARAM</span>[L]{<span class="pl-c1">7</span>};  <span class="pl-c"># production lower-bound</span>
+$<span class="pl-k">PARAM</span>[C]{<span class="pl-c1">16</span>}; <span class="pl-c"># production upper-bound</span>
+
+<span class="pl-c"># demand:</span>
+$<span class="pl-k">PARAM</span>[d]{read_demand(<span class="pl-s"><span class="pl-pds">"</span>data/cldemand.dat<span class="pl-pds">"</span></span>, _params[<span class="pl-s"><span class="pl-pds">"</span>NI<span class="pl-pds">"</span></span>], _params[<span class="pl-s"><span class="pl-pds">"</span>NT<span class="pl-pds">"</span></span>])};
+
+<span class="pl-c"># production time:</span>
+<span class="pl-k">var</span> x{<span class="pl-c1">1</span><span class="pl-k">..</span>NI, <span class="pl-c1">1</span><span class="pl-k">..</span>NT}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
+
+<span class="pl-c"># storage variables:</span>
+<span class="pl-k">var</span> s{<span class="pl-c1">1</span><span class="pl-k">..</span>NI, <span class="pl-c1">1</span><span class="pl-k">..</span>NT}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
+
+<span class="pl-c"># backlog variables:</span>
+<span class="pl-k">var</span> r{<span class="pl-c1">1</span><span class="pl-k">..</span>NI, <span class="pl-c1">1</span><span class="pl-k">..</span>NT}, ${<span class="pl-s"><span class="pl-pds">"</span>&gt;= 0<span class="pl-pds">"</span></span> <span class="pl-k">if</span> BACKLOG <span class="pl-k">else</span> <span class="pl-s"><span class="pl-pds">"</span>== 0<span class="pl-pds">"</span></span>}$;
+
+<span class="pl-c"># production variables:</span>
+<span class="pl-k">var</span> y{<span class="pl-c1">1</span><span class="pl-k">..</span>NI, <span class="pl-c1">1</span><span class="pl-k">..</span>NT}, <span class="pl-k">binary</span>;
+
+<span class="pl-c"># start-up of item i at the beginning of period t:</span>
+<span class="pl-k">var</span> z{<span class="pl-c1">1</span><span class="pl-k">..</span>NI, <span class="pl-c1">1</span><span class="pl-k">..</span>NT}, <span class="pl-k">binary</span>;
+
+<span class="pl-c"># switch-off of item i at the end of period t:</span>
+<span class="pl-k">var</span> w{<span class="pl-c1">1</span><span class="pl-k">..</span>NI, <span class="pl-c1">1</span><span class="pl-k">..</span>NT}, <span class="pl-k">binary</span>;
+
+<span class="pl-k">minimize</span> cost<span class="pl-k">:</span>
+    <span class="pl-k">sum</span>{i <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NI, t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT}
+        (h[i]<span class="pl-k">*</span>a[i]<span class="pl-k">*</span>s[i, t] <span class="pl-k">+</span> h[i]<span class="pl-k">*</span>rho<span class="pl-k">*</span>a[i]<span class="pl-k">*</span>r[i, t] <span class="pl-k">+</span>
+         q[t]<span class="pl-k">*</span>y[i, t] <span class="pl-k">+</span> g<span class="pl-k">*</span>z[i, t] <span class="pl-k">+</span> <span class="pl-k">gamma*</span>w[i, t]);
+
+s.t. dem_sat{i <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NI, t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT}<span class="pl-k">:</span>
+    (<span class="pl-k">if</span> t <span class="pl-k">&gt;</span> <span class="pl-c1">1</span> <span class="pl-k">then</span> s[i, t<span class="pl-k">-</span><span class="pl-c1">1</span>] <span class="pl-k">-</span> r[i, t<span class="pl-k">-</span><span class="pl-c1">1</span>]) <span class="pl-k">+</span> x[i, t] <span class="pl-k">=</span> d[i, t] <span class="pl-k">+</span> s[i, t] <span class="pl-k">-</span> r[i, t];
+
+s.t. upper_bound{i <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NI, t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT}<span class="pl-k">:</span> x[i, t] <span class="pl-k">&lt;=</span> C<span class="pl-k">*</span>y[i, t];
+s.t. lower_bound{i <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NI, t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT}<span class="pl-k">:</span> x[i, t] <span class="pl-k">&gt;=</span> L<span class="pl-k">*</span>y[i, t];
+
+s.t. setups1{i <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NI, t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT}<span class="pl-k">:</span>
+    z[i, t] <span class="pl-k">-</span> (<span class="pl-k">if</span> t <span class="pl-k">&gt;</span> <span class="pl-c1">1</span> <span class="pl-k">then</span> w[i, t<span class="pl-k">-</span><span class="pl-c1">1</span>]) <span class="pl-k">=</span> y[i, t] <span class="pl-k">-</span> (<span class="pl-k">if</span> t <span class="pl-k">&gt;</span> <span class="pl-c1">1</span> <span class="pl-k">then</span> y[i, t<span class="pl-k">-</span><span class="pl-c1">1</span>]);
+s.t. setups2{i <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NI, t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT}<span class="pl-k">:</span>
+    z[i, t] <span class="pl-k">&lt;=</span> y[i, t];
+
+s.t. one_at_time{t <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NT}<span class="pl-k">:</span> <span class="pl-k">sum</span>{i <span class="pl-k">in</span> <span class="pl-c1">1</span><span class="pl-k">..</span>NI} y[i, t] <span class="pl-k">&lt;=</span> <span class="pl-c1">1</span>;
+
+$EXEC{
+NI <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pds">"</span>NI<span class="pl-pds">"</span></span>]
+NT <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pds">"</span>NT<span class="pl-pds">"</span></span>]
+L <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pds">"</span>L<span class="pl-pds">"</span></span>]
+C <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pds">"</span>C<span class="pl-pds">"</span></span>]
+demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pds">"</span>d<span class="pl-pds">"</span></span>]
+<span class="pl-k">for</span> i <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NI)<span class="pl-k">:</span>
+    s <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>s[%d,%d]<span class="pl-pds">"</span></span>%(i, t) <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+    x <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>x[%d,%d]<span class="pl-pds">"</span></span>%(i, t) <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+    y <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>y[%d,%d]<span class="pl-pds">"</span></span>%(i, t) <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+    z <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>z[%d,%d]<span class="pl-pds">"</span></span>%(i, t) <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+    d <span class="pl-k">=</span> [demand[i, t] <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+    <span class="pl-k">if</span> BACKLOG is False<span class="pl-k">:</span>
+        WW_U(s, y, d, NT)
+    <span class="pl-k">else</span><span class="pl-k">:</span>
+        r <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>r[%d,%d]<span class="pl-pds">"</span></span>%(i, t) <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+        w <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">"</span>w[%d,%d]<span class="pl-pds">"</span></span>%(i, t) <span class="pl-k">for</span> t <span class="pl-k">in</span> mrange(<span class="pl-c1">1</span>, NT)]
+        LS_U_B(s, r, x, y, d, NT)
+        WW_U_SCB(s, r, y, z, w, d, NT, Tk<span class="pl-k">=</span><span class="pl-c1">5</span>)
+};
+
+<span class="pl-k">solve</span>;
+<span class="pl-k">end</span>;</pre></div>
+
+<h4>
+<a id="user-content-parameters" class="anchor" href="#parameters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters</h4>
 
 <ul>
 <li>
-<a href="STMTS_General.html#exec">EXEC</a>: <code>$EXEC{python code};</code>
-</li>
+<code>NT</code>- number of periods;</li>
 <li>
-<a href="STMTS_General.html#stmt">STMT</a>: <code>$STMT{python expression};</code>
-</li>
+<code>s</code>- list of size <code>NT</code> (s0=0) or <code>NT+1</code> with the stock variables for each period;</li>
+<li>
+<code>r</code>- list of size <code>NT</code> with the backlog variables for each period;</li>
+<li>
+<code>y</code>- list of size <code>NT</code> with the set-up variables for each period;</li>
+<li>
+<code>z</code>- list of size <code>NT</code> with the start-up variables for each period;</li>
+<li>
+<code>w</code>- list of size <code>NT</code> with the switch-off variables for each period;</li>
+<li>
+<code>d</code>- list of size <code>NT</code> with the demand for each period;</li>
+<li>
+<code>L</code>- production lower-bound;</li>
+<li>
+<code>C</code>- production capacity;</li>
+<li>
+<code>Tk</code>- approximation parameter.</li>
 </ul>
-</li>
-<li>
-<p><code>$CMD[AMPL parameters]{python arguments or code};</code> </p>
 
-<ul>
-<li>
-<a href="STMTS_General.html#set">SET</a>: <code>$SET[set_name]{values};</code>
-</li>
-<li>
-<a href="STMTS_General.html#param">PARAM</a>: <code>$PARAM[param_name]{values, i0=0};</code>
-</li>
-<li>
-<a href="STMTS_General.html#var">VAR</a>: <code>$VAR[var_name]{typ="", lb=None, ub=None, index_set=None};</code>
-</li>
-<li>
-<a href="STMTS_General.html#con">CON</a>: <code>$CON[constraint_name]{left, sign, right};</code>
-</li>
-</ul>
-</li>
-</ol>
+<p>For more details please refer to the book Production Planning by Mixed Integer Programming.</p>
 
-<p>Additional statements:</p>
+<h3>
+<a id="user-content-wagner-whitin-models" class="anchor" href="#wagner-whitin-models" aria-hidden="true"><span class="octicon octicon-link"></span></a>Wagner-Whitin models</h3>
 
-<ol>
-<li>
-<p>Statements for <a href="https://github.com/fdabrandao/vpsolver">VPSolver</a>:</p>
+<h4>
+<a id="user-content-ww_u" class="anchor" href="#ww_u" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U</h4>
 
-<ul>
-<li>
-<a href="STMTS_VPSolver.html#vbp_load">VBP_LOAD</a>: <code>$VBP_LOAD[name]{fname, i0=0, d0=0};</code>
-</li>
-<li>
-<a href="STMTS_VPSolver.html#vbp_flow">VBP_FLOW</a>: <code>$VBP_FLOW[zvar]{W, w, b, bounds=None};</code>
-</li>
-<li>
-<a href="STMTS_VPSolver.html#vbp_graph">VBP_GRAPH</a>: <code>$VBP_GRAPH[V_name, A_name]{W, w, labels, bounds=None};</code>
-</li>
-</ul>
-</li>
-<li>
-<p>Statements for special ordered sets and piecewise linear functions:</p>
+<p>Usage: <code>$WW_U{s, y, d, NT, Tk};</code></p>
 
-<ul>
-<li>
-<a href="STMTS_SOS.html#sos1">SOS1</a>: <code>$SOS1{varl, ub=1};</code>
-</li>
-<li>
-<a href="STMTS_SOS.html#sos2">SOS2</a>: <code>$SOS2{varl, ub=1};</code>
-</li>
-<li>
-<a href="STMTS_SOS.html#pwl">PWL</a>: <code>$PWL[var_x, var_y]{xyvalues};</code>
-</li>
-</ul>
-</li>
-<li>
-<p>Statements for TSP:</p>
+<p>Description: Basic Wagner-Whitin.</p>
 
-<ul>
-<li>
-<a href="STMTS_TSP.html#atsp_mtz">ATSP_MTZ</a>: <code>$ATSP_MTZ{xvars, DL=False, cuts=False};</code>
-</li>
-<li>
-<a href="STMTS_TSP.html#atsp_scf">ATSP_SCF</a>: <code>$ATSP_SCF{xvars, cuts=False};</code>
-</li>
-<li>
-<a href="STMTS_TSP.html#atsp_mcf">ATSP_MCF</a>: <code>$ATSP_SCF{xvars, cuts=False};</code>
-</li>
-</ul>
-</li>
-<li>
-<p>Statements for Lot-sizing (<a href="STMTS_LSLIB.html">LS-LIB</a>):</p>
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
 
-<ul>
-<li>
-<a href="STMTS_LSLIB.html#wagner-whitin-models">Wagner-Whitin models</a>: <code>$WW_*{...};</code>
-</li>
-<li>
-<a href="STMTS_LSLIB.html#lot-sizing-models">Lot-sizing models</a>: <code>$LS_{...};</code>
-</li>
-</ul>
-</li>
-</ol>
+<h4>
+<a id="user-content-ww_u_b" class="anchor" href="#ww_u_b" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U_B</h4>
 
-<p><strong>Note</strong>: The values between <code>[]</code> are usually used to name new AMPL variables, constraints, sets, or parameters. Names starting with a <code>^</code> indicate that the corresponding AMPL element should not be defined by the command. This prefix is useful when the corresponding AMPL element was declared before and we do not want to declared it again.</p>
+<p>Usage: <code>$WW_U_B{s, r, y, d, NT, Tk};</code></p>
+
+<p>Description: Wagner-Whitin and Backlogging.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-ww_u_sc" class="anchor" href="#ww_u_sc" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U_SC</h4>
+
+<p>Usage: <code>$WW_U_SC{s, y, z, d, NT, Tk};</code></p>
+
+<p>Description: Wagner-Whitin and Start-up.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-ww_u_scb" class="anchor" href="#ww_u_scb" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U_SCB</h4>
+
+<p>Usage: <code>$WW_U_SCB{s, r, y, z, w, d, NT, Tk};</code></p>
+
+<p>Description: Wagner-Whitin, Backlogging and Start-up.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-ww_u_lb" class="anchor" href="#ww_u_lb" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U_LB</h4>
+
+<p>Usage: <code>$WW_U_LB{s, y, d, L, NT, Tk};</code></p>
+
+<p>Description: Wagner-Whitin, Constant Lower Bound.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-ww_cc" class="anchor" href="#ww_cc" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_CC</h4>
+
+<p>Usage: <code>$WW_CC{s, y, d, C, NT, Tk};</code></p>
+
+<p>Description: Wagner-Whitin, Constant Capacity.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-ww_cc_b" class="anchor" href="#ww_cc_b" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_CC_B</h4>
+
+<p>Usage: <code>$WW_CC_B{s, r, y, d, C, NT, Tk};</code></p>
+
+<p>Description: Wagner-Whitin, Constant Capacity and Backlogging.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h3>
+<a id="user-content-lot-sizing-models" class="anchor" href="#lot-sizing-models" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lot-sizing models</h3>
+
+<h4>
+<a id="user-content-ls_u-or-ls_u1" class="anchor" href="#ls_u-or-ls_u1" aria-hidden="true"><span class="octicon octicon-link"></span></a>LS_U or LS_U1</h4>
+
+<p>Usage: <code>$LS_U{s, x, y, d, NT, Tk};</code> or <code>LS_U1{s, x, y, d, NT, Tk};</code></p>
+
+<p>Description: Multi-commodity formulation for LS-U.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-ls_u2" class="anchor" href="#ls_u2" aria-hidden="true"><span class="octicon octicon-link"></span></a>LS_U2</h4>
+
+<p>Usage: <code>$LS_U2{s, x, y, d, NT, Tk};</code></p>
+
+<p>Description: Shortest path formulation for LS-U.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-ls_u_b" class="anchor" href="#ls_u_b" aria-hidden="true"><span class="octicon octicon-link"></span></a>LS_U_B</h4>
+
+<p>Usage: <code>$LS_U_B{s, r, x, y, d, NT, Tk};</code></p>
+
+<p>Description: Multi-commodity formulation for LS-U-B.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
 
 <hr>
 
