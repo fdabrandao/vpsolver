@@ -8,10 +8,10 @@ $VBP_FLOW[Z]{
 };
 
 $EXEC{
-print _params['instance1_b']
-print _instance1.b
-print "_sets:", _sets.keys()
-print "_params:", _params.keys()
+print(_params['instance1_b'])
+print(_instance1.b)
+print("_sets:", _sets.keys())
+print("_params:", _params.keys())
 };
 
 minimize obj: Z;

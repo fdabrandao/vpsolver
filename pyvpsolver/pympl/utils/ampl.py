@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from builtins import str
+import six
 
 from copy import deepcopy
 from .common import linear_constraint, lincomb2str
@@ -25,14 +27,7 @@ from .common import linear_constraint, lincomb2str
 
 def tuple2str(tuple_):
     """Converts a tuple to a AMPL tuple."""
-
-    def format_entry(e):
-        if not isinstance(e, str):
-            return str(e)
-        else:
-            return "'{0}'".format(e)
-
-    return ",".join(format_entry(e) for e in tuple_)
+    return ",".join(repr(e) for e in tuple_)
 
 
 def ampl_set(name, values, sets, params):
@@ -46,12 +41,7 @@ def ampl_set(name, values, sets, params):
         sets[name] = deepcopy(values)
 
     def format_entry(e):
-        if isinstance(e, str):
-            return "'{0}'".format(e)
-        elif isinstance(e, (tuple, list)):
-            return "({0})".format(tuple2str(e))
-        else:
-            return str(e)
+        return repr(e).replace(" ", "")
 
     defs = "set {0} := {{{1}}};\n".format(
         name, ",".join(format_entry(e) for e in values)
@@ -73,16 +63,8 @@ def ampl_param(name, index, value, sets, params):
         defs = "param {0}{{{1}}};\n".format(name, index.lstrip("^"))
 
         def format_entry(k, v):
-            if isinstance(k, str):
-                k = "'{0}'".format(k)
-            elif isinstance(k, tuple):
-                k = tuple2str(k)
-            else:
-                k = str(k)
-            if isinstance(v, str):
-                v = "'{0}'".format(v)
-            else:
-                v = str(v)
+            k = repr(k).strip("()").replace(" ", "")
+            v = repr(v).strip("()").replace(" ", "")
             return "[{0}]{1}".format(k, v)
 
         data = "param {0} := {1};\n".format(
@@ -91,8 +73,8 @@ def ampl_param(name, index, value, sets, params):
         return defs, data
     else:
         assert index is None
-        assert isinstance(value, (str, float, int))
-        if isinstance(value, str):
+        assert isinstance(value, (six.string_types, float, int))
+        if isinstance(value, six.string_types):
             value = "'{0}'".format(value)
         defs = "param {0} := {1};\n".format(name, str(value))
         return defs, ""

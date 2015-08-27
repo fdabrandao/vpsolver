@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
+from builtins import range
+from builtins import object
 
 import os
 import sys
@@ -71,7 +74,7 @@ class Solver(object):
         if verbose is None:
             verbose = Solver.VERBOSE
         if verbose:
-            print msg
+            print(msg)
 
     @staticmethod
     def run(cmd, tee=None, grep=None, grepv=None, verbose=None):
@@ -89,7 +92,7 @@ class Solver(object):
 
         def pipe_output(fin, fout_list, grep=None, grepv=None):
             while True:
-                line = fin.readline()
+                line = fin.readline().decode("utf-8")
                 if not line:
                     break
                 if grep is not None and grep not in line:
@@ -141,7 +144,7 @@ class Solver(object):
                 sol = f.read().split()
                 values = {}
                 assert len(sol) % 2 == 0
-                for i in xrange(0, len(sol), 2):
+                for i in range(0, len(sol), 2):
                     var, value = sol[i], float(sol[i+1])
                     if int(value) == value:
                         value = int(value)
@@ -155,7 +158,7 @@ class Solver(object):
 
 def signal_handler(signal_, frame):
     """Signal handler for a cleaner exit."""
-    print "signal received: {0}".format(signal_)
+    print("signal received: {0}".format(signal_))
     Solver.clear()
     sys.exit(0)
 

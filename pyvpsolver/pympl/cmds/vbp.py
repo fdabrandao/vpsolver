@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,9 +18,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import division
+from builtins import zip
+from builtins import str
+from builtins import range
+import six
 
 import re
-from pyvpsolver import VPSolver, VBP, AFG
 from .base import CmdBase, SubmodBase
 from ..model import Model, writemod
 from .. import utils
@@ -31,6 +35,7 @@ class CmdVBPLoad(CmdBase):
 
     def _evalcmd(self, name, fname, i0=0, d0=0):
         """Evalutates CMD[name](*args)."""
+        from pyvpsolver import VBP
         name, index = utils.parse_indexed(name, "{}")
         index_I = "{0}_I".format(name)
         index_D = "{0}_D".format(name)
@@ -45,16 +50,16 @@ class CmdVBPLoad(CmdBase):
 
         W = {
             i0+i: instance.W[i]
-            for i in xrange(instance.ndims)
+            for i in range(instance.ndims)
         }
         w = {
             (i0+i, d0+d): instance.w[i][d]
-            for i in xrange(instance.m)
-            for d in xrange(instance.ndims)
+            for i in range(instance.m)
+            for d in range(instance.ndims)
         }
         b = {
             i0+i: instance.b[i]
-            for i in xrange(instance.m)
+            for i in range(instance.m)
         }
 
         assert "_{0}".format(name.lstrip("^")) not in self._pyvars
@@ -82,13 +87,13 @@ class CmdVBPLoad(CmdBase):
         data += pdata
 
         sdefs, sdata = utils.ampl_set(
-            index_I, range(i0, i0+instance.m), sets, sets
+            index_I, list(range(i0, i0+instance.m)), sets, sets
         )
         defs += sdefs
         data += sdata
 
         sdefs, sdata = utils.ampl_set(
-            index_D, range(d0, d0+instance.ndims), sets, params
+            index_D, list(range(d0, d0+instance.ndims)), sets, params
         )
         defs += sdefs
         data += sdata
@@ -136,7 +141,7 @@ class CmdVBPGraph(CmdBase):
             m = max(i for i, d in w)-i0+1
             p = max(d for i, d in w)-d0+1
             ww = [
-                [w[i0+i, d0+d] for d in xrange(p)] for i in xrange(m)
+                [w[i0+i, d0+d] for d in range(p)] for i in range(m)
             ]
             w = ww
         if isinstance(bounds, dict):
@@ -155,19 +160,20 @@ class CmdVBPGraph(CmdBase):
 
     def _generate_graph(self, W, w, labels, bounds):
         """Generates an arc-flow graph."""
+        from pyvpsolver import VBP, AFG
         m = len(w)
         ndims = len(W)
         if isinstance(bounds, list):
             b = bounds
         else:
             b = [
-                min(W[d]/w[i][d] for d in xrange(ndims) if w[i][d] != 0)
-                for i in xrange(m)
+                min(W[d]//w[i][d]) for d in range(ndims) if w[i][d] != 0
+                for i in range(m)
             ]
         instance = VBP(W, w, b, verbose=False)
         graph = AFG(instance, verbose=False).graph()
         graph.relabel(
-            lambda u: u if isinstance(u, str) else str(u),
+            lambda u: u if isinstance(u, six.string_types) else str(u),
             lambda i: labels[i] if isinstance(i, int) and i < m else "LOSS"
         )
         return graph
@@ -197,7 +203,7 @@ class SubmodVBPFlow(SubmodBase):
             m = max(i for i, d in w)-i0+1
             p = max(d for i, d in w)-d0+1
             ww = [
-                [w[i0+i, d0+d] for d in xrange(p)] for i in xrange(m)
+                [w[i0+i, d0+d] for d in range(p)] for i in range(m)
             ]
             w = ww
         if isinstance(b, dict):
@@ -221,13 +227,14 @@ class SubmodVBPFlow(SubmodBase):
 
     def _generate_model(self, zvar, W, w, b, bounds=None, prefix=""):
         """Generates a arc-flow model."""
+        from pyvpsolver import VBP, AFG
         m = len(w)
         bb = [0]*m
         bvars = []
-        for i in xrange(m):
-            if isinstance(b[i], str):
+        for i in range(m):
+            if isinstance(b[i], six.string_types):
                 bb[i] = min(
-                    W[d]/w[i][d] for d in xrange(len(w[i])) if w[i][d] != 0
+                    W[d]//w[i][d] for d in range(len(w[i])) if w[i][d] != 0
                 )
                 if bounds is not None:
                     bb[i] = min(bb[i], bounds[i])
@@ -254,13 +261,13 @@ class SubmodVBPFlow(SubmodBase):
         }
         graph.set_labels(labels)
 
-        for i in xrange(m):
+        for i in range(m):
             if i not in assocs:
                 assocs[i] = []
             if bounds is not None:
                 for var in assocs[i]:
                     ub[var] = bounds[i]
-            if isinstance(b[i], str):
+            if isinstance(b[i], six.string_types):
                 varl.append(b[i])
                 cons.append((assocs[i], "=", b[i]))
             else:
@@ -308,10 +315,8 @@ class SubmodVBPFlow(SubmodBase):
             graph.set_flow(varvalues)
             sol = graph.extract_solution(graph.S, "<-", graph.T)
             lst_sol.append((zvar, varvalues.get(zvar, 0), sol))
-            VPSolver.log(
-                "Graph: {0} (flow={1:d})\n\t{2}".format(
+            if verbose:
+                print ("Graph: {0} (flow={1:d})\n\t{2}".format(
                     zvar, varvalues.get("_total_flow", 0), sol
-                ),
-                verbose=verbose
-            )
+                ))
         return lst_sol

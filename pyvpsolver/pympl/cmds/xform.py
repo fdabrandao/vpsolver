@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from builtins import range
 
 from .base import SubmodBase
 from ..model import Model, writemod
@@ -55,12 +56,12 @@ class SubmodWWU(SubmodBase):
         varl = s + y
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -96,13 +97,13 @@ class SubmodWWUB(SubmodBase):
         varl = s + r + y
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        r = {i+1: r[i] for i in xrange(NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        r = {i+1: r[i] for i in range(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -138,13 +139,13 @@ class SubmodWWUSC(SubmodBase):
         varl = s + y + z
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        z = {i+1: z[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        z = {i+1: z[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -182,15 +183,15 @@ class SubmodWWUSCB(SubmodBase):
         varl = s + r + y + z + w
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        r = {i+1: r[i] for i in xrange(NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        z = {i+1: z[i] for i in xrange(NT)}
-        w = {i+1: w[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        r = {i+1: r[i] for i in range(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        z = {i+1: z[i] for i in range(NT)}
+        w = {i+1: w[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -225,12 +226,12 @@ class SubmodWWULB(SubmodBase):
         varl = s + y
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -265,12 +266,12 @@ class SubmodWWCC(SubmodBase):
         varl = s + y
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -306,13 +307,13 @@ class SubmodWWCCB(SubmodBase):
         varl = s + r + y
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        r = {i+1: r[i] for i in xrange(NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        r = {i+1: r[i] for i in range(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -348,13 +349,13 @@ class SubmodLSU1(SubmodBase):
         varl = s + x + y
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        x = {i+1: x[i] for i in xrange(NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        x = {i+1: x[i] for i in range(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -390,13 +391,13 @@ class SubmodLSU2(SubmodBase):
         varl = s + x + y
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        x = {i+1: x[i] for i in xrange(NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        x = {i+1: x[i] for i in range(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -432,13 +433,13 @@ class SubmodLSU(SubmodBase):
         varl = s + x + y
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        x = {i+1: x[i] for i in xrange(NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        x = {i+1: x[i] for i in range(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT
@@ -475,14 +476,14 @@ class SubmodLSUB(SubmodBase):
         varl = s + r + x + y
 
         if len(s) == NT:
-            s = {i+1: s[i] for i in xrange(NT)}
+            s = {i+1: s[i] for i in range(NT)}
             s[0] = 0
         else:
             s = {i: s[i] for i in mrange(0, NT)}
-        r = {i+1: r[i] for i in xrange(NT)}
-        x = {i+1: x[i] for i in xrange(NT)}
-        y = {i+1: y[i] for i in xrange(NT)}
-        d = {i+1: d[i] for i in xrange(NT)}
+        r = {i+1: r[i] for i in range(NT)}
+        x = {i+1: x[i] for i in range(NT)}
+        y = {i+1: y[i] for i in range(NT)}
+        d = {i+1: d[i] for i in range(NT)}
 
         if Tk is None:
             Tk = NT

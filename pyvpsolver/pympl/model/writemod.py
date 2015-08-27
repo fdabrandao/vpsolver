@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 # AMPL format example:
 #
@@ -40,23 +41,27 @@ def write_mod(model, filename):
         typ = model.vars[var]["vtype"]
         lb = model.vars[var]["lb"]
         ub = model.vars[var]["ub"]
-        print >>fout, ampl_var(name=var, typ=typ, lb=lb, ub=ub)
+        print(ampl_var(name=var, typ=typ, lb=lb, ub=ub), file=fout)
 
     # Objective:
 
     if model.obj != []:
         if model.objdir == "min":
-            print >>fout, "minimize obj:{0};".format(lincomb2str(model.obj))
+            print(
+                "minimize obj:{0};".format(lincomb2str(model.obj)), file=fout
+            )
         else:
-            print >>fout, "maximize obj:{0};".format(lincomb2str(model.obj))
+            print(
+                "maximize obj:{0};".format(lincomb2str(model.obj)), file=fout
+            )
 
     # Constraints:
 
     for name in model.cons_list:
         lincomb, sign, rhs = model.cons[name]
-        print >>fout, ampl_con(name, lincomb, sign, rhs)
+        print(ampl_con(name, lincomb, sign, rhs), file=fout)
 
-    print >>fout, "end;"
+    print("end;", file=fout)
     fout.close()
 
 

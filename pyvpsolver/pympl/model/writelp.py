@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 # LP format example:
 #
@@ -44,25 +45,27 @@ def write_lp(model, filename):
     # Objective:
 
     if model.objdir == "min":
-        print >>fout, "Minimize"
+        print("Minimize", file=fout)
     else:
-        print >>fout, "Maximize"
+        print("Maximize", file=fout)
 
     obj = model.obj
     if obj == []:
         obj = [(var, 0) for var in model.vars]
-    print >>fout, "\tobjective:{0}".format(lincomb2str(obj, mult=" "))
+    print("\tobjective:{0}".format(lincomb2str(obj, mult=" ")), file=fout)
 
     # Constraints:
 
-    print >>fout, "Subject To"
+    print("Subject To", file=fout)
 
     for name in model.cons_list:
         lincomb, sign, rhs = model.cons[name]
         if sign in (">", "<"):
             sign += "="
-        print >>fout, "\t{0}:{1} {2} {3}".format(
-            name, lincomb2str(lincomb, mult=" "), sign, rhs
+        print(
+            "\t{0}:{1} {2} {3}".format(
+                name, lincomb2str(lincomb, mult=" "), sign, rhs
+            ), file=fout
         )
 
     # Bounds:
@@ -75,22 +78,29 @@ def write_lp(model, filename):
             bounds.append((name, lb, ub))
 
     if bounds != []:
-        print >>fout, "Bounds"
+        print("Bounds", file=fout)
         for name, lb, ub in bounds:
             if lb is not None and ub is not None:
-                print >>fout, "\t{0:g} <= {1} <= {2:g}".format(lb, name, ub)
+                print(
+                    "\t{0} <= {1} <= {2}".format(repr(lb), name, repr(ub)),
+                    file=fout
+                )
             elif lb is not None:
-                print >>fout, "\t{0:g} <= {1}".format(lb, name)
+                print(
+                    "\t{0} <= {1}".format(repr(lb), name), file=fout
+                )
             elif ub is not None:
-                print >>fout, "\t{0} <= {1:g}".format(name, ub)
+                print(
+                    "\t{0} <= {1}".format(name, repr(ub)), file=fout
+                )
 
     # Integer variables:
 
-    print >>fout, "General"
+    print("General", file=fout)
     for name in sorted(model.vars):
         if model.vars[name]["vtype"] == "I":
-            print >>fout, "\t{0}".format(name)
+            print("\t{0}".format(name), file=fout)
 
-    print >>fout, "End"
+    print("End", file=fout)
 
     fout.close()

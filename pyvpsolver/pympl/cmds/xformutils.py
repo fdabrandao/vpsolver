@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import division
+from builtins import range
 
 from math import floor, ceil
 
@@ -66,7 +68,7 @@ The implementations are a direct translation from the LS-LIB's xform.mos file.
 
 def mrange(a, b):
     """Returns a range [a, b]."""
-    return xrange(a, b+1)
+    return range(a, b+1)
 
 
 def CumulDemand(d, NT):
@@ -414,13 +416,13 @@ def XFormWWULB(model, s, y, d, L, NT, Tk, prefix=""):
     # gs(k,t):=D(k+1,t)-L*(ceil(D(k+1,t)/L)-1)
     for k in Ts0:
         for t in mrange(k+1, min(NT, k+Tk)):
-            gs[k, t] = D[k+1, t]-L*(ceil(D[k+1, t]/float(L))-1)
+            gs[k, t] = D[k+1, t]-L*(ceil(D[k+1, t]/L)-1)
 
     # forall(k in Ts0,t in maxlist(0,k-Tk)..k-1)
     # gs(k,t):=L*(floor(D(t+1,k)/L)+1)-D(t+1,k)
     for k in Ts0:
         for t in mrange(max(0, k-Tk), k-1):
-            gs[k, t] = L*(floor(D[t+1, k]/float(L))+1)-D[t+1, k]
+            gs[k, t] = L*(floor(D[t+1, k]/L)+1)-D[t+1, k]
 
     # forall(k in Ts0)
     # gs(k,k):=L
@@ -470,13 +472,13 @@ def XFormWWULB(model, s, y, d, L, NT, Tk, prefix=""):
                     for i in mrange(max(0, k-Tk), min(NT, k+Tk))
                     if gs[k, i] >= gs[k, t]
                 ]
-                rhs = [floor((D[k+1, l]-gs[k, t])/float(L))+1]
+                rhs = [floor((D[k+1, l]-gs[k, t])/L)+1]
                 for i in mrange(k+1, l):
                     # possible bug: floor((D[k+1, i-1]-gs[k, t])/float(L))
                     #               D[1, 0] is undefined
                     coef = (
-                        floor((D[k+1, i-1]-gs[k, t])/float(L)) -
-                        floor((D[k+1, l]-gs[k, t])/float(L))
+                        floor((D[k+1, i-1]-gs[k, t])/L) -
+                        floor((D[k+1, l]-gs[k, t])/L)
                     )
                     rhs.append((coef, y[i]))
                 model.add_con(lhs, ">=", rhs)
@@ -492,7 +494,7 @@ def XFormWWULB(model, s, y, d, L, NT, Tk, prefix=""):
                 for i in mrange(max(0, k-Tk), min(NT, k+Tk))
                 if gs[k, i] >= gs[k, t]
             ]
-            rhs = [y[i] for i in mrange(t+1, k)]+[-floor(D[t+1, k]/float(L))]
+            rhs = [y[i] for i in mrange(t+1, k)]+[-floor(D[t+1, k]/L)]
             model.add_con(lhs, ">=", rhs)
 
 
@@ -562,7 +564,7 @@ def XFormWWCC(model, s, y, d, C, NT, Tk, prefix=""):
     gs = {}
     for k in mrange(1, NT):
         for t in mrange(k, min(NT, k+Tk-1)):
-            gs[k-1, t] = D[k, t]-C*floor(D[k, t]/float(C))
+            gs[k-1, t] = D[k, t]-C*floor(D[k, t]/C)
 
     # forall(k in 1..NT) XS(k) :=
     # s(k-1) >= C*ds(k-1)+sum(i in k..minlist(NT,k+Tk-1))gs(k-1,i)*ws(k-1,i)
@@ -589,7 +591,7 @@ def XFormWWCC(model, s, y, d, C, NT, Tk, prefix=""):
                 for i in mrange(k, min(NT, k+Tk-1))
                 if gs[k-1, i] >= gs[k-1, t]
             ]
-            model.add_con(lhs, ">=", floor(D[k, t]/float(C))+1)
+            model.add_con(lhs, ">=", floor(D[k, t]/C)+1)
 
 
 def XFormWWCCB2(model, s, r, y, D, C, T1, TN, prefix=""):
@@ -683,15 +685,15 @@ def XFormWWCCB2(model, s, r, y, D, C, T1, TN, prefix=""):
     # forall(k in Ts0,t in T0..k-1) gs(k,t):=C*ceil(D(t+1,k)/C)-D(t+1,k)
     for k in Ts0:
         for t in mrange(T0, k-1):
-            gr[k, t] = D[t+1, k]-C*floor(D[t+1, k]/float(C))
-            gs[k, t] = C*ceil(D[t+1, k]/float(C))-D[t+1, k]
+            gr[k, t] = D[t+1, k]-C*floor(D[t+1, k]/C)
+            gs[k, t] = C*ceil(D[t+1, k]/C)-D[t+1, k]
 
     # forall(k in Ts0,t in k+1..TN) gs(k,t):=D(k+1,t)-C*floor(D(k+1,t)/C)
     # forall(k in Ts0,t in k+1..TN) gr(k,t):=C*ceil(D(k+1,t)/C)-D(k+1,t)
     for k in Ts0:
         for t in mrange(k+1, TN):
-            gs[k, t] = D[k+1, t]-C*floor(D[k+1, t]/float(C))
-            gr[k, t] = C*ceil(D[k+1, t]/float(C))-D[k+1, t]
+            gs[k, t] = D[k+1, t]-C*floor(D[k+1, t]/C)
+            gr[k, t] = C*ceil(D[k+1, t]/C)-D[k+1, t]
 
     # forall(k in Ts0) gs(k,k):=0
     # forall(k in Ts0) gr(k,k):=0
@@ -733,7 +735,7 @@ def XFormWWCCB2(model, s, r, y, D, C, T1, TN, prefix=""):
     for k in Ts:
         for l in mrange(k, TN):
             for t in Ts0:
-                if ceil((D[k, l]-gr[l, t])/float(C)) > 0:
+                if ceil((D[k, l]-gr[l, t])/C) > 0:
                     lhs = [dsvar(k-1), drvar(l)]
                     for i in mrange(k, l):
                         lhs.append(y[i])
@@ -743,7 +745,7 @@ def XFormWWCCB2(model, s, r, y, D, C, T1, TN, prefix=""):
                     for i in Ts0:
                         if gr[l, i] >= gr[l, t]:
                             lhs.append(wrvar(l, i))
-                    model.add_con(lhs, ">=", ceil((D[k, l]-gr[l, t])/float(C)))
+                    model.add_con(lhs, ">=", ceil((D[k, l]-gr[l, t])/C))
 
 
 def XFormWWCCB(model, s, r, y, d, C, NT, Tk, prefix=""):

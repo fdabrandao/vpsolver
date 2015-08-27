@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -214,7 +214,7 @@ def tsp_cut_generator(graph, cutvars, get_var_value):
         for group in groups:
             if len(group) <= 2:
                 continue
-            grp = set(map(lambda id_: V[id_], group))
+            grp = set([V[id_] for id_ in group])
             cuts.append((
                 [
                    (cutvars[u, v], 1)

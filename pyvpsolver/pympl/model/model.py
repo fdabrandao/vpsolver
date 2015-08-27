@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from builtins import map
+from builtins import object
 
 from ..utils import linear_constraint
 from .writelp import write_lp
@@ -99,7 +101,7 @@ class Model(object):
 
     def rename_vars(self, var_name):
         """Renames variables."""
-        self.vars_list = map(var_name, self.vars_list)
+        self.vars_list = list(map(var_name, self.vars_list))
         oldvars = self.vars
         self.vars = {}
         for name in oldvars:
@@ -114,7 +116,7 @@ class Model(object):
 
     def rename_cons(self, con_name):
         """Renames constraints."""
-        self.cons_list = map(con_name, self.cons_list)
+        self.cons_list = list(map(con_name, self.cons_list))
         oldcons = self.cons
         self.cons = {}
         for con in oldcons:

@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from builtins import range
+from builtins import object
+import six
 
 from collections import defaultdict
 
@@ -32,29 +35,35 @@ def linear_constraint(left, sign, right):
     rhs = 0
 
     def add_entry(e, signal):
-        assert isinstance(e, (int, float, str, tuple))
+        assert isinstance(e, (int, float, six.string_types, tuple))
         if isinstance(e, (int, float)):
             return -signal*e
-        elif isinstance(e, str):
+        elif isinstance(e, six.string_types):
             pairs[e] += signal
             return 0
         elif isinstance(e, tuple):
             a, b = e
-            assert isinstance(a, (int, float)) or isinstance(b, (int, float))
-            assert isinstance(a, str) or isinstance(b, str)
-            if isinstance(a, str):
+            assert (
+                isinstance(a, (int, float)) or
+                isinstance(b, (int, float))
+            )
+            assert (
+                isinstance(a, six.string_types) or
+                isinstance(b, six.string_types)
+            )
+            if isinstance(a, six.string_types):
                 pairs[a] += signal*b
             else:
                 pairs[b] += signal*a
             return 0
 
-    if isinstance(left, (int, float, str, tuple)):
+    if isinstance(left, (int, float, six.string_types, tuple)):
         rhs += add_entry(left, 1)
     else:
         for e in left:
             rhs += add_entry(e, 1)
 
-    if isinstance(right, (int, float, str, tuple)):
+    if isinstance(right, (int, float, six.string_types, tuple)):
         rhs += add_entry(right, -1)
     else:
         for e in right:
@@ -91,7 +100,7 @@ def list2dict(lst, i0=0):
     dic = {}
 
     def conv_rec(key, lst):
-        for i in xrange(len(lst)):
+        for i in range(len(lst)):
             if not isinstance(lst[i], list):
                 if key == []:
                     dic[i0+i] = lst[i]
@@ -104,7 +113,7 @@ def list2dict(lst, i0=0):
     return dic
 
 
-class UnionFind:
+class UnionFind(object):
     """Union-find data structure."""
 
     def __init__(self, N):
@@ -115,7 +124,7 @@ class UnionFind:
     def init(self):
         """Initialize data."""
         self.ngroups = self.N
-        self.p = range(self.N)
+        self.p = list(range(self.N))
         self.rank = [0]*self.N
 
     def find(self, x):
@@ -141,6 +150,6 @@ class UnionFind:
         """Retrieve groups."""
         from collections import defaultdict
         grps = defaultdict(list)
-        for x in xrange(self.N):
+        for x in range(self.N):
             grps[self.find(x)].append(x)
-        return grps.values()
+        return list(grps.values())

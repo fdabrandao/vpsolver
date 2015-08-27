@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from builtins import zip
+from builtins import range
 
 from .base import SubmodBase
 from ..model import Model, writemod
@@ -31,13 +33,13 @@ def add_sos1(model, varl, ub=1, prefix=""):
     def yvar(i):
         return prefix+"y_{0}".format(i)
 
-    for i in xrange(len(varl)):
+    for i in range(len(varl)):
         model.add_var(name=yvar(i), vtype="B")
 
     for i, var in enumerate(varl):
         model.add_con(var, "<=", (yvar(i), ub))
 
-    model.add_con([yvar(i) for i in xrange(len(varl))], "=", 1)
+    model.add_con([yvar(i) for i in range(len(varl))], "=", 1)
 
 
 def add_sos2(model, varl, ub=1, prefix=""):
@@ -45,7 +47,7 @@ def add_sos2(model, varl, ub=1, prefix=""):
     def yvar(i):
         return prefix+"y_{0}".format(i)
 
-    for i in xrange(len(varl)-1):
+    for i in range(len(varl)-1):
         model.add_var(name=yvar(i), vtype="B")
 
     for i, var in enumerate(varl):
@@ -56,7 +58,7 @@ def add_sos2(model, varl, ub=1, prefix=""):
         else:
             model.add_con(var, "<=", [(yvar(i-1), ub), (yvar(i), ub)])
 
-    model.add_con([yvar(i) for i in xrange(len(varl)-1)], "=", 1)
+    model.add_con([yvar(i) for i in range(len(varl)-1)], "=", 1)
 
 
 class SubmodSOS1(SubmodBase):
@@ -72,6 +74,7 @@ class SubmodSOS1(SubmodBase):
         self._cnt += 1
         prefix = "_sos1{0}_".format(self._cnt)
 
+        varl = list(varl)
         model = Model()
         for var in varl:
             model.add_var(name=var)
@@ -95,6 +98,7 @@ class SubmodSOS2(SubmodBase):
         self._cnt += 1
         prefix = "_sos2{0}_".format(self._cnt)
 
+        varl = list(varl)
         model = Model()
         for var in varl:
             model.add_var(name=var)
@@ -121,8 +125,9 @@ class SubmodPWL(SubmodBase):
         self._cnt += 1
         prefix = "_pwl{0}_".format(self._cnt)
 
+        xyvalues = list(xyvalues)
         n = len(xyvalues)
-        xvalues, yvalues = zip(*xyvalues)
+        xvalues, yvalues = list(zip(*xyvalues))
 
         model = Model()
 
@@ -135,19 +140,19 @@ class SubmodPWL(SubmodBase):
         def zvar(i):
             return prefix+"z_{0}".format(i)
         # var z{I}, >= 0;
-        for i in xrange(n):
+        for i in range(n):
             model.add_var(name=zvar(i), lb=0, ub=1, vtype="C")
 
         # s.t. convexity: sum{i in I} z[i] = 1;
-        model.add_con([zvar(i) for i in xrange(n)], "=", 1)
+        model.add_con([zvar(i) for i in range(n)], "=", 1)
 
         # SOS2{z};
-        add_sos2(model, [zvar(i) for i in xrange(n)], 1, prefix)
+        add_sos2(model, [zvar(i) for i in range(n)], 1, prefix)
 
         # s.t. fix_x: x = sum{i in I} X[i] * z[i];
         # s.t. fix_y: y = sum{i in I} Y[i] * z[i];
-        model.add_con([(zvar(i), xvalues[i]) for i in xrange(n)], "=", xvar)
-        model.add_con([(zvar(i), yvalues[i]) for i in xrange(n)], "=", yvar)
+        model.add_con([(zvar(i), xvalues[i]) for i in range(n)], "=", xvar)
+        model.add_con([(zvar(i), yvalues[i]) for i in range(n)], "=", yvar)
 
         model.rename_cons(lambda name: prefix+name)
         self._pyvars["_model"] += writemod.model2ampl(model)

@@ -1,5 +1,5 @@
 """
-This code is part of the Mathematical Modelling Toolbox PyMPL.
+This code is part of the Mathematical Programming Toolbox PyMPL.
 
 Copyright (C) 2015-2015, Filipe Brandao
 Faculdade de Ciencias, Universidade do Porto
@@ -18,6 +18,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
+from builtins import str
+from builtins import object
 
 import re
 import sys
@@ -127,7 +130,9 @@ class PyMPL(object):
             clean_strmatch = strmatch.strip("/*# ")
 
             if PyMPL.DEBUG:
-                print "\n---\n{0}\n{1}\n---\n".format(strmatch, match.groups())
+                print(
+                    "\n---\n{0}\n{1}\n---\n".format(strmatch, match.groups())
+                )
 
             if comment is not None:
                 if comment_cmds and comment.startswith("/*"):
@@ -159,15 +164,16 @@ class PyMPL(object):
                     res = str(self._locals["_model"])
                 res += self._locals["_defs"]
                 self._add_data(self._locals["_data"])
-            except:
-                exctype, value, traceback = sys.exc_info()
-                msg = str(value)+"\n\t"
-                msg += "(while evaluating {0} at line {1:d} col {2:d})".format(
-                    "$"+call+("[...]" if args1 is not None else "")+"{...}",
+            except Exception as e:
+                msg = "Exception occurred while evaluating {0}".format(
+                    "$"+call+("[...]" if args1 is not None else "")+"{...}"
+                )
+                msg += " at line {0:d} col {1:d}".format(
                     self.input[:match.start()].count("\n")+1,
                     match.start()-self.input[:match.start()].rfind("\n"),
                 )
-                raise exctype, msg, traceback
+                e.args += (msg,)
+                raise
 
             if comment_cmds:
                 res = "/*EVALUATED:{0}*/{1}".format(
@@ -204,7 +210,7 @@ class PyMPL(object):
     def write(self, mod_out):
         """Writes the output to a file."""
         with open(mod_out, "w") as fout:
-            print >>fout, self.output
+            print(self.output, file=fout)
 
     def submodels(self):
         """Returns the names of submodels used."""

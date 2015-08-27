@@ -44,7 +44,7 @@ def main():
 
     mod_in = "instance.mod"
     mod_out = "tmp/instance.out.mod"
-    parser = PyMPL()
+    parser = PyMPL(locals_=locals(), globals_=globals())
     parser.parse(mod_in, mod_out)
 
     lp_out = "tmp/instance.lp"
