@@ -1,4 +1,4 @@
-# Python API
+## Python API
 
 The VPSolver Python API has 3 levels:
 
@@ -6,7 +6,7 @@ The VPSolver Python API has 3 levels:
 * [Mid-level API](#mid-level-api): objects that wrap calls to VPSolver executables;
 * [Low-level API](#low-level-api): direct calls to VPSolver scripts and executables.
 
-## High-level API
+### High-level API
 
 Example:
 
@@ -83,7 +83,7 @@ How to use:
 
 Examples: [example_mvbp.py](https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example_mvbp.py) and [example_vsbpp.py](https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example_vsbpp.py).
 
-## Mid-level API
+### Mid-level API
 
 Example:
 
@@ -146,7 +146,7 @@ Objects:
 
 Examples: [example.py](https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example.py).
 
-## Low-level API
+### Low-level API
 
 How to import:
 

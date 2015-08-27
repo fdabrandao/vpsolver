@@ -1,8 +1,8 @@
-# Docker
+## Docker
 
 Docker is an open platform for building, shipping and running applications. Docker allows [VPSolver](https://github.com/fdabrandao/vpsolver) to run on a large variety of platforms with very little effort.
 
-## Docker Setup
+### Docker Setup
 Install Docker [[Docker installation instructions](https://docs.docker.com/installation/)].
 
 Option 1: simply `pull` VPSolver from Docker repository (without building):
@@ -18,7 +18,7 @@ user@locahost ~$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
 user@locahost ~$ docker build -t fdabrandao/vpsolver vpsolver
 ```
 
-## Usage
+### Usage
 Directly using the command line interface:
 
 ```bash
@@ -44,7 +44,7 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 ...
 ```
 
-## Advanced
+### Advanced
 Run vpsolver in background:
 
 ```bash
