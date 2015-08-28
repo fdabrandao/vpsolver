@@ -6,6 +6,7 @@
 *.svg
 *.egg-info
 /build/
+/dist/
 /git_push.sh
 /git_fetch.sh
 /update_pympl.sh
