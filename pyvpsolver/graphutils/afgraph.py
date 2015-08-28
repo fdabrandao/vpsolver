@@ -18,6 +18,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from builtins import range
+from builtins import object
 
 from .afgutils import AFGUtils
 
@@ -188,11 +190,11 @@ class AFGraph(object):
     @staticmethod
     def validate_solution(lst_solutions, nbtypes, ndims, Ws, ws, b):
         """Validates multiple-choice vector packing solutions."""
-        for i in xrange(nbtypes):
+        for i in range(nbtypes):
             for r, pat in lst_solutions[i]:
                 if any(
                     sum(ws[it][t][d] for (it, t) in pat) > Ws[i][d]
-                    for d in xrange(ndims)
+                    for d in range(ndims)
                 ):
                     return False
 
@@ -203,4 +205,4 @@ class AFGraph(object):
             for i, t in p:
                 c[i] += r
 
-        return all(c[i] >= b[i] for i in xrange(len(b)))
+        return all(c[i] >= b[i] for i in range(len(b)))

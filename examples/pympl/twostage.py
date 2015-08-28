@@ -20,6 +20,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
+from builtins import map
+from builtins import range
 
 import os
 import sys
@@ -43,12 +45,12 @@ from pyvpsolver import VPSolver, PyMPL, glpkutils
 def read_twostage(fname):
     """Loads two-stage instances."""
     with open(fname) as f:
-        lst = map(int, f.read().split())
+        lst = list(map(int, f.read().split()))
         W = lst.pop(0)
         H = lst.pop(0)
         m = lst.pop(0)
         w, h, b = [], [], []
-        for i in xrange(m):
+        for i in range(m):
             w.append(lst.pop(0))
             h.append(lst.pop(0))
             b.append(lst.pop(0))

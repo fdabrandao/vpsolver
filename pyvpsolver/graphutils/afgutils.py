@@ -19,6 +19,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
+from __future__ import division
+from builtins import zip
+from builtins import str
+from builtins import map
+from builtins import range
+from builtins import object
 
 import random
 
@@ -35,7 +41,7 @@ class AFGUtils(object):
         lst = s.split()
         m = int(lst[lst.index("M:")+1])
         lst = lst[lst.index("IDS:")+1:]
-        ids = map(int, lst[:m])
+        ids = list(map(int, lst[:m]))
 
         s = s[s.find("#GRAPH_BEGIN#"):]
         s = s[:s.find("#GRAPH_END#\n")]
@@ -49,10 +55,10 @@ class AFGUtils(object):
         NV = int(lst.pop(0))
         lst.pop(0)  # ignore "NA:"
         NA = int(lst.pop(0))
-        lst = map(int, lst)
+        lst = list(map(int, lst))
         A = []
         V = set([])
-        for i in xrange(0, len(lst), 3):
+        for i in range(0, len(lst), 3):
             u, v, i = lst[i:i+3]
             V.add(u)
             V.add(v)
@@ -66,7 +72,7 @@ class AFGUtils(object):
     @staticmethod
     def relabel(V, A, fv, fa=lambda x: x):
         """Relabels graphs."""
-        V = map(fv, V)
+        V = list(map(fv, V))
         At = []
         for (u, v, i) in A:
             u, v = fv(u), fv(v)

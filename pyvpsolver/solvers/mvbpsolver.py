@@ -19,6 +19,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
+from __future__ import division
+from builtins import zip
+from builtins import range
 
 import os
 import sys
@@ -44,8 +47,8 @@ def solve(
     ww = []
     bb = []
     itlabel = []
-    for i in xrange(len(ws)):
-        for j in xrange(len(ws[i])):
+    for i in range(len(ws)):
+        for j in range(len(ws[i])):
             itlabel.append((i, j))
             ww.append(ws[i][j])
             bb.append(b[i])
@@ -53,9 +56,9 @@ def solve(
     instances = [None] * nbtypes
     graphs = [None] * nbtypes
     Ss, Ts = [None] * nbtypes, [None] * nbtypes
-    for i in xrange(nbtypes):
+    for i in range(nbtypes):
         bbi = bb[:]
-        for j in xrange(len(ww)):
+        for j in range(len(ww)):
             if any(a > b for a, b in zip(ww[j], Ws[i])):
                 bbi[j] = 0
                 continue
@@ -108,7 +111,7 @@ def solve(
         for v, i in adj[u]:
             wi = itemw(i)
             vlbl = compress(v)
-            for d in xrange(ndims):
+            for d in range(ndims):
                 lbl[d] = max(lbl[d], vlbl[d]+wi[d])
         newlbl[u] = lbl
         return lbl
@@ -143,8 +146,8 @@ def solve(
 
     nv2, na2 = len(V), len(A)
     VPSolver.log("  #V2: {0} #A2: {1}".format(nv2, na2), verbose)
-    VPSolver.log("  #V2/#V1 = {0:.2f}".format(nv2/float(nv1)), verbose)
-    VPSolver.log("  #A2/#A1 = {0:.2f}".format(na2/float(na1)), verbose)
+    VPSolver.log("  #V2/#V1 = {0:.2f}".format(nv2/nv1), verbose)
+    VPSolver.log("  #A2/#A1 = {0:.2f}".format(na2/na1), verbose)
 
     if svg_file.endswith(".svg"):
         try:
@@ -168,13 +171,13 @@ def solve(
 
     nv3, na3 = len(V), len(A)
     VPSolver.log("  #V3: {0} #A3: {1}".format(nv3, na3), verbose)
-    VPSolver.log("  #V3/#V1 = {0:.2f}".format(nv3/float(nv1)), verbose)
-    VPSolver.log("  #A3/#A1 = {0:.2f}".format(na3/float(na1)), verbose)
+    VPSolver.log("  #V3/#V1 = {0:.2f}".format(nv3/nv1), verbose)
+    VPSolver.log("  #A3/#A1 = {0:.2f}".format(na3/na1), verbose)
 
     varl, cons = graph.get_flow_cons()
 
     assocs = graph.get_assocs()
-    for i in xrange(len(b)):
+    for i in range(len(b)):
         lincomb = [
             (var, 1)
             for it, (j, t) in enumerate(itlabel) if j == i
@@ -189,12 +192,12 @@ def solve(
     model = Model()
 
     ub = {}
-    for i in xrange(len(b)):
+    for i in range(len(b)):
         for var in assocs[i]:
             ub[var] = b[i]
 
     n = sum(b)
-    for i in xrange(nbtypes):
+    for i in range(nbtypes):
         var = graph.vname(Ts[i], "T", "L")
         ub[var] = min(Qs[i], n)
 
@@ -205,7 +208,7 @@ def solve(
     for lincomb, sign, rhs in cons:
         model.add_con(lincomb, sign, rhs)
 
-    lincomb = [(graph.vname(Ts[i], "T", "L"), Cs[i]) for i in xrange(nbtypes)]
+    lincomb = [(graph.vname(Ts[i], "T", "L"), Cs[i]) for i in range(nbtypes)]
     model.set_obj("min", lincomb)
 
     model_file = VPSolver.new_tmp_file(".lp")
@@ -224,7 +227,7 @@ def solve(
     VPSolver.log("#V3: {0} #A3: {1}".format(nv3, na3), verbose)
     VPSolver.log(
         "#V3/#V1: {0:.2f} #A3/#A1: {1:.2f}".format(
-            nv3/float(nv1), na3/float(na1)
+            nv3/nv1, na3/na1
         ),
         verbose
     )
@@ -237,15 +240,15 @@ def solve(
     lst_sol = []
     graph.set_flow(varvalues)
     graph.set_labels(labels)
-    for i in xrange(nbtypes):
+    for i in range(nbtypes):
         lst_sol.append(graph.extract_solution("S", "<-", Ts[i]))
 
     assert graph.validate_solution(lst_sol, nbtypes, ndims, Ws, ws, b)
 
-    c1 = sum(sum(r for r, patt in lst_sol[i])*Cs[i] for i in xrange(nbtypes))
+    c1 = sum(sum(r for r, patt in lst_sol[i])*Cs[i] for i in range(nbtypes))
     c2 = sum(
         varvalues.get(graph.vname(Ts[i], "T", "L"), 0) * Cs[i]
-        for i in xrange(nbtypes)
+        for i in range(nbtypes)
     )
     assert c1 == c2
 

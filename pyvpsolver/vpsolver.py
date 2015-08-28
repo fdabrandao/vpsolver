@@ -19,6 +19,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
+from builtins import map
+from builtins import range
+from builtins import object
 
 import os
 import sys
@@ -43,7 +46,7 @@ class VBP(object):
             print(len(W), file=f)
             print(" ".join(map(str, W)), file=f)
             print(len(w), file=f)
-            for i in xrange(len(w)):
+            for i in range(len(w)):
                 if isinstance(w[i], int):
                     row = [w[i], b[i]]
                 else:
@@ -60,13 +63,13 @@ class VBP(object):
     @classmethod
     def from_file(cls, vbp_file, verbose=None):
         with open(vbp_file, "r") as f:
-            lst = map(int, f.read().split())
+            lst = list(map(int, f.read().split()))
             ndims = lst.pop(0)
             W = lst[:ndims]
             lst = lst[ndims:]
             m = lst.pop(0)
             w, b = [], []
-            for i in xrange(m):
+            for i in range(m):
                 w.append(lst[:ndims])
                 lst = lst[ndims:]
                 b.append(lst.pop(0))
@@ -242,13 +245,13 @@ class VPSolver(object):
             lst[0] = lst[0].replace("Objective: ", "")
             obj = int(lst[0])
             lst = lst[2:]
-            lst = map(lambda x: x.split("x"), lst)
+            lst = [x.split("x") for x in lst]
             sol = []
             for mult, pat in lst:
                 mult = int(mult)
                 pat = pat.replace("i=", "")
                 pat = pat.replace("[", "").replace("]", "")
-                pat = map(lambda x: int(x)-1, pat.split(","))
+                pat = [int(x)-1 for x in pat.split(",")]
                 sol.append((mult, pat))
         except:
             return None
@@ -409,7 +412,7 @@ class VPSolver(object):
                 sol = f.read().split()
                 values = {}
                 assert len(sol) % 2 == 0
-                for i in xrange(0, len(sol), 2):
+                for i in range(0, len(sol), 2):
                     var, value = sol[i], float(sol[i+1])
                     if int(value) == value:
                         value = int(value)

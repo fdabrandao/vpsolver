@@ -20,6 +20,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
+from __future__ import division
+from builtins import range
 
 import os
 import sys
@@ -45,7 +47,7 @@ def main():
 
     a, a0 = [65, 64, 41, 22, 13, 12, 8, 2], 80
     aS = abs(2*a0+1-sum(a))
-    if a0 < (sum(a)-1)/2:
+    if a0 < (sum(a)-1)//2:
         a0 += aS
     a.append(aS)
 
@@ -53,9 +55,9 @@ def main():
 
     m = len(a)
     W = [a0]+[1]*len(a)
-    w = [[a[i]]+[1 if j == i else 0 for j in xrange(m)] for i in xrange(m)]
-    labels = [i+1 for i in xrange(m)]
-    bounds = [1 if w[i] <= W else 0 for i in xrange(m)]
+    w = [[a[i]]+[1 if j == i else 0 for j in range(m)] for i in range(m)]
+    labels = [i+1 for i in range(m)]
+    bounds = [1 if w[i] <= W else 0 for i in range(m)]
 
     # wolseyR2network:
 
