@@ -211,7 +211,7 @@ class VPSolver(object):
 
         def pipe_output(fin, fout_list, grep=None, grepv=None):
             while True:
-                line = fin.readline()
+                line = fin.readline().decode("utf-8")
                 if not line:
                     break
                 if grep is not None and grep not in line:

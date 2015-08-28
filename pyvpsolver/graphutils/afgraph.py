@@ -71,16 +71,18 @@ class AFGraph(object):
 
     def get_flow_cons(self, vnames=None):
         """Returns the list of flow conservation constraints."""
+        def keyval(a):
+            return tuple((repr(type(ai)), ai) for ai in a)
         Ain = {u: [] for u in self.V}
         Aout = {u: [] for u in self.V}
         varl = []
-        for (u, v, i) in sorted(self.A):
+        for (u, v, i) in sorted(self.A, key=keyval):
             name = self.vname(u, v, i, vnames)
             Aout[u].append(name)
             Ain[v].append(name)
             varl.append(name)
         cons = []
-        for u in sorted(self.V):
+        for u in sorted(self.V, key=repr):
             if Ain[u] != [] and Aout[u] != []:
                 lincomb = []
                 if u in Ain:
@@ -93,8 +95,10 @@ class AFGraph(object):
 
     def get_assocs(self, vnames=None):
         """Returns the arc variables grouped by label."""
+        def keyval(a):
+            return tuple((repr(type(ai)), ai) for ai in a)
         assocs = {}
-        for (u, v, i) in sorted(self.A):
+        for (u, v, i) in sorted(self.A, key=keyval):
             if i not in assocs:
                 assocs[i] = []
             name = self.vname(u, v, i, vnames)
@@ -103,8 +107,10 @@ class AFGraph(object):
 
     def get_assocs_multi(self, vnames=None):
         """Returns the arc variables grouped by label (multi-label variant)."""
+        def keyval(a):
+            return tuple((repr(type(ai)), ai) for ai in a)
         assocs = {}
-        for (u, v, l) in sorted(self.A):
+        for (u, v, l) in sorted(self.A, key=keyval):
             if not isinstance(l, (list, tuple)):
                 lst = [l]
             else:
@@ -175,7 +181,7 @@ class AFGraph(object):
         # group identical patterns
         rep = {}
         for (r, p) in solution:
-            p = tuple(sorted(p))
+            p = tuple(sorted(p, key=repr))
             if p not in rep:
                 rep[p] = r
             else:

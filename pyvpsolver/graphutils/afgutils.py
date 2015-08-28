@@ -85,13 +85,10 @@ class AFGUtils(object):
             svg_file, V, A, multigraph=True, showlabel=False, ignore=None,
             loss=None, verbose=None):
         """Draws arc-flow graphs in .svg format."""
+        from pygraphviz.agraph import AGraph
         if loss is None:
             loss = [i for (u, v, i) in A if not isinstance(i, int)]
             loss.append(max([i for (u, v, i) in A if isinstance(i, int)]+[-1]))
-        try:
-            from pygraphviz.agraph import AGraph
-        except:
-            raise ImportError("Failed to load pygraphviz!")
         g = AGraph(
             rankdir="LR", directed=True, bgcolor="white", text="black",
             font_color="white", ranksep="1.0", nodesep="0.10",
