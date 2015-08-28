@@ -19,6 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -53,8 +54,8 @@ def main():
         script="vpsolver_glpk.sh",
         verbose=True
     )
-    print "obj:", obj
-    print "sol:", sol
+    print("obj:", obj)
+    print("sol:", sol)
     vbpsolver.print_solution(obj, sol)
 
     assert obj == 33  # check the solution objective value

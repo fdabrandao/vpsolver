@@ -19,6 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -71,8 +72,8 @@ def main():
         svg_file="tmp/graphA_mvbp.svg",
         verbose=True, script="vpsolver_glpk.sh"
     )
-    print "obj:", obj
-    print "sol:", sol
+    print("obj:", obj)
+    print("sol:", sol)
     mvbpsolver.print_solution(obj, sol)
 
     ## Example 2
@@ -95,8 +96,8 @@ def main():
         script="vpsolver_glpk.sh",
         verbose=True
     )
-    print "obj:", obj
-    print "sol:", sol
+    print("obj:", obj)
+    print("sol:", sol)
     mvbpsolver.print_solution(obj, sol)
 
     assert obj == 5  # check the solution objective value

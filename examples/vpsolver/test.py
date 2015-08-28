@@ -19,6 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -45,16 +46,16 @@ import example_mvbp
 def main():
     """Runs all VPSolver examples."""
 
-    print "example:"
+    print("example:")
     example.main()
 
-    print "example_vbp:"
+    print("example_vbp:")
     example_vbp.main()
 
-    print "example_vsbpp:"
+    print("example_vsbpp:")
     example_vsbpp.main()
 
-    print "example_mvbp:"
+    print("example_mvbp:")
     example_mvbp.main()
 
 

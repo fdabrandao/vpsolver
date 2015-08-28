@@ -19,6 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -187,7 +188,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
     sys.stderr = output
     input_ = form["input"].strip("\n")
     if DEBUG:
-        print "Input:\n{0}\n\nOutput:".format(input_)
+        print("Input:\n{0}\n\nOutput:".format(input_))
         output.flush()
 
     if app_name == "vbp":
@@ -213,7 +214,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
             verbose=True
         )
 
-    print "EOF\n"
+    print("EOF\n")
     output.flush()
 
 
@@ -231,11 +232,11 @@ class IterativeOutput(object):
         for line in iter(self.output.readline, "EOF\n"):
             yield line.rstrip() + "\n"
         if not self.proc.is_alive():
-            print "DONE {0}!".format(self.proc.pid)
+            print("DONE {0}!".format(self.proc.pid))
 
     def __del__(self):
         try:
-            print "TERMINATE {0}!".format(self.proc.pid)
+            print("TERMINATE {0}!".format(self.proc.pid))
             os.kill(self.proc.pid, signal.SIGTERM)
             # self.proc.terminate()
         except:

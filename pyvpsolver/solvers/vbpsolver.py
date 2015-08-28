@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import sys
 from .. import VPSolver, VBP, AFG, MPS
@@ -61,11 +62,11 @@ def solve(
 def print_solution(obj, sol, fout=sys.stdout):
     """Pretty-print function for vector packing solutions."""
     if obj is not None:
-        print >>fout, "Objective:", obj
-    print >>fout, "Solution:"
+        print("Objective:", obj, file=fout)
+    print("Solution:", file=fout)
     for mult, patt in sol:
-        print >>fout, "{0} x [{1}]".format(
+        print("{0} x [{1}]".format(
             mult, ", ".join(
                 ["i={0}".format(it+1) for it in patt]
             )
-        )
+        ), file=fout)

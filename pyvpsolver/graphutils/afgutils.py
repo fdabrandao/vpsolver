@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import random
 
@@ -149,7 +150,7 @@ class AFGUtils(object):
                     )
 
         g.draw(svg_file, format="svg", prog="dot")
-        print "SVG file '{0}' generated!".format(svg_file)
+        print("SVG file '{0}' generated!".format(svg_file))
 
 
 class Colors(object):

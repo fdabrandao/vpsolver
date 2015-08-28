@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -39,19 +40,19 @@ class VBP(object):
                 W = [W]
             else:
                 W = list(W)
-            print >>f, len(W)
-            print >>f, " ".join(map(str, W))
-            print >>f, len(w)
+            print(len(W), file=f)
+            print(" ".join(map(str, W)), file=f)
+            print(len(w), file=f)
             for i in xrange(len(w)):
                 if isinstance(w[i], int):
                     row = [w[i], b[i]]
                 else:
                     row = list(w[i])+[b[i]]
                 assert len(row) == len(W)+1
-                print >>f, " ".join(map(str, row))
+                print(" ".join(map(str, row)), file=f)
         if verbose:
             with open(self.vbp_file, "r") as f:
-                print f.read()
+                print(f.read())
         self.m = len(b)
         self.ndims = len(W)
         self.W, self.w, self.b = W, w, b
@@ -189,7 +190,7 @@ class VPSolver(object):
         if verbose is None:
             verbose = VPSolver.VERBOSE
         if verbose:
-            print msg
+            print(msg)
 
     @staticmethod
     def run(cmd, tee=None, grep=None, grepv=None, verbose=None):
@@ -422,7 +423,7 @@ class VPSolver(object):
 
 def signal_handler(signal_, frame):
     """Signal handler for a cleaner exit."""
-    print "signal received: {0}".format(signal_)
+    print("signal received: {0}".format(signal_))
     VPSolver.clear()
     sys.exit(0)
 

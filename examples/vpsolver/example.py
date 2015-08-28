@@ -19,6 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -60,14 +61,14 @@ def main():
     try:
         afg.graph().draw("tmp/graph.svg")
     except ImportError as e:
-        print repr(e)
+        print(repr(e))
 
     # Solve instanceA using bin/vpsolver (requires Gurobi)
     try:
         out, sol = VPSolver.vpsolver(instanceA, verbose=True)
     except Exception as e:
-        print "Failed to call vpsolver"
-        print repr(e)
+        print("Failed to call vpsolver")
+        print(repr(e))
 
     # Solve instanceA using any vpsolver script (i.e., any MIP solver):
     #   The scripts accept models with and without the underlying graphs.
@@ -78,15 +79,15 @@ def main():
             "vpsolver_gurobi.sh", mps_model, verbose=True
         )
     except Exception as e:
-        print repr(e)
+        print(repr(e))
 
     # Solve an instance directly without creating AFG, MPS or LP objects:
     out, sol = VPSolver.script("vpsolver_glpk.sh", instanceB, verbose=True)
 
     # Print the solution:
     obj, patterns = sol
-    print "Objective:", obj
-    print "Solution:", patterns
+    print("Objective:", obj)
+    print("Solution:", patterns)
 
     # Pretty-print the solution:
     vbpsolver.print_solution(obj, patterns)

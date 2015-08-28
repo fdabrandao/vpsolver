@@ -19,6 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -57,10 +58,10 @@ def main():
         verbose=True
     )
 
-    print
-    print "sol:", sol
-    print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
-    print
+    print("")
+    print("sol:", sol)
+    print("varvalues:", [(k, v) for k, v in sorted(varvalues.items())])
+    print("")
     assert varvalues["Z"] == 21  # check the solution objective value
 
     exit_code = os.system("glpsol --math {0}".format(mod_out))

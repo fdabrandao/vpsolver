@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import division
+from __future__ import print_function
 from builtins import zip
 from builtins import str
 from builtins import range
@@ -316,7 +317,7 @@ class SubmodVBPFlow(SubmodBase):
             sol = graph.extract_solution(graph.S, "<-", graph.T)
             lst_sol.append((zvar, varvalues.get(zvar, 0), sol))
             if verbose:
-                print ("Graph: {0} (flow={1:d})\n\t{2}".format(
+                print("Graph: {0} (flow={1:d})\n\t{2}".format(
                     zvar, varvalues.get("_total_flow", 0), sol
                 ))
         return lst_sol

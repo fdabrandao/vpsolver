@@ -19,6 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -48,7 +49,7 @@ def main():
         a0 += aS
     a.append(aS)
 
-    print 'self-dual:', a, a0
+    print('self-dual:', a, a0)
 
     m = len(a)
     W = [a0]+[1]*len(a)
@@ -58,8 +59,8 @@ def main():
 
     # wolseyR2network:
 
-    print "-"*10
-    print "Primal:"
+    print("-"*10)
+    print("Primal:")
 
     mod_in = "wolseyR2network.mod"
     mod_out = "tmp/wolseyR2network.out.mod"
@@ -70,9 +71,9 @@ def main():
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_glpk.sh", lp_out, verbose=False
     )
-    print
-    print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
-    print
+    print("")
+    print("varvalues:", [(k, v) for k, v in sorted(varvalues.items())])
+    print("")
 
     # Check the solution objective value:
     assert abs(varvalues["Z0"] - 9) < 1e-5
@@ -82,8 +83,8 @@ def main():
 
     # wolseyR1gamma:
 
-    print "-"*10
-    print "wolseyR1gamma:"
+    print("-"*10)
+    print("wolseyR1gamma:")
 
     mod_in = "wolseyR1gamma.mod"
     mod_out = "tmp/wolseyR1gamma.mod.out.mod"
@@ -94,9 +95,9 @@ def main():
     out, varvalues = VPSolver.script_wsol(
         "vpsolver_glpk.sh", lp_out, verbose=False
     )
-    print
-    print "varvalues:", [(k, v) for k, v in sorted(varvalues.items())]
-    print
+    print("")
+    print("varvalues:", [(k, v) for k, v in sorted(varvalues.items())])
+    print("")
 
     # Check the solution objective value:
     assert abs(varvalues['theta(T)'] - 9) < 1e-5
