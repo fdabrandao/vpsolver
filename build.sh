@@ -45,6 +45,4 @@ build "vbpsol"  || exit 1
 if [[ "$@" != "minimal" ]]; then
     echo "optional:"
     build "vpsolver"
-    build "solve_gurobi"
-    build "solve_glpk"
 fi;
