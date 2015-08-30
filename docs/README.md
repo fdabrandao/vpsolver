@@ -12,7 +12,7 @@ solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MI
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.
 
-For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling language [PyMPL](https://github.com/fdabrandao/vpsolver/wiki/PyMPL), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a [Docker container](#docker).
+For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling toolbox ([PyMPL](https://github.com/fdabrandao/pympl/)), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a [Docker container](#docker).
 
 For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki) or to the manual.
 
