@@ -36,7 +36,6 @@ build(){
 make clean
 
 echo "mandatory:"
-
 build "vbp2afg" || exit 1
 build "afg2mps" || exit 1
 build "afg2lp"  || exit 1
@@ -45,4 +44,5 @@ build "vbpsol"  || exit 1
 if [[ "$@" != "minimal" ]]; then
     echo "optional:"
     build "vpsolver"
+    exit 0;
 fi;

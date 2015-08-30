@@ -5,13 +5,13 @@ VPSolver
 VPSolver is a vector packing solver based on an arc-flow formulation
 with graph compression. VPSolver generates very strong models that can
 be solved using general-purpose mixed-integer programming solvers such
-as Gurobi and GLPK. For modelling other problems easily, VPSolver includes
-a Python API and a modelling toolbox (PyMPL).
+as Gurobi and GLPK. For modelling other problems easily, VPSolver
+includes a Python API and a modelling toolbox (PyMPL).
 
 Links
 `````
 
-* `VPSolver documentation <https://github.com/fdabrandao/vpsolver/wiki>`_
+* `VPSolver wiki <https://github.com/fdabrandao/vpsolver/wiki>`_
 * `GiHub repository <https://github.com/fdabrandao/vpsolver>`_
 * `BitBucket repository <https://bitbucket.org/fdabrandao/vpsolver>`_
 """
