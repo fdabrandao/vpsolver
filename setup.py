@@ -60,6 +60,7 @@ setup(
     description="Arc-flow Vector Packing Solver (VPSolver)",
     long_description=__doc__,
     packages=["pyvpsolver"],
+    package_data={"": ls_dir("pyvpsolver/")},
     include_package_data=True,
     platforms=["unix", "linux", "osx"],
     scripts=[os.path.join("scripts", f) for f in ls_dir("scripts/")],
