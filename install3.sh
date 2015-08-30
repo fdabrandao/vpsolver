@@ -20,31 +20,10 @@
 BASEDIR=`dirname $0`
 cd $BASEDIR
 
-build(){
-    make bin/$1
-
-    if [[ $? == 0 ]];
-    then
-        echo "  $1 [OK]";
-        return 0;
-    else
-        echo "  $1 [Failed]";
-        return 1;
-    fi
-}
-
-make clean
-
-echo "mandatory:"
-
-build "vbp2afg" || exit 1
-build "afg2mps" || exit 1
-build "afg2lp"  || exit 1
-build "vbpsol"  || exit 1
-
-if [[ "$@" != "minimal" ]]; then
-    echo "optional:"
-    build "vpsolver"
-    build "solve_gurobi"
-    build "solve_glpk"
+if ! [[ -x bin/vbp2afg && -x bin/afg2mps && -x bin/afg2lp && -x bin/vbpsol ]];
+then
+    bash build.sh
 fi;
+sudo -H pip3 install --upgrade pip
+sudo -H pip3 install -r requirements.txt
+sudo -H pip3 install --upgrade .

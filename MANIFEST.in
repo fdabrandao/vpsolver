@@ -1,0 +1,4 @@
+include README.md COPYING LICENSE requirements.txt
+include Makefile build.sh bin/.gitignore
+recursive-include src *.cpp
+recursive-include src *.hpp

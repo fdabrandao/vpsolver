@@ -38,4 +38,4 @@ $(BIN)/gg_afg: $(SRC)/gg_afg.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arc
 	$(CC) -o $(BIN)/gg_afg $(CFLAGS) $(SRC)/gg_afg.cpp $(SRC)/instance.cpp  $(SRC)/graph.cpp $(SRC)/arcflow.cpp  $(GUROBI_OPTS)
 
 clean:
-	rm -rf *~ $(BIN)/*~ $(SRC)/*~ $(BIN)/*
+	rm -rf $(BIN)/*

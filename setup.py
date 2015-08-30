@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import re
+import ast
 from setuptools import setup
 from setuptools.command.install import install
 
@@ -29,7 +31,8 @@ class CustomInstallCommand(install):
     """Custom Install Command."""
 
     def run(self):
-        os.system("/bin/cp " + self.install_scripts)
+        assert os.system("/bin/bash build.sh") == 0
+        os.system("/bin/cp bin/* {0}/".format(self.install_scripts))
         install.run(self)
 
 
@@ -46,10 +49,14 @@ def ls_dir(base_dir):
         )
     ]
 
+_version_re = re.compile(r'__version__\s+=\s+(.*)')
+with open("pyvpsolver/__init__.py", "rb") as f:
+    version = str(ast.literal_eval(_version_re.search(
+        f.read().decode("utf-8")).group(1)))
 
 setup(
-    name="VPSolver",
-    version="2.0.0-rc3",
+    name="pyvpsolver",
+    version=version,
     license="GPLv3+",
     author="Filipe Brandao",
     author_email="fdabrandao@dcc.fc.up.pt",
@@ -57,17 +64,17 @@ setup(
     description="Arc-flow Vector Packing Solver (VPSolver)",
     long_description=open("README.md").read(),
     packages=["pyvpsolver"],
-    package_data={"": ls_dir("pyvpsolver/")},
     include_package_data=True,
-    scripts=[os.path.join("scripts", f) for f in ls_dir("scripts/")] +
-            [os.path.join("bin", f) for f in ls_dir("bin/")],
-    install_requires=[],
+    platforms=["unix", "linux", "osx"],
+    scripts=[os.path.join("scripts", f) for f in ls_dir("scripts/")],
+    install_requires=open("requirements.txt").read().split("\n"),
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Science/Research",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Topic :: Scientific/Engineering"
     ],
     cmdclass={"install": CustomInstallCommand},
-    use_2to3=True
 )

@@ -20,8 +20,7 @@
 BASEDIR=`dirname $0`
 cd $BASEDIR
 
-nfiles=$(find bin/ -type f -executable | wc -l)
-if [ $nfiles -lt 4 ];
+if ! [[ -x bin/vbp2afg && -x bin/afg2mps && -x bin/afg2lp && -x bin/vbpsol ]];
 then
     bash build.sh
 fi;

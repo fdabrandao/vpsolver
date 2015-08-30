@@ -147,11 +147,11 @@ class LP(object):
 class VPSolver(object):
     """Tools for calling VPSolver binaries and scripts."""
 
-    VPSOLVER = "vpsolver"
-    VBP2AFG = "vbp2afg"
-    AFG2MPS = "afg2mps"
-    AFG2LP = "afg2lp"
-    VBPSOL = "vbpsol"
+    VPSOLVER_PATH = "vpsolver"
+    VBP2AFG_PATH = "vbp2afg"
+    AFG2MPS_PATH = "afg2mps"
+    AFG2LP_PATH = "afg2lp"
+    VBPSOL_PATH = "vbpsol"
 
     TMP_DIR = tempfile.mkdtemp()
     TMP_CNT = 0
@@ -265,7 +265,7 @@ class VPSolver(object):
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
             "{0} {1} {2} {3}".format(
-                VPSolver.VBPSOL, afg_file, sol_file, opts
+                VPSolver.VBPSOL_PATH, afg_file, sol_file, opts
             ),
             tee=out_file,
             verbose=verbose
@@ -283,7 +283,7 @@ class VPSolver(object):
         out_file = VPSolver.new_tmp_file()
         opts = "{0} {1} {2}".format(compress, binary, vtype)
         VPSolver.run(
-            "{0} {1} {2}".format(VPSolver.VPSOLVER, vbp_file, opts),
+            "{0} {1} {2}".format(VPSolver.VPSOLVER_PATH, vbp_file, opts),
             tee=out_file,
             verbose=verbose
         )
@@ -303,7 +303,7 @@ class VPSolver(object):
         opts = "{0} {1} {2}".format(compress, binary, vtype)
         VPSolver.run(
             "{0} {1} {2} {3}".format(
-                VPSolver.VBP2AFG, vbp_file, afg_file, opts
+                VPSolver.VBP2AFG_PATH, vbp_file, afg_file, opts
             ),
             tee=out_file,
             verbose=verbose
@@ -321,7 +321,7 @@ class VPSolver(object):
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
             "{0} {1} {2} {3}".format(
-                VPSolver.AFG2MPS, afg_file, mps_file, opts
+                VPSolver.AFG2MPS_PATH, afg_file, mps_file, opts
             ),
             tee=out_file,
             verbose=verbose
@@ -338,7 +338,7 @@ class VPSolver(object):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
-            "{0} {1} {2} {3}".format(VPSolver.AFG2LP, afg_file, lp_file, opts),
+            "{0} {1} {2} {3}".format(VPSolver.AFG2LP_PATH, afg_file, lp_file, opts),
             tee=out_file,
             verbose=verbose
         )
