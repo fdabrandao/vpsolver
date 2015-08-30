@@ -1,23 +1,19 @@
 #!/usr/bin/env python
 """
-This code is part of the Arc-flow Vector Packing Solver (VPSolver).
+VPSolver
+--------
+VPSolver is a vector packing solver based on an arc-flow formulation
+with graph compression. VPSolver generates very strong models that can
+be solved using general-purpose mixed-integer programming solvers such
+as Gurobi and GLPK. For modelling other problems easily, VPSolver includes
+a Python API and a modelling toolbox (PyMPL).
 
-Copyright (C) 2013-2015, Filipe Brandao
-Faculdade de Ciencias, Universidade do Porto
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
+Links
+`````
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* `VPSolver documentation <https://github.com/fdabrandao/vpsolver/wiki>`_
+* `GiHub repository <https://github.com/fdabrandao/vpsolver>`_
+* `BitBucket repository <https://bitbucket.org/fdabrandao/vpsolver>`_
 """
 
 import os
@@ -62,7 +58,7 @@ setup(
     author_email="fdabrandao@dcc.fc.up.pt",
     url="https://github.com/fdabrandao/vpsolver",
     description="Arc-flow Vector Packing Solver (VPSolver)",
-    long_description=open("README.md").read(),
+    long_description=__doc__,
     packages=["pyvpsolver"],
     include_package_data=True,
     platforms=["unix", "linux", "osx"],

@@ -21,7 +21,7 @@ BASEDIR=`dirname $0`
 cd $BASEDIR
 
 build(){
-    make bin/$1
+    make bin/$1 2>/dev/null
 
     if [[ $? == 0 ]];
     then

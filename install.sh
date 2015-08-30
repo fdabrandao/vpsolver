@@ -24,6 +24,5 @@ if ! [[ -x bin/vbp2afg && -x bin/afg2mps && -x bin/afg2lp && -x bin/vbpsol ]];
 then
     bash build.sh
 fi;
-sudo -H pip install --upgrade pip
 sudo -H pip install -r requirements.txt
 sudo -H pip install --upgrade .
