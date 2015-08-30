@@ -250,7 +250,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <li>
 <code>C</code>- production capacity;</li>
 <li>
-<code>Tk</code>- approximation parameter.</li>
+<code>Tk</code>- approximation parameter (default: <code>NT</code>).</li>
 </ul>
 
 <p>For more details please refer to the book Production Planning by Mixed Integer Programming.</p>
@@ -261,7 +261,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ww_u" class="anchor" href="#ww_u" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U</h4>
 
-<p>Usage: <code>$WW_U{s, y, d, NT, Tk};</code></p>
+<p>Usage: <code>$WW_U{s, y, d, NT, Tk=None};</code></p>
 
 <p>Description: Basic Wagner-Whitin.</p>
 
@@ -270,7 +270,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ww_u_b" class="anchor" href="#ww_u_b" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U_B</h4>
 
-<p>Usage: <code>$WW_U_B{s, r, y, d, NT, Tk};</code></p>
+<p>Usage: <code>$WW_U_B{s, r, y, d, NT, Tk=None};</code></p>
 
 <p>Description: Wagner-Whitin and Backlogging.</p>
 
@@ -279,7 +279,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ww_u_sc" class="anchor" href="#ww_u_sc" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U_SC</h4>
 
-<p>Usage: <code>$WW_U_SC{s, y, z, d, NT, Tk};</code></p>
+<p>Usage: <code>$WW_U_SC{s, y, z, d, NT, Tk=None};</code></p>
 
 <p>Description: Wagner-Whitin and Start-up.</p>
 
@@ -288,7 +288,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ww_u_scb" class="anchor" href="#ww_u_scb" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U_SCB</h4>
 
-<p>Usage: <code>$WW_U_SCB{s, r, y, z, w, d, NT, Tk};</code></p>
+<p>Usage: <code>$WW_U_SCB{s, r, y, z, w, d, NT, Tk=None};</code></p>
 
 <p>Description: Wagner-Whitin, Backlogging and Start-up.</p>
 
@@ -297,7 +297,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ww_u_lb" class="anchor" href="#ww_u_lb" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_U_LB</h4>
 
-<p>Usage: <code>$WW_U_LB{s, y, d, L, NT, Tk};</code></p>
+<p>Usage: <code>$WW_U_LB{s, y, d, L, NT, Tk=None};</code></p>
 
 <p>Description: Wagner-Whitin, Constant Lower Bound.</p>
 
@@ -306,7 +306,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ww_cc" class="anchor" href="#ww_cc" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_CC</h4>
 
-<p>Usage: <code>$WW_CC{s, y, d, C, NT, Tk};</code></p>
+<p>Usage: <code>$WW_CC{s, y, d, C, NT, Tk=None};</code></p>
 
 <p>Description: Wagner-Whitin, Constant Capacity.</p>
 
@@ -315,7 +315,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ww_cc_b" class="anchor" href="#ww_cc_b" aria-hidden="true"><span class="octicon octicon-link"></span></a>WW_CC_B</h4>
 
-<p>Usage: <code>$WW_CC_B{s, r, y, d, C, NT, Tk};</code></p>
+<p>Usage: <code>$WW_CC_B{s, r, y, d, C, NT, Tk=None};</code></p>
 
 <p>Description: Wagner-Whitin, Constant Capacity and Backlogging.</p>
 
@@ -327,7 +327,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ls_u-or-ls_u1" class="anchor" href="#ls_u-or-ls_u1" aria-hidden="true"><span class="octicon octicon-link"></span></a>LS_U or LS_U1</h4>
 
-<p>Usage: <code>$LS_U{s, x, y, d, NT, Tk};</code> or <code>LS_U1{s, x, y, d, NT, Tk};</code></p>
+<p>Usage: <code>$LS_U{s, x, y, d, NT, Tk=None};</code> or <code>LS_U1{s, x, y, d, NT, Tk=None};</code></p>
 
 <p>Description: Multi-commodity formulation for LS-U.</p>
 
@@ -336,7 +336,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ls_u2" class="anchor" href="#ls_u2" aria-hidden="true"><span class="octicon octicon-link"></span></a>LS_U2</h4>
 
-<p>Usage: <code>$LS_U2{s, x, y, d, NT, Tk};</code></p>
+<p>Usage: <code>$LS_U2{s, x, y, d, NT, Tk=None};</code></p>
 
 <p>Description: Shortest path formulation for LS-U.</p>
 
@@ -345,7 +345,7 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <h4>
 <a id="user-content-ls_u_b" class="anchor" href="#ls_u_b" aria-hidden="true"><span class="octicon octicon-link"></span></a>LS_U_B</h4>
 
-<p>Usage: <code>$LS_U_B{s, r, x, y, d, NT, Tk};</code></p>
+<p>Usage: <code>$LS_U_B{s, r, x, y, d, NT, Tk=None};</code></p>
 
 <p>Description: Multi-commodity formulation for LS-U-B.</p>
 
