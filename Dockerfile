@@ -1,23 +1,6 @@
-FROM ubuntu:trusty
+FROM fdabrandao/docker-ubuntu
 
-MAINTAINER Filipe Brandao <fdabrandao@dcc.fc.up.pt>
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install \
-    make \
-    g++-4.8 \
-    python2.7 \
-    python-pip \
-    python-dev \
-    python3 \
-    python3-pip \
-    python3-dev \
-    glpk-utils \
-    libglpk-dev \
-    libffi-dev \
-    libssl-dev
-
-RUN DEBIAN_FRONTEND=noninteractive pip2 install --upgrade requests[security]
-RUN DEBIAN_FRONTEND=noninteractive pip3 install --upgrade requests[security]
+MAINTAINER Filipe Brandão <fdabrandao@dcc.fc.up.pt>
 
 USER root
 RUN mkdir -p /vpsolver
