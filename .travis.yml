@@ -11,6 +11,8 @@ addons:
   apt:
     packages:
     - glpk-utils
+git:
+  submodules: false
 install:
   - pip install -r requirements.txt
   - pip install .
