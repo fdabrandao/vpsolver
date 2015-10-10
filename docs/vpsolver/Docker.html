@@ -60,11 +60,11 @@
 
 <p>Option 1: simply <code>pull</code> VPSolver from Docker repository (without building):</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker pull fdabrandao/vpsolver</pre></div>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker pull fdabrandao/vpsolver</pre></div>
 
 <p>Option 2: <code>clone</code> VPSolver and <code>build</code> locally:</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
 user@locahost <span class="pl-k">~</span>$ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
 
 <h3>
@@ -72,13 +72,13 @@ user@locahost <span class="pl-k">~</span>$ docker build -t fdabrandao/vpsolver v
 
 <p>Directly using the command line interface:</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it fdabrandao/vpsolver bash
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it fdabrandao/vpsolver bash
 root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
 ...</pre></div>
 
 <p>or through the VPSolver Web App (example URL: <code>http://172.17.0.60:5555/</code>):</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it -p 5555 fdabrandao/vpsolver 
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker run -it -p 5555 fdabrandao/vpsolver 
 eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
           inet addr:<span class="pl-k">*</span>172.17.0.60<span class="pl-k">*</span>  Bcast:0.0.0.0  Mask:255.255.0.0
           inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
@@ -96,24 +96,24 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
 
 <p>Run vpsolver in background:</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ CID=<span class="pl-s"><span class="pl-pds">$(</span>docker run -d -p 5555 fdabrandao/vpsolver<span class="pl-pds">)</span></span>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ CID=<span class="pl-s"><span class="pl-pds">$(</span>docker run -d -p 5555 fdabrandao/vpsolver<span class="pl-pds">)</span></span>
 user@locahost <span class="pl-k">~</span>$ docker inspect --format URL:http://{{.NetworkSettings.IPAddress}}:5555/ <span class="pl-smi">$CID</span>
 URL:http://172.17.0.71:5555/</pre></div>
 
 <p>List all running vpsolver containers:</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker ps <span class="pl-k">|</span> grep fdabrandao/vpsolver
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker ps <span class="pl-k">|</span> grep fdabrandao/vpsolver
 ...</pre></div>
 
 <p>List URLs of all running vpsolver containers:</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ CIDs=<span class="pl-s"><span class="pl-pds">$(</span>docker ps <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ CIDs=<span class="pl-s"><span class="pl-pds">$(</span>docker ps <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
 user@locahost <span class="pl-k">~</span>$ docker inspect --format URL:http://{{.NetworkSettings.IPAddress}}:5555/ <span class="pl-smi">$CIDs</span>
 ...</pre></div>
 
 <p>Stop and remove all vpsolver containers:</p>
 
-<div class="highlight highlight-bash"><pre>user@locahost <span class="pl-k">~</span>$ docker stop <span class="pl-s"><span class="pl-pds">$(</span>docker ps -a <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker stop <span class="pl-s"><span class="pl-pds">$(</span>docker ps -a <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
 user@locahost <span class="pl-k">~</span>$ docker rm <span class="pl-s"><span class="pl-pds">$(</span>docker ps -a <span class="pl-k">|</span> grep fdabrandao/vpsolver <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span></pre></div>
 
 <hr>

@@ -12,6 +12,9 @@ solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MI
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.
 
+![](https://img.shields.io/badge/license-GPL-blue.svg)
+[![](https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master)](https://travis-ci.org/fdabrandao/vpsolver)
+
 For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling toolbox ([PyMPL](https://github.com/fdabrandao/pympl/)), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a [Docker container](#docker).
 
 For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki) or to the manual.
@@ -33,7 +36,7 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 
 For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and [Web App](#vpsolver-web-app):
 
-* `python-2.7`
+* `python-2.7` or `python-3`
 * `python-pip`
 * `python-dev`
 * `python-pygraphviz`
@@ -175,7 +178,7 @@ $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg
 * `bin/`: vpsolver executables
 * `scripts/`: vpsolver scripts
 * `src/`: vpsolver source code in C++
-* `pyvpsolver/`: pyvpsolver source code in Python 2.7
+* `pyvpsolver/`: pyvpsolver source code in Python
 * `examples/`: vpsolver and pyvpsolver examples
 * `reports/`: technical reports on the underlying algorithms and models
 

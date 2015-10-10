@@ -64,7 +64,10 @@ solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MI
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.</p>
 
-<p>For modelling other problems easily, VPSolver includes a <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a>, a modelling toolbox (<a href="https://github.com/fdabrandao/pympl/">PyMPL</a>), and a <a href="#vpsolver-web-app">Web App</a>. VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a <a href="#docker">Docker container</a>.</p>
+<p><a href="https://camo.githubusercontent.com/2329b3418e73f1b98f3ea9e1ee8fc69a195afcbc/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d47504c2d626c75652e737667" target="_blank"><img src="https://camo.githubusercontent.com/2329b3418e73f1b98f3ea9e1ee8fc69a195afcbc/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d47504c2d626c75652e737667" alt="" data-canonical-src="https://img.shields.io/badge/license-GPL-blue.svg" style="max-width:100%;"></a>
+<a href="https://travis-ci.org/fdabrandao/vpsolver"><img src="https://camo.githubusercontent.com/b5a9500005427c1ae535605357273db19e847a70/68747470733a2f2f7472617669732d63692e6f72672f6664616272616e64616f2f7670736f6c7665722e7376673f6272616e63683d6d6173746572" alt="" data-canonical-src="https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master" style="max-width:100%;"></a></p>
+
+<p>For modelling other problems easily, VPSolver includes a <a href="Python-API.html">Python API</a>, a modelling toolbox (<a href="https://github.com/fdabrandao/pympl/">PyMPL</a>), and a <a href="#vpsolver-web-app">Web App</a>. VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a <a href="#docker">Docker container</a>.</p>
 
 <p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/wiki">project wiki</a> or to the manual.</p>
 
@@ -98,10 +101,12 @@ large models.</p>
 <h4>
 <a id="user-content-optional" class="anchor" href="#optional" aria-hidden="true"><span class="octicon octicon-link"></span></a>Optional</h4>
 
-<p>For the <a href="https://github.com/fdabrandao/vpsolver/wiki/Python-API">Python API</a> and <a href="#vpsolver-web-app">Web App</a>:</p>
+<p>For the <a href="Python-API.html">Python API</a> and <a href="#vpsolver-web-app">Web App</a>:</p>
 
 <ul>
-<li><code>python-2.7</code></li>
+<li>
+<code>python-2.7</code> or <code>python-3</code>
+</li>
 <li><code>python-pip</code></li>
 <li><code>python-dev</code></li>
 <li><code>python-pygraphviz</code></li>
@@ -124,7 +129,7 @@ large models.</p>
 
 <p>Without the python interface: </p>
 
-<div class="highlight highlight-bash"><pre>$ bash build.sh  </pre></div>
+<div class="highlight highlight-source-shell"><pre>$ bash build.sh  </pre></div>
 
 <p>With the python interface: </p>
 
@@ -152,11 +157,11 @@ $ bash test.sh test_install
 
 <p>Option 1: simply <code>pull</code> VPSolver from Docker repository (without building):</p>
 
-<div class="highlight highlight-bash"><pre>$ docker pull fdabrandao/vpsolver</pre></div>
+<div class="highlight highlight-source-shell"><pre>$ docker pull fdabrandao/vpsolver</pre></div>
 
 <p>Option 2: <code>clone</code> VPSolver and <code>build</code> locally:</p>
 
-<div class="highlight highlight-bash"><pre>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
+<div class="highlight highlight-source-shell"><pre>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
 $ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
 
 <h3>
@@ -164,13 +169,13 @@ $ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
 
 <p>Directly using the command line interface:</p>
 
-<div class="highlight highlight-bash"><pre>$ docker run -it fdabrandao/vpsolver bash
+<div class="highlight highlight-source-shell"><pre>$ docker run -it fdabrandao/vpsolver bash
 root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
 ...</pre></div>
 
 <p>or through the VPSolver Web App (example URL: <code>http://172.17.0.60:5555/</code>):</p>
 
-<div class="highlight highlight-bash"><pre>$ docker run -it -p 5555 fdabrandao/vpsolver 
+<div class="highlight highlight-source-shell"><pre>$ docker run -it -p 5555 fdabrandao/vpsolver 
 eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
           inet addr:<span class="pl-k">*</span>172.17.0.60<span class="pl-k">*</span>  Bcast:0.0.0.0  Mask:255.255.0.0
           inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
@@ -250,7 +255,7 @@ solvers:</p>
 
 <p>Usage:</p>
 
-<div class="highlight highlight-bash"><pre>$ vpsolver_X.sh --vbp instance.vbp
+<div class="highlight highlight-source-shell"><pre>$ vpsolver_X.sh --vbp instance.vbp
 $ vpsolver_X.sh --afg graph.afg
 $ vpsolver_X.sh --mps/--lp model.mps/.lp
 $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
@@ -268,7 +273,7 @@ $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
 <li>
 <code>src/</code>: vpsolver source code in C++</li>
 <li>
-<code>pyvpsolver/</code>: pyvpsolver source code in Python 2.7</li>
+<code>pyvpsolver/</code>: pyvpsolver source code in Python</li>
 <li>
 <code>examples/</code>: vpsolver and pyvpsolver examples</li>
 <li>
