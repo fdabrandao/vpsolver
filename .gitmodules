@@ -2,3 +2,7 @@
 	path = submodules/PyMPL-git
 	url = git@github.com:fdabrandao/pympl.git
 	ignore = dirty
+[submodule "submodules/docker-ubuntu-git"]
+	path = submodules/docker-ubuntu-git
+	url = git@github.com:fdabrandao/docker-ubuntu.git
+	ignore = dirty
