@@ -14,6 +14,7 @@ addons:
 git:
   submodules: false
 install:
+  - bash build.sh minimal
   - pip install -r requirements.txt
   - pip install .
 script: bash test.sh quick_test
