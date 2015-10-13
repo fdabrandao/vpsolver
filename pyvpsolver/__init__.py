@@ -21,11 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 __version__ = "v2.0.0-rc4"
 
-import os
-import shutil
-import tempfile
 from .graphutils import AFGraph
 from .vpsolver import VPSolver, VBP, AFG, MPS, LP
-from .pympl import PyMPL, Model, glpkutils
 from . import solvers
-from . import pympl

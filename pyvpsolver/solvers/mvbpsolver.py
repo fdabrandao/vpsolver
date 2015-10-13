@@ -26,7 +26,8 @@ from builtins import range
 import os
 import sys
 from .. import VPSolver, VBP, AFG
-from .. import AFGraph, Model
+from .. import AFGraph
+from pympl import Model
 
 
 def solve(

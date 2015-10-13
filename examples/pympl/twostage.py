@@ -25,21 +25,13 @@ from builtins import range
 
 import os
 import sys
-sdir = os.path.dirname(__file__)
-if sdir != "":
-    os.chdir(sdir)
+from pyvpsolver import VPSolver
+from pympl import PyMPL, glpkutils
 
 if __name__ == "__main__":
-    if "test_install" in sys.argv:
-        sys.argv.remove("test_install")
-    else:
-        project_dir = "../../"
-        sys.path.insert(0, project_dir)
-        os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
-            project_dir, os.environ["PATH"]
-        )
-
-from pyvpsolver import VPSolver, PyMPL, glpkutils
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
 
 
 def read_twostage(fname):

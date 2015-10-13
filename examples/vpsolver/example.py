@@ -23,22 +23,14 @@ from __future__ import print_function
 
 import os
 import sys
-sdir = os.path.dirname(__file__)
-if sdir != "":
-    os.chdir(sdir)
-
-if __name__ == "__main__":
-    if "test_install" in sys.argv:
-        sys.argv.remove("test_install")
-    else:
-        project_dir = "../../"
-        sys.path.insert(0, project_dir)
-        os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
-            project_dir, os.environ["PATH"]
-        )
-
 from pyvpsolver import VPSolver, VBP, AFG, MPS, LP
 from pyvpsolver.solvers import vbpsolver
+
+if __name__ == "__main__":
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
+
 
 def main():
     """Examples: how to use VBP, AFG, MPS, LP and VPSolver"""

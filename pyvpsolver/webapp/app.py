@@ -25,6 +25,13 @@ from builtins import object
 
 import os
 import sys
+import flask
+import signal
+from flask import Flask, Response
+from flask import render_template, json, request, redirect, url_for
+from multiprocessing import Process
+from pyvpsolver import VPSolver, VBP, AFG, LP
+from pympl import PyMPL
 
 DEBUG = False
 PORT = 5555
@@ -36,25 +43,8 @@ if __name__ == "__main__":
         __file__ = os.path.basename(__file__)
         sys.argv[0] = __file__
 
-    if "test_install" in sys.argv:
-        sys.argv.remove("test_install")
-    else:
-        project_dir = "../../"
-        sys.path.insert(0, project_dir)
-        os.environ["PATH"] = "{0}/scripts:{0}/bin:{1}".format(
-            project_dir, os.environ["PATH"]
-        )
-
     if len(sys.argv) >= 2 and sys.argv[1].isdigit():
         PORT = int(sys.argv[1])
-
-import flask
-import signal
-from flask import Flask, Response
-from flask import render_template, json, request, redirect, url_for
-from multiprocessing import Process
-from pyvpsolver import VPSolver, PyMPL, VBP, AFG, LP
-
 
 app = Flask(__name__)
 app.debug = True
@@ -259,5 +249,14 @@ def solve(app_name):
         pass
 
 
+def get_ip_address():
+    """Returns the ip address of 'eth0'."""
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    return s.getsockname()[0]
+
+
 if __name__ == "__main__":
+    print("URL: http://{0}:{1}/".format(get_ip_address(), PORT))
     app.run(host="0.0.0.0", port=PORT, threaded=True)

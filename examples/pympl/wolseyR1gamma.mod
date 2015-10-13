@@ -1,3 +1,7 @@
+/*
+Wolsey, L. A. (1977). Valid inequalities, covering problems and discrete
+dynamic programs.
+*/
 $VBP_GRAPH[V,A]{W, w, labels, bounds};
 
 $PARAM[m]{m};
