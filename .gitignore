@@ -7,8 +7,11 @@
 *.egg-info
 /build/
 /dist/
+/venv*
 /register.sh
 /git_push.sh
 /git_fetch.sh
-/update_pympl.sh
+/rmbackups.sh
+/testupdate.sh
+/update_submodules.sh
 /workspace_private
