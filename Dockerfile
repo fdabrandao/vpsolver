@@ -7,18 +7,14 @@ RUN mkdir -p /vpsolver
 ADD . /vpsolver
 ENV HOME=/vpsolver
 WORKDIR /vpsolver
+
+# python2.7 virtualenv
+RUN rm -rf venv2.7
+RUN bash virtualenv.sh -p python2.7 --venv venv2.7
+
+# python3.5 virtualenv
+RUN rm -rf venv3.5
+RUN bash virtualenv.sh -p python3.5 --venv venv3.5
+
 EXPOSE 5555
-
-RUN bash build.sh
-RUN pip2 install -r requirements.txt
-RUN bash test.sh quick_test
-RUN pip3 install -r requirements.txt
-RUN bash test3.sh quick_test
-
-RUN bash install.sh
-RUN bash test.sh test_install quick_test
-
-RUN bash install3.sh
-RUN bash test3.sh test_install quick_test
-
-CMD ifconfig eth0 && python -m pyvpsolver.webapp.app
+CMD bash webapp.sh --venv venv2.7 --port 5555
