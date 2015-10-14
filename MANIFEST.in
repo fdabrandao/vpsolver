@@ -1,6 +1,5 @@
 include COPYING LICENSE requirements.txt
 include Makefile build.sh bin/.gitignore
 recursive-include pyvpsolver *
-recursive-exclude pyvpsolver *~
 recursive-include src *.cpp
 recursive-include src *.hpp
