@@ -1,7 +1,7 @@
 #!/bin/bash
-# This code is part of the Arc-flow Vector Packing Solver (VPSolver).
+# This code is part of the Mathematical Programming Toolbox PyMPL.
 #
-# Copyright (C) 2013-2015, Filipe Brandao
+# Copyright (C) 2015-2015, Filipe Brandao
 # Faculdade de Ciencias, Universidade do Porto
 # Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 #
@@ -23,7 +23,7 @@ CMD="$0 $*"
 
 usage(){
     echo -e "Usage:"
-    echo -e "  $0 [--venv venv_dir] [--options test_options]"
+    echo -e "  $0 --venv venv_dir [-p python_exe]"
 }
 
 error(){
@@ -33,29 +33,35 @@ error(){
     exit 1
 }
 
-venv=""
-options=""
+pyexec="";
+venv="venv";
 
 while true;
 do
-    case "$1" in
+  case "$1" in
+    -p)
+        if [[ -n "$2" ]]; then pyexec=$2; else error; fi
+        shift 2;;
     --venv)
         if [[ -n "$2" ]]; then venv=$2; else error; fi
         shift 2;;
-    --options)
-        if [[ -n "$2" ]]; then
-            options=$2; shift 2;
-        else
-            options=""; shift 1;
-        fi;;
     *)
         if [[ -n "$1" ]]; then error; else break; fi
-    esac
+  esac
 done
 
-if [[ -n "$venv" ]]; then
-    source $venv/bin/activate;
-fi;
+if [[ -z "$venv" ]]; then
+    error
+fi
 
-python examples/vpsolver/test.py $options || exit 1
-python examples/pympl/test.py $options    || exit 1
+if [[ -n "$pyexec" ]]; then
+    virtualenv --system-site-packages -p $pyexec $venv || exit 1;
+else
+    virtualenv --system-site-packages $venv || exit 1;
+fi
+
+source $venv/bin/activate         || exit 1
+python --version                  || exit 1
+bash install.sh                   || exit 1
+bash test.sh --options quick_test || exit 1
+deactivate                        || exit 1

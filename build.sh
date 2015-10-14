@@ -33,7 +33,7 @@ build(){
     fi
 }
 
-make clean
+#make clean
 
 echo "mandatory:"
 build "vbp2afg" || exit 1
