@@ -63,5 +63,6 @@ fi
 source $venv/bin/activate         || exit 1
 python --version                  || exit 1
 bash install.sh                   || exit 1
+pip install pympl --pre --upgrade || exit 1
 bash test.sh --options quick_test || exit 1
 deactivate                        || exit 1
