@@ -25,8 +25,7 @@ from builtins import range
 
 import os
 import sys
-from pyvpsolver import VPSolver
-from pympl import PyMPL, glpkutils
+from pympl import PyMPL, Tools, glpkutils
 
 if __name__ == "__main__":
     sdir = os.path.dirname(__file__)
@@ -62,8 +61,8 @@ def main():
     parser.parse(mod_in, mod_out)
     lp_out = "tmp/wolseyR2network.lp"
     glpkutils.mod2lp(mod_out, lp_out, verbose=False)
-    out, varvalues = VPSolver.script_wsol(
-        "vpsolver_glpk.sh", lp_out, verbose=False
+    out, varvalues = Tools.script(
+        "glpk_wrapper.sh", lp_out, verbose=False
     )
     print("")
     print("varvalues:", [(k, v) for k, v in sorted(varvalues.items())])
@@ -86,8 +85,8 @@ def main():
     parser.parse(mod_in, mod_out)
     lp_out = "tmp/wolseyR1gamma.mod.lp"
     glpkutils.mod2lp(mod_out, lp_out, verbose=False)
-    out, varvalues = VPSolver.script_wsol(
-        "vpsolver_glpk.sh", lp_out, verbose=False
+    out, varvalues = Tools.script(
+        "glpk_wrapper.sh", lp_out, verbose=False
     )
     print("")
     print("varvalues:", [(k, v) for k, v in sorted(varvalues.items())])

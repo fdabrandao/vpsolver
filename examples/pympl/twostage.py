@@ -25,8 +25,7 @@ from builtins import range
 
 import os
 import sys
-from pyvpsolver import VPSolver
-from pympl import PyMPL, glpkutils
+from pympl import PyMPL, Tools, glpkutils
 
 if __name__ == "__main__":
     sdir = os.path.dirname(__file__)
@@ -60,8 +59,8 @@ def main():
     lp_out = "tmp/twostage.lp"
     glpkutils.mod2lp(mod_out, lp_out, True)
 
-    out, varvalues = VPSolver.script_wsol(
-        "vpsolver_glpk.sh", lp_out, verbose=True
+    out, varvalues = Tools.script(
+        "glpk_wrapper.sh", lp_out, verbose=True
     )
 
     print("")
