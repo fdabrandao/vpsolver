@@ -105,7 +105,7 @@ large models.</p>
 
 <ul>
 <li>
-<code>python-2.7</code> or <code>python-3</code>
+<code>python-2.7</code> or <code>python-3.x</code>
 </li>
 <li><code>python-pip</code></li>
 <li><code>python-dev</code></li>
@@ -134,15 +134,15 @@ large models.</p>
 <p>With the python interface: </p>
 
 <pre><code>$ bash build.sh
-$ sudo pip install -r requirements.txt
-$ sudo pip install . --upgrade
-$ bash test.sh test_install
+$ pip install -r requirements.txt
+$ pip install . --upgrade
+$ bash test.sh
 </code></pre>
 
 <p>or simply:</p>
 
 <pre><code>$ bash install.sh
-$ bash test.sh test_install
+$ bash test.sh
 </code></pre>
 
 <h2>
@@ -169,15 +169,16 @@ $ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
 
 <p>Directly using the command line interface:</p>
 
-<div class="highlight highlight-source-shell"><pre>$ docker run -it fdabrandao/vpsolver bash
-root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
+<div class="highlight highlight-source-shell"><pre>$ docker run --rm -it fdabrandao/vpsolver bash
+root@55d14f6b6f32:<span class="pl-k">~</span># <span class="pl-c1">source</span> venv2.7/bin/activate <span class="pl-c"># load a virtualenv</span>
+(venv2.7)root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
 ...</pre></div>
 
 <p>or through the VPSolver Web App (example URL: <code>http://172.17.0.60:5555/</code>):</p>
 
-<div class="highlight highlight-source-shell"><pre>$ docker run -it -p 5555 fdabrandao/vpsolver 
+<div class="highlight highlight-source-shell"><pre>$ docker run --rm -it -p 5555 fdabrandao/vpsolver 
 eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
-          inet addr:<span class="pl-k">*</span>172.17.0.60<span class="pl-k">*</span>  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet addr:172.17.0.60  Bcast:0.0.0.0  Mask:255.255.0.0
           inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
           UP BROADCAST  MTU:1500  Metric:1
           RX packets:2 errors:0 dropped:0 overruns:0 frame:0
@@ -185,6 +186,7 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
           collisions:0 txqueuelen:0 
           RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
 
+URL: http://172.17.0.60:5555/
  <span class="pl-k">*</span> Running on http://0.0.0.0:5555/
 ...</pre></div>
 

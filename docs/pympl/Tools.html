@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  STMTS_General.md
+  Tools.md
   
     - Grip
   
@@ -44,422 +44,216 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  STMTS_General.md
+                  Tools.md
                 </h3>
               
               <div class="markdown-body entry-content">
                 <h2>
-<a id="user-content-general-pympl-statements" class="anchor" href="#general-pympl-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>General PyMPL Statements</h2>
+<a id="user-content-pympl-tools" class="anchor" href="#pympl-tools" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyMPL Tools</h2>
+
+<p>PyMPL includes a few tools in order to make it easier to parse PyMPL models, solve them and extract their solutions.</p>
 
 <ul>
-<li><a href="#eval">${...}$</a></li>
-<li><a href="#exec">$EXEC{...};</a></li>
-<li><a href="#stmt">$STMT{...};</a></li>
-<li><a href="#set">$SET[...]{...};</a></li>
-<li><a href="#param">$PARAM[...]{...};</a></li>
-<li><a href="#var">$VAR[...]{...};</a></li>
-<li><a href="#con">$CON[...]{...};</a></li>
-<li><a href="STMTS.html">Return to the index</a></li>
+<li><a href="#usage-example">Usage example</a></li>
+<li><a href="#solver-wrappers">Solver wrappers</a></li>
+<li><a href="#tools-api">Tools API</a></li>
+<li><a href="#glpkutils">glpkutils</a></li>
 </ul>
 
-<h4>
-<a id="user-content-eval" class="anchor" href="#eval" aria-hidden="true"><span class="octicon octicon-link"></span></a>EVAL</h4>
+<h3>
+<a id="user-content-usage-example" class="anchor" href="#usage-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage example</h3>
 
-<p>Usage: <code>${python expression}$</code></p>
+<p>In the following example, we solve a small cutting stock problem with rolls of width 5180,
+items of width 1250, 1000, 750, 915, 920, 985 with demands
+19, 264, 10, 30, 5, 21, respectively. Since the base model (<code>model.mod</code>) is a valid GMPL model, 
+we use GLPK to convert it to LP and to solve it. Nevertheless, any other solver could have been used to solve it.</p>
 
-<p>Description: is replaced by the result of <code>eval("python expression")</code>.  </p>
+<p><code>model.mod (AMPL/GMPL + PyMPL statements)</code></p>
 
-<p>Parameters:</p>
-
-<ul>
-<li>Python:
-
-<ul>
-<li>valid python expression.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>is replaced by the result of evaluating the expression.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-<span class="pl-k">var</span> x1, <span class="pl-k">&gt;=</span> ${<span class="pl-c1">2</span><span class="pl-k">+</span><span class="pl-c1">6</span>}$, <span class="pl-k">&lt;=</span> ${<span class="pl-c1">10</span><span class="pl-k">*</span><span class="pl-c1">5</span>}$;
-s.t. con1<span class="pl-k">:</span> x <span class="pl-k">+</span> y <span class="pl-k">&lt;=</span> ${<span class="pl-k">abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>)}$ <span class="pl-k">*</span> z;
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-<span class="pl-k">var</span> x1, <span class="pl-k">&gt;=</span> <span class="pl-c1">8</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">50</span>;
-s.t. con1<span class="pl-k">:</span> x <span class="pl-k">+</span> y <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span> <span class="pl-k">*</span> z;
-<span class="pl-k">..</span>.</pre></div>
-
-<h4>
-<a id="user-content-exec" class="anchor" href="#exec" aria-hidden="true"><span class="octicon octicon-link"></span></a>EXEC</h4>
-
-<p>Usage: <code>$EXEC{python code};</code></p>
-
-<p>Description: executes python code.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>Python:
-
-<ul>
-<li>valid python code.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>May create anything that results from calls to PyMPL commands.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>May create new python variables/functions/etc. that can be used in the following statements.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$EXEC{
-<span class="pl-k">for</span> i <span class="pl-k">in</span> range(<span class="pl-c1">3</span>)<span class="pl-k">:</span>
-    STMT(<span class="pl-s"><span class="pl-pds">"</span>var x{0}, integer, &gt;= 0, &lt;= {1};<span class="pl-pds">"</span></span>.<span class="pl-k">format</span>(i, i<span class="pl-k">+</span><span class="pl-c1">1</span>))
+<div class="highlight highlight-source-ampl"><pre>$EXEC{
+W <span class="pl-k">=</span> [<span class="pl-c1">5180</span>]                                       <span class="pl-c"># roll width</span>
+w <span class="pl-k">=</span> [[<span class="pl-c1">1250</span>], [<span class="pl-c1">1000</span>], [<span class="pl-c1">750</span>], [<span class="pl-c1">915</span>], [<span class="pl-c1">920</span>], [<span class="pl-c1">985</span>]] <span class="pl-c"># item widths</span>
+b <span class="pl-k">=</span> [<span class="pl-c1">19</span>, <span class="pl-c1">264</span>, <span class="pl-c1">10</span>, <span class="pl-c1">30</span>, <span class="pl-c1">5</span>, <span class="pl-c1">21</span>]                     <span class="pl-c"># item demands</span>
 };
-<span class="pl-k">..</span>.</pre></div>
+$<span class="pl-k">PARAM</span>[b{I}]{b, i0<span class="pl-k">=</span><span class="pl-c1">1</span>};
+<span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
+<span class="pl-c"># Generate an arc-flow model (with x[i] = total amount of flow on arcs (u, v, i)):</span>
+$VBP_FLOW[Z]{W, w,  [<span class="pl-s"><span class="pl-pds">"</span>x[1]<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>x[2]<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>x[3]<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>x[4]<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>x[5]<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>x[6]<span class="pl-pds">"</span></span>]};
+<span class="pl-k">minimize</span> <span class="pl-k">obj</span><span class="pl-k">:</span> Z;
+s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <span class="pl-k">&gt;=</span> b[i];
+<span class="pl-k">solve</span>;
+<span class="pl-k">end</span>;</pre></div>
 
-<p>is replaced by:</p>
+<p><code>solve.py (Python)</code></p>
 
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">var</span> x0, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">1</span>;
-<span class="pl-k">var</span> x1, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">2</span>;
-<span class="pl-k">var</span> x2, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">3</span>;</pre></div>
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> pympl <span class="pl-k">import</span> PyMPL, Tools, glpkutils
+parser <span class="pl-k">=</span> PyMPL() <span class="pl-c"># initialize the parser </span>
+parser.parse(<span class="pl-s"><span class="pl-pds">"</span>model.mod<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>model.out.mod<span class="pl-pds">"</span></span>) <span class="pl-c"># parse "model.mod" and produce "model.out.mod"</span>
+glpkutils.mod2lp(<span class="pl-s"><span class="pl-pds">"</span>model.out.mod<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>model.lp<span class="pl-pds">"</span></span>) <span class="pl-c"># use GLPK to convert "model.out.mod" to LP</span>
+out, varvalues <span class="pl-k">=</span> Tools.script(<span class="pl-s"><span class="pl-pds">"</span>glpk_wrapper.sh<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>model.lp<span class="pl-pds">"</span></span>) <span class="pl-c"># solve and return the solution</span>
+<span class="pl-c"># extract a vector packing solution from the arc-flow solution:</span>
+sol <span class="pl-k">=</span> parser[<span class="pl-s"><span class="pl-pds">"</span>VBP_FLOW<span class="pl-pds">"</span></span>].extract(<span class="pl-k">lambda</span> <span class="pl-smi">varname</span>: varvalues.get(varname, <span class="pl-c1">0</span>))</pre></div>
 
-<p>Note: you call use PyMPL commands inside python code as follows:</p>
+<p><code>Output</code></p>
 
-<ul>
-<li>
-<code>$CMD[...]{...};</code> are equivalent to <code>CMD["..."](...)</code> in python code;</li>
-<li>
-<code>$CMD{...};</code> are equivalent to <code>CMD(...)</code> in python code.</li>
-</ul>
+<pre><code>...
+OPTIMAL LP SOLUTION FOUND
+Integer optimization begins...
++    29: mip =     not found yet &gt;=              -inf        (1; 0)
++    88: &gt;&gt;&gt;&gt;&gt;   7.000000000e+01 &gt;=   6.900000000e+01   1.4% (30; 0)
++    93: &gt;&gt;&gt;&gt;&gt;   6.900000000e+01 &gt;=   6.900000000e+01   0.0% (6; 33)
++    93: mip =   6.900000000e+01 &gt;=     tree is empty   0.0% (0; 59)
+INTEGER OPTIMAL SOLUTION FOUND
+Time used:   0.0 secs
+Memory used: 0.1 Mb (145550 bytes)
+Writing MIP solution to `/tmp/Xz5GCUfsze/sol.out'...
+Graph: Z (flow=69)                                   # 69 rolls are used
+    [(4, ['i=3', 'i=3', 'i=4', 'i=4', 'i=4', 'i=4']),# 4 rolls with this pattern 
+     (1, ['i=1', 'i=2', 'i=3', 'i=3', 'i=4']),       # 1 roll with this pattern 
+     (13, ['i=1', 'i=2', 'i=2', 'i=2', 'i=4']),      # 13 rolls with this pattern 
+     (25, ['i=2', 'i=2', 'i=2', 'i=2', 'i=2']),      # 25 rolls with this pattern 
+     (5, ['i=1', 'i=2', 'i=2', 'i=2', 'i=5']),       # 5 rolls with this pattern 
+     (21, ['i=2', 'i=2', 'i=2', 'i=2', 'i=6'])]      # 21 rolls with this pattern 
+</code></pre>
 
-<h4>
-<a id="user-content-stmt" class="anchor" href="#stmt" aria-hidden="true"><span class="octicon octicon-link"></span></a>STMT</h4>
+<h3>
+<a id="user-content-solver-wrappers" class="anchor" href="#solver-wrappers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solver wrappers</h3>
 
-<p>Usage: <code>$STMT{python expression};</code></p>
-
-<p>Description: is replaced by the result of <code>eval("python expression")</code>.  </p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>Python:
-
-<ul>
-<li>valid python expression.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>is replaced by the result of evaluating the expression.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$STMT{<span class="pl-s"><span class="pl-pds">"</span>s.t. con1: x + y &lt;= {0} * z;<span class="pl-pds">"</span></span>.<span class="pl-k">format</span>(<span class="pl-k">abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>))};
-$EXEC{stmt <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>s.t. {0}: x &gt;= 10;<span class="pl-pds">"</span></span>.<span class="pl-k">format</span>(<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>)};
-$STMT{stmt};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-s.t. con1<span class="pl-k">:</span> x <span class="pl-k">+</span> y <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span> <span class="pl-k">*</span> z;
-s.t. test<span class="pl-k">:</span> x <span class="pl-k">&gt;=</span> <span class="pl-c1">10</span>;
-<span class="pl-k">..</span>.</pre></div>
-
-<p>Note: <code>$STMT{expression};</code> is equivalent to <code>${expression}$</code> (<a href="#eval">EVAL</a>).</p>
-
-<h4>
-<a id="user-content-set" class="anchor" href="#set" aria-hidden="true"><span class="octicon octicon-link"></span></a>SET</h4>
-
-<p>Usage: <code>$SET[set_name]{values};</code></p>
-
-<p>Description: creates an AMPL sets.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
+<p>PyMPL includes several scripts for solving MPS/LP models using different
+solvers:</p>
 
 <ul>
 <li>
-<code>'set_name'</code>: set name.</li>
+<code>scripts/gurobi_wrapper.sh</code>: Gurobi</li>
+<li>
+<code>scripts/cplex_wrapper.sh</code>: IBM CPLEX</li>
+<li>
+<code>scripts/coinor_wrapper.sh</code>: COIN-OR CBC</li>
+<li>
+<code>scripts/glpk_wrapper.sh</code>: GLPK</li>
+<li>
+<code>scripts/scip_wrapper.sh</code>: SCIP</li>
+<li>
+<code>scripts/lpsolve_wrapper.sh</code>: lp_solve</li>
 </ul>
-</li>
-<li>Python:
+
+<p>Usage:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ X_wrapper.sh --mps model.mps
+$ X_wrapper.sh --lp model.lp
+$ X_wrapper.sh --mps model.mps --wsol vars.sol
+$ X_wrapper.sh --lp model.lp --wsol vars.sol</pre></div>
+
+<h3>
+<a id="user-content-tools-api" class="anchor" href="#tools-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tools API</h3>
+
+<p>How to import: </p>
 
 <ul>
 <li>
-<code>values</code>: list of values.</li>
-</ul>
-</li>
+<code>from pympl import Tools</code>.</li>
 </ul>
 
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>a set named <code>'set_name'</code>.</li>
-</ul>
-</li>
-<li>Python:
+<p>How to use:</p>
 
 <ul>
 <li>
-<code>_set['set_name']</code>: list of values.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$<span class="pl-k">SET</span>[A]{range(<span class="pl-c1">5</span>)};
-$<span class="pl-k">SET</span>[B]{zip(range(<span class="pl-c1">5</span>),range(<span class="pl-c1">5</span>))};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">set</span> A <span class="pl-k">:=</span> {<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};
-<span class="pl-k">set</span> B <span class="pl-k">:=</span> {(<span class="pl-c1">0</span>,<span class="pl-c1">0</span>),(<span class="pl-c1">1</span>,<span class="pl-c1">1</span>),(<span class="pl-c1">2</span>,<span class="pl-c1">2</span>),(<span class="pl-c1">3</span>,<span class="pl-c1">3</span>),(<span class="pl-c1">4</span>,<span class="pl-c1">4</span>)};</pre></div>
-
-<p>Note: Is is possible to call external functions (i.e., <code>$SET[X]{some_function(...)}</code>) that return the set.</p>
-
-<h4>
-<a id="user-content-param" class="anchor" href="#param" aria-hidden="true"><span class="octicon octicon-link"></span></a>PARAM</h4>
-
-<p>Usage: <code>$PARAM[param_name]{values, i0=0};</code></p>
-
-<p>Description: creates AMPL parameters.</p>
-
-<p>Parameters:</p>
+<p><code>output, solution = Tools.script(script_name, model, options=None, verbose=None)</code></p>
 
 <ul>
-<li>AMPL:
-
-<ul>
-<li>Option 1: <code>'param_name'</code> -&gt; parameter name;<br>
-</li>
-<li>Option 2: <code>'param_name{Index_name}'</code> -&gt; parameter name and index name.</li>
-</ul>
-</li>
-<li>Python:
+<li>Description: calls VPSolver scripts.</li>
+<li>Important arguments:
 
 <ul>
 <li>
-<code>values</code>: dictionary of key:value pairs or a list of values;</li>
+<code>script_name</code>: wrapper script (e.g., <code>glpk_wrapper.sh</code>);</li>
 <li>
-<code>i0</code>: initial index if <code>values</code> is a list of values.</li>
+<code>model</code>: model file (.mps/.lp file name);</li>
+<li>
+<code>options</code>: parameters to pass to the wrapper.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>script_name</code> to solve a .mps/.lp model;</li>
+<li>returns the output and a python dictionary <code>{var:value}</code> with the solution.</li>
+</ul>
+</li>
+<li>Usage examples:
+
+<ul>
+<li>
+<code>Tools.script(script name, .mps file/MPS object)</code>;</li>
+<li>
+<code>Tools.script(script name, .lp file/LP object)</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>Tools.set_verbose(verbose)</code></p>
+
+<ul>
+<li>Description: sets the default "verbose" behaviour.</li>
+<li>Arguments:
+
+<ul>
+<li>
+<code>verbose</code>: <code>True</code> or <code>False</code>.</li>
+</ul>
+</li>
+<li>Note: The default behaviour is overridden if the <code>verbose</code> argument is set to a value different from <code>None</code> in any API call.</li>
 </ul>
 </li>
 </ul>
 
-<p>Creates:</p>
+<h3>
+<a id="user-content-glpkutils" class="anchor" href="#glpkutils" aria-hidden="true"><span class="octicon octicon-link"></span></a>glpkutils</h3>
 
-<ul>
-<li>AMPL:
-
-<ul>
-<li>a parameter named <code>'param_name'</code>.</li>
-</ul>
-</li>
-<li>Python:
+<p>How to import: </p>
 
 <ul>
 <li>
-<code>_param['param_name']</code>: dictionary with the parameter data.</li>
-</ul>
-</li>
+<code>from pympl import glpkutils</code>.</li>
 </ul>
 
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$<span class="pl-k">PARAM</span>[NAME]{<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>}; 
-$<span class="pl-k">PARAM</span>[VALUE]{<span class="pl-c1">10</span>};
-$<span class="pl-k">PARAM</span>[D{I}]{{<span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span><span class="pl-k">:</span> <span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span><span class="pl-k">:</span> <span class="pl-c1">2</span>}};
-$<span class="pl-k">PARAM</span>[L0]{[<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>], i0<span class="pl-k">=</span><span class="pl-c1">0</span>};
-$<span class="pl-k">PARAM</span>[L1]{[<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>], i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; <span class="pl-c"># `i0` is the initial index if `values` is a list</span>
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">param</span> NAME <span class="pl-k">:=</span> <span class="pl-s"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>;
-<span class="pl-k">param</span> VALUE <span class="pl-k">:=</span> <span class="pl-c1">10</span>;
-<span class="pl-k">param</span> D <span class="pl-k">:=</span> [<span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span>]<span class="pl-c1">1</span>[<span class="pl-s"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span>]<span class="pl-c1">2</span>;
-<span class="pl-k">set</span> I <span class="pl-k">:=</span> {<span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span>};
-<span class="pl-k">param</span> L0 <span class="pl-k">:=</span> [<span class="pl-c1">0</span>]<span class="pl-c1">1</span>[<span class="pl-c1">1</span>]<span class="pl-c1">2</span>[<span class="pl-c1">2</span>]<span class="pl-c1">3</span>;
-<span class="pl-k">param</span> L1 <span class="pl-k">:=</span> [<span class="pl-c1">1</span>]<span class="pl-c1">1</span>[<span class="pl-c1">2</span>]<span class="pl-c1">2</span>[<span class="pl-c1">3</span>]<span class="pl-c1">3</span>;</pre></div>
-
-<p>Note: Is is possible to call external functions (i.e., <code>$PARAM[X]{some_function(...)}</code>) that return the parameter.</p>
-
-<h4>
-<a id="user-content-var" class="anchor" href="#var" aria-hidden="true"><span class="octicon octicon-link"></span></a>VAR</h4>
-
-<p>Usage: <code>$VAR[var_name]{typ="", lb=None, ub=None, index_set=None};</code></p>
-
-<p>Description: creates AMPL variables.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>Option 1: <code>'var_name'</code> -&gt;  variable name;</li>
-<li>Option 2: <code>'var_name{Iname}'</code> -&gt; variable name and index name (<code>index_set</code> must be provided).</li>
-</ul>
-</li>
-<li>Python:
+<p>How to use:</p>
 
 <ul>
 <li>
-<code>typ</code>: variable type (e.g., "integer");</li>
+<p><code>glpkutils.mod2lp(fname_mod, fname_lp, verbose=None)</code></p>
+
+<ul>
+<li>Description: calls glpsol to convert GMPL models to LP.</li>
+<li>Important arguments:
+
+<ul>
 <li>
-<code>lb</code>: variable lower bound;</li>
+<code>fname_mod</code>: GMPL model file (.mod file name);</li>
 <li>
-<code>ub</code>: variable upper bound;</li>
-<li>
-<code>index_set</code>: index set for the variable.</li>
+<code>fname_lp</code>: LP model file (.lp file name).</li>
 </ul>
 </li>
 </ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>creates a variable named <code>'var_name'</code>.</li>
-</ul>
 </li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$<span class="pl-k">VAR</span>[x]{<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>, <span class="pl-c1">0</span>, <span class="pl-c1">10</span>};
-$<span class="pl-k">VAR</span>[y]{<span class="pl-s"><span class="pl-pds">"</span>binary<span class="pl-pds">"</span></span>};
-$<span class="pl-k">VAR</span>[z]{ub<span class="pl-k">=abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>)};
-$<span class="pl-k">VAR</span>[xs{I}]{<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>, index_set<span class="pl-k">=</span>range(<span class="pl-c1">3</span>)};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">var</span> x, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">10</span>;
-<span class="pl-k">var</span> y, <span class="pl-k">binary</span>; 
-<span class="pl-k">var</span> z, <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span>;
-<span class="pl-k">set</span> I <span class="pl-k">:=</span> {<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>};
-<span class="pl-k">var</span> xs{I}, <span class="pl-k">integer</span>;</pre></div>
-
-<h4>
-<a id="user-content-con" class="anchor" href="#con" aria-hidden="true"><span class="octicon octicon-link"></span></a>CON</h4>
-
-<p>Usage: <code>$CON[constraint_name]{left, sign, right};</code></p>
-
-<p>Description: creates AMPL constraints.</p>
-
-<p>Parameters:</p>
+<li>
+<p><code>glpkutils.mod2mps(fname_mod, fname_mps, verbose=None)</code></p>
 
 <ul>
-<li>AMPL:
+<li>Description: calls glpsol to convert GMPL models to MPS.</li>
+<li>Important arguments:
 
 <ul>
 <li>
-<code>'constraint_name'</code>: constraint name.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
+<code>fname_mod</code>: GMPL model file (.mod file name);</li>
 <li>
-<code>left</code>: list of variable names, values, or pairs (variable name, coefficient);</li>
-<li>
-<code>sign</code>: constraint type ("&gt;=", "=", "&lt;=");</li>
-<li>
-<code>right</code>: list of variable names, values, or pairs (variable name, coefficient).</li>
+<code>fname_mps</code>: MPS model file (.mps file name).</li>
 </ul>
 </li>
 </ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>a constraint named <code>'constraint_name'</code>.</li>
-</ul>
 </li>
 </ul>
-
-<p>Examples:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$CON[con1]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-c1">10</span>)],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,<span class="pl-c1">20</span>};
-$CON[con2]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-c1">15</span>),<span class="pl-k">-</span><span class="pl-c1">20</span>],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>)};
-$CON[con3]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>)],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>),<span class="pl-c1">20</span>]};
-$CON[con4]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>)]};
-$CON[con5]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">5</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-$CON[con6]{[<span class="pl-k">-</span><span class="pl-c1">20</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-$CON[con7]{<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),<span class="pl-c1">20</span>,(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre>s.t. con1<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con2<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con3<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con4<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con5<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con6<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con7<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;</pre></div>
-
-<p>Note: all the original constraints are just different representations of the same constraint.</p>
 
 <hr>
 

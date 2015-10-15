@@ -92,7 +92,7 @@
 
 <p>Example:</p>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-k">var</span> x{<span class="pl-c1">1</span><span class="pl-k">..</span>3}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
+<div class="highlight highlight-source-ampl"><pre><span class="pl-k">var</span> x{<span class="pl-c1">1</span><span class="pl-k">..</span>3}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
 $SOS1{[<span class="pl-s"><span class="pl-pds">"</span>x[1]<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>x[2]<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>x[3]<span class="pl-pds">"</span></span>]};</pre></div>
 
 <h4>
@@ -129,7 +129,7 @@ $SOS1{[<span class="pl-s"><span class="pl-pds">"</span>x[1]<span class="pl-pds">
 
 <p>Example:</p>
 
-<div class="highlight highlight-ampl"><pre>$<span class="pl-k">PARAM</span>[X{I}]{[<span class="pl-c1">0</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>, <span class="pl-c1">25</span>, <span class="pl-c1">30</span>, <span class="pl-c1">35</span>, <span class="pl-c1">40</span>, <span class="pl-c1">45</span>, <span class="pl-c1">50</span>, <span class="pl-c1">55</span>, <span class="pl-c1">60</span>, <span class="pl-c1">70</span>]};
+<div class="highlight highlight-source-ampl"><pre>$<span class="pl-k">PARAM</span>[X{I}]{[<span class="pl-c1">0</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>, <span class="pl-c1">25</span>, <span class="pl-c1">30</span>, <span class="pl-c1">35</span>, <span class="pl-c1">40</span>, <span class="pl-c1">45</span>, <span class="pl-c1">50</span>, <span class="pl-c1">55</span>, <span class="pl-c1">60</span>, <span class="pl-c1">70</span>]};
 $<span class="pl-k">PARAM</span>[Y{<span class="pl-k">^</span>I}]{[<span class="pl-c1">0</span>, <span class="pl-c1">20</span>, <span class="pl-c1">15</span>, <span class="pl-c1">10</span>, <span class="pl-c1">0</span>, <span class="pl-c1">50</span>, <span class="pl-c1">18</span>, <span class="pl-c1">0</span>, <span class="pl-c1">15</span>, <span class="pl-c1">24</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>]};
 <span class="pl-c"># Model a piecewise linear function</span>
 <span class="pl-k">var</span> x;
@@ -182,7 +182,7 @@ $SOS2{[<span class="pl-s"><span class="pl-pds">"</span>z[%d]<span class="pl-pds"
 
 <p>Examples:</p>
 
-<div class="highlight highlight-ampl"><pre>$EXEC{
+<div class="highlight highlight-source-ampl"><pre>$EXEC{
 <span class="pl-k">xval</span>ues <span class="pl-k">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>, <span class="pl-c1">25</span>, <span class="pl-c1">30</span>, <span class="pl-c1">35</span>, <span class="pl-c1">40</span>, <span class="pl-c1">45</span>, <span class="pl-c1">50</span>, <span class="pl-c1">55</span>, <span class="pl-c1">60</span>, <span class="pl-c1">70</span>]
 <span class="pl-k">yval</span>ues <span class="pl-k">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">20</span>, <span class="pl-c1">15</span>, <span class="pl-c1">10</span>, <span class="pl-c1">0</span>, <span class="pl-c1">50</span>, <span class="pl-c1">18</span>, <span class="pl-c1">0</span>, <span class="pl-c1">15</span>, <span class="pl-c1">24</span>, <span class="pl-c1">10</span>, <span class="pl-c1">15</span>]
 };

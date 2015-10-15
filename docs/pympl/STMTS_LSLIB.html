@@ -72,9 +72,20 @@
 <a href="#lot-sizing-models">Lot-sizing models</a>
 
 <ul>
-<li><a href="#ls_u-or-ls_u1">$LS_U or LS_U1{...};</a></li>
+<li><a href="#ls_u-or-ls_u1">$LS_U{...}; or LS_U1{...};</a></li>
 <li><a href="#ls_u2">$LS_U2{...};</a></li>
 <li><a href="#ls_u_b">$LS_U_B{...};</a></li>
+<li><a href="#ls_u_sc">$LS_U_SC{...};</a></li>
+</ul>
+</li>
+<li>
+<a href="#discrete-lot-sizing-models">Discrete lot-sizing models</a>
+
+<ul>
+<li><a href="#dlsi_cc">$DLSI_CC{...};</a></li>
+<li><a href="#dlsi_cc_b">$DLSI_CC_B{...};</a></li>
+<li><a href="#dls_cc_b">$DLS_CC_B{...};</a></li>
+<li><a href="#dls_cc_sc">$DLS_CC_SC{...};</a></li>
 </ul>
 </li>
 <li><a href="STMTS.html">Return to the index</a></li>
@@ -90,7 +101,7 @@
 
 <p><code>bike.mod</code></p>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-c"># PPbyMIP: A Tiny Planning Model (Section 1.1, pag. 9)</span>
+<div class="highlight highlight-source-ampl"><pre><span class="pl-c"># PPbyMIP: A Tiny Planning Model (Section 1.1, pag. 9)</span>
 <span class="pl-c"># LS-U Model (4.1)-(4.5) (Section 4.1, pag. 117)</span>
 $<span class="pl-k">PARAM</span>[NT]{<span class="pl-c1">8</span>};
 <span class="pl-k">param</span> p <span class="pl-k">:=</span> <span class="pl-c1">100</span>;
@@ -135,7 +146,7 @@ LS_U(s, x, y, d, NT)
 
 <p><code>clb.mod</code></p>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-c"># Consumer Goods Production (pag. 195)</span>
+<div class="highlight highlight-source-ampl"><pre><span class="pl-c"># Consumer Goods Production (pag. 195)</span>
 $EXEC{
 def mrange(a, b)<span class="pl-k">:</span>
     return range(a, b<span class="pl-k">+</span><span class="pl-c1">1</span>)
@@ -250,6 +261,8 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <li>
 <code>C</code>- production capacity;</li>
 <li>
+<code>s0</code>- initial stock;</li>
+<li>
 <code>Tk</code>- approximation parameter (default: <code>NT</code>).</li>
 </ul>
 
@@ -348,6 +361,56 @@ demand <span class="pl-k">=</span> _params[<span class="pl-s"><span class="pl-pd
 <p>Usage: <code>$LS_U_B{s, r, x, y, d, NT, Tk=None};</code></p>
 
 <p>Description: Multi-commodity formulation for LS-U-B.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-ls_u_sc" class="anchor" href="#ls_u_sc" aria-hidden="true"><span class="octicon octicon-link"></span></a>LS_U_SC</h4>
+
+<p>Usage: <code>$LS_U_SC{s, r, x, y, z, d, NT, Tk=None};</code></p>
+
+<p>Description: Extended formulation for LS-U-SC.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h3>
+<a id="user-content-discrete-lot-sizing-models" class="anchor" href="#discrete-lot-sizing-models" aria-hidden="true"><span class="octicon octicon-link"></span></a>Discrete lot-sizing models</h3>
+
+<h4>
+<a id="user-content-dlsi_cc" class="anchor" href="#dlsi_cc" aria-hidden="true"><span class="octicon octicon-link"></span></a>DLSI_CC</h4>
+
+<p>Usage: <code>$DLSI_CC{s0, y, d, C, NT, Tk=None};</code></p>
+
+<p>Description: Discrete lot-sizing with variable initial stock.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-dlsi_cc_b" class="anchor" href="#dlsi_cc_b" aria-hidden="true"><span class="octicon octicon-link"></span></a>DLSI_CC_B</h4>
+
+<p>Usage: <code>$DLSI_CC_B{s0, r, y, d, C, NT, Tk=None};</code></p>
+
+<p>Description: Discrete lot-sizing with variable initial stock and backlogging.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-dls_cc_b" class="anchor" href="#dls_cc_b" aria-hidden="true"><span class="octicon octicon-link"></span></a>DLS_CC_B</h4>
+
+<p>Usage: <code>$DLS_CC_B{r, y, d, C, NT, Tk=None};</code></p>
+
+<p>Description: Discrete lot-sizing (without initial stock) with backlogging.</p>
+
+<p>Parameters: see <a href="#parameters">parameter description</a>.</p>
+
+<h4>
+<a id="user-content-dls_cc_sc" class="anchor" href="#dls_cc_sc" aria-hidden="true"><span class="octicon octicon-link"></span></a>DLS_CC_SC</h4>
+
+<p>Usage: <code>$DLS_CC_SC{s, y, z, d, C, NT, Tk=None};</code></p>
+
+<p>Description: Discrete lot-sizing (without initial stock) with start-up costs.</p>
+
+<p>Notes: <code>DLS_CC_SC</code> is only valid if demands are in {0, C}.</p>
 
 <p>Parameters: see <a href="#parameters">parameter description</a>.</p>
 

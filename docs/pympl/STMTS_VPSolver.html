@@ -141,13 +141,13 @@
 
 <p><code>model.mod</code>:</p>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-k">..</span>.
+<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
 $VBP_LOAD[instance{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>, d0<span class="pl-k">=</span><span class="pl-c1">0</span>}
 <span class="pl-k">..</span>.</pre></div>
 
 <p>is replaced by:</p>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-k">param</span> instance_m <span class="pl-k">:=</span> <span class="pl-c1">4</span>; <span class="pl-c"># number of different item types</span>
+<div class="highlight highlight-source-ampl"><pre><span class="pl-k">param</span> instance_m <span class="pl-k">:=</span> <span class="pl-c1">4</span>; <span class="pl-c"># number of different item types</span>
 <span class="pl-k">param</span> instance_n <span class="pl-k">:=</span> <span class="pl-c1">17</span>;<span class="pl-c"># total number of items</span>
 <span class="pl-k">param</span> instance_p <span class="pl-k">:=</span> <span class="pl-c1">2</span>; <span class="pl-c"># number of dimensions</span>
 <span class="pl-k">set</span> I <span class="pl-k">:=</span> {<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};    <span class="pl-c"># index set for items (starting at `i0`)</span>
@@ -211,7 +211,7 @@ $VBP_LOAD[instance{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instanc
 
 <p>Examples:</p>
 
-<div class="highlight highlight-ampl"><pre>$VBP_LOAD[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>};
+<div class="highlight highlight-source-ampl"><pre>$VBP_LOAD[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>};
 <span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;
 $VBP_FLOW[Z]{_instance1.W, _instance1.w, [<span class="pl-s"><span class="pl-pds">"</span>x[%d]<span class="pl-pds">"</span></span>%i <span class="pl-k">for</span> i <span class="pl-k">in</span> _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]]};    
 
@@ -223,7 +223,7 @@ s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <s
 
 <p>is replaced by:</p>
 
-<div class="highlight highlight-ampl"><pre><span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;  
+<div class="highlight highlight-source-ampl"><pre><span class="pl-k">var</span> x{I}, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>;  
 <span class="pl-c">/*<span class="pl-c"> arc-flow model with graph compression for instance.vbp </span>*/</span>
 <span class="pl-c">/*<span class="pl-c"> Z is the amount of flow on the feedback arc </span>*/</span>
 <span class="pl-c">/*<span class="pl-c"> x[i] = amount of flow on arcs associated with item i </span>*/</span>
@@ -294,7 +294,7 @@ s.t. demand{i <span class="pl-k">in</span> I}<span class="pl-k">:</span> x[i] <s
 
 <p>Examples:</p>
 
-<div class="highlight highlight-ampl"><pre>$VBP_LOAD[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; 
+<div class="highlight highlight-source-ampl"><pre>$VBP_LOAD[instance1{I,D}]{<span class="pl-s"><span class="pl-pds">"</span>instance.vbp<span class="pl-pds">"</span></span>, i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; 
 $VBP_GRAPH[V,A]{_instance1.W, _instance1.w, _sets[<span class="pl-s"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>]};
 
 <span class="pl-c"># Variables:</span>

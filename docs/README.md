@@ -36,7 +36,7 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 
 For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and [Web App](#vpsolver-web-app):
 
-* `python-2.7` or `python-3`
+* `python-2.7` or `python-3.x`
 * `python-pip`
 * `python-dev`
 * `python-pygraphviz`
@@ -59,16 +59,16 @@ With the python interface:
 
 ```
 $ bash build.sh
-$ sudo pip install -r requirements.txt
-$ sudo pip install . --upgrade
-$ bash test.sh test_install
+$ pip install -r requirements.txt
+$ pip install . --upgrade
+$ bash test.sh
 ```
 or simply:
 
 
 ```
 $ bash install.sh
-$ bash test.sh test_install
+$ bash test.sh
 ```
 
 ## Docker
@@ -96,17 +96,18 @@ $ docker build -t fdabrandao/vpsolver vpsolver
 Directly using the command line interface:
 
 ```bash
-$ docker run -it fdabrandao/vpsolver bash
-root@55d14f6b6f32:~# python examples/vpsolver/example_vbp.py
+$ docker run --rm -it fdabrandao/vpsolver bash
+root@55d14f6b6f32:~# source venv2.7/bin/activate # load a virtualenv
+(venv2.7)root@55d14f6b6f32:~# python examples/vpsolver/example_vbp.py
 ...
 ```
 
 or through the VPSolver Web App (example URL: `http://172.17.0.60:5555/`):
 
 ```bash
-$ docker run -it -p 5555 fdabrandao/vpsolver 
+$ docker run --rm -it -p 5555 fdabrandao/vpsolver 
 eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
-          inet addr:*172.17.0.60*  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet addr:172.17.0.60  Bcast:0.0.0.0  Mask:255.255.0.0
           inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
           UP BROADCAST  MTU:1500  Metric:1
           RX packets:2 errors:0 dropped:0 overruns:0 frame:0
@@ -114,6 +115,7 @@ eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c
           collisions:0 txqueuelen:0 
           RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
 
+URL: http://172.17.0.60:5555/
  * Running on http://0.0.0.0:5555/
 ...
 ```

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  STMTS_General.md
+  Docker.md
   
     - Grip
   
@@ -44,422 +44,81 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  STMTS_General.md
+                  Docker.md
                 </h3>
               
               <div class="markdown-body entry-content">
                 <h2>
-<a id="user-content-general-pympl-statements" class="anchor" href="#general-pympl-statements" aria-hidden="true"><span class="octicon octicon-link"></span></a>General PyMPL Statements</h2>
+<a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker</h2>
 
-<ul>
-<li><a href="#eval">${...}$</a></li>
-<li><a href="#exec">$EXEC{...};</a></li>
-<li><a href="#stmt">$STMT{...};</a></li>
-<li><a href="#set">$SET[...]{...};</a></li>
-<li><a href="#param">$PARAM[...]{...};</a></li>
-<li><a href="#var">$VAR[...]{...};</a></li>
-<li><a href="#con">$CON[...]{...};</a></li>
-<li><a href="STMTS.html">Return to the index</a></li>
-</ul>
+<p>Docker is an open platform for building, shipping and running applications. Docker allows <a href="https://github.com/fdabrandao/pympl">PyMPL</a> to run on a large variety of platforms with very little effort.</p>
 
-<h4>
-<a id="user-content-eval" class="anchor" href="#eval" aria-hidden="true"><span class="octicon octicon-link"></span></a>EVAL</h4>
+<h3>
+<a id="user-content-docker-setup" class="anchor" href="#docker-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Docker Setup</h3>
 
-<p>Usage: <code>${python expression}$</code></p>
+<p>Install Docker [<a href="https://docs.docker.com/installation/">Docker installation instructions</a>].</p>
 
-<p>Description: is replaced by the result of <code>eval("python expression")</code>.  </p>
+<p>Option 1: simply <code>pull</code> PyMPL from Docker repository (without building):</p>
 
-<p>Parameters:</p>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker pull fdabrandao/pympl</pre></div>
 
-<ul>
-<li>Python:
+<p>Option 2: <code>clone</code> PyMPL and <code>build</code> locally:</p>
 
-<ul>
-<li>valid python expression.</li>
-</ul>
-</li>
-</ul>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ git clone git@github.com:fdabrandao/pympl.git pympl
+user@locahost <span class="pl-k">~</span>$ docker build -t fdabrandao/pympl pympl</pre></div>
 
-<p>Creates:</p>
+<h3>
+<a id="user-content-usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
 
-<ul>
-<li>AMPL:
+<p>Directly using the command line interface:</p>
 
-<ul>
-<li>is replaced by the result of evaluating the expression.</li>
-</ul>
-</li>
-</ul>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker run --rm -it fdabrandao/pympl bash
+root@55d14f6b6f32:<span class="pl-k">~</span># <span class="pl-c1">source</span> venv2.7/bin/activate <span class="pl-c"># load a virtualenv</span>
+(venv2.7)root@55d14f6b6f32:<span class="pl-k">~</span># python examples/equivknapsack01.py
+...</pre></div>
 
-<p>Examples:  </p>
+<p>or through the PyMPL Web App (example URL: <code>http://172.17.0.60:5555/</code>):</p>
 
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-<span class="pl-k">var</span> x1, <span class="pl-k">&gt;=</span> ${<span class="pl-c1">2</span><span class="pl-k">+</span><span class="pl-c1">6</span>}$, <span class="pl-k">&lt;=</span> ${<span class="pl-c1">10</span><span class="pl-k">*</span><span class="pl-c1">5</span>}$;
-s.t. con1<span class="pl-k">:</span> x <span class="pl-k">+</span> y <span class="pl-k">&lt;=</span> ${<span class="pl-k">abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>)}$ <span class="pl-k">*</span> z;
-<span class="pl-k">..</span>.</pre></div>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker run --rm -it -p 5555 fdabrandao/pympl 
+eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
+          inet addr:172.17.0.60  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
+          UP BROADCAST  MTU:1500  Metric:1
+          RX packets:2 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
 
-<p>is replaced by:</p>
+URL: http://172.17.0.60:5555/
+USERNAME: ...
+PASSWORD: ...
+ <span class="pl-k">*</span> Running on http://0.0.0.0:5555/
+...</pre></div>
 
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-<span class="pl-k">var</span> x1, <span class="pl-k">&gt;=</span> <span class="pl-c1">8</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">50</span>;
-s.t. con1<span class="pl-k">:</span> x <span class="pl-k">+</span> y <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span> <span class="pl-k">*</span> z;
-<span class="pl-k">..</span>.</pre></div>
+<h3>
+<a id="user-content-advanced" class="anchor" href="#advanced" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced</h3>
 
-<h4>
-<a id="user-content-exec" class="anchor" href="#exec" aria-hidden="true"><span class="octicon octicon-link"></span></a>EXEC</h4>
+<p>Run PyMPL Web App in background:</p>
 
-<p>Usage: <code>$EXEC{python code};</code></p>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ CID=<span class="pl-s"><span class="pl-pds">$(</span>docker run -d -p 5555 fdabrandao/pympl<span class="pl-pds">)</span></span>
+user@locahost <span class="pl-k">~</span>$ docker inspect --format URL:http://{{.NetworkSettings.IPAddress}}:5555/ <span class="pl-smi">$CID</span>
+URL:http://172.17.0.71:5555/</pre></div>
 
-<p>Description: executes python code.</p>
+<p>List all running PyMPL containers:</p>
 
-<p>Parameters:</p>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker ps <span class="pl-k">|</span> grep fdabrandao/pympl
+...</pre></div>
 
-<ul>
-<li>Python:
+<p>List URLs of all running PyMPL containers:</p>
 
-<ul>
-<li>valid python code.</li>
-</ul>
-</li>
-</ul>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ CIDs=<span class="pl-s"><span class="pl-pds">$(</span>docker ps <span class="pl-k">|</span> grep fdabrandao/pympl <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
+user@locahost <span class="pl-k">~</span>$ docker inspect --format URL:http://{{.NetworkSettings.IPAddress}}:5555/ <span class="pl-smi">$CIDs</span>
+...</pre></div>
 
-<p>Creates:</p>
+<p>Stop and remove all PyMPL containers:</p>
 
-<ul>
-<li>AMPL:
-
-<ul>
-<li>May create anything that results from calls to PyMPL commands.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>May create new python variables/functions/etc. that can be used in the following statements.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$EXEC{
-<span class="pl-k">for</span> i <span class="pl-k">in</span> range(<span class="pl-c1">3</span>)<span class="pl-k">:</span>
-    STMT(<span class="pl-s"><span class="pl-pds">"</span>var x{0}, integer, &gt;= 0, &lt;= {1};<span class="pl-pds">"</span></span>.<span class="pl-k">format</span>(i, i<span class="pl-k">+</span><span class="pl-c1">1</span>))
-};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">var</span> x0, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">1</span>;
-<span class="pl-k">var</span> x1, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">2</span>;
-<span class="pl-k">var</span> x2, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">3</span>;</pre></div>
-
-<p>Note: you call use PyMPL commands inside python code as follows:</p>
-
-<ul>
-<li>
-<code>$CMD[...]{...};</code> are equivalent to <code>CMD["..."](...)</code> in python code;</li>
-<li>
-<code>$CMD{...};</code> are equivalent to <code>CMD(...)</code> in python code.</li>
-</ul>
-
-<h4>
-<a id="user-content-stmt" class="anchor" href="#stmt" aria-hidden="true"><span class="octicon octicon-link"></span></a>STMT</h4>
-
-<p>Usage: <code>$STMT{python expression};</code></p>
-
-<p>Description: is replaced by the result of <code>eval("python expression")</code>.  </p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>Python:
-
-<ul>
-<li>valid python expression.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>is replaced by the result of evaluating the expression.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$STMT{<span class="pl-s"><span class="pl-pds">"</span>s.t. con1: x + y &lt;= {0} * z;<span class="pl-pds">"</span></span>.<span class="pl-k">format</span>(<span class="pl-k">abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>))};
-$EXEC{stmt <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>s.t. {0}: x &gt;= 10;<span class="pl-pds">"</span></span>.<span class="pl-k">format</span>(<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>)};
-$STMT{stmt};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-s.t. con1<span class="pl-k">:</span> x <span class="pl-k">+</span> y <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span> <span class="pl-k">*</span> z;
-s.t. test<span class="pl-k">:</span> x <span class="pl-k">&gt;=</span> <span class="pl-c1">10</span>;
-<span class="pl-k">..</span>.</pre></div>
-
-<p>Note: <code>$STMT{expression};</code> is equivalent to <code>${expression}$</code> (<a href="#eval">EVAL</a>).</p>
-
-<h4>
-<a id="user-content-set" class="anchor" href="#set" aria-hidden="true"><span class="octicon octicon-link"></span></a>SET</h4>
-
-<p>Usage: <code>$SET[set_name]{values};</code></p>
-
-<p>Description: creates an AMPL sets.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>
-<code>'set_name'</code>: set name.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>values</code>: list of values.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>a set named <code>'set_name'</code>.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>_set['set_name']</code>: list of values.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$<span class="pl-k">SET</span>[A]{range(<span class="pl-c1">5</span>)};
-$<span class="pl-k">SET</span>[B]{zip(range(<span class="pl-c1">5</span>),range(<span class="pl-c1">5</span>))};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">set</span> A <span class="pl-k">:=</span> {<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};
-<span class="pl-k">set</span> B <span class="pl-k">:=</span> {(<span class="pl-c1">0</span>,<span class="pl-c1">0</span>),(<span class="pl-c1">1</span>,<span class="pl-c1">1</span>),(<span class="pl-c1">2</span>,<span class="pl-c1">2</span>),(<span class="pl-c1">3</span>,<span class="pl-c1">3</span>),(<span class="pl-c1">4</span>,<span class="pl-c1">4</span>)};</pre></div>
-
-<p>Note: Is is possible to call external functions (i.e., <code>$SET[X]{some_function(...)}</code>) that return the set.</p>
-
-<h4>
-<a id="user-content-param" class="anchor" href="#param" aria-hidden="true"><span class="octicon octicon-link"></span></a>PARAM</h4>
-
-<p>Usage: <code>$PARAM[param_name]{values, i0=0};</code></p>
-
-<p>Description: creates AMPL parameters.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>Option 1: <code>'param_name'</code> -&gt; parameter name;<br>
-</li>
-<li>Option 2: <code>'param_name{Index_name}'</code> -&gt; parameter name and index name.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>values</code>: dictionary of key:value pairs or a list of values;</li>
-<li>
-<code>i0</code>: initial index if <code>values</code> is a list of values.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>a parameter named <code>'param_name'</code>.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>_param['param_name']</code>: dictionary with the parameter data.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$<span class="pl-k">PARAM</span>[NAME]{<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>}; 
-$<span class="pl-k">PARAM</span>[VALUE]{<span class="pl-c1">10</span>};
-$<span class="pl-k">PARAM</span>[D{I}]{{<span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span><span class="pl-k">:</span> <span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span><span class="pl-k">:</span> <span class="pl-c1">2</span>}};
-$<span class="pl-k">PARAM</span>[L0]{[<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>], i0<span class="pl-k">=</span><span class="pl-c1">0</span>};
-$<span class="pl-k">PARAM</span>[L1]{[<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>], i0<span class="pl-k">=</span><span class="pl-c1">1</span>}; <span class="pl-c"># `i0` is the initial index if `values` is a list</span>
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">param</span> NAME <span class="pl-k">:=</span> <span class="pl-s"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>;
-<span class="pl-k">param</span> VALUE <span class="pl-k">:=</span> <span class="pl-c1">10</span>;
-<span class="pl-k">param</span> D <span class="pl-k">:=</span> [<span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span>]<span class="pl-c1">1</span>[<span class="pl-s"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span>]<span class="pl-c1">2</span>;
-<span class="pl-k">set</span> I <span class="pl-k">:=</span> {<span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span>};
-<span class="pl-k">param</span> L0 <span class="pl-k">:=</span> [<span class="pl-c1">0</span>]<span class="pl-c1">1</span>[<span class="pl-c1">1</span>]<span class="pl-c1">2</span>[<span class="pl-c1">2</span>]<span class="pl-c1">3</span>;
-<span class="pl-k">param</span> L1 <span class="pl-k">:=</span> [<span class="pl-c1">1</span>]<span class="pl-c1">1</span>[<span class="pl-c1">2</span>]<span class="pl-c1">2</span>[<span class="pl-c1">3</span>]<span class="pl-c1">3</span>;</pre></div>
-
-<p>Note: Is is possible to call external functions (i.e., <code>$PARAM[X]{some_function(...)}</code>) that return the parameter.</p>
-
-<h4>
-<a id="user-content-var" class="anchor" href="#var" aria-hidden="true"><span class="octicon octicon-link"></span></a>VAR</h4>
-
-<p>Usage: <code>$VAR[var_name]{typ="", lb=None, ub=None, index_set=None};</code></p>
-
-<p>Description: creates AMPL variables.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>Option 1: <code>'var_name'</code> -&gt;  variable name;</li>
-<li>Option 2: <code>'var_name{Iname}'</code> -&gt; variable name and index name (<code>index_set</code> must be provided).</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>typ</code>: variable type (e.g., "integer");</li>
-<li>
-<code>lb</code>: variable lower bound;</li>
-<li>
-<code>ub</code>: variable upper bound;</li>
-<li>
-<code>index_set</code>: index set for the variable.</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>creates a variable named <code>'var_name'</code>.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:  </p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$<span class="pl-k">VAR</span>[x]{<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>, <span class="pl-c1">0</span>, <span class="pl-c1">10</span>};
-$<span class="pl-k">VAR</span>[y]{<span class="pl-s"><span class="pl-pds">"</span>binary<span class="pl-pds">"</span></span>};
-$<span class="pl-k">VAR</span>[z]{ub<span class="pl-k">=abs</span>((<span class="pl-c1">2</span><span class="pl-k">**</span><span class="pl-c1">7</span>)<span class="pl-k">/</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">135</span>)};
-$<span class="pl-k">VAR</span>[xs{I}]{<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>, index_set<span class="pl-k">=</span>range(<span class="pl-c1">3</span>)};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">var</span> x, <span class="pl-k">integer</span>, <span class="pl-k">&gt;=</span> <span class="pl-c1">0</span>, <span class="pl-k">&lt;=</span> <span class="pl-c1">10</span>;
-<span class="pl-k">var</span> y, <span class="pl-k">binary</span>; 
-<span class="pl-k">var</span> z, <span class="pl-k">&lt;=</span> <span class="pl-c1">110</span>;
-<span class="pl-k">set</span> I <span class="pl-k">:=</span> {<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>};
-<span class="pl-k">var</span> xs{I}, <span class="pl-k">integer</span>;</pre></div>
-
-<h4>
-<a id="user-content-con" class="anchor" href="#con" aria-hidden="true"><span class="octicon octicon-link"></span></a>CON</h4>
-
-<p>Usage: <code>$CON[constraint_name]{left, sign, right};</code></p>
-
-<p>Description: creates AMPL constraints.</p>
-
-<p>Parameters:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>
-<code>'constraint_name'</code>: constraint name.</li>
-</ul>
-</li>
-<li>Python:
-
-<ul>
-<li>
-<code>left</code>: list of variable names, values, or pairs (variable name, coefficient);</li>
-<li>
-<code>sign</code>: constraint type ("&gt;=", "=", "&lt;=");</li>
-<li>
-<code>right</code>: list of variable names, values, or pairs (variable name, coefficient).</li>
-</ul>
-</li>
-</ul>
-
-<p>Creates:</p>
-
-<ul>
-<li>AMPL:
-
-<ul>
-<li>a constraint named <code>'constraint_name'</code>.</li>
-</ul>
-</li>
-</ul>
-
-<p>Examples:</p>
-
-<div class="highlight highlight-source-ampl"><pre><span class="pl-k">..</span>.
-$CON[con1]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-c1">10</span>)],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,<span class="pl-c1">20</span>};
-$CON[con2]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-c1">15</span>),<span class="pl-k">-</span><span class="pl-c1">20</span>],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>)};
-$CON[con3]{[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-c1">5</span>)],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>),<span class="pl-c1">20</span>]};
-$CON[con4]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">5</span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">10</span>)]};
-$CON[con5]{<span class="pl-k">-</span><span class="pl-c1">20</span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">5</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-$CON[con6]{[<span class="pl-k">-</span><span class="pl-c1">20</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>],<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-$CON[con7]{<span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>&gt;=<span class="pl-pds">"</span></span>,[(<span class="pl-k">-</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">"</span>x1<span class="pl-pds">"</span></span>),<span class="pl-c1">20</span>,(<span class="pl-s"><span class="pl-pds">"</span>x2<span class="pl-pds">"</span></span>,<span class="pl-k">-</span><span class="pl-c1">15</span>),(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-s"><span class="pl-pds">"</span>x3<span class="pl-pds">"</span></span>)]};
-<span class="pl-k">..</span>.</pre></div>
-
-<p>is replaced by:</p>
-
-<div class="highlight highlight-source-ampl"><pre>s.t. con1<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con2<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con3<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con4<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con5<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con6<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;
-s.t. con7<span class="pl-k">:</span> <span class="pl-k">+</span><span class="pl-c1">5</span><span class="pl-k">*</span>x1<span class="pl-k">+</span><span class="pl-c1">15</span><span class="pl-k">*</span>x2<span class="pl-k">+</span><span class="pl-c1">10</span><span class="pl-k">*</span>x3 <span class="pl-k">&gt;=</span> <span class="pl-c1">20</span>;</pre></div>
-
-<p>Note: all the original constraints are just different representations of the same constraint.</p>
+<div class="highlight highlight-source-shell"><pre>user@locahost <span class="pl-k">~</span>$ docker stop <span class="pl-s"><span class="pl-pds">$(</span>docker ps -a <span class="pl-k">|</span> grep fdabrandao/pympl <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span>
+user@locahost <span class="pl-k">~</span>$ docker rm <span class="pl-s"><span class="pl-pds">$(</span>docker ps -a <span class="pl-k">|</span> grep fdabrandao/pympl <span class="pl-k">|</span> cut -d<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> -f1<span class="pl-pds">)</span></span></pre></div>
 
 <hr>
 
