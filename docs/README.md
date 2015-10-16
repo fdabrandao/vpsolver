@@ -31,6 +31,7 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 * MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...  
 * `g++ >= 4.8`
 * `make >= 3.81`
+* `bash >= 3.2`
       
 #### Optional
 
