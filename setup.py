@@ -8,6 +8,21 @@ be solved using general-purpose mixed-integer programming solvers such
 as Gurobi and GLPK. For modelling other problems easily, VPSolver
 includes a Python API and a modelling toolbox (PyMPL).
 
+Setup
+`````
+
+.. code:: bash
+
+    $ pip install pyvpsolver
+
+System requirements
+```````````````````
+
+* UNIX-based operating system
+* g++ >= 4.8
+* make >= 3.81
+* bash >= 4.3
+
 Links
 `````
 

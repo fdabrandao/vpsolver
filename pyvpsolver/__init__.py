@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = "v2.0.0-rc4"
+__version__ = "2.0.0"
 
 from .graphutils import AFGraph
 from .vpsolver import VPSolver, VBP, AFG, MPS, LP
