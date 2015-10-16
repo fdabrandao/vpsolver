@@ -21,7 +21,7 @@ System requirements
 * UNIX-based operating system
 * g++ >= 4.8
 * make >= 3.81
-* bash >= 4.3
+* bash >= 3.2
 
 Links
 `````
