@@ -23,32 +23,33 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 * Project Homepage: <http://vpsolver.dcc.fc.up.pt/>
 * GiHub repository: <https://github.com/fdabrandao/vpsolver>
 * BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>
-* Docker repository: <https://hub.docker.com/r/fdabrandao/vpsolver/>
+* Docker repository: <https://hub.docker.com/r/fdabrandao/vpsolver>
+* PyPI repository: <https://pypi.python.org/pypi/pyvpsolver>
 
 ## Requirements
 #### Mandatory
 
 * MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...  
-* `g++ >= 4.8`
-* `make >= 3.81`
-* `bash >= 3.2`
+* UNIX-like operating system or a UNIX-like environment such as [Cygwin](https://www.cygwin.com/)
+* `g++ >= 4.8`; `make >= 3.0`; `bash >= 3.0`
       
 #### Optional
 
 For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and [Web App](#vpsolver-web-app):
 
 * `python-2.7` or `python-3.x`
+* `python-setuptools`
 * `python-pip`
 * `python-dev`
-* `python-pygraphviz`
 * `glpk-utils`
  
 #### Platforms
 It has been successfully compiled and run on the following platforms:
 
-* **Linux**
-* **Mac OS X**
-* On a large variety of platforms including **Windows** using a [Docker container](#docker).
+* **Linux**;
+* **Mac OS X**;
+* On a large variety of platforms including **Windows** using a [Docker container](#docker);
+* It also runs on **Windows** using [Cygwin](https://www.cygwin.com/) (a Unix-like environment and command-line interface).
 
 ## Setup
 Without the python interface: 
