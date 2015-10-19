@@ -6,3 +6,7 @@
 	path = submodules/docker-ubuntu-git
 	url = git@github.com:fdabrandao/docker-ubuntu.git
 	ignore = dirty
+[submodule "docs/wiki"]
+	path = docs/wiki
+	url = git@github.com:fdabrandao/vpsolver.wiki.git
+	ignore = dirty
