@@ -20,7 +20,7 @@ For modelling other problems easily, VPSolver includes a [Python API](https://gi
 For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki) or to the manual.
 
 #### Repositories
-* Project Homepage: <http://vpsolver.dcc.fc.up.pt/>
+* Project Homepage: <http://vpsolver.dcc.fc.up.pt>
 * GiHub repository: <https://github.com/fdabrandao/vpsolver>
 * BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>
 * Docker repository: <https://hub.docker.com/r/fdabrandao/vpsolver>
@@ -46,10 +46,10 @@ For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and
 #### Platforms
 It has been successfully compiled and run on the following platforms:
 
-* **Linux**;
-* **Mac OS X**;
-* On a large variety of platforms including **Windows** using a [Docker container](#docker);
-* It also runs on **Windows** using [Cygwin](https://www.cygwin.com/) (a Unix-like environment and command-line interface).
+* **Linux**
+* **Mac OS X**
+* On a large variety of platforms including **Windows** using a [Docker container](#docker)
+* It also runs on **Windows** using [Cygwin](https://www.cygwin.com/) (a Unix-like environment and command-line interface)
 
 ## Setup
 Without the python interface: 
@@ -122,7 +122,7 @@ URL: http://172.17.0.60:5555/
 ...
 ```
 
-For more details, please refer to the project wiki [https://github.com/fdabrandao/vpsolver/wiki/docker].
+For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki/docker).
 
 ## VPSolver Web App
 VPSolver includes a Web App that can be started as follows:
@@ -179,12 +179,12 @@ $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg
 ## Folders
 
 * `docs/`: documentation
-* `bin/`: vpsolver executables
 * `scripts/`: vpsolver scripts
+* `bin/`: vpsolver executables
 * `src/`: vpsolver source code in C++
 * `pyvpsolver/`: pyvpsolver source code in Python
 * `examples/`: vpsolver and pyvpsolver examples
-* `reports/`: technical reports on the underlying algorithms and models
+* `docs/reports/`: technical reports on the underlying algorithms and models
 
 ## Reports
 VPSolver was proposed in:
