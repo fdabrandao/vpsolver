@@ -75,13 +75,15 @@ large models.</p>
 <a id="user-content-repositories" class="anchor" href="#repositories" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repositories</h4>
 
 <ul>
-<li>Project Homepage: <a href="http://vpsolver.dcc.fc.up.pt/">http://vpsolver.dcc.fc.up.pt/</a>
+<li>Project Homepage: <a href="http://vpsolver.dcc.fc.up.pt">http://vpsolver.dcc.fc.up.pt</a>
 </li>
 <li>GiHub repository: <a href="https://github.com/fdabrandao/vpsolver">https://github.com/fdabrandao/vpsolver</a>
 </li>
 <li>BitBucket repository: <a href="https://bitbucket.org/fdabrandao/vpsolver">https://bitbucket.org/fdabrandao/vpsolver</a>
 </li>
-<li>Docker repository: <a href="https://hub.docker.com/r/fdabrandao/vpsolver/">https://hub.docker.com/r/fdabrandao/vpsolver/</a>
+<li>Docker repository: <a href="https://hub.docker.com/r/fdabrandao/vpsolver">https://hub.docker.com/r/fdabrandao/vpsolver</a>
+</li>
+<li>PyPI repository: <a href="https://pypi.python.org/pypi/pyvpsolver">https://pypi.python.org/pypi/pyvpsolver</a>
 </li>
 </ul>
 
@@ -94,9 +96,11 @@ large models.</p>
 <ul>
 <li>MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...<br>
 </li>
-<li><code>g++ &gt;= 4.8</code></li>
-<li><code>make &gt;= 3.81</code></li>
-<li><code>bash &gt;= 3.2</code></li>
+<li>UNIX-like operating system or a UNIX-like environment such as <a href="https://www.cygwin.com/">Cygwin</a>
+</li>
+<li>
+<code>g++ &gt;= 4.8</code>; <code>make &gt;= 3.0</code>; <code>bash &gt;= 3.0</code>
+</li>
 </ul>
 
 <h4>
@@ -108,9 +112,9 @@ large models.</p>
 <li>
 <code>python-2.7</code> or <code>python-3.x</code>
 </li>
+<li><code>python-setuptools</code></li>
 <li><code>python-pip</code></li>
 <li><code>python-dev</code></li>
-<li><code>python-pygraphviz</code></li>
 <li><code>glpk-utils</code></li>
 </ul>
 
@@ -122,7 +126,9 @@ large models.</p>
 <ul>
 <li><strong>Linux</strong></li>
 <li><strong>Mac OS X</strong></li>
-<li>On a large variety of platforms including <strong>Windows</strong> using a <a href="#docker">Docker container</a>.</li>
+<li>On a large variety of platforms including <strong>Windows</strong> using a <a href="#docker">Docker container</a>
+</li>
+<li>It also runs on <strong>Windows</strong> using <a href="https://www.cygwin.com/">Cygwin</a> (a Unix-like environment and command-line interface)</li>
 </ul>
 
 <h2>
@@ -191,7 +197,7 @@ URL: http://172.17.0.60:5555/
  <span class="pl-k">*</span> Running on http://0.0.0.0:5555/
 ...</pre></div>
 
-<p>For more details, please refer to the project wiki [<a href="https://github.com/fdabrandao/vpsolver/wiki/docker">https://github.com/fdabrandao/vpsolver/wiki/docker</a>].</p>
+<p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/wiki/docker">project wiki</a>.</p>
 
 <h2>
 <a id="user-content-vpsolver-web-app" class="anchor" href="#vpsolver-web-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>VPSolver Web App</h2>
@@ -270,9 +276,9 @@ $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
 <li>
 <code>docs/</code>: documentation</li>
 <li>
-<code>bin/</code>: vpsolver executables</li>
-<li>
 <code>scripts/</code>: vpsolver scripts</li>
+<li>
+<code>bin/</code>: vpsolver executables</li>
 <li>
 <code>src/</code>: vpsolver source code in C++</li>
 <li>
@@ -280,7 +286,7 @@ $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
 <li>
 <code>examples/</code>: vpsolver and pyvpsolver examples</li>
 <li>
-<code>reports/</code>: technical reports on the underlying algorithms and models</li>
+<code>docs/reports/</code>: technical reports on the underlying algorithms and models</li>
 </ul>
 
 <h2>
