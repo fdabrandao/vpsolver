@@ -29,6 +29,8 @@ from .. import VPSolver, VBP, AFG
 from .. import AFGraph
 from pympl import Model
 
+LOSS = "L"
+
 
 def solve(
         Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="",
@@ -66,7 +68,10 @@ def solve(
         symb = "G{0}".format(i)
         instances[i] = VBP(Ws[i], ww, bbi, verbose=False)
         graphs[i] = AFG(instances[i], verbose=verbose).graph()
-        graphs[i].relabel(lambda u: "{0}{1}".format(symb, u))
+        graphs[i].relabel(
+            lambda u: "{0}{1}".format(symb, u),
+            lambda lbl: lbl if lbl < len(ww) else LOSS
+        )
         Ss[i] = symb+"S"
         Ts[i] = symb+"T"
         if svg_file.endswith(".svg"):
@@ -75,74 +80,62 @@ def solve(
             except Exception as e:
                 VPSolver.log(e, verbose)
 
+    S, T = "S", "T"
     V = sum([g.V for g in graphs], [])
     A = sum([g.A for g in graphs], [])
-    V += ["S", "T"]
-    A += [("S", s, "L") for s in Ss]
-    A += [(t, "T", "L") for t in Ts]
-    A += [("T", "S", "L")]
+    V += [S, T]
+    A += [(S, s, LOSS) for s in Ss]
+    A += [(t, T, LOSS) for t in Ts]
+    A += [(T, S, LOSS)]
 
-    graph = AFGraph(V, A, "S", "T")
+    graph = AFGraph(V, A, S, T)
     if svg_file.endswith(".svg"):
         try:
-            graph.draw(svg_file, ignore=[("T", "S")])
+            graph.draw(svg_file, ignore=[(T, S)])
         except Exception as e:
                 VPSolver.log(e, verbose)
 
     adj = {u: [] for u in V}
     for (u, v, i) in A:
         adj[v].append((u, i))
-    S, T = "S", "T"
-
-    newlbl = {}
-
-    def compress(u):
-        if u == S:
-            return [0]*ndims
-        if u in newlbl:
-            return newlbl[u]
-
-        def itemw(lbl):
-            if isinstance(lbl, int) and lbl < len(ww):
-                return ww[lbl]
-            else:
-                return [0]*ndims
-
-        lbl = [0]*ndims
-        for v, i in adj[u]:
-            wi = itemw(i)
-            vlbl = compress(v)
-            for d in range(ndims):
-                lbl[d] = max(lbl[d], vlbl[d]+wi[d])
-        newlbl[u] = lbl
-        return lbl
-
-    compress(T)
-    revlbl = {tuple(x): [] for x in newlbl.values()}
-    for u in newlbl:
-        if u not in Ts+[T]:
-            revlbl[tuple(newlbl[u])].append(u)
-
-    revlbl2 = {}
-    for i, x in enumerate(sorted(revlbl)):
-        if sum(x) != 0:
-            revlbl2["V{0}".format(i)] = revlbl[x]
-        else:
-            revlbl2[S] = revlbl[x]
-
-    vlbl = {}
-    for lbl in revlbl2:
-        for v in revlbl2[lbl]:
-            vlbl[v] = lbl
-
-    assert set([v for v in V if v not in vlbl]) == set([S, T]+Ts)
 
     VPSolver.log("Final compression steps:", verbose)
 
     nv1, na1 = len(V), len(A)
     VPSolver.log("  #V1: {0} #A1: {1}".format(nv1, na1), verbose)
+    zero = tuple([0]*ndims)
 
-    graph.relabel(lambda u: vlbl.get(u, u))
+    def compress(u):
+        if u == S:
+            return zero
+        if u in newlbl:
+            return newlbl[u]
+        lbl = zero
+        for v, i in adj[u]:
+            wi = ww[i] if i != LOSS else zero
+            vlbl = compress(v)
+            lbl = tuple(max(lbl[d], vlbl[d]+wi[d]) for d in range(ndims))
+        newlbl[u] = lbl
+        return lbl
+
+    newlbl = {}
+    compress(T)
+    newlbl[S] = S
+    newlbl[T] = T
+    for t in Ts:
+        newlbl[t] = t
+    for u in newlbl:
+        if newlbl[u] == zero:
+            newlbl[u] = S
+
+    graph.relabel(lambda u: newlbl.get(u, u))
+
+    newlbl = {}
+    for u in sorted(graph.V):
+        if isinstance(u, tuple):
+            newlbl[u] = len(newlbl)
+
+    graph.relabel(lambda u: newlbl.get(u, u))
     V, A = graph.V, graph.A
 
     nv2, na2 = len(V), len(A)
@@ -153,7 +146,7 @@ def solve(
     if svg_file.endswith(".svg"):
         try:
             graph.draw(
-                svg_file.replace(".svg", ".final.svg"), ignore=[("T", "S")]
+                svg_file.replace(".svg", ".final.svg"), ignore=[(T, S)]
             )
         except Exception as e:
                 VPSolver.log(e, verbose)
@@ -162,13 +155,13 @@ def solve(
     At = []
     used = set()
     for (u, v, i) in A:
-        k = itlabel[i][0] if (isinstance(i, int) and i < len(itlabel)) else "L"
+        k = itlabel[i][0] if i != LOSS else LOSS
         if (u, v, k) not in used:
             At.append((u, v, i))
             used.add((u, v, k))
 
     A = At
-    graph = AFGraph(V, A, "S", "T")
+    graph = AFGraph(V, A, S, T)
 
     nv3, na3 = len(V), len(A)
     VPSolver.log("  #V3: {0} #A3: {1}".format(nv3, na3), verbose)
@@ -199,7 +192,7 @@ def solve(
 
     n = sum(b)
     for i in range(nbtypes):
-        var = graph.vname(Ts[i], "T", "L")
+        var = graph.vname(Ts[i], T, LOSS)
         ub[var] = min(Qs[i], n)
 
     for var in varl:
@@ -209,7 +202,7 @@ def solve(
     for lincomb, sign, rhs in cons:
         model.add_con(lincomb, sign, rhs)
 
-    lincomb = [(graph.vname(Ts[i], "T", "L"), Cs[i]) for i in range(nbtypes)]
+    lincomb = [(graph.vname(Ts[i], T, LOSS), Cs[i]) for i in range(nbtypes)]
     model.set_obj("min", lincomb)
 
     model_file = VPSolver.new_tmp_file(".lp")
@@ -235,20 +228,20 @@ def solve(
 
     labels = {}
     for (u, v, i) in A:
-        if isinstance(i, int) and i < len(itlabel):
+        if i != LOSS:
             labels[u, v, i] = [itlabel[i]]
 
     lst_sol = []
     graph.set_flow(varvalues)
     graph.set_labels(labels)
     for i in range(nbtypes):
-        lst_sol.append(graph.extract_solution("S", "<-", Ts[i]))
+        lst_sol.append(graph.extract_solution(S, "<-", Ts[i]))
 
     assert graph.validate_solution(lst_sol, nbtypes, ndims, Ws, ws, b)
 
     c1 = sum(sum(r for r, patt in lst_sol[i])*Cs[i] for i in range(nbtypes))
     c2 = sum(
-        varvalues.get(graph.vname(Ts[i], "T", "L"), 0) * Cs[i]
+        varvalues.get(graph.vname(Ts[i], T, LOSS), 0) * Cs[i]
         for i in range(nbtypes)
     )
     assert c1 == c2
