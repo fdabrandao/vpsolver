@@ -237,7 +237,7 @@ def solve(
     for i in range(nbtypes):
         lst_sol.append(graph.extract_solution(S, "<-", Ts[i]))
 
-    assert graph.validate_solution(lst_sol, nbtypes, ndims, Ws, ws, b)
+    validate_solution(lst_sol, nbtypes, ndims, Ws, ws, b)
 
     c1 = sum(sum(r for r, patt in lst_sol[i])*Cs[i] for i in range(nbtypes))
     c2 = sum(
@@ -247,6 +247,26 @@ def solve(
     assert c1 == c2
 
     return c1, lst_sol
+
+
+def validate_solution(lst_solutions, nbtypes, ndims, Ws, ws, b):
+    """Validates multiple-choice vector packing solutions."""
+    for i in range(nbtypes):
+        for r, pat in lst_solutions[i]:
+            if any(
+                sum(ws[it][t][d] for (it, t) in pat) > Ws[i][d]
+                for d in range(ndims)
+            ):
+                return False
+
+    aggsol = sum([sol for sol in lst_solutions], [])
+
+    c = [0] * len(b)
+    for (r, p) in aggsol:
+        for i, t in p:
+            c[i] += r
+
+    return all(c[i] >= b[i] for i in range(len(b)))
 
 
 def print_solution(obj, lst_sol, fout=sys.stdout):
