@@ -72,13 +72,9 @@ class AFGUtils(object):
     @staticmethod
     def relabel(V, A, fv, fa=lambda x: x):
         """Relabels graphs."""
-        V = list(map(fv, V))
-        At = []
-        for (u, v, i) in A:
-            u, v = fv(u), fv(v)
-            if u != v:
-                At.append((u, v, fa(i)))
-        return list(set(V)), list(set(At))
+        V = set(map(fv, V))
+        A = set((fv(u), fv(v), fa(i)) for (u, v, i) in A if fv(u) != fv(v))
+        return list(V), list(A)
 
     @staticmethod
     def draw(
@@ -87,8 +83,9 @@ class AFGUtils(object):
         """Draws arc-flow graphs in .svg format."""
         from pygraphviz.agraph import AGraph
         if loss is None:
-            loss = [i for (u, v, i) in A if not isinstance(i, int)]
-            loss.append(max([i for (u, v, i) in A if isinstance(i, int)]+[-1]))
+            loss = []
+        elif not isinstance(loss, (tuple, list)):
+            loss = [loss]
         g = AGraph(
             rankdir="LR", directed=True, bgcolor="white", text="black",
             font_color="white", ranksep="1.0", nodesep="0.10",
