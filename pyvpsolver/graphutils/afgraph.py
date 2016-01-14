@@ -23,6 +23,8 @@ from builtins import object
 
 from .afgutils import AFGUtils
 
+inf = float("inf")
+
 
 class AFGraph(object):
     """Manipulable graph objects."""
@@ -137,7 +139,7 @@ class AFGraph(object):
         """Sets arc labels."""
         self.labels = labels
 
-    def extract_solution(self, source, direction, target):
+    def extract_solution(self, source, direction, target, flow_limit=inf):
         """Extracts vector packing solutions form arc-flow solutions."""
         assert direction in ("<-", "->")
         flow = self.flow
@@ -176,7 +178,7 @@ class AFGraph(object):
                         go(v, ff, path+[arc])
                         f -= ff
 
-        go(node_a, float("inf"), [])
+        go(node_a, flow_limit, [])
 
         # group identical patterns
         rep = {}
