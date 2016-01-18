@@ -18,26 +18,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#ifndef _COMMON_HPP_
-#define _COMMON_HPP_
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include "common.hpp"
+using namespace std;
 
-#define EPS 1e-5
-#define MAX_LEN 256
-#define TRANSPOSE (1)
-#define All(x) (x).begin(),(x).end()
-#define ForEach(i,c) for(__typeof((c).begin()) i = (c).begin(); i != (c).end(); i++)
-#define MP(x,y) make_pair(x,y)
+bool check_ext(const char* name, const char* extension){
+    const char* end = strrchr(name, '.');
+    return strcmp(end, extension) == 0;
+}
 
-#define MIN_METHOD -2
-#define MAX_METHOD 1
-
-#define CURTIME clock()
-#define TIMEDIF(t0) (double(clock()-t0)/CLOCKS_PER_SEC)
-
-#include <utility>
-typedef std::pair<int, int> int_pair;
-
-bool check_ext(const char* name, const char* extension);
-void exit_msg(const char *msg);
-
-#endif
+void exit_msg(const char *msg){
+    puts(msg);
+    exit(-1);
+}

@@ -152,7 +152,7 @@ int main(int argc, char *argv[]){
     printf("Copyright (C) 2013-2015, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if(argc < 2 || argc > 5){
-        printf("Usage: vpsolver instance.vbp [method:-2] [binary:0] [vtype:I]\n");
+        printf("Usage: vpsolver instance.vbp/instance.mvp [method:-2] [binary:0] [vtype:I]\n");
         return 1;
     }
 
@@ -173,5 +173,3 @@ int main(int argc, char *argv[]){
     graph.solve(inst);
     return 0;
 }
-
-

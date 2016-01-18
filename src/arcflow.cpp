@@ -36,7 +36,7 @@ Arcflow::Arcflow(const Instance &inst){
     tstart = CURTIME;
     ready = false;
     m = inst.m;
-    W = inst.W;
+    W = inst.Ws[0]; // FIXME
     ndims = inst.ndims;
     items = inst.items;
     binary = inst.binary;
@@ -519,6 +519,3 @@ void Arcflow::write(const char *fname){
     write(fout);
     fclose(fout);
 }
-
-
-

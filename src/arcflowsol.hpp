@@ -40,7 +40,7 @@ private:
         const vector<pair<int, vector<int> > > &sol, vector<int> dem) const;
 
     bool is_valid(vector<pair<int, vector<int_pair> > > sol,
-        const Instance &inst) const;
+        const Instance &inst, int btype) const;
 
 public:
     ArcflowSol(const map<Arc, int> &_flow, int _S, int _T, bool _binary = false):
@@ -53,4 +53,3 @@ public:
 };
 
 #endif
-

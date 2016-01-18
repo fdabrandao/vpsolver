@@ -126,7 +126,7 @@ vector<pair<int, vector<int_pair> > > ArcflowSol::extract_solution(
 }
 
 bool ArcflowSol::is_valid(vector<pair<int, vector<int_pair> > > sol,
-        const Instance &inst) const{
+        const Instance &inst, int btype) const{
     vector<int> dem(inst.m);
     for(int i = 0; i < inst.m; i++)
         dem[i] = inst.items[i].demand;
@@ -140,7 +140,7 @@ bool ArcflowSol::is_valid(vector<pair<int, vector<int_pair> > > sol,
             dem[itr->first] -= pat->first * itr->second;
         }
         for(int i = 0; i < inst.ndims; i++)
-            if(w[i] > inst.W[i]) return false;
+            if(w[i] > inst.Ws[btype][i]) return false;
     }
     for(int i = 0; i < inst.m; i++){
         if(dem[i] != 0) return false;
@@ -159,7 +159,7 @@ void ArcflowSol::print_solution(const Instance &inst,
     }
     vector<pair<int, vector<int_pair> > > sol = extract_solution(dem);
     if(validate)
-        assert(is_valid(sol, inst));
+        assert(is_valid(sol, inst, 0)); // FIXME
 
     int obj = 0;
     ForEach(pat, sol)
@@ -198,4 +198,3 @@ void ArcflowSol::print_solution(const Instance &inst,
         }
     }
 }
-

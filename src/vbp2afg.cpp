@@ -29,7 +29,7 @@ int main(int argc, char *argv[]){
     printf("Copyright (C) 2013-2015, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if(argc < 3 || argc > 6){
-        printf("Usage: vbp2afg instance.vbp graph.afg [method:-2] [binary:0] [vtype:I]\n");
+        printf("Usage: vbp2afg instance.vbp/instance.mvp graph.afg [method:-2] [binary:0] [vtype:I]\n");
         return 1;
     }
 
@@ -62,4 +62,3 @@ int main(int argc, char *argv[]){
     fclose(fout);
     return 0;
 }
-

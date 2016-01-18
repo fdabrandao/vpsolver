@@ -66,9 +66,9 @@ Instance::Instance(){
     init();
 }
 
-Instance::Instance(FILE *fin){
+Instance::Instance(FILE *fin, ftype type){
     init();
-    read(fin);
+    read(fin, type);
 }
 
 Instance::Instance(const char *fname){
@@ -76,35 +76,114 @@ Instance::Instance(const char *fname){
     read(fname);
 }
 
-void Instance::read(FILE *fin){
+void Instance::read(const char *fname){
+    FILE *fin = fopen(fname, "r");
+    assert(fin != NULL);
+    if(check_ext(fname, ".vbp")){
+        read(fin, VBP);
+    } else if(check_ext(fname, ".mvp")){
+        read(fin, MVP);
+    } else {
+        exit_msg("Invalid file extension!");
+    }
+    fclose(fin);
+}
+
+void Instance::read(FILE *fin, ftype type){
     assert(fscanf(fin, " NDIMS: ") >= 0);
     assert(fscanf(fin, "%d", &ndims) == 1);
 
-    W.resize(ndims);
-    for(int d = 0; d < ndims; d++)
-        assert(fscanf(fin, "%d", &W[d])==1);
+    if(type == MVP){
+        assert(fscanf(fin, " NBTYPES: ") >= 0);
+        assert(fscanf(fin, "%d", &nbtypes) == 1);
+    }else{
+        nbtypes = 1;
+    }
+
+    Cs.resize(nbtypes);
+    Ws.resize(nbtypes);
+    for(int t = 0; t < nbtypes; t++){
+        Ws[t].resize(ndims);
+        assert(fscanf(fin, " Wi: ") >= 0);
+        for(int d = 0; d < ndims; d++)
+            assert(fscanf(fin, "%d", &Ws[t][d])==1);
+        if(type == MVP){
+            assert(fscanf(fin, " Ci: ") >= 0);
+            assert(fscanf(fin, "%d", &Cs[t])==1);
+        } else {
+            Cs[t] = 1;
+        }
+    }
 
     assert(fscanf(fin, " M: ") >= 0);
     assert(fscanf(fin, "%d", &m) == 1);
 
     items.clear();
-    for(int i = 0; i < m; i++){
-        items.push_back(Item(ndims));
-        for(int d = 0; d < ndims; d++){
-            int &w = items[i][d];
-            assert(fscanf(fin, "%d", &w)==1);
-            if(w != 0)
-                items[i].nonzero.push_back(d);
+    nopts.clear();
+    demands.clear();
+    int it_count = 0;
+    for(int it_type = 0; it_type < m; it_type++){
+
+        int qi, bi;
+        if(type == MVP){
+            assert(fscanf(fin, " qi: ") >= 0);
+            assert(fscanf(fin, "%d", &qi) == 1);
+            assert(fscanf(fin, " bi: ") >= 0);
+            assert(fscanf(fin, "%d", &bi) == 1);
+            demands.push_back(bi);
+        } else {
+            qi = 1;
+            bi = -1;
         }
-        assert(!items[i].nonzero.empty());
-        assert(fscanf(fin, "%d", &items[i].demand)==1);
-        int S = 0;
-        for(int d = 0; d < ndims; d++){
-            assert(items[i].demand == 0 || items[i][d] <= W[d]);
-            S += W[d] > 0 ? round(items[i][d]/double(W[d])*NORM_PRECISION) : 0;
+        nopts.push_back(qi);
+
+        for(int t = 0; t < qi; t++){
+            items.push_back(Item(ndims));
+            Item &item = items.back();
+
+            assert(fscanf(fin, " wi: ") >= 0);
+            for(int d = 0; d < ndims; d++){
+                assert(fscanf(fin, "%d", &item[d])==1);
+                if(item[d] != 0)
+                    item.nonzero.push_back(d);
+            }
+            assert(!item.nonzero.empty());
+
+            if(type == VBP){
+                assert(fscanf(fin, " bi: ") >= 0);
+                assert(fscanf(fin, "%d", &bi)==1);
+                demands.push_back(bi);
+            }
+            item.demand = bi;
+
+            int S = 0;
+            vector<int> maxW(ndims, 0);
+            for(int d = 0; d < ndims; d++){
+                for(int t = 0; t < nbtypes; t++)
+                    maxW[d] = max(maxW[d], Ws[t][d]);
+            }
+            for(int d = 0; d < ndims; d++){
+                if(maxW[d] > 0){
+                    S += round(item[d]/double(maxW[d])*NORM_PRECISION);
+                }
+            }
+            if(item.demand > 0){
+                bool fits = true;
+                for(int t = 0; t < nbtypes; t++){
+                    for(int d = 0; d < ndims; d++){
+                        if(item[d] > Ws[t][d]){
+                            fits = false;
+                            break;
+                        }
+                    }
+                    if(fits) break;
+                }
+                assert(fits == true);
+            }
+            item.key = S;
+            item.type = it_type;
+            item.id = it_count++;
         }
-        items[i].key = S;
-        items[i].id = i;
     }
 
     char buf[MAX_LEN];
@@ -163,55 +242,31 @@ void Instance::read(FILE *fin){
     }
 }
 
-void Instance::read(const char *fname){
-    FILE *fin = fopen(fname, "r");
-    assert(fin != NULL);
-    read(fin);
-    fclose(fin);
-}
-
-Instance::Instance(vector<int> W, vector<vector<int> > w, vector<int> b){
-    vtype = 'I';
-    this->W = W;
-    ndims = (int)W.size();
-
-    items.clear();
-    m = (int)w.size();
-    for(int i = 0; i < m; i++){
-        items.push_back(Item(ndims));
-        for(int j = 0; j < ndims; j++)
-            items[i][j] = w[i][j];
-        items[i].demand = b[i];
-        items[i].ctype = (items[i].demand <= 1) ? '=' : '>';
-        double S = 0;
-        for(int j = 0; j < ndims; j++){
-            assert(items[i][j] <= W[j]);
-            S += W[j] > 0 ? items[i][j]/double(W[j]) : 0;
-        }
-        assert(S > 0);
-        items[i].key = S;
-        items[i].id = i;
-    }
-    stable_sort(All(items));
-    reverse(All(items));
-}
-
 void Instance::write(FILE *fout) const{
     fprintf(fout, "NDIMS: %d\n", ndims);
 
-    for(int i = 0; i < ndims; i++){
-        if(i > 0) fprintf(fout, " ");
-        fprintf(fout, "%d", W[i]);
+    fprintf(fout, "NBTYPES: %d\n", nbtypes);
+
+    for(int t = 0; t < nbtypes; t++){
+        fprintf(fout, "Wi:");
+        for(int i = 0; i < ndims; i++){
+            fprintf(fout, " %d", Ws[t][i]);
+        }
+        fprintf(fout, " Ci: %d\n", Cs[t]);
     }
-    fprintf(fout, "\n");
 
     fprintf(fout, "M: %d\n", m);
+    int p = 0;
     for(int i = 0; i < m; i++){
-        for(int j = 0; j < ndims; j++){
-            if(j > 0) fprintf(fout, " ");
-            fprintf(fout, "%d", items[i][j]);
+        fprintf(fout, "qi: %d bi: %d\n", nopts[i], demands[i]);
+        for(int q = 0; q < nopts[i]; q++){
+            fprintf(fout, "wi:");
+            for(int j = 0; j < ndims; j++){
+                fprintf(fout, " %d", items[p][j]);
+            }
+            fprintf(fout, "\n");
+            p++;
         }
-        fprintf(fout, " %d\n", items[i].demand);
     }
 
     fprintf(fout, "VTYPE: %c\n", vtype);
@@ -234,12 +289,3 @@ void Instance::write(FILE *fout) const{
         fprintf(fout, " %d", items[i].id);
     fprintf(fout, "\n");
 }
-
-void Instance::write(const char *fname) const{
-    FILE *fout = fopen(fname, "w");
-    assert(fout != NULL);
-    write(fout);
-    fclose(fout);
-}
-
-

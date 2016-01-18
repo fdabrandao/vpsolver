@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
     }
 
     assert(fscanf(fafg, " #INSTANCE_BEGIN# ")==0);
-    Instance inst(fafg);
+    Instance inst(fafg, VBP);
     assert(fscanf(fafg, " #GRAPH_BEGIN# ")==0);
     assert(fscanf(fafg, " #GRAPH_BEGIN# ")==0);
 
@@ -88,5 +88,3 @@ int main(int argc, char *argv[]){
     sol.print_solution(inst, print_inst, true);
     return 0;
 }
-
-

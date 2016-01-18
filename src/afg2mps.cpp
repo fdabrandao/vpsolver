@@ -96,7 +96,7 @@ int main(int argc, char *argv[]){
     printf("Generating the .MPS model...");
 
     assert(fscanf(fin, " #INSTANCE_BEGIN# ")==0);
-    Instance inst(fin);
+    Instance inst(fin, VBP);
 
     assert(fscanf(fin, " #GRAPH_BEGIN# ")==0);
 
@@ -209,5 +209,3 @@ int main(int argc, char *argv[]){
     printf("DONE!\n");
     return 0;
 }
-
-
