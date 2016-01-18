@@ -11,7 +11,7 @@ GUROBI_OPTS = -I$(INC) $(CPPLIB) -lpthread
 
 GLPK_OPTS = -lglpk
 
-all: $(BIN)/vpsolver $(BIN)/vbp2afg $(BIN)/afg2mps $(BIN)/afg2lp $(BIN)/solve_gurobi $(BIN)/solve_glpk $(BIN)/vbpsol $(BIN)/gg_afg
+all: $(BIN)/vpsolver $(BIN)/vbp2afg $(BIN)/afg2mps $(BIN)/afg2lp $(BIN)/solve_gurobi $(BIN)/solve_glpk $(BIN)/vbpsol
 
 $(BIN)/vpsolver: $(SRC)/vpsolver.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp
 	$(CC) -o $(BIN)/vpsolver $(CFLAGS) $(SRC)/vpsolver.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp $(GUROBI_OPTS)
@@ -33,9 +33,6 @@ $(BIN)/solve_glpk: $(SRC)/solve_glpk.cpp
 
 $(BIN)/vbpsol: $(SRC)/vbpsol.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp
 	$(CC) -o $(BIN)/vbpsol $(CFLAGS) $(SRC)/vbpsol.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp
-
-$(BIN)/gg_afg: $(SRC)/gg_afg.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp
-	$(CC) -o $(BIN)/gg_afg $(CFLAGS) $(SRC)/gg_afg.cpp $(SRC)/instance.cpp  $(SRC)/graph.cpp $(SRC)/arcflow.cpp  $(GUROBI_OPTS)
 
 clean:
 	rm -rf $(BIN)/*
