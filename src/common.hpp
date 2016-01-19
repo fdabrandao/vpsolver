@@ -38,6 +38,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef std::pair<int, int> int_pair;
 
 bool check_ext(const char* name, const char* extension);
-void exit_msg(const char *msg);
+void exit_error(const char *msg);
 
 #endif

@@ -32,9 +32,9 @@ using namespace std;
 
 /* Class ArcflowSol */
 
-vector<pair<int, vector<int_pair> > > ArcflowSol::remove_excess(
-        const vector<pair<int, vector<int> > > &sol, vector<int> dem) const{
-    vector<pair<int, vector<int_pair> > > tmp;
+vector<pattern_pair> ArcflowSol::remove_excess(
+        const vector<pattern_int> &sol, vector<int> &dem) const{
+    vector<pattern_pair> tmp;
     ForEach(pat, sol){
         map<int, int> count;
         ForEach(it, pat->second) count[*it] += 1;
@@ -43,36 +43,40 @@ vector<pair<int, vector<int_pair> > > ArcflowSol::remove_excess(
         while(rep > 0){
             rm.clear();
             ForEach(itr, count){
-                itr->second = min(itr->second, dem[itr->first]);
+                int type = inst.items[itr->first].type;
+                itr->second = min(itr->second, dem[type]);
                 if(itr->second == 0) rm.push_back(itr->first);
             }
             ForEach(ind, rm) count.erase(*ind);
 
             int f = rep;
-            ForEach(itr, count)
-                f = min(f, dem[itr->first]/itr->second);
+            ForEach(itr, count){
+                int type = inst.items[itr->first].type;
+                f = min(f, dem[type]/itr->second);
+            }
             rep -= f;
 
             tmp.push_back(MP(f, vector<int_pair>(All(count))));
-            ForEach(itr, count)
-                dem[itr->first] -= f * itr->second;
+            ForEach(itr, count){
+                int type = inst.items[itr->first].type;
+                dem[type] -= f * itr->second;
+            }
         }
     }
 
-    map<vector<int_pair>, int> m;
+    map<vector<int_pair>, int> mp;
     ForEach(itr, tmp){
         sort(All(itr->second));
-        m[itr->second] += itr->first;
+        mp[itr->second] += itr->first;
     }
 
-    vector<pair<int, vector<int_pair> > > final;
-    ForEach(itr, m)
-        final.push_back(MP(itr->second, itr->first));
-    return final;
+    vector<pattern_pair> finalsol;
+    ForEach(itr, mp)
+        finalsol.push_back(MP(itr->second, itr->first));
+    return finalsol;
 }
 
-vector<pair<int, vector<int_pair> > > ArcflowSol::extract_solution(
-        const vector<int> &dem){
+vector<pattern_pair> ArcflowSol::extract_solution(vector<int> &dem, int T){
     set<int> nodes;
     map<int, vector<Arc> > adj;
     ForEach(a, flow){
@@ -80,56 +84,53 @@ vector<pair<int, vector<int_pair> > > ArcflowSol::extract_solution(
         int v = a->first.v;
         nodes.insert(u);
         nodes.insert(v);
-        adj[v].push_back(a->first);
+        if(v != S) adj[v].push_back(a->first);
     }
+
+    int &zflow = flow[Arc(T, S, inst.items.size())];
 
     vector<int> lst(All(nodes));
 
-    vector<pair<int, vector<int> > > sol;
+    vector<pattern_int> sol;
     while(true){
         map<int, Arc> pred;
         map<int, int> dp;
-        dp[S] = INT_MAX;
+        dp[S] = zflow;
         ForEach(v, lst){
             int &val = dp[*v];
             Arc &p = pred[*v];
             ForEach(a, adj[*v]){
                 assert(dp.count(a->u) != 0);
-                int m = min(dp[a->u], flow[*a]);
-                if(m > val){
+                int mf = min(dp[a->u], flow[*a]);
+                if(mf > val){
                     p = *a;
-                    val = m;
+                    val = mf;
                 }
             }
         }
         int f = dp[T];
+        zflow -= f;
         if(f == 0) break;
         int v = T;
-        sol.push_back(pair<int, vector<int> >());
-        pair<int, vector<int> > &pat = sol.back();
-        pat.first = f;
+        sol.push_back(pattern_int());
+        pattern_int &patt = sol.back();
+        patt.first = f;
         while(v != S){
             Arc a = pred[v];
             int u = a.u;
             int lbl = a.label;
-            if(lbl < (int)dem.size()) // != LOSS
-                pat.second.push_back(lbl);
+            if(lbl < (int)inst.items.size()) // != LOSS
+                patt.second.push_back(lbl);
             flow[a] -= f;
             v = u;
         }
     }
-    int fs = 0;
-    ForEach(a, flow)
-        fs += a->second;
-    assert(fs == 0);
     return remove_excess(sol, dem);
 }
 
-bool ArcflowSol::is_valid(vector<pair<int, vector<int_pair> > > sol,
-        const Instance &inst, int btype) const{
-    vector<int> dem(inst.m);
-    for(int i = 0; i < inst.m; i++)
-        dem[i] = inst.items[i].demand;
+bool ArcflowSol::is_valid(
+        const vector<pattern_pair> &sol, const Instance &inst,
+        vector<int> dem, int btype) const {
     ForEach(pat, sol){
         vector<int> w(inst.ndims);
         ForEach(itr, pat->second){
@@ -137,64 +138,94 @@ bool ArcflowSol::is_valid(vector<pair<int, vector<int_pair> > > sol,
             const Item &it = inst.items[itr->first];
             for(int i = 0; i < inst.ndims; i++)
                 w[i] += it[i];
-            dem[itr->first] -= pat->first * itr->second;
+            dem[it.type] -= pat->first * itr->second;
         }
         for(int i = 0; i < inst.ndims; i++)
             if(w[i] > inst.Ws[btype][i]) return false;
     }
-    for(int i = 0; i < inst.m; i++){
-        if(dem[i] != 0) return false;
-    }
     return true;
 }
 
-void ArcflowSol::print_solution(const Instance &inst,
-        bool print_inst = true, bool validate = true){
+void ArcflowSol::print_solution(
+        const Instance &inst, bool print_inst = true, bool validate = true){
     vector<int> dem(inst.m), id(inst.m), rid(inst.m);
     for(int i = 0; i < inst.m; i++){
-        dem[i] = inst.items[i].demand;
-        int t = inst.items[i].id;
-        id[i] = t;
+        dem[i] = inst.demands[i];
+        int t = inst.items[i].type;
         rid[t] = i;
     }
-    vector<pair<int, vector<int_pair> > > sol = extract_solution(dem);
-    if(validate)
-        assert(is_valid(sol, inst, 0)); // FIXME
 
     int obj = 0;
-    ForEach(pat, sol)
-        obj += pat->first;
+    vector<int> nbins(inst.nbtypes);
+    vector<vector<pattern_pair> > sols(inst.nbtypes);
+    for(int t = 0; t < inst.nbtypes; t++){
+        sols[t] = extract_solution(dem, Ts[t]);
+        if(validate && !is_valid(sols[t], inst, dem, t))
+            exit_error("Invalid solution! (capacity)");
+
+        ForEach(pat, sols[t]) {
+            obj += pat->first * inst.Cs[t];
+            nbins[t] += pat->first;
+        }
+    }
+
+    if(validate){
+        for(int i = 0; i < inst.m; i++){
+            if(dem[i] > 0) exit_error("Invalid solution! (demand)");
+        }
+
+        int fs = 0;
+        ForEach(a, flow) fs += a->second;
+        if(fs != 0) exit_error("Invalid solution! (flow)");
+    }
 
     printf("Objective: %d\n", obj);
 
     printf("Solution:\n");
 
-    ForEach(pat, sol){
-        vector<int> tmp;
-        ForEach(itr, pat->second){
-            int t = id[itr->first]+1;
-            for(int i = 0; i < itr->second; i++)
-                tmp.push_back(t);
-        }
-        sort(All(tmp));
+    for(int t = 0; t < inst.nbtypes; t++){
+        if(inst.nbtypes > 1)
+            printf("Bins of type %d: %d\n", t+1, nbins[t]);
+        vector<pattern_pair> &sol = sols[t];
+        ForEach(pat, sol){
+            vector<int_pair> tmp;
+            ForEach(itr, pat->second){
+                int t = inst.items[itr->first].type;
+                int opt = inst.items[itr->first].opt;
+                for(int i = 0; i < itr->second; i++)
+                    tmp.push_back(MP(t, opt));
+            }
+            sort(All(tmp));
 
-        printf("%d x [", pat->first);
-        ForEach(i, tmp){
-            if(i != tmp.begin()) printf(", ");
-            printf("i=%d", *i);
+            printf("%d x [", pat->first);
+            ForEach(p, tmp){
+                if(p != tmp.begin()) printf(", ");
+                if(p->second == -1)
+                    printf("i=%d", p->first+1);
+                else
+                    printf("i=%d opt=%d", p->first+1, p->second+1);
+            }
+            printf("]\n");
         }
-        printf("]\n");
     }
 
     if(print_inst){
         printf("Instance:\n");
+        int p = 0;
+        vector<int> rid(inst.items.size());
+        for(int it = 0; it < (int)inst.items.size(); it++)
+            rid[inst.items[it].id] = it;
         for(int i = 0; i < inst.m; i++){
-            printf("w_%d: (", i+1);
-            for(int j = 0; j < inst.ndims; j++){
-                if(j != 0) printf(", ");
-                printf("%d", inst.items[rid[i]][j]);
+            printf("i=%d (nopts: %d, demand: %d)\n", i+1, inst.nopts[i], inst.demands[i]);
+            for(int q = 0; q < inst.nopts[i]; q++){
+                printf("  opt=%d: (", q+1);
+                for(int j = 0; j < inst.ndims; j++){
+                    if(j) printf(", ");
+                    printf("%d", inst.items[rid[p]][j]);
+                }
+                printf(")\n");
+                p++;
             }
-            printf(") b_%d: %d\n", i+1, inst.items[rid[i]].demand);
         }
     }
 }

@@ -60,13 +60,17 @@ int main(int argc, char *argv[]){
     printf("Generating the .LP model...");
 
     assert(fscanf(fin, " #INSTANCE_BEGIN# ")==0);
-    Instance inst(fin, VBP);
+    Instance inst(fin, MVP);
 
     assert(fscanf(fin, " #GRAPH_BEGIN# ")==0);
 
-    int S, T;
+    int S;
+    vector<int> Ts(inst.nbtypes);
     assert(fscanf(fin, " S: %d ", &S)==1);
-    assert(fscanf(fin, " T: %d ", &T)==1);
+    assert(fscanf(fin, " Ts: ") >= 0);
+    for(int t = 0; t < inst.nbtypes; t++){
+        assert(fscanf(fin, " %d ", &Ts[t])==1);
+    }
 
     int NV, NA;
     assert(fscanf(fin, " NV: %d ", &NV)==1);
@@ -75,17 +79,26 @@ int main(int argc, char *argv[]){
     map<int, vector<int> > Ai;
     map<int, vector<int> > in;
     map<int, vector<int> > out;
+
+    /* objective */
+
+    fprintf(fout, "Minimize");
     for(int i = 0; i < NA; i++){
         int i_u, i_v, label;
         assert(fscanf(fin, " %d %d %d ", &i_u, &i_v, &label)==3);
         Ai[label].push_back(i);
         in[i_v].push_back(i);
         out[i_u].push_back(i);
+        if(i_v == S) {
+            for(int j = 0; j < (int)Ts.size(); j++){
+                if(Ts[j] == i_u){
+                    fprintf(fout, " %d X%x", inst.Cs[j], i);
+                    break;
+                }
+            }
+        }
     }
-
-    /* objective */
-
-    fprintf(fout, "Minimize Z\n");
+    fprintf(fout, "\n");
 
     /* constraints */
 
@@ -96,12 +109,14 @@ int main(int argc, char *argv[]){
     for(int i = 0; i < inst.m; i++){
         if(inst.items[i].demand == 0) continue;
         fprintf(fout, "\tB%d:", i);
-        ForEach(ai, Ai[i])
-            fprintf(fout, " + X%x", *ai);
-        if(inst.items[i].ctype == '=' && !inst.relax_domains)
-            fprintf(fout, " = %d", inst.items[i].demand);
+        for(int j = 0; j < (int)inst.items.size(); j++){
+            if(inst.items[j].type == i)
+                ForEach(ai, Ai[j]) fprintf(fout, " + X%x", *ai);
+        }
+        if(inst.ctypes[i] == '=' && !inst.relax_domains)
+            fprintf(fout, " = %d", inst.demands[i]);
         else
-            fprintf(fout, " >= %d", inst.items[i].demand);
+            fprintf(fout, " >= %d", inst.demands[i]);
         fprintf(fout, "\n");
     }
 
@@ -113,32 +128,25 @@ int main(int argc, char *argv[]){
             fprintf(fout, " + X%x", *ai);
         ForEach(ai, out[i])
             fprintf(fout, " - X%x", *ai);
-        if(i == S)
-            fprintf(fout, " + Z = 0");
-        else if(i == T)
-            fprintf(fout, " - Z = 0");
-        else
-            fprintf(fout, " = 0");
-        fprintf(fout, "\n");
+        fprintf(fout, " = 0\n");
     }
 
     /* bounds */
 
     int n = 0;
     for(int i = 0; i < inst.m; i++)
-        n += inst.items[i].demand;
+        n += inst.demands[i];
 
     fprintf(fout, "Bounds\n");
     ForEach(e, Ai){
         int i = e->first;
         ForEach(ai, e->second){
-            if(i != inst.m && !inst.relax_domains)
+            if(i < (int)inst.items.size() && !inst.relax_domains)
                 fprintf(fout, "0 <= X%x <= %d\n", *ai, inst.items[i].demand);
             else
                 fprintf(fout, "0 <= X%x <= %d\n", *ai, n);
         }
     }
-    fprintf(fout, "0 <= Z <= %d\n", n);
 
     /* integer variables */
 
@@ -152,10 +160,9 @@ int main(int argc, char *argv[]){
             else
                 fprintf(fout, " X%x", i);
         }
-        fprintf(fout, " Z\n");
     }
 
-    fprintf(fout, "End\n");
+    fprintf(fout, "\nEnd\n");
 
     fclose(fin);
     fclose(fout);

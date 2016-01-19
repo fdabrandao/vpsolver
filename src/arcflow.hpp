@@ -47,11 +47,17 @@ protected:
     bool ready;
     clock_t tstart;
     bool binary;
-    int ndims, m;
+
+    int ndims;
+    int nbtypes;
+    int nsizes;
     vector<int> W;
     vector<Item> items;
+
     NodeSet NS;
     vector<Arc> A;
+    int S;
+    vector<int> Ts;
 
     vector<int> max_rep(const vector<int> &u, int i0, int sub_i0) const;
     void lift_state(vector<int> &u, int it, int ic) const;
@@ -73,5 +79,3 @@ public:
 };
 
 #endif
-
-

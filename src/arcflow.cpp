@@ -35,18 +35,19 @@ using namespace std;
 Arcflow::Arcflow(const Instance &inst){
     tstart = CURTIME;
     ready = false;
-    m = inst.m;
+    nsizes = inst.items.size();
+    nbtypes = inst.nbtypes;
     W = inst.Ws[0]; // FIXME
     ndims = inst.ndims;
     items = inst.items;
     binary = inst.binary;
     int method = inst.method;
 
-    ls_mat.assign(m+1, vector<int>(ndims, 0));
+    ls_mat.assign(nsizes+1, vector<int>(ndims, 0));
     const vector<int> &r = max_rep(vector<int>(ndims, 0), 0, 0);
-    for(int i = 0; i < m; i++){
+    for(int i = 0; i < nsizes; i++){
         int next = binary ? i+1 : i;
-        for(int j = next; j < m; j++){
+        for(int j = next; j < nsizes; j++){
             if(is_compatible(items[i], items[j])){
                 for(int d = 0; d < ndims; d++)
                     ls_mat[i][d] = min(ls_mat[i][d]+r[j]*items[j][d], W[d]);
@@ -153,8 +154,8 @@ void Arcflow::relabel_graph(const vector<int> &label){
 }
 
 vector<int> Arcflow::max_rep(const vector<int> &u, int i0 = 0, int sub_i0 = 0) const{
-    vector<int> r(m);
-    for(int i = i0; i < m; i++){
+    vector<int> r(nsizes);
+    for(int i = i0; i < nsizes; i++){
         int dem = binary ? 1 : items[i].demand;
         if(i != i0)
             r[i] = dem;
@@ -175,7 +176,7 @@ int Arcflow::knapsack(const vector<int> &b, int i0, int d, int C) const{
     vis[0] = true;
     Q.push_back(0);
     int res = 0;
-    for(int i = i0; i < m; i++){
+    for(int i = i0; i < nsizes; i++){
         int w = items[i][d];
         int qs = Q.size();
         for(int j = 0; j < qs; j++){
@@ -201,7 +202,7 @@ void Arcflow::build(){
     NS.clear();
     NS.get_index(vector<int>(lsize, 0));
     int nv = NS.size();
-    for(int i = 0; i < m; i++){
+    for(int i = 0; i < nsizes; i++){
         for(int p = 0; p < nv; p++){
             int u = p;
             vector<int> lu = NS.get_label(u);
@@ -243,7 +244,7 @@ void Arcflow::lift_state(vector<int> &u, int it, int ic) const{
         if(u[d] < W[d]){
             // lift method 2
             int val = W[d];
-            for(int t = it; t < m && val >= u[d]; t++)
+            for(int t = it; t < nsizes && val >= u[d]; t++)
                 val -= r[t]*items[t][d];
 
             if(val >= u[d]){
@@ -302,7 +303,7 @@ int Arcflow::go(const vector<int> &su){
     vector<int> mu(max_label);
 
     int up = -1;
-    if(it+1 < m){
+    if(it+1 < nsizes){
         vector<int> sv(su);
         sv[ndims] = it+1;
         if(!binary)
@@ -312,7 +313,7 @@ int Arcflow::go(const vector<int> &su){
     }
 
     int dem = items[it].demand;
-    if(it < m && ic < dem){
+    if(it < nsizes && ic < dem){
         vector<int> sv(su);
         const vector<int> &w = items[it].w;
         for(int d = 0; d < ndims; d++)
@@ -321,7 +322,7 @@ int Arcflow::go(const vector<int> &su){
             int iv;
             if(binary){
                 sv[ndims] = it+1;
-                if(it+1 < m)
+                if(it+1 < nsizes)
                     lift_state(sv, it+1, 0);
                 iv = go(sv);
             }else{
@@ -345,7 +346,7 @@ int Arcflow::go(const vector<int> &su){
             int iu = NS.get_index(mu);
             AS.insert(Arc(iu, iv, it));
             if(up != -1 && iu != up)
-                AS.insert(Arc(iu, up, m));
+                AS.insert(Arc(iu, up, nsizes));
         }
     }
 
@@ -378,7 +379,7 @@ void Arcflow::break_symmetry(){
 
     NodeSet NStmp;
     ForEach(itr, A){
-        assert(itr->label != m);
+        assert(itr->label != nsizes);
         vector<int> lu(NS.get_label(itr->u));
         lu.push_back(itr->label);
         int nu = NStmp.get_index(lu);
@@ -410,7 +411,7 @@ void Arcflow::break_symmetry(){
         sort(All(g));
         for(int i = 1; i < (int)g.size(); i++){
             int u = g[i-1], v = g[i];
-            A.push_back(Arc(u, v, m));
+            A.push_back(Arc(u, v, nsizes));
             assert(u < v);
         }
     }
@@ -463,7 +464,7 @@ void Arcflow::final_compression_step(){
             for(int d = 0; d < ndims; d++)
                 lbl[d] = max(lbl[d], lv[d]+items[it][d]);
             if(binary){
-                if(it == m)
+                if(it == nsizes)
                     lbl[ndims] = max(lbl[ndims], lv[ndims]);
                 else
                     lbl[ndims] = max(lbl[ndims], max(lv[ndims], it));
@@ -482,9 +483,15 @@ void Arcflow::final_compression_step(){
 
 void Arcflow::finalize(){
     assert(ready == false);
+    S = 0;
     int t = NS.size();
+    Ts.clear();
+    Ts.push_back(t); // FIXME
     for(int i = 1; i < NS.size(); i++)
-        A.push_back(Arc(i, t, m));
+        A.push_back(Arc(i, t, nsizes));
+    for(int i = 0; i < (int)Ts.size(); i++){
+        A.push_back(Arc(Ts[i], S, nsizes));
+    }
     ready = true;
     printf("Ready! (%.2fs)\n", TIMEDIF(tstart));
 }
@@ -494,10 +501,12 @@ void Arcflow::write(FILE *fout){
     sort(All(A));
 
     int iS = 0;
-    int iT = NS.size();
-
     fprintf(fout, "S: %d\n", iS);
-    fprintf(fout, "T: %d\n", iT);
+    fprintf(fout, "Ts:");
+    for(int t = 0; t < (int)Ts.size(); t++){
+        fprintf(fout, " %d", Ts[t]);
+    }
+    fprintf(fout, "\n");
 
     fprintf(fout, "NV: %d\n", (int)NS.size()+1);
     fprintf(fout, "NA: %d\n", (int)A.size());
@@ -506,8 +515,8 @@ void Arcflow::write(FILE *fout){
     for(int i = 0; i < 3; i++){
         ForEach(a, A){
             if(i == 1 && a->u != iS) continue;
-            if(i == 2 && a->v != iT) continue;
-            if(i == 0 && (a->u == iS || a->v == iT)) continue;
+            if(i == 2 && a->v < Ts[0]) continue;
+            if(i == 0 && (a->u == iS || a->v >= Ts[0])) continue;
             fprintf(fout, "%d %d %d\n", a->u, a->v, a->label);
         }
     }

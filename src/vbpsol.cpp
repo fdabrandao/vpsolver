@@ -48,13 +48,17 @@ int main(int argc, char *argv[]){
     }
 
     assert(fscanf(fafg, " #INSTANCE_BEGIN# ")==0);
-    Instance inst(fafg, VBP);
+    Instance inst(fafg, MVP);
     assert(fscanf(fafg, " #GRAPH_BEGIN# ")==0);
     assert(fscanf(fafg, " #GRAPH_BEGIN# ")==0);
 
-    int S, T;
+    int S;
+    vector<int> Ts(inst.nbtypes);
     assert(fscanf(fafg, " S: %d ", &S)==1);
-    assert(fscanf(fafg, " T: %d ", &T)==1);
+    assert(fscanf(fafg, " Ts: ") >= 0);
+    for(int t = 0; t < inst.nbtypes; t++){
+        assert(fscanf(fafg, " %d ", &Ts[t])==1);
+    }
 
     int NV, NA;
     assert(fscanf(fafg, " NV: %d ", &NV)==1);
@@ -84,7 +88,7 @@ int main(int argc, char *argv[]){
         }
     }
 
-    ArcflowSol sol(flow, S, T, inst.binary);
+    ArcflowSol sol(inst, flow, S, Ts, inst.binary);
     sol.print_solution(inst, print_inst, true);
     return 0;
 }

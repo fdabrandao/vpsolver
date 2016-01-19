@@ -84,7 +84,7 @@ void Instance::read(const char *fname){
     } else if(check_ext(fname, ".mvp")){
         read(fin, MVP);
     } else {
-        exit_msg("Invalid file extension!");
+        exit_error("Invalid file extension!");
     }
     fclose(fin);
 }
@@ -120,6 +120,7 @@ void Instance::read(FILE *fin, ftype type){
 
     items.clear();
     nopts.clear();
+    ctypes.clear();
     demands.clear();
     int it_count = 0;
     for(int it_type = 0; it_type < m; it_type++){
@@ -136,10 +137,16 @@ void Instance::read(FILE *fin, ftype type){
             bi = -1;
         }
         nopts.push_back(qi);
+        ctypes.push_back('*');
 
         for(int t = 0; t < qi; t++){
             items.push_back(Item(ndims));
             Item &item = items.back();
+            if(qi > 1){
+                item.opt = t;
+            }else{
+                item.opt = -1;
+            }
 
             assert(fscanf(fin, " wi: ") >= 0);
             for(int d = 0; d < ndims; d++){
@@ -194,19 +201,20 @@ void Instance::read(FILE *fin, ftype type){
             vtype = buf[0];
             assert(vtype == 'C' || vtype == 'I');
         }else if(!strcmp(buf, "CTYPE:")){
+            ctypes.clear();
             for(int i = 0; i < m; i++){
                 assert(fscanf(fin, "%s", buf)==1);
                 if(!strcmp(buf, ">")){
-                    items[i].ctype = '>';
+                    ctypes.push_back('>');
                 }else if(!strcmp(buf, "=")){
-                    items[i].ctype = '=';
+                    ctypes.push_back('=');
                 }else{
                     assert(!strcmp(buf, "*"));
-                    items[i].ctype = '*';
+                    ctypes.push_back('*');
                 }
             }
         }else if(!strcmp(buf, "IDS:")){
-            for(int i = 0; i < m; i++)
+            for(int i = 0; i < (int)items.size(); i++)
                 assert(fscanf(fin, "%d", &items[i].id)==1);
         }else if(!strcmp(buf, "SORT:")){
             int tsort;
@@ -233,8 +241,8 @@ void Instance::read(FILE *fin, ftype type){
     }
 
     for(int i = 0; i < m; i++)
-        if(items[i].ctype == '*')
-            items[i].ctype = (items[i].demand <= 1) ? '=' : '>';
+        if(ctypes[i] == '*')
+            ctypes[i] = (demands[i] <= 1) ? '=' : '>';
 
     if(sort){
         stable_sort(All(items));
@@ -257,12 +265,14 @@ void Instance::write(FILE *fout) const{
 
     fprintf(fout, "M: %d\n", m);
     int p = 0;
+    vector<int> rid(items.size());
+    for(int it = 0; it < (int)items.size(); it++) rid[items[it].id] = it;
     for(int i = 0; i < m; i++){
         fprintf(fout, "qi: %d bi: %d\n", nopts[i], demands[i]);
         for(int q = 0; q < nopts[i]; q++){
             fprintf(fout, "wi:");
             for(int j = 0; j < ndims; j++){
-                fprintf(fout, " %d", items[p][j]);
+                fprintf(fout, " %d", items[rid[p]][j]);
             }
             fprintf(fout, "\n");
             p++;
@@ -273,7 +283,7 @@ void Instance::write(FILE *fout) const{
 
     fprintf(fout, "CTYPE:");
     for(int i = 0; i < m; i++)
-        fprintf(fout, " %c", items[i].ctype);
+        fprintf(fout, " %c", ctypes[i]);
     fprintf(fout, "\n");
 
     fprintf(fout, "SORT: %d\n", sort);
@@ -285,7 +295,7 @@ void Instance::write(FILE *fout) const{
     fprintf(fout, "BINARY: %d\n", binary);
 
     fprintf(fout, "IDS:");
-    for(int i = 0; i < m; i++)
+    for(int i = 0; i < (int)items.size(); i++)
         fprintf(fout, " %d", items[i].id);
     fprintf(fout, "\n");
 }

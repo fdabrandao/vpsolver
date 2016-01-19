@@ -33,13 +33,12 @@ public:
     vector<int> nonzero;
     int id;
     int type;
+    int opt;
     int ndims;
     int demand;
     int key;
-    char ctype;
 
     Item(int _ndims): ndims(_ndims){
-        ctype = '*';
         w = vector<int>(_ndims);
     }
     void add_dim(int dw){
@@ -55,18 +54,20 @@ class Instance{
 private:
     void init();
 public:
-    char vtype;
     int nbtypes;
     int ndims, m;
     vector<vector<int> > Ws; // bin types
     vector<int> Cs; // costs
     vector<Item> items;
-    vector<int> nopts;
-    vector<int> demands;
     int method;
     bool sort;
     bool binary;
     bool relax_domains;
+
+    char vtype;
+    vector<char> ctypes;
+    vector<int> nopts;
+    vector<int> demands;
 
     Instance();
     Instance(const char *fname);

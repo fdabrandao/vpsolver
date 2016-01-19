@@ -1,10 +1,10 @@
 SRC = src
 BIN = bin
 CC=g++
-CFLAGS= -Wall -O2
+CFLAGS= -std=c++11 -Wall -O2
 
-GUROBI_DIR = /opt/gurobi602/linux64
-CLIB     = -L$(GUROBI_DIR)/lib/ -lgurobi60
+GUROBI_DIR = /opt/gurobi650/linux64
+CLIB     = -L$(GUROBI_DIR)/lib/ -lgurobi65
 INC      = $(GUROBI_DIR)/include/
 CPPLIB   = -L$(GUROBI_DIR)/lib/ -lgurobi_c++ $(CLIB)
 GUROBI_OPTS = -I$(INC) $(CPPLIB) -lpthread

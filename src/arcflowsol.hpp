@@ -30,24 +30,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "instance.hpp"
 using namespace std;
 
+typedef pair<int, vector<int> > pattern_int;
+typedef pair<int, vector<int_pair> > pattern_pair;
+
 class ArcflowSol{
 private:
+    Instance inst;
     map<Arc, int> flow;
-    int S, T;
+    int S;
+    vector<int> Ts;
     bool binary;
+    int LOSS;
 
-    vector<pair<int, vector<int_pair> > > remove_excess(
-        const vector<pair<int, vector<int> > > &sol, vector<int> dem) const;
+    vector<pattern_pair> remove_excess(
+        const vector<pattern_int> &sol, vector<int> &dem) const;
 
-    bool is_valid(vector<pair<int, vector<int_pair> > > sol,
-        const Instance &inst, int btype) const;
+    bool is_valid(
+        const vector<pattern_pair> &sol, const Instance &inst,
+        vector<int> dem, int btype) const;
 
 public:
-    ArcflowSol(const map<Arc, int> &_flow, int _S, int _T, bool _binary = false):
-        flow(_flow), S(_S), T(_T), binary(_binary){}
+    ArcflowSol(
+        const Instance &_inst, const map<Arc, int> &_flow,
+        int _S, const vector<int> &_Ts, bool _binary = false):
+        inst(_inst), flow(_flow), S(_S), Ts(_Ts), binary(_binary){}
 
-    vector<pair<int, vector<int_pair> > > extract_solution(
-        const vector<int> &dem);
+    vector<pattern_pair> extract_solution(vector<int> &dem, int T);
 
     void print_solution(const Instance &inst, bool print_inst, bool validate);
 };

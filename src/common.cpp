@@ -29,7 +29,7 @@ bool check_ext(const char* name, const char* extension){
     return strcmp(end, extension) == 0;
 }
 
-void exit_msg(const char *msg){
-    puts(msg);
+void exit_error(const char *msg){
+    printf("Error: %s\n", msg);
     exit(-1);
 }

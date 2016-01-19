@@ -96,13 +96,18 @@ int main(int argc, char *argv[]){
     printf("Generating the .MPS model...");
 
     assert(fscanf(fin, " #INSTANCE_BEGIN# ")==0);
-    Instance inst(fin, VBP);
+    Instance inst(fin, MVP);
 
     assert(fscanf(fin, " #GRAPH_BEGIN# ")==0);
 
-    int S, T;
+    int S;
+    vector<int> Ts(inst.nbtypes);
     assert(fscanf(fin, " S: %d ", &S)==1);
-    assert(fscanf(fin, " T: %d ", &T)==1);
+    assert(fscanf(fin, " Ts: ") >= 0);
+    for(int t = 0; t < inst.nbtypes; t++){
+        assert(fscanf(fin, " %d ", &Ts[t])==1);
+    }
+
 
     int NV, NA;
     assert(fscanf(fin, " NV: %d ", &NV)==1);
@@ -120,7 +125,7 @@ int main(int argc, char *argv[]){
     /* demand constraints */
 
     for(int i = 0; i < inst.m; i++){
-        char ctype = inst.items[i].ctype;
+        char ctype = inst.ctypes[i];
         assert(ctype == '>' || ctype == '=');
         sprintf(buf, "B%d", i);
         if(ctype == '=' && !inst.relax_domains)
@@ -152,16 +157,20 @@ int main(int argc, char *argv[]){
         sprintf(buf1, "F%x", i_u);
         sprintf(buf2, "F%x", i_v);
         mps.write(7, "", "", buf, buf1, "-1", buf2, "1");
-        if(label < inst.m){
-            sprintf(buf1, "B%d", label);
+        if(label < (int)inst.items.size()){
+            sprintf(buf1, "B%d", inst.items[label].type);
             mps.write(5, "", "", buf, buf1, "1");
         }
+        if(i_v == S) {
+            for(int j = 0; j < (int)Ts.size(); j++){
+                if(Ts[j] == i_u){
+                    sprintf(buf1, "%d", inst.Cs[j]);
+                    mps.write(5, "", "", buf, "OBJ", buf1);
+                    break;
+                }
+            }
+        }
     }
-
-    sprintf(buf1, "F%x", T);
-    sprintf(buf2, "F%x", S);
-    mps.write(7, "", "", "Z", buf1, "-1", buf2, "1");
-    mps.write(5, "", "", "Z", "OBJ", "1");
 
     if(inst.vtype == 'I')
         mps.write(6, "", "", "MARKER", "'MARKER'", "", "'INTEND'");
@@ -172,7 +181,7 @@ int main(int argc, char *argv[]){
 
     for(int i = 0; i < inst.m; i++){
         sprintf(buf, "B%d", i);
-        sprintf(buf1, "%d", inst.items[i].demand);
+        sprintf(buf1, "%d", inst.demands[i]);
         mps.write(5, "", "", "RHS1", buf, buf1);
     }
 
@@ -182,7 +191,7 @@ int main(int argc, char *argv[]){
 
     int n = 0;
     for(int i = 0; i < inst.m; i++)
-        n += inst.items[i].demand;
+        n += inst.demands[i];
 
     for(int i = 0; i < NA; i++){
         int lbl = labels[i];
@@ -197,10 +206,6 @@ int main(int argc, char *argv[]){
 
         mps.write(5, "", "UP", "BND1", buf, buf1);
     }
-
-    mps.write(5, "", "LO", "BND1", "Z", "0");
-    sprintf(buf, "%d", n);
-    mps.write(5, "", "UP", "BND1", "Z", buf);
 
     mps.write(1, "ENDATA");
 

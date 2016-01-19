@@ -56,63 +56,54 @@ public:
         //model.getEnv().set(GRB_DoubleParam_ImproveStartTime, 60);
         //model.getEnv().set(GRB_DoubleParam_ImproveStartGap, 1);
 
-        int iS = 0;
-        int iT = NS.size();
-
         sort(All(A));
         //reverse(All(A));
         map<Arc, GRBVar> va;
         for(int i = 0; i < 3; i++){
             ForEach(a, A){
-                if(i == 1 && a->u != iS) continue;
-                if(i == 2 && a->v != iT) continue;
-                if(i == 0 && (a->u == iS || a->v == iT)) continue;
+                if(i == 1 && a->u != S) continue;
+                if(i == 2 && a->v < Ts[0]) continue;
+                if(i == 0 && (a->u == S || a->v >= Ts[0])) continue;
 
-                if(a->label == m || inst.relax_domains)
+                if(a->label == nsizes || inst.relax_domains)
                     va[*a] = model.addVar(0.0, GRB_INFINITY, 0, vtype);
                 else
                     va[*a] = model.addVar(0.0, items[a->label].demand, 0, vtype);
             }
         }
-        /*ForEach(a, A){
-            if(a->label == m)
-                va[*a] = model.addVar(0.0, GRB_INFINITY, 0, vtype);
-            else
-                va[*a] = model.addVar(0.0, items[a->label].demand, 0, vtype);
-        }*/
-        GRBVar z = model.addVar(0.0, GRB_INFINITY, 1, vtype);
         model.update();
 
-        vector<vector<Arc> > Al(m);
+        GRBLinExpr linobj = 0;
+        for(int i = 0; i < inst.nbtypes; i++)
+            linobj += va[Arc(Ts[i], S, nsizes)] * inst.Cs[i];
+        model.setObjective(linobj);
+
+        vector<vector<Arc> > Al(nsizes);
         vector<vector<Arc> > in(NS.size()+1);
         vector<vector<Arc> > out(NS.size()+1);
 
         ForEach(itr, A){
-            if(itr->label != m)
+            if(itr->label != nsizes)
                 Al[itr->label].push_back(*itr);
             out[itr->u].push_back(*itr);
             in[itr->v].push_back(*itr);
         }
 
-        for(int it = 0; it < m; it++){
+        for(int i = 0; i < inst.m; i++){
             GRBLinExpr lin = 0;
-            ForEach(a, Al[it]) lin += va[*a];
-            if(items[it].ctype == '>' || inst.relax_domains)
-                model.addConstr(lin >= items[it].demand);
+            for(int it = 0; it < (int)items.size(); it++)
+                if(items[it].type == i) ForEach(a, Al[it]) lin += va[*a];
+            if(inst.ctypes[i] == '>' || inst.relax_domains)
+                model.addConstr(lin >= inst.demands[i]);
             else
-                model.addConstr(lin == items[it].demand);
+                model.addConstr(lin == inst.demands[i]);
         }
 
         for(int u = 0; u <= NS.size(); u++){
             GRBLinExpr lin = 0;
             ForEach(a, in[u]) lin += va[*a];
             ForEach(a, out[u]) lin -= va[*a];
-            if(u == iS)
-                model.addConstr(lin == -z);
-            else if(u == iT)
-                model.addConstr(lin == z);
-            else
-                model.addConstr(lin == 0);
+            model.addConstr(lin == 0);
         }
 
         Al.clear();
@@ -140,7 +131,7 @@ public:
                     flow[a] = rx;
                 }
             }
-            ArcflowSol sol(flow, iS, iT, binary);
+            ArcflowSol sol(inst, flow, S, Ts, binary);
             sol.print_solution(inst, false, true);
         }
 
@@ -169,7 +160,14 @@ int main(int argc, char *argv[]){
         assert(inst.vtype == 'I' || inst.vtype == 'C');
     }
 
-    GrbArcflow graph(inst);
-    graph.solve(inst);
+    try {
+        GrbArcflow graph(inst);
+        graph.solve(inst);
+    } catch(GRBException e) {
+        printf("Error code = %d\n", e.getErrorCode());
+        printf("%s\n", e.getMessage().c_str());
+    } catch (...) {
+        printf("Error during optimization\n");
+    }
     return 0;
 }
