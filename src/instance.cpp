@@ -175,8 +175,9 @@ void Instance::read(FILE *fin, ftype type){
                 }
             }
             if(item.demand > 0){
-                bool fits = true;
+                bool fits;
                 for(int t = 0; t < nbtypes; t++){
+                    fits = true;
                     for(int d = 0; d < ndims; d++){
                         if(item[d] > Ws[t][d]){
                             fits = false;

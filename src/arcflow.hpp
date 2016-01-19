@@ -46,23 +46,24 @@ private:
 protected:
     bool ready;
     clock_t tstart;
-    bool binary;
 
+    bool binary;
     int ndims;
-    int nbtypes;
     int nsizes;
-    vector<int> W;
+    int nbtypes;
     vector<Item> items;
+    vector<int> maxW;
+    vector<vector<int> > Ws;
 
     NodeSet NS;
     vector<Arc> A;
     int S;
     vector<int> Ts;
 
-    vector<int> max_rep(const vector<int> &u, int i0, int sub_i0) const;
-    void lift_state(vector<int> &u, int it, int ic) const;
+    vector<int> max_rep(const vector<int> &maxW, const vector<int> &u, int i0, int sub_i0) const;
+    void lift_state(const vector<int> &maxW, vector<int> &u, int it, int ic) const;
     int knapsack(const vector<int> &b, int i0, int d, int C) const;
-    bool is_valid(const vector<int> &u) const;
+    bool is_valid(const vector<int> &u, const vector<int> &W) const;
     bool is_compatible(const Item &a, const Item &b) const;
     void relabel_graph(const vector<int> &label);
     void build();

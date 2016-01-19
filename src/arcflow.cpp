@@ -37,26 +37,31 @@ Arcflow::Arcflow(const Instance &inst){
     ready = false;
     nsizes = inst.items.size();
     nbtypes = inst.nbtypes;
-    W = inst.Ws[0]; // FIXME
+    Ws = inst.Ws;
+    maxW.resize(ndims, 0);
+    for(int d = 0; d < ndims; d++){
+        for(int t = 0; t < nbtypes; t++)
+            maxW[d] = max(maxW[d], Ws[t][d]);
+    }
     ndims = inst.ndims;
     items = inst.items;
     binary = inst.binary;
     int method = inst.method;
 
     ls_mat.assign(nsizes+1, vector<int>(ndims, 0));
-    const vector<int> &r = max_rep(vector<int>(ndims, 0), 0, 0);
+    const vector<int> &r = max_rep(maxW, vector<int>(ndims, 0), 0, 0);
     for(int i = 0; i < nsizes; i++){
         int next = binary ? i+1 : i;
         for(int j = next; j < nsizes; j++){
             if(is_compatible(items[i], items[j])){
                 for(int d = 0; d < ndims; d++)
-                    ls_mat[i][d] = min(ls_mat[i][d]+r[j]*items[j][d], W[d]);
+                    ls_mat[i][d] = min(ls_mat[i][d]+r[j]*items[j][d], maxW[d]);
             }
         }
     }
 
     lsize = ndims;
-    max_label = W;
+    max_label = maxW;
     if(binary){
         lsize = ndims+1;
         max_label.push_back(INT_MAX);
@@ -71,27 +76,24 @@ Arcflow::Arcflow(const Instance &inst){
     printf("Build (method = %d)\n", method);
     assert(method >= MIN_METHOD && method <= MAX_METHOD);
 
-    // build step-3' graph
-    build();
-    int nv1 = NS.size()+1;
-    int na1 = A.size()+NS.size()-1;
+    build(); // build step-3' graph
+    int nv1 = NS.size()+nbtypes;
+    int na1 = A.size()+(NS.size()-1)*nbtypes;
     printf("  Step-3' Graph: %d vertices and %d arcs (%.2fs)\n",
         nv1, na1, TIMEDIF(tstart));
 
-    // create step-4' graph
-    final_compression_step();
-    int nv2 = NS.size()+1;
-    int na2 = A.size()+NS.size()-1;
+    final_compression_step(); // create step-4' graph
+    finalize(); // add the final loss arcs
+    int nv2 = NS.size()+Ts.size();
+    int na2 = A.size();
     printf("  Step-4' Graph: %d vertices and %d arcs (%.2fs)\n",
         nv2, na2, TIMEDIF(tstart));
     printf("  #V4/#V3 = %.2f\n", nv2/double(nv1));
     printf("  #A4/#A3 = %.2f\n", na2/double(na1));
-
-    // add the final loss arcs
-    finalize();
+    printf("Ready! (%.2fs)\n", TIMEDIF(tstart));
 }
 
-bool Arcflow::is_valid(const vector<int> &u) const{
+bool Arcflow::is_valid(const vector<int> &u, const vector<int> &W) const{
     for(int i = 0; i < ndims; i++)
         if(u[i] > W[i]) return false;
     return true;
@@ -99,7 +101,7 @@ bool Arcflow::is_valid(const vector<int> &u) const{
 
 bool Arcflow::is_compatible(const Item &a, const Item &b) const{
     for(int i = 0; i < ndims; i++)
-        if(a[i]+b[i] > W[i]) return false;
+        if(a[i]+b[i] > maxW[i]) return false;
     return true;
 }
 
@@ -114,7 +116,9 @@ void Arcflow::relabel_graph(const vector<int> &label){
     A.assign(All(arcs));
 }
 
-vector<int> Arcflow::max_rep(const vector<int> &u, int i0 = 0, int sub_i0 = 0) const{
+vector<int> Arcflow::max_rep(
+        const vector<int> &maxW, const vector<int> &u,
+        int i0 = 0, int sub_i0 = 0) const {
     vector<int> r(nsizes);
     for(int i = i0; i < nsizes; i++){
         int dem = binary ? 1 : items[i].demand;
@@ -124,7 +128,7 @@ vector<int> Arcflow::max_rep(const vector<int> &u, int i0 = 0, int sub_i0 = 0) c
             r[i] = max(0, dem-sub_i0);
         for(int d = 0; d < ndims && r[i] > 0; d++)
             if(items[i][d] != 0)
-                r[i] = min(r[i], (W[d]-u[d])/items[i][d]);
+                r[i] = min(r[i], (maxW[d]-u[d])/items[i][d]);
     }
     return r;
 }
@@ -158,19 +162,20 @@ int Arcflow::knapsack(const vector<int> &b, int i0, int d, int C) const{
     return res;
 }
 
-void Arcflow::lift_state(vector<int> &u, int it, int ic) const{
+void Arcflow::lift_state(
+        const vector<int> &maxW, vector<int> &u, int it, int ic) const {
     for(int d = 0; d < ndims; d++){
         // lift method 1
         if(ic > 0)
-            u[d] = max(u[d], W[d]-ls_mat[it][d]);
+            u[d] = max(u[d], maxW[d]-ls_mat[it][d]);
         else if(it > 0)
-            u[d] = max(u[d], W[d]-ls_mat[it-1][d]);
+            u[d] = max(u[d], maxW[d]-ls_mat[it-1][d]);
     }
-    const vector<int> &r = max_rep(u, it, ic);
+    const vector<int> &r = max_rep(maxW, u, it, ic);
     for(int d = 0; d < ndims; d++){
-        if(u[d] < W[d]){
+        if(u[d] < maxW[d]){
             // lift method 2
-            int val = W[d];
+            int val = maxW[d];
             for(int t = it; t < nsizes && val >= u[d]; t++)
                 val -= r[t]*items[t][d];
 
@@ -178,7 +183,7 @@ void Arcflow::lift_state(vector<int> &u, int it, int ic) const{
                 u[d] = val;
             }else{
                 // lift method 3
-                u[d] = W[d]-knapsack(r, it, d, W[d]-u[d]);
+                u[d] = maxW[d]-knapsack(r, it, d, maxW[d]-u[d]);
             }
         }
     }
@@ -192,7 +197,7 @@ inline vector<int> Arcflow::hash(const vector<int> &su){
     int *p = NULL, bits = 0;
     const int all = sizeof(int)*8;
     for(int d = 0; d < ndims; d++){
-        int x = su[d], xl = W[d];
+        int x = su[d], xl = maxW[d];
         while(xl != 0){
             if(bits == 0){
                 h.push_back(0);
@@ -237,6 +242,13 @@ int Arcflow::go(const vector<int> &su){
             sv[ndims+1] = 0;
         up = go(sv);
         mu = NS.get_label(up);
+    }else if(nbtypes > 1){
+        for(int t = 0; t < nbtypes; t++){
+            if(is_valid(su, Ws[t])){
+                for(int d = 0; d < ndims; d++)
+                    mu[d] = min(mu[d], Ws[t][d]);
+            }
+        }
     }
 
     int dem = items[it].demand;
@@ -245,22 +257,26 @@ int Arcflow::go(const vector<int> &su){
         const vector<int> &w = items[it].w;
         for(int d = 0; d < ndims; d++)
             sv[d] += w[d];
-        if(is_valid(sv)){
+        bool fits = false;
+        vector<int> max_w(0, ndims);
+        for(int t = 0; !fits && t < nbtypes; t++){
+            if(is_valid(sv, Ws[t])) fits = true;
+        }
+        if(fits){
             int iv;
             if(binary){
                 sv[ndims] = it+1;
-                if(it+1 < nsizes)
-                    lift_state(sv, it+1, 0);
+                //if(it+1 < nsizes) lift_state(max_w, sv, it+1, 0); // FIXME
                 iv = go(sv);
             }else{
                 if(ic+1 < dem){
                     sv[ndims] = it;
                     sv[ndims+1] = ic+1;
-                    lift_state(sv, it, ic+1);
+                    //lift_state(max_w, sv, it, ic+1); // FIXME
                 }else{
                     sv[ndims] = it+1;
                     sv[ndims+1] = 0;
-                    lift_state(sv, it+1, 0);
+                    //lift_state(max_w, sv, it+1, 0); // FIXME
                 }
                 iv = go(sv);
             }
@@ -337,16 +353,18 @@ void Arcflow::final_compression_step(){
 void Arcflow::finalize(){
     assert(ready == false);
     S = 0;
-    int t = NS.size();
     Ts.clear();
-    Ts.push_back(t); // FIXME
-    for(int i = 1; i < NS.size(); i++)
-        A.push_back(Arc(i, t, nsizes));
-    for(int i = 0; i < (int)Ts.size(); i++){
+    for(int i = 0; i < nbtypes; i++)
+        Ts.push_back(NS.size()+i);
+    for(int i = 0; i < (int)Ts.size(); i++)
         A.push_back(Arc(Ts[i], S, nsizes));
+    for(int i = 1; i < NS.size(); i++){
+        const vector<int> &u = NS.get_label(i);
+        for(int j = 0; j < (int)Ts.size(); j++)
+            if(is_valid(u, Ws[j]))
+                A.push_back(Arc(i, Ts[j], nsizes));
     }
     ready = true;
-    printf("Ready! (%.2fs)\n", TIMEDIF(tstart));
 }
 
 void Arcflow::write(FILE *fout){
@@ -361,8 +379,8 @@ void Arcflow::write(FILE *fout){
     }
     fprintf(fout, "\n");
 
-    fprintf(fout, "NV: %d\n", (int)NS.size()+1);
-    fprintf(fout, "NA: %d\n", (int)A.size());
+    fprintf(fout, "NV: %d\n", int(NS.size()+Ts.size()));
+    fprintf(fout, "NA: %d\n", int(A.size()));
 
     sort(All(A));
     for(int i = 0; i < 3; i++){

@@ -79,8 +79,8 @@ public:
         model.setObjective(linobj);
 
         vector<vector<Arc> > Al(nsizes);
-        vector<vector<Arc> > in(NS.size()+1);
-        vector<vector<Arc> > out(NS.size()+1);
+        vector<vector<Arc> > in(NS.size()+Ts.size());
+        vector<vector<Arc> > out(NS.size()+Ts.size());
 
         ForEach(itr, A){
             if(itr->label != nsizes)
@@ -99,7 +99,7 @@ public:
                 model.addConstr(lin == inst.demands[i]);
         }
 
-        for(int u = 0; u <= NS.size(); u++){
+        for(int u = 0; u < NS.size()+nbtypes; u++){
             GRBLinExpr lin = 0;
             ForEach(a, in[u]) lin += va[*a];
             ForEach(a, out[u]) lin -= va[*a];
