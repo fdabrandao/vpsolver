@@ -92,7 +92,10 @@ int main(int argc, char *argv[]){
         if(i_v == S) {
             for(int j = 0; j < (int)Ts.size(); j++){
                 if(Ts[j] == i_u){
-                    fprintf(fout, " %d X%x", inst.Cs[j], i);
+                    if(inst.Cs[j] >= 0)
+                        fprintf(fout, " +%d X%x", inst.Cs[j], i);
+                    else
+                        fprintf(fout, " -%d X%x", abs(inst.Cs[j]), i);
                     break;
                 }
             }

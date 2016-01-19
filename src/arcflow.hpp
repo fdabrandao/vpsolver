@@ -66,11 +66,7 @@ protected:
     bool is_compatible(const Item &a, const Item &b) const;
     void relabel_graph(const vector<int> &label);
     void build();
-    void build_dp();
-    void break_symmetry();
-    void main_compression_step();
     void final_compression_step();
-    void compress();
     void finalize();
 public:
     Arcflow(const Instance &inst);

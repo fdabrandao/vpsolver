@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MP(x,y) make_pair(x,y)
 
 #define MIN_METHOD -2
-#define MAX_METHOD 1
+#define MAX_METHOD -2
 
 #define CURTIME clock()
 #define TIMEDIF(t0) (double(clock()-t0)/CLOCKS_PER_SEC)
