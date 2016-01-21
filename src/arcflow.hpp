@@ -60,9 +60,9 @@ protected:
     int S;
     vector<int> Ts;
 
-    vector<int> max_rep(const vector<int> &maxW, const vector<int> &u, int i0, int sub_i0) const;
-    void lift_state(const vector<int> &maxW, vector<int> &u, int it, int ic) const;
-    int knapsack(const vector<int> &b, int i0, int d, int C) const;
+    vector<int> max_rep(const vector<int> &W, const vector<int> &u, int i0, int sub_i0) const;
+    void lift_state(const vector<int> &valid_opts, vector<int> &u, int it, int ic) const;
+    int min_slack(const vector<int> &b, int i0, int d, const vector<int> &caps) const;
     bool is_valid(const vector<int> &u, const vector<int> &W) const;
     bool is_compatible(const Item &a, const Item &b) const;
     void relabel_graph(const vector<int> &label);

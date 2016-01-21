@@ -91,7 +91,7 @@ public:
 
         for(int i = 0; i < inst.m; i++){
             GRBLinExpr lin = 0;
-            for(int it = 0; it < (int)items.size(); it++)
+            for(int it = 0; it < nsizes; it++)
                 if(items[it].type == i) ForEach(a, Al[it]) lin += va[*a];
             if(inst.ctypes[i] == '>' || inst.relax_domains)
                 model.addConstr(lin >= inst.demands[i]);

@@ -38,15 +38,16 @@ Arcflow::Arcflow(const Instance &inst){
     nsizes = inst.items.size();
     nbtypes = inst.nbtypes;
     Ws = inst.Ws;
+    ndims = inst.ndims;
+    items = inst.items;
+    binary = inst.binary;
+    int method = inst.method;
+
     maxW.resize(ndims, 0);
     for(int d = 0; d < ndims; d++){
         for(int t = 0; t < nbtypes; t++)
             maxW[d] = max(maxW[d], Ws[t][d]);
     }
-    ndims = inst.ndims;
-    items = inst.items;
-    binary = inst.binary;
-    int method = inst.method;
 
     ls_mat.assign(nsizes+1, vector<int>(ndims, 0));
     const vector<int> &r = max_rep(maxW, vector<int>(ndims, 0), 0, 0);
@@ -79,14 +80,14 @@ Arcflow::Arcflow(const Instance &inst){
     build(); // build step-3' graph
     int nv1 = NS.size()+nbtypes;
     int na1 = A.size()+(NS.size()-1)*nbtypes;
-    printf("  Step-3' Graph: %d vertices and %d arcs (%.2fs)\n",
+    printf("  Step-3* Graph: %d vertices and %d arcs (%.2fs)\n",
         nv1, na1, TIMEDIF(tstart));
 
     final_compression_step(); // create step-4' graph
     finalize(); // add the final loss arcs
     int nv2 = NS.size()+Ts.size();
     int na2 = A.size();
-    printf("  Step-4' Graph: %d vertices and %d arcs (%.2fs)\n",
+    printf("  Step-4* Graph: %d vertices and %d arcs (%.2fs)\n",
         nv2, na2, TIMEDIF(tstart));
     printf("  #V4/#V3 = %.2f\n", nv2/double(nv1));
     printf("  #A4/#A3 = %.2f\n", na2/double(na1));
@@ -117,7 +118,7 @@ void Arcflow::relabel_graph(const vector<int> &label){
 }
 
 vector<int> Arcflow::max_rep(
-        const vector<int> &maxW, const vector<int> &u,
+        const vector<int> &W, const vector<int> &u,
         int i0 = 0, int sub_i0 = 0) const {
     vector<int> r(nsizes);
     for(int i = i0; i < nsizes; i++){
@@ -128,15 +129,16 @@ vector<int> Arcflow::max_rep(
             r[i] = max(0, dem-sub_i0);
         for(int d = 0; d < ndims && r[i] > 0; d++)
             if(items[i][d] != 0)
-                r[i] = min(r[i], (maxW[d]-u[d])/items[i][d]);
+                r[i] = min(r[i], (W[d]-u[d])/items[i][d]);
     }
     return r;
 }
 
-int Arcflow::knapsack(const vector<int> &b, int i0, int d, int C) const{
+int Arcflow::min_slack(const vector<int> &b, int i0, int d, const vector<int> &caps) const {
+    int C = caps.back();
     if(C == 0) return 0;
     vector<int> Q;
-    bool vis[C];
+    bool vis[C+1];
     memset(&vis, 0, sizeof(vis));
     vis[0] = true;
     Q.push_back(0);
@@ -150,7 +152,7 @@ int Arcflow::knapsack(const vector<int> &b, int i0, int d, int C) const{
             for(int k = 1; k <= b[i]; k++){
                 v += w;
                 if(v > C) break;
-                if(v == C) return v;
+                if(v == C) return 0;
                 if(vis[v]) break;
                 res = max(res, v);
                 Q.push_back(v);
@@ -159,31 +161,47 @@ int Arcflow::knapsack(const vector<int> &b, int i0, int d, int C) const{
         for(int j = qs; j < (int)Q.size(); j++)
             vis[Q[j]] = true;
     }
-    return res;
+    if(res <= caps[0]){
+        return caps[0]-res;
+    }else{
+        int mslack = C-res;
+        for(int cap: caps){
+            int p = cap;
+            while(!vis[p] && cap-p <= mslack) p--;
+            mslack = min(mslack, cap-p);
+        }
+        return mslack;
+    }
 }
 
 void Arcflow::lift_state(
-        const vector<int> &maxW, vector<int> &u, int it, int ic) const {
-    for(int d = 0; d < ndims; d++){
-        // lift method 1
-        if(ic > 0)
-            u[d] = max(u[d], maxW[d]-ls_mat[it][d]);
-        else if(it > 0)
-            u[d] = max(u[d], maxW[d]-ls_mat[it-1][d]);
-    }
+        const vector<int> &valid_opts, vector<int> &u, int it, int ic) const {
     const vector<int> &r = max_rep(maxW, u, it, ic);
     for(int d = 0; d < ndims; d++){
-        if(u[d] < maxW[d]){
+        int minw = maxW[d];
+        for(int t : valid_opts) minw = min(minw, Ws[t][d]);
+        // lift method 1
+        if(ic > 0)
+            u[d] = max(u[d], minw-ls_mat[it][d]);
+        else if(it > 0)
+            u[d] = max(u[d], minw-ls_mat[it-1][d]);
+        if(u[d] != minw){
             // lift method 2
-            int val = maxW[d];
-            for(int t = it; t < nsizes && val >= u[d]; t++)
-                val -= r[t]*items[t][d];
-
-            if(val >= u[d]){
-                u[d] = val;
+            int maxpos = minw;
+            for(int t = it; t < nsizes && maxpos >= u[d]; t++)
+                maxpos -= r[t]*items[t][d];
+            if(maxpos >= u[d]){
+                u[d] = maxpos;
             }else{
                 // lift method 3
-                u[d] = maxW[d]-knapsack(r, it, d, maxW[d]-u[d]);
+                vector<int> caps;
+                for(int t : valid_opts)
+                    caps.push_back(Ws[t][d]-u[d]);
+                if(caps.size() > 1){
+                    sort(All(caps));
+                    caps.erase(unique(All(caps)), caps.end());
+                }
+                u[d] += min_slack(r, it, d, caps);
             }
         }
     }
@@ -257,26 +275,25 @@ int Arcflow::go(const vector<int> &su){
         const vector<int> &w = items[it].w;
         for(int d = 0; d < ndims; d++)
             sv[d] += w[d];
-        bool fits = false;
-        vector<int> max_w(0, ndims);
-        for(int t = 0; !fits && t < nbtypes; t++){
-            if(is_valid(sv, Ws[t])) fits = true;
+        vector<int> valid_opts;
+        for(int t = 0; t < nbtypes; t++){
+            if(is_valid(sv, Ws[t])) valid_opts.push_back(t);
         }
-        if(fits){
+        if(!valid_opts.empty()){
             int iv;
             if(binary){
                 sv[ndims] = it+1;
-                //if(it+1 < nsizes) lift_state(max_w, sv, it+1, 0); // FIXME
+                if(it+1 < nsizes) lift_state(valid_opts, sv, it+1, 0);
                 iv = go(sv);
             }else{
                 if(ic+1 < dem){
                     sv[ndims] = it;
                     sv[ndims+1] = ic+1;
-                    //lift_state(max_w, sv, it, ic+1); // FIXME
+                    lift_state(valid_opts, sv, it, ic+1);
                 }else{
                     sv[ndims] = it+1;
                     sv[ndims+1] = 0;
-                    //lift_state(max_w, sv, it+1, 0); // FIXME
+                    lift_state(valid_opts, sv, it+1, 0);
                 }
                 iv = go(sv);
             }
