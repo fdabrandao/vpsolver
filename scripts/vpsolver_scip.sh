@@ -24,12 +24,13 @@ echo "Copyright (C) 2013-2015, Filipe Brandao"
 CMD="$0 $*"
 BASEDIR=`dirname $0`
 BIN_DIR=$BASEDIR/../bin/
+PATH=$BIN_DIR:$PATH
 TMP_DIR=`mktemp -d -t XXXXXXXXXX`
 trap "rm -rf $TMP_DIR;" SIGHUP SIGINT SIGTERM EXIT
 
 usage(){
     echo -e "Usage:"
-    echo -e "  $0 --vbp instance.vbp"
+    echo -e "  $0 --vbp/--mvp instance.vbp/.mvp"
     echo -e "  $0 --afg graph.afg"
     echo -e "  $0 --mps/--lp model.mps/.lp"
     echo -e "  $0 --mps/--lp model.mps/.lp --afg graph.afg"
@@ -62,16 +63,16 @@ solve(){
 }
 
 options=""
+instance_file=""
 model_file=""
 afg_file=""
-vbp_file=""
 sol_file=""
 
 while true;
 do
   case "$1" in
     --mps)
-        if [[ -n "$2" && -e "$2" && "$2" =~ \.mps$ ]]; then
+        if [[ -z "$model_file" && -n "$2" && -e "$2" && "$2" =~ \.mps$ ]]; then
             model_file=$2
         else
             error
@@ -79,7 +80,7 @@ do
         shift 2;;
 
     --lp)
-        if [[ -n "$2" && -e "$2" && "$2" =~ \.lp$ ]]; then
+        if [[ -z "$model_file" && -n "$2" && -e "$2" && "$2" =~ \.lp$ ]]; then
             model_file=$2
         else
             error
@@ -87,7 +88,7 @@ do
         shift 2;;
 
     --afg)
-        if [[ -n "$2" && -e "$2" && "$2" =~ \.afg$ ]]; then
+        if [[ -z "$afg_file" && -n "$2" && -e "$2" && "$2" =~ \.afg$ ]]; then
             afg_file=$2
         else
             error
@@ -95,15 +96,23 @@ do
         shift 2;;
 
     --vbp)
-        if [[ -n "$2" && -e "$2" && "$2" =~ \.vbp$ ]]; then
-            vbp_file=$2
+        if [[ -z "$instance_file" && -n "$2" && -e "$2" && "$2" =~ \.vbp$ ]]; then
+            instance_file=$2
+        else
+            error
+        fi
+        shift 2;;
+
+    --mvp)
+        if [[ -z "$instance_file" && -n "$2" && -e "$2" && "$2" =~ \.mvp$ ]]; then
+            instance_file=$2
         else
             error
         fi
         shift 2;;
 
     --wsol)
-        if [[ -n "$2" ]]; then
+        if [[ -z "$sol_file" && -n "$2" ]]; then
             sol_file=$2
         else
             error
@@ -111,7 +120,7 @@ do
         shift 2;;
 
     --options)
-        if [[ -n "$2" ]]; then
+        if [[ -z "$options" && -n "$2" ]]; then
             options=$2
         else
             error
@@ -140,13 +149,13 @@ if [[ -n "$vbp_file" ]]; then
     model_file=$TMP_DIR/model.mps
 
     echo -e "\n>>> vbp2afg..."
-    $BIN_DIR/vbp2afg $vbp_file $afg_file -2 &
+    vbp2afg $vbp_file $afg_file -2 &
     pid=$!
     trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
     wait $pid
 
     echo -e "\n>>> afg2mps..."
-    $BIN_DIR/afg2mps $afg_file $model_file
+    afg2mps $afg_file $model_file
 elif [[ -n "$afg_file" ]]; then
     if [[ -n "$vbp_file" ]]; then
         error
@@ -156,7 +165,7 @@ elif [[ -n "$afg_file" ]]; then
       model_file=$TMP_DIR/model.mps
 
       echo -e "\n>>> afg2mps..."
-      $BIN_DIR/afg2mps $afg_file $model_file
+      afg2mps $afg_file $model_file
     fi
 fi
 
@@ -164,7 +173,7 @@ solve $model_file;
 
 if [[ -n "$afg_file" && -z "$sol_file" ]]; then
     echo -e "\n>>> vbpsol..."
-    $BIN_DIR/vbpsol $afg_file $TMP_DIR/vars.sol
+    vbpsol $afg_file $TMP_DIR/vars.sol
 fi
 
 if [[ -n "$sol_file" ]]; then
