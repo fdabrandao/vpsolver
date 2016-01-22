@@ -68,14 +68,14 @@ Arcflow::Arcflow(const Instance &inst){
     build(); // build step-3' graph
     int nv1 = NS.size()+nbtypes;
     int na1 = A.size()+(NS.size()-1)*nbtypes+1;
-    printf("  Step-3* Graph: %d vertices and %d arcs (%.2fs)\n",
+    printf("  Step-3' Graph: %d vertices and %d arcs (%.2fs)\n",
         nv1, na1, TIMEDIF(tstart));
 
     final_compression_step(); // create step-4' graph
     finalize(); // add the final loss arcs
     int nv2 = NS.size()+Ts.size();
     int na2 = A.size();
-    printf("  Step-4* Graph: %d vertices and %d arcs (%.2fs)\n",
+    printf("  Step-4' Graph: %d vertices and %d arcs (%.2fs)\n",
         nv2, na2, TIMEDIF(tstart));
     printf("  #V4/#V3 = %.2f\n", nv2/double(nv1));
     printf("  #A4/#A3 = %.2f\n", na2/double(na1));
@@ -224,17 +224,22 @@ int Arcflow::go(vector<int> su){
     int ic = binary ? 0 : su[ndims+1];
     vector<int> valid_opts;
     vector<int> mu(max_label);
+    vector<int> maxw(ndims, 0);
     for(int t = 0; t < nbtypes; t++){
         if(is_valid(su, Ws[t])){
             valid_opts.push_back(t);
-            if(nbtypes > 1){
-                for(int d = 0; d < ndims; d++)
-                    mu[d] = min(mu[d], Ws[t][d]);
+            for(int d = 0; d < ndims; d++){
+                mu[d] = min(mu[d], Ws[t][d]);
+                maxw[d] = max(maxw[d], Ws[t][d]);
             }
         }
     }
-    if(valid_opts.empty()) return -1;
-    lift_state(valid_opts, su, it, ic);
+    if(valid_opts.empty()) // if invalid
+        return -1;
+    else if(is_full(su, maxw)) // if full
+        return NS.get_index(mu);
+    else
+        lift_state(valid_opts, su, it, ic);
 
     //const vector<int> key(su);
     const vector<int> key(hash(su));
@@ -242,50 +247,50 @@ int Arcflow::go(vector<int> su){
     if(itr != dp.end())
         return itr->second;
 
-    if(!is_full(su, mu)){
-        int up = -1;
-        if(it+1 < nsizes){
-            vector<int> sv(su);
-            sv[ndims] = it+1;
-            if(!binary)
-                sv[ndims+1] = 0;
-            up = go(sv);
-            mu = NS.get_label(up);
+    int up = -1;
+    if(it+1 < nsizes){
+        vector<int> sv(su);
+        sv[ndims] = it+1;
+        if(!binary)
+            sv[ndims+1] = 0;
+        up = go(sv);
+        assert(up != -1);
+        mu = NS.get_label(up);
+    }
+
+    int dem = items[it].demand;
+    if(it < nsizes && ic < dem){
+        vector<int> sv(su);
+        const vector<int> &w = items[it].w;
+        for(int d = 0; d < ndims; d++){
+            sv[d] += w[d];
+            if(sv[d] > maxw[d]) // if invalid
+                return dp[key] = NS.get_index(mu);
         }
 
-        int dem = items[it].demand;
-        if(it < nsizes && ic < dem){
-            vector<int> sv(su);
-            const vector<int> &w = items[it].w;
-            for(int d = 0; d < ndims; d++)
-                sv[d] += w[d];
-
-            int iv = -1;
-            if(binary){
-                sv[ndims] = it+1;
-                iv = go(sv);
+        if(binary){
+            sv[ndims] = it+1;
+        }else{
+            if(ic+1 < dem){
+                sv[ndims] = it;
+                sv[ndims+1] = ic+1;
             }else{
-                if(ic+1 < dem){
-                    sv[ndims] = it;
-                    sv[ndims+1] = ic+1;
-                }else{
-                    sv[ndims] = it+1;
-                    sv[ndims+1] = 0;
-                }
-                iv = go(sv);
+                sv[ndims] = it+1;
+                sv[ndims+1] = 0;
             }
+        }
+        int iv = go(sv);
 
-            if(iv != -1){
-                const vector<int> &v = NS.get_label(iv);
-                for(int d = 0; d < ndims; d++)
-                    mu[d] = min(mu[d], v[d]-w[d]);
-                if(binary)
-                    mu[ndims] = min(mu[ndims], it+1);
-                int iu = NS.get_index(mu);
-                AS.insert(Arc(iu, iv, it));
-                if(up != -1 && iu != up)
-                    AS.insert(Arc(iu, up, nsizes));
-            }
+        if(iv != -1){
+            const vector<int> &v = NS.get_label(iv);
+            for(int d = 0; d < ndims; d++)
+                mu[d] = min(mu[d], v[d]-w[d]);
+            if(binary)
+                mu[ndims] = min(mu[ndims], it+1);
+            int iu = NS.get_index(mu);
+            AS.insert(Arc(iu, iv, it));
+            if(up != -1 && iu != up)
+                AS.insert(Arc(iu, up, nsizes));
         }
     }
 
