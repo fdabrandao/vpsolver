@@ -32,6 +32,8 @@ import tempfile
 import subprocess
 from .graphutils import AFGraph
 
+inf = float("inf")
+
 
 class VBP(object):
     """Wrapper for .vbp files."""
@@ -43,9 +45,13 @@ class VBP(object):
                 W = [W]
             else:
                 W = list(W)
+            # ndims
             print(len(W), file=f)
+            # W
             print(" ".join(map(str, W)), file=f)
+            # m
             print(len(w), file=f)
+            # items
             for i in range(len(w)):
                 if isinstance(w[i], int):
                     row = [w[i], b[i]]
@@ -73,7 +79,76 @@ class VBP(object):
                 w.append(lst[:ndims])
                 lst = lst[ndims:]
                 b.append(lst.pop(0))
+            assert lst == []
         return cls(W, w, b, verbose)
+
+    def __del__(self):
+        try:
+            os.remove(self.vbp_file)
+        except:
+            pass
+
+
+class MVP(object):
+    """Wrapper for .mvp files."""
+
+    def __init__(self, Ws, Cs, Qs, ws, b, verbose=None):
+        self.mvp_file = VPSolver.new_tmp_file(".mvp")
+        with open(self.mvp_file, "w") as f:
+            # ndims
+            ndims = len(Ws[0])
+            print(ndims, file=f)
+            # nbtypes
+            print(len(Ws), file=f)
+            assert len(Ws) == len(Cs)
+            assert len(Ws) == len(Qs)
+            # Ws, Cs, Qs
+            for Wi, Ci, Qi in zip(Ws, Cs, Qs):
+                assert len(Wi) == ndims
+                if Qi == inf:
+                    Qi = -1
+                print(" ".join(map(str, list(Wi)+[Ci]+[Qi])), file=f)
+            # m
+            assert len(ws) == len(b)
+            print(len(ws), file=f)
+            # items
+            for i in range(len(ws)):
+                print("{} {}".format(len(ws[i]), b[i]), file=f)
+                for w in ws[i]:
+                    assert len(w) == ndims
+                    print(" ".join(map(str, w)), file=f)
+        if verbose:
+            with open(self.mvp_file, "r") as f:
+                print(f.read())
+        self.m = len(b)
+        self.ndims = ndims
+        self.Ws, self.Cs, self.Qs = Ws, Cs, Qs
+        self.ws, self.b = ws, b
+
+    @classmethod
+    def from_file(cls, mvp_file, verbose=None):
+        with open(mvp_file, "r") as f:
+            lst = list(map(int, f.read().split()))
+            ndims = lst.pop(0)
+            nbtypes = lst.pop(0)
+            Ws, Cs, Qs = [], [], []
+            for i in range(nbtypes):
+                Ws.append(lst[:ndims])
+                lst = lst[ndims:]
+                Cs.append(lst.pop(0))
+                Qs.append(lst.pop(0))
+            m = lst.pop(0)
+            ws, b = [], []
+            for i in range(m):
+                ws.append([])
+                qi = lst.pop(0)
+                bi = lst.pop(0)
+                b.append(bi)
+                for j in range(qi):
+                    ws[i].append(lst[:ndims])
+                    lst = lst[ndims:]
+            assert lst == []
+        return cls(Ws, Cs, Qs, ws, b, verbose)
 
     def __del__(self):
         try:
@@ -88,11 +163,15 @@ class AFG(object):
     def __init__(
             self, instance, compress=-2, binary=False, vtype="I",
             verbose=None):
-        assert isinstance(instance, VBP)
+        assert isinstance(instance, (VBP, MVP))
         self.instance = instance
         self.afg_file = VPSolver.new_tmp_file(".afg")
+        if isinstance(instance, VBP):
+            instance_file = instance.vbp_file
+        elif isinstance(instance, MVP):
+            instance_file = instance.mvp_file
         self.output = VPSolver.vbp2afg(
-            instance.vbp_file, self.afg_file, compress, binary, vtype,
+            instance_file, self.afg_file, compress, binary, vtype,
             verbose=verbose
         )
         self.V, self.A, self.S, self.T = None, None, None, None
@@ -168,8 +247,8 @@ class VPSolver(object):
     def new_tmp_file(ext="tmp"):
         """Creates temporary files."""
         if not ext.startswith("."):
-            ext = ".{0}".format(ext)
-        fname = "{0}/{1}{2}".format(VPSolver.TMP_DIR, VPSolver.TMP_CNT, ext)
+            ext = ".{}".format(ext)
+        fname = "{}/{}{}".format(VPSolver.TMP_DIR, VPSolver.TMP_CNT, ext)
         VPSolver.TMP_CNT += 1
         return fname
 
@@ -235,37 +314,28 @@ class VPSolver(object):
         exit_code = proc.wait()
         proc.stdout.close()
         if exit_code != 0:
-            raise Exception("failed to run '{0}'".format(cmd))
+            raise Exception("failed to run '{}'".format(cmd))
 
     @staticmethod
     def parse_vbpsol(vpsol_output):
         """Transforms 'vbpsol' plaintext solutions into python data."""
-        try:
-            s = vpsol_output.strip()
-            lst = s[s.rfind("Objective:"):].split("\n")
-            lst[0] = lst[0].replace("Objective: ", "")
-            obj = int(lst[0])
-            lst = lst[2:]
-            lst = [x.split("x") for x in lst]
-            sol = []
-            for mult, pat in lst:
-                mult = int(mult)
-                pat = pat.replace("i=", "")
-                pat = pat.replace("[", "").replace("]", "")
-                pat = [int(x)-1 for x in pat.split(",")]
-                sol.append((mult, pat))
-        except:
+        marker = "PYSOL="
+        if marker in vpsol_output:
+            vpsol_output = vpsol_output[vpsol_output.find(marker)+len(marker):]
+            vpsol_output = vpsol_output[:vpsol_output.find("\n")]
+            obj, sol = eval(vpsol_output)
+            return obj, sol
+        else:
             return None
-        return obj, sol
 
     @staticmethod
-    def vbpsol(afg_file, sol_file, opts="", verbose=None):
+    def vbpsol(afg_file, sol_file, opts="0 1", verbose=None):
         """Calls 'vbpsol' to extract vector packing solutions."""
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
-            "{0} {1} {2} {3}".format(
+            "{} {} {} {}".format(
                 VPSolver.VBPSOL_PATH, afg_file, sol_file, opts
             ),
             tee=out_file,
@@ -274,17 +344,23 @@ class VPSolver(object):
         with open(out_file) as f:
             output = f.read()
         os.remove(out_file)
-        return output
+        return VPSolver.parse_vbpsol(output)
 
     @staticmethod
-    def vpsolver(vbp_file, compress=-2, binary=False, vtype="I", verbose=None):
+    def vpsolver(
+            instance_file, compress=-2, binary=False, vtype="I",
+            print_inst=False, pyout=True, verbose=None):
         """Calls 'vpsolver' to solve .vbp instances."""
-        if isinstance(vbp_file, VBP):
-            vbp_file = vbp_file.vbp_file
+        if isinstance(instance_file, VBP):
+            instance_file = instance_file.vbp_file
+        elif isinstance(instance_file, MVP):
+            instance_file = instance_file.mvp_file
         out_file = VPSolver.new_tmp_file()
-        opts = "{0} {1} {2}".format(compress, binary, vtype)
+        opts = "{:d} {:d} {} {:d} {:d}".format(
+            compress, binary, vtype, print_inst, pyout
+        )
         VPSolver.run(
-            "{0} {1} {2}".format(VPSolver.VPSOLVER_PATH, vbp_file, opts),
+            "{} {} {}".format(VPSolver.VPSOLVER_PATH, instance_file, opts),
             tee=out_file,
             verbose=verbose
         )
@@ -295,16 +371,18 @@ class VPSolver(object):
 
     @staticmethod
     def vbp2afg(
-            vbp_file, afg_file, compress=-2, binary=False, vtype="I",
+            instance_file, afg_file, compress=-2, binary=False, vtype="I",
             verbose=None):
         """Calls 'vbp2afg' to create arc-flow graphs for .vbp instances."""
-        if isinstance(vbp_file, VBP):
-            vbp_file = vbp_file.vbp_file
+        if isinstance(instance_file, VBP):
+            instance_file = instance_file.vbp_file
+        elif isinstance(instance_file, MVP):
+            instance_file = instance_file.mvp_file
         out_file = VPSolver.new_tmp_file()
-        opts = "{0} {1} {2}".format(compress, binary, vtype)
+        opts = "{} {} {}".format(compress, binary, vtype)
         VPSolver.run(
-            "{0} {1} {2} {3}".format(
-                VPSolver.VBP2AFG_PATH, vbp_file, afg_file, opts
+            "{} {} {} {}".format(
+                VPSolver.VBP2AFG_PATH, instance_file, afg_file, opts
             ),
             tee=out_file,
             verbose=verbose
@@ -321,7 +399,7 @@ class VPSolver(object):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
-            "{0} {1} {2} {3}".format(
+            "{} {} {} {}".format(
                 VPSolver.AFG2MPS_PATH, afg_file, mps_file, opts
             ),
             tee=out_file,
@@ -339,7 +417,9 @@ class VPSolver(object):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
-            "{0} {1} {2} {3}".format(VPSolver.AFG2LP_PATH, afg_file, lp_file, opts),
+            "{} {} {} {}".format(
+                VPSolver.AFG2LP_PATH, afg_file, lp_file, opts
+            ),
             tee=out_file,
             verbose=verbose
         )
@@ -354,26 +434,31 @@ class VPSolver(object):
         cmd = script_name
         for arg in [arg1, arg2]:
             if isinstance(arg, MPS):
-                cmd += " --mps {0}".format(arg.mps_file)
+                cmd += " --mps {}".format(arg.mps_file)
             elif isinstance(arg, LP):
-                cmd += " --lp {0}".format(arg.lp_file)
+                cmd += " --lp {}".format(arg.lp_file)
             elif isinstance(arg, AFG):
-                cmd += " --afg {0}".format(arg.afg_file)
+                cmd += " --afg {}".format(arg.afg_file)
             elif isinstance(arg, VBP):
-                cmd += " --vbp {0}".format(arg.vbp_file)
+                cmd += " --vbp {}".format(arg.vbp_file)
+            elif isinstance(arg, MVP):
+                cmd += " --mvp {}".format(arg.mvp_file)
             elif isinstance(arg, str):
                 if arg.endswith(".mps"):
-                    cmd += " --mps {0}".format(arg)
+                    cmd += " --mps {}".format(arg)
                 elif arg.endswith(".lp"):
-                    cmd += " --lp {0}".format(arg)
+                    cmd += " --lp {}".format(arg)
                 elif arg.endswith(".afg"):
-                    cmd += " --afg {0}".format(arg)
+                    cmd += " --afg {}".format(arg)
                 elif arg.endswith(".vbp"):
-                    cmd += " --vbp {0}".format(arg)
+                    cmd += " --vbp {}".format(arg)
+                elif arg.endswith(".mvp"):
+                    cmd += " --mvp {}".format(arg)
                 else:
                     raise Exception("Invalid file extension!")
         if options is not None:
-            cmd += " --options \"{0}\"".format(options)
+            cmd += " --options \"{}\"".format(options)
+        cmd += " --pyout"
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(cmd, tee=out_file, verbose=verbose)
         with open(out_file) as f:
@@ -386,22 +471,22 @@ class VPSolver(object):
         """Calls VPSolver scripts and returns arc-flow solutions."""
         cmd = script_name
         if isinstance(model, MPS):
-            cmd += " --mps {0}".format(model.mps_file)
+            cmd += " --mps {}".format(model.mps_file)
         elif isinstance(model, LP):
-            cmd += " --lp {0}".format(model.lp_file)
+            cmd += " --lp {}".format(model.lp_file)
         elif isinstance(model, str):
             if model.endswith(".mps"):
-                cmd += " --mps {0}".format(model)
+                cmd += " --mps {}".format(model)
             elif model.endswith(".lp"):
-                cmd += " --lp {0}".format(model)
+                cmd += " --lp {}".format(model)
             else:
                 raise Exception("Invalid file extension!")
         if options is not None:
-            cmd += " --options \"{0}\"".format(options)
+            cmd += " --options \"{}\"".format(options)
         out_file = VPSolver.new_tmp_file()
         sol_file = VPSolver.new_tmp_file(".sol")
         VPSolver.run(
-            "{0} --wsol {1}".format(cmd, sol_file),
+            "{} --wsol {}".format(cmd, sol_file),
             tee=out_file,
             verbose=verbose
         )
@@ -427,7 +512,7 @@ class VPSolver(object):
 
 def signal_handler(signal_, frame):
     """Signal handler for a cleaner exit."""
-    print("signal received: {0}".format(signal_))
+    print("signal received: {}".format(signal_))
     VPSolver.clear()
     sys.exit(0)
 

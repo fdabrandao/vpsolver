@@ -57,7 +57,8 @@ public:
 
     vector<pattern_pair> extract_solution(vector<int> &dem, int T);
 
-    void print_solution(const Instance &inst, bool print_inst, bool validate);
+    void print_solution(
+        const Instance &inst, bool print_inst, bool pyout, bool validate);
 };
 
 #endif

@@ -36,7 +36,8 @@ class GrbArcflow: public Arcflow{
 public:
     GrbArcflow(const Instance &inst): Arcflow(inst){}
 
-    void solve(const Instance &inst){
+    void solve(
+            const Instance &inst, bool print_inst = false, bool pyout = false){
         assert(ready == true);
         char vtype = inst.vtype;
         GRBEnv* env = new GRBEnv();
@@ -66,17 +67,19 @@ public:
                 if(i == 0 && (a->u == S || a->v >= Ts[0])) continue;
 
                 if(a->label == nsizes || inst.relax_domains)
-                    va[*a] = model.addVar(0.0, GRB_INFINITY, 0, vtype);
+                    va[*a] = model.addVar(0.0, inst.n, 0, vtype);
                 else
                     va[*a] = model.addVar(0.0, items[a->label].demand, 0, vtype);
             }
         }
         model.update();
 
-        GRBLinExpr linobj = 0;
-        for(int i = 0; i < inst.nbtypes; i++)
-            linobj += va[Arc(Ts[i], S, nsizes)] * inst.Cs[i];
-        model.setObjective(linobj);
+        for(int i = 0; i < inst.nbtypes; i++){
+            GRBVar &feedback = va[Arc(Ts[i], S, nsizes)];
+            feedback.set(GRB_DoubleAttr_Obj, inst.Cs[i]);
+            if(inst.Qs[i] >= 0)
+                feedback.set(GRB_DoubleAttr_UB, inst.Qs[i]);
+        }
 
         vector<vector<Arc> > Al(nsizes);
         vector<vector<Arc> > in(NS.size()+Ts.size());
@@ -132,7 +135,7 @@ public:
                 }
             }
             ArcflowSol sol(inst, flow, S, Ts, binary);
-            sol.print_solution(inst, false, true);
+            sol.print_solution(inst, print_inst, pyout, true);
         }
 
         free(env);
@@ -142,8 +145,10 @@ public:
 int main(int argc, char *argv[]){
     printf("Copyright (C) 2013-2015, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
-    if(argc < 2 || argc > 5){
-        printf("Usage: vpsolver instance.vbp/instance.mvp [method:-2] [binary:0] [vtype:I]\n");
+    if(argc < 2 || argc > 7){
+        printf("Usage: vpsolver instance.vbp/instance.mvp "
+               "[method:-2] [binary:0] [vtype:I] "
+               "[print_instance:0] [pyout:0]\n");
         return 1;
     }
 
@@ -159,10 +164,18 @@ int main(int argc, char *argv[]){
         inst.vtype = argv[4][0];
         assert(inst.vtype == 'I' || inst.vtype == 'C');
     }
+    bool print_inst = false;
+    if(argc >= 6){
+        print_inst = atoi(argv[5]) != 0;
+    }
+    bool pyout = false;
+    if(argc >= 7){
+        pyout = atoi(argv[6]) != 0;
+    }
 
     try {
         GrbArcflow graph(inst);
-        graph.solve(inst);
+        graph.solve(inst, print_inst, pyout);
     } catch(GRBException e) {
         printf("Error code = %d\n", e.getErrorCode());
         printf("%s\n", e.getMessage().c_str());

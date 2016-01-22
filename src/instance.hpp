@@ -54,10 +54,13 @@ class Instance{
 private:
     void init();
 public:
+    int ndims;
     int nbtypes;
-    int ndims, m;
+    int nsizes;
+    int m, n;
     vector<vector<int> > Ws; // bin types
     vector<int> Cs; // costs
+    vector<int> Qs; // quantities
     vector<Item> items;
     int method;
     bool sort;

@@ -100,8 +100,9 @@ void Instance::read(FILE *fin, ftype type){
         nbtypes = 1;
     }
 
-    Cs.resize(nbtypes);
     Ws.resize(nbtypes);
+    Cs.resize(nbtypes);
+    Qs.resize(nbtypes);
     for(int t = 0; t < nbtypes; t++){
         Ws[t].resize(ndims);
         assert(fscanf(fin, " Wi: ") >= 0);
@@ -110,8 +111,11 @@ void Instance::read(FILE *fin, ftype type){
         if(type == MVP){
             assert(fscanf(fin, " Ci: ") >= 0);
             assert(fscanf(fin, "%d", &Cs[t])==1);
+            assert(fscanf(fin, " Qi: ") >= 0);
+            assert(fscanf(fin, "%d", &Qs[t])==1);
         } else {
             Cs[t] = 1;
+            Qs[t] = -1;
         }
     }
 
@@ -245,6 +249,12 @@ void Instance::read(FILE *fin, ftype type){
         if(ctypes[i] == '*')
             ctypes[i] = (demands[i] <= 1) ? '=' : '>';
 
+    n = 0;
+    for(int i = 0; i < m; i++)
+        n += demands[i];
+
+    nsizes = items.size();
+
     if(sort){
         stable_sort(All(items));
         reverse(All(items));
@@ -262,6 +272,7 @@ void Instance::write(FILE *fout) const{
             fprintf(fout, " %d", Ws[t][i]);
         }
         fprintf(fout, " Ci: %d\n", Cs[t]);
+        fprintf(fout, " Qi: %d\n", Qs[t]);
     }
 
     fprintf(fout, "M: %d\n", m);

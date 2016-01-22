@@ -22,5 +22,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 __version__ = "2.0.0"
 
 from .graphutils import AFGraph
-from .vpsolver import VPSolver, VBP, AFG, MPS, LP
+from .vpsolver import VPSolver, VBP, MVP, AFG, MPS, LP
 from . import solvers

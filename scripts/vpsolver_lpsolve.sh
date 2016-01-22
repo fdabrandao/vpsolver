@@ -67,6 +67,7 @@ instance_file=""
 model_file=""
 afg_file=""
 sol_file=""
+vbpsol_opts=""
 
 while true;
 do
@@ -118,6 +119,14 @@ do
             error
         fi
         shift 2;;
+
+    --pyout)
+        if [[ -z "$vbpsol_opts" ]]; then
+            vbpsol_opts="0 1"
+        else
+            error
+        fi
+        shift 1;;
 
     --options)
         if [[ -z "$options" && -n "$2" ]]; then
@@ -173,7 +182,7 @@ solve $model_file;
 
 if [[ -n "$afg_file" && -z "$sol_file" ]]; then
     echo -e "\n>>> vbpsol..."
-    vbpsol $afg_file $TMP_DIR/vars.sol
+    vbpsol $afg_file $TMP_DIR/vars.sol $vbpsol_opts
 fi
 
 if [[ -n "$sol_file" ]]; then

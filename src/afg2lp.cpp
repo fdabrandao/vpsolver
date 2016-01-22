@@ -83,6 +83,7 @@ int main(int argc, char *argv[]){
     /* objective */
 
     fprintf(fout, "Minimize");
+    vector<int> ub(NA);
     for(int i = 0; i < NA; i++){
         int i_u, i_v, label;
         assert(fscanf(fin, " %d %d %d ", &i_u, &i_v, &label)==3);
@@ -92,6 +93,7 @@ int main(int argc, char *argv[]){
         if(i_v == S) {
             for(int j = 0; j < (int)Ts.size(); j++){
                 if(Ts[j] == i_u){
+                    ub[i] = (inst.Qs[j] >= 0) ? inst.Qs[j] : inst.n;
                     if(inst.Cs[j] >= 0)
                         fprintf(fout, " +%d X%x", inst.Cs[j], i);
                     else
@@ -99,6 +101,11 @@ int main(int argc, char *argv[]){
                     break;
                 }
             }
+        }else{
+            if(label < inst.nsizes && !inst.relax_domains)
+                ub[i] = inst.items[label].demand;
+            else
+                ub[i] = inst.n;
         }
     }
     fprintf(fout, "\n");
@@ -112,7 +119,7 @@ int main(int argc, char *argv[]){
     for(int i = 0; i < inst.m; i++){
         if(inst.items[i].demand == 0) continue;
         fprintf(fout, "\tB%d:", i);
-        for(int j = 0; j < (int)inst.items.size(); j++){
+        for(int j = 0; j < inst.nsizes; j++){
             if(inst.items[j].type == i)
                 ForEach(ai, Ai[j]) fprintf(fout, " + X%x", *ai);
         }
@@ -136,20 +143,10 @@ int main(int argc, char *argv[]){
 
     /* bounds */
 
-    int n = 0;
-    for(int i = 0; i < inst.m; i++)
-        n += inst.demands[i];
-
     fprintf(fout, "Bounds\n");
-    ForEach(e, Ai){
-        int i = e->first;
-        ForEach(ai, e->second){
-            if(i < (int)inst.items.size() && !inst.relax_domains)
-                fprintf(fout, "0 <= X%x <= %d\n", *ai, inst.items[i].demand);
-            else
-                fprintf(fout, "0 <= X%x <= %d\n", *ai, n);
-        }
-    }
+
+    for(int i = 0; i < NA; i++)
+        fprintf(fout, "0 <= X%x <= %d\n", i, ub[i]);
 
     /* integer variables */
 

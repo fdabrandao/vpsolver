@@ -35,7 +35,7 @@ using namespace std;
 Arcflow::Arcflow(const Instance &inst){
     tstart = CURTIME;
     ready = false;
-    nsizes = inst.items.size();
+    nsizes = inst.nsizes;
     nbtypes = inst.nbtypes;
     Ws = inst.Ws;
     ndims = inst.ndims;

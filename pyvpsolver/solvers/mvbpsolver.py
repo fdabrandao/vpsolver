@@ -74,6 +74,7 @@ def solve(
         )
         Ss[i] = symb+"S"
         Ts[i] = symb+"T"
+        graphs[i].A.remove((Ts[i], Ss[i], LOSS))
         if svg_file.endswith(".svg"):
             try:
                 graphs[i].draw(svg_file.replace(".svg", "{0}.svg".format(i)))

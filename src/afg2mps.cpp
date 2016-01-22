@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cassert>
 #include <cstring>
 #include <cstdarg>
+#include <map>
 #include "instance.hpp"
 using namespace std;
 
@@ -108,7 +109,6 @@ int main(int argc, char *argv[]){
         assert(fscanf(fin, " %d ", &Ts[t])==1);
     }
 
-
     int NV, NA;
     assert(fscanf(fin, " NV: %d ", &NV)==1);
     assert(fscanf(fin, " NA: %d ", &NA)==1);
@@ -149,6 +149,7 @@ int main(int argc, char *argv[]){
         mps.write(6, "", "", "MARKER", "'MARKER'", "", "'INTORG'");
 
     vector<int> labels;
+    vector<int> ub(NA);
     for(int i = 0; i < NA; i++){
         int i_u, i_v, label;
         assert(fscanf(fin, " %d %d %d ", &i_u, &i_v, &label)==3);
@@ -157,18 +158,24 @@ int main(int argc, char *argv[]){
         sprintf(buf1, "F%x", i_u);
         sprintf(buf2, "F%x", i_v);
         mps.write(7, "", "", buf, buf1, "-1", buf2, "1");
-        if(label < (int)inst.items.size()){
+        if(label < inst.nsizes){
             sprintf(buf1, "B%d", inst.items[label].type);
             mps.write(5, "", "", buf, buf1, "1");
         }
         if(i_v == S) {
             for(int j = 0; j < (int)Ts.size(); j++){
                 if(Ts[j] == i_u){
+                    ub[i] = (inst.Qs[j] >= 0) ? inst.Qs[j] : inst.n;
                     sprintf(buf1, "%d", inst.Cs[j]);
                     mps.write(5, "", "", buf, "OBJ", buf1);
                     break;
                 }
             }
+        }else{
+            if(label < inst.nsizes && !inst.relax_domains)
+                ub[i] = inst.items[label].demand;
+            else
+                ub[i] = inst.n;
         }
     }
 
@@ -189,21 +196,10 @@ int main(int argc, char *argv[]){
 
     mps.write(1, "BOUNDS");
 
-    int n = 0;
-    for(int i = 0; i < inst.m; i++)
-        n += inst.demands[i];
-
     for(int i = 0; i < NA; i++){
-        int lbl = labels[i];
         sprintf(buf, "X%x", i);
-
         mps.write(5, "", "LO", "BND1", buf, "0");
-
-        if(lbl < inst.m && !inst.relax_domains)
-            sprintf(buf1, "%d", inst.items[lbl].demand);
-        else
-            sprintf(buf1, "%d", n);
-
+        sprintf(buf1, "%d", ub[i]);
         mps.write(5, "", "UP", "BND1", buf, buf1);
     }
 

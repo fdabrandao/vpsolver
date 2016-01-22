@@ -87,7 +87,7 @@ vector<pattern_pair> ArcflowSol::extract_solution(vector<int> &dem, int T){
         if(v != S) adj[v].push_back(a->first);
     }
 
-    int &zflow = flow[Arc(T, S, inst.items.size())];
+    int &zflow = flow[Arc(T, S, inst.nsizes)];
 
     vector<int> lst(All(nodes));
 
@@ -119,7 +119,7 @@ vector<pattern_pair> ArcflowSol::extract_solution(vector<int> &dem, int T){
             Arc a = pred[v];
             int u = a.u;
             int lbl = a.label;
-            if(lbl < (int)inst.items.size()) // != LOSS
+            if(lbl < inst.nsizes) // != LOSS
                 patt.second.push_back(lbl);
             flow[a] -= f;
             v = u;
@@ -147,7 +147,8 @@ bool ArcflowSol::is_valid(
 }
 
 void ArcflowSol::print_solution(
-        const Instance &inst, bool print_inst = true, bool validate = true){
+        const Instance &inst, bool print_inst = true,
+        bool pyout = false, bool validate = true){
     vector<int> dem(inst.m), id(inst.m), rid(inst.m);
     for(int i = 0; i < inst.m; i++){
         dem[i] = inst.demands[i];
@@ -179,13 +180,23 @@ void ArcflowSol::print_solution(
         if(fs != 0) exit_error("Invalid solution! (flow)");
     }
 
-    printf("Objective: %d\n", obj);
 
-    printf("Solution:\n");
-
+    if(!pyout){
+        printf("Objective: %d\n", obj);
+        printf("Solution:\n");
+    }else{
+        printf("PYSOL=(%d, [", obj);
+    }
     for(int t = 0; t < inst.nbtypes; t++){
-        if(inst.nbtypes > 1)
-            printf("Bins of type %d: %d\n", t+1, nbins[t]);
+        if(!pyout){
+            if(inst.nbtypes > 1)
+                printf("Bins of type %d: %d\n", t+1, nbins[t]);
+        }else{
+            if(t == 0)
+                printf("[");
+            else
+                printf(", [");
+        }
         vector<pattern_pair> &sol = sols[t];
         ForEach(pat, sol){
             vector<int_pair> tmp;
@@ -197,23 +208,42 @@ void ArcflowSol::print_solution(
             }
             sort(All(tmp));
 
-            printf("%d x [", pat->first);
-            ForEach(p, tmp){
-                if(p != tmp.begin()) printf(", ");
-                if(p->second == -1)
-                    printf("i=%d", p->first+1);
-                else
-                    printf("i=%d opt=%d", p->first+1, p->second+1);
+            if(!pyout){
+                printf("%d x [", pat->first);
+                ForEach(p, tmp){
+                    if(p != tmp.begin()) printf(", ");
+                    if(p->second == -1)
+                        printf("i=%d", p->first+1);
+                    else
+                        printf("i=%d opt=%d", p->first+1, p->second+1);
+                }
+                printf("]\n");
+            }else{
+                if(pat != sol.begin()) printf(", ");
+                printf("(%d, [", pat->first);
+                ForEach(p, tmp){
+                    if(p != tmp.begin()) printf(", ");
+                    if(p->second == -1)
+                        printf("(%d, 0)", p->first);
+                    else
+                        printf("(%d, %d)", p->first, p->second);
+                }
+                printf("])");
             }
-            printf("]\n");
         }
+        if(pyout){
+            printf("]");
+        }
+    }
+    if(pyout){
+        printf("])\n");
     }
 
     if(print_inst){
         printf("Instance:\n");
         int p = 0;
-        vector<int> rid(inst.items.size());
-        for(int it = 0; it < (int)inst.items.size(); it++)
+        vector<int> rid(inst.nsizes);
+        for(int it = 0; it < inst.nsizes; it++)
             rid[inst.items[it].id] = it;
         for(int i = 0; i < inst.m; i++){
             printf("i=%d (nopts: %d, demand: %d)\n", i+1, inst.nopts[i], inst.demands[i]);
