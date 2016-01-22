@@ -49,18 +49,6 @@ Arcflow::Arcflow(const Instance &inst){
             maxW[d] = max(maxW[d], Ws[t][d]);
     }
 
-    ls_mat.assign(nsizes+1, vector<int>(ndims, 0));
-    const vector<int> &r = max_rep(maxW, vector<int>(ndims, 0), 0, 0);
-    for(int i = 0; i < nsizes; i++){
-        int next = binary ? i+1 : i;
-        for(int j = next; j < nsizes; j++){
-            if(is_compatible(items[i], items[j])){
-                for(int d = 0; d < ndims; d++)
-                    ls_mat[i][d] = min(ls_mat[i][d]+r[j]*items[j][d], maxW[d]);
-            }
-        }
-    }
-
     lsize = ndims;
     max_label = maxW;
     if(binary){
@@ -79,7 +67,7 @@ Arcflow::Arcflow(const Instance &inst){
 
     build(); // build step-3' graph
     int nv1 = NS.size()+nbtypes;
-    int na1 = A.size()+(NS.size()-1)*nbtypes;
+    int na1 = A.size()+(NS.size()-1)*nbtypes+1;
     printf("  Step-3* Graph: %d vertices and %d arcs (%.2fs)\n",
         nv1, na1, TIMEDIF(tstart));
 
@@ -100,9 +88,9 @@ bool Arcflow::is_valid(const vector<int> &u, const vector<int> &W) const{
     return true;
 }
 
-bool Arcflow::is_compatible(const Item &a, const Item &b) const{
+bool Arcflow::is_full(const vector<int> &u, const vector<int> &W) const{
     for(int i = 0; i < ndims; i++)
-        if(a[i]+b[i] > maxW[i]) return false;
+        if(u[i] != W[i]) return false;
     return true;
 }
 
@@ -176,24 +164,20 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d, const vector<int> &c
 
 void Arcflow::lift_state(
         const vector<int> &valid_opts, vector<int> &u, int it, int ic) const {
+    if(it >= nsizes) return;
     const vector<int> &r = max_rep(maxW, u, it, ic);
     for(int d = 0; d < ndims; d++){
         int minw = maxW[d];
         for(int t : valid_opts) minw = min(minw, Ws[t][d]);
-        // lift method 1
-        if(ic > 0)
-            u[d] = max(u[d], minw-ls_mat[it][d]);
-        else if(it > 0)
-            u[d] = max(u[d], minw-ls_mat[it-1][d]);
         if(u[d] != minw){
-            // lift method 2
+            // lift method 1
             int maxpos = minw;
-            for(int t = it; t < nsizes && maxpos >= u[d]; t++)
-                maxpos -= r[t]*items[t][d];
+            for(int i = it; i < nsizes && maxpos >= u[d]; i++)
+                maxpos -= r[i]*items[i][d];
             if(maxpos >= u[d]){
                 u[d] = maxpos;
             }else{
-                // lift method 3
+                // lift method 2
                 vector<int> caps;
                 for(int t : valid_opts)
                     caps.push_back(Ws[t][d]-u[d]);
@@ -235,78 +219,73 @@ inline vector<int> Arcflow::hash(const vector<int> &su){
     return h;
 }
 
-int Arcflow::go(const vector<int> &su){
+int Arcflow::go(vector<int> su){
+    int it = su[ndims];
+    int ic = binary ? 0 : su[ndims+1];
+    vector<int> valid_opts;
+    vector<int> mu(max_label);
+    for(int t = 0; t < nbtypes; t++){
+        if(is_valid(su, Ws[t])){
+            valid_opts.push_back(t);
+            if(nbtypes > 1){
+                for(int d = 0; d < ndims; d++)
+                    mu[d] = min(mu[d], Ws[t][d]);
+            }
+        }
+    }
+    if(valid_opts.empty()) return -1;
+    lift_state(valid_opts, su, it, ic);
+
     //const vector<int> key(su);
     const vector<int> key(hash(su));
     map<vector<int>, int>::iterator itr = dp.find(key);
     if(itr != dp.end())
         return itr->second;
 
-    int it = 0, ic = 0;
-    if(binary){
-        it = su[ndims];
-    }else{
-        it = su[ndims];
-        ic = su[ndims+1];
-    }
-
-    vector<int> mu(max_label);
-
-    int up = -1;
-    if(it+1 < nsizes){
-        vector<int> sv(su);
-        sv[ndims] = it+1;
-        if(!binary)
-            sv[ndims+1] = 0;
-        up = go(sv);
-        mu = NS.get_label(up);
-    }else if(nbtypes > 1){
-        for(int t = 0; t < nbtypes; t++){
-            if(is_valid(su, Ws[t])){
-                for(int d = 0; d < ndims; d++)
-                    mu[d] = min(mu[d], Ws[t][d]);
-            }
+    if(!is_full(su, mu)){
+        int up = -1;
+        if(it+1 < nsizes){
+            vector<int> sv(su);
+            sv[ndims] = it+1;
+            if(!binary)
+                sv[ndims+1] = 0;
+            up = go(sv);
+            mu = NS.get_label(up);
         }
-    }
 
-    int dem = items[it].demand;
-    if(it < nsizes && ic < dem){
-        vector<int> sv(su);
-        const vector<int> &w = items[it].w;
-        for(int d = 0; d < ndims; d++)
-            sv[d] += w[d];
-        vector<int> valid_opts;
-        for(int t = 0; t < nbtypes; t++){
-            if(is_valid(sv, Ws[t])) valid_opts.push_back(t);
-        }
-        if(!valid_opts.empty()){
-            int iv;
+        int dem = items[it].demand;
+        if(it < nsizes && ic < dem){
+            vector<int> sv(su);
+            const vector<int> &w = items[it].w;
+            for(int d = 0; d < ndims; d++)
+                sv[d] += w[d];
+
+            int iv = -1;
             if(binary){
                 sv[ndims] = it+1;
-                if(it+1 < nsizes) lift_state(valid_opts, sv, it+1, 0);
                 iv = go(sv);
             }else{
                 if(ic+1 < dem){
                     sv[ndims] = it;
                     sv[ndims+1] = ic+1;
-                    lift_state(valid_opts, sv, it, ic+1);
                 }else{
                     sv[ndims] = it+1;
                     sv[ndims+1] = 0;
-                    lift_state(valid_opts, sv, it+1, 0);
                 }
                 iv = go(sv);
             }
-            const vector<int> &v = NS.get_label(iv);
 
-            for(int d = 0; d < ndims; d++)
-                mu[d] = min(mu[d], v[d]-w[d]);
-            if(binary)
-                mu[ndims] = min(mu[ndims], it+1);
-            int iu = NS.get_index(mu);
-            AS.insert(Arc(iu, iv, it));
-            if(up != -1 && iu != up)
-                AS.insert(Arc(iu, up, nsizes));
+            if(iv != -1){
+                const vector<int> &v = NS.get_label(iv);
+                for(int d = 0; d < ndims; d++)
+                    mu[d] = min(mu[d], v[d]-w[d]);
+                if(binary)
+                    mu[ndims] = min(mu[ndims], it+1);
+                int iu = NS.get_index(mu);
+                AS.insert(Arc(iu, iv, it));
+                if(up != -1 && iu != up)
+                    AS.insert(Arc(iu, up, nsizes));
+            }
         }
     }
 

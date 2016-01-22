@@ -37,11 +37,10 @@ class Arcflow{
 private:
     set<Arc> AS;
     map<vector<int>, int> dp;
-    int go(const vector<int> &su);
+    int go(vector<int> su);
     inline vector<int> hash(const vector<int> &su);
     vector<int> max_label;
     vector<int> min_label;
-    vector<vector<int> > ls_mat;
     int lsize;
 protected:
     bool ready;
@@ -64,7 +63,7 @@ protected:
     void lift_state(const vector<int> &valid_opts, vector<int> &u, int it, int ic) const;
     int min_slack(const vector<int> &b, int i0, int d, const vector<int> &caps) const;
     bool is_valid(const vector<int> &u, const vector<int> &W) const;
-    bool is_compatible(const Item &a, const Item &b) const;
+    bool is_full(const vector<int> &u, const vector<int> &W) const;
     void relabel_graph(const vector<int> &label);
     void build();
     void final_compression_step();
