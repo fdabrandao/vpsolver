@@ -47,14 +47,29 @@ class AFGUtils(object):
         s = s[:s.find("#GRAPH_END#\n")]
         s = s.replace("#GRAPH_BEGIN#", "")
         lst = s.split()
+
+        assert lst[0] == "S:"
         lst.pop(0)  # ignore "S:"
         S = int(lst.pop(0))
-        lst.pop(0)  # ignore "T:"
-        T = int(lst.pop(0))
+
+        assert lst[0] == "Ts:"
+        lst.pop(0)  # ignore "Ts:"
+        Ts = []
+        while lst[0] != "NV:":
+            Ts.append(int(lst.pop(0)))
+        if len(Ts) == 1:
+            T = Ts[0]
+        else:
+            T = Ts
+
+        assert lst[0] == "NV:"
         lst.pop(0)  # ignore "NV:"
         NV = int(lst.pop(0))
+
+        assert lst[0] == "NA:"
         lst.pop(0)  # ignore "NA:"
         NA = int(lst.pop(0))
+
         lst = list(map(int, lst))
         A = []
         V = set([])

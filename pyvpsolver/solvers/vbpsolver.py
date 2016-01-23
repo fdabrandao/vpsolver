@@ -59,14 +59,17 @@ def solve(
     return obj, sol
 
 
-def print_solution(obj, sol, fout=sys.stdout):
+def print_solution(obj, lst_sol, fout=sys.stdout):
     """Pretty-print function for vector packing solutions."""
+    assert len(lst_sol) == 1
+    sol = lst_sol[0]
     if obj is not None:
         print("Objective:", obj, file=fout)
     print("Solution:", file=fout)
     for mult, patt in sol:
+        assert all(opt == 0 for it, opt in patt)
         print("{0} x [{1}]".format(
             mult, ", ".join(
-                ["i={0}".format(it+1) for it in patt]
+                ["i={0}".format(it+1) for it, opt in patt]
             )
         ), file=fout)

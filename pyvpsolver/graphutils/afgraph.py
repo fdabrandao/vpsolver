@@ -40,16 +40,25 @@ class AFGraph(object):
     def from_file(cls, afg_file):
         """Loads a graph from a .afg file."""
         V, A, S, T = AFGUtils.read_graph(afg_file)
-        V, A = AFGUtils.relabel(
-            V, A,
-            lambda u: "S" if u == S else "T" if u == T else u
-        )
-        return cls(V, A, "S", "T")
+        lbls = {}
+        lbls[S] = "S"
+        if isinstance(T, list):
+            newT = ["T{}".format(i) for i in range(len(T))]
+            for t, newt in zip(T, newT):
+                lbls[t] = newt
+        else:
+            newT = "T"
+            lbls[T] = newT
+        V, A = AFGUtils.relabel(V, A, lambda u: lbls.get(u, u))
+        return cls(V, A, "S", newT)
 
     def relabel(self, fv, fa=lambda x: x):
         """Relabels the graph."""
         self.S = fv(self.S)
-        self.T = fv(self.T)
+        if isinstance(self.T, list):
+            self.T = list(map(fv, self.T))
+        else:
+            self.T = fv(self.T)
         self.V, self.A = AFGUtils.relabel(self.V, self.A, fv, fa)
 
     def draw(
