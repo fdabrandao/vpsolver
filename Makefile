@@ -1,7 +1,10 @@
 SRC = src
 BIN = bin
-CC=g++
-CFLAGS= -std=c++11 -Wall -O2
+CC = g++
+CFLAGS = -std=c++11 -Wall -O2
+
+PREFIX = /usr/local
+INSTALL = install -c
 
 GUROBI_DIR = /opt/gurobi650/linux64
 INC    = $(GUROBI_DIR)/include/
@@ -10,6 +13,8 @@ CPPLIB = -L$(GUROBI_DIR)/lib/ -lpthread -lgurobi_c++ -lgurobi65
 GUROBI_OPTS = -I$(INC) $(CPPLIB)
 
 GLPK_OPTS = -lglpk
+
+all: $(BIN)/vpsolver $(BIN)/vbp2afg $(BIN)/afg2mps $(BIN)/afg2lp $(BIN)/solve_gurobi $(BIN)/solve_glpk $(BIN)/vbpsol
 
 swig:
 	swig -python -c++ $(SRC)/vbp2afg.i
@@ -20,8 +25,6 @@ swig:
 	mv $(SRC)/afg2mps.py scripts/
 	swig -python -c++ $(SRC)/vbpsol.i
 	mv $(SRC)/vbpsol.py scripts/
-
-all: $(BIN)/vpsolver $(BIN)/vbp2afg $(BIN)/afg2mps $(BIN)/afg2lp $(BIN)/solve_gurobi $(BIN)/solve_glpk $(BIN)/vbpsol
 
 $(BIN)/vpsolver: $(SRC)/vpsolver.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp $(SRC)/common.cpp
 	$(CC) -o $(BIN)/vpsolver $(CFLAGS) $(SRC)/vpsolver.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp $(SRC)/common.cpp $(GUROBI_OPTS)
@@ -43,6 +46,9 @@ $(BIN)/solve_gurobi: $(SRC)/solve_gurobi.cpp
 
 $(BIN)/solve_glpk: $(SRC)/solve_glpk.cpp
 	$(CC) -o $(BIN)/solve_glpk $(CFLAGS) $(SRC)/solve_glpk.cpp $(GLPK_OPTS)
+
+install:
+	$(INSTALL) $(BIN)/* $(PREFIX)/bin/
 
 clean:
 	rm -rf $(BIN)/*
