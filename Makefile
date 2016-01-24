@@ -11,6 +11,16 @@ GUROBI_OPTS = -I$(INC) $(CPPLIB)
 
 GLPK_OPTS = -lglpk
 
+swig:
+	swig -python -c++ $(SRC)/vbp2afg.i
+	mv $(SRC)/vbp2afg.py scripts/
+	swig -python -c++ $(SRC)/afg2lp.i
+	mv $(SRC)/afg2lp.py scripts/
+	swig -python -c++ $(SRC)/afg2mps.i
+	mv $(SRC)/afg2mps.py scripts/
+	swig -python -c++ $(SRC)/vbpsol.i
+	mv $(SRC)/vbpsol.py scripts/
+
 all: $(BIN)/vpsolver $(BIN)/vbp2afg $(BIN)/afg2mps $(BIN)/afg2lp $(BIN)/solve_gurobi $(BIN)/solve_glpk $(BIN)/vbpsol
 
 $(BIN)/vpsolver: $(SRC)/vpsolver.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp $(SRC)/common.cpp
@@ -25,14 +35,14 @@ $(BIN)/afg2mps: $(SRC)/afg2mps.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/a
 $(BIN)/afg2lp: $(SRC)/afg2lp.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/common.cpp
 	$(CC) -o $(BIN)/afg2lp $(CFLAGS) $(SRC)/afg2lp.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/common.cpp
 
+$(BIN)/vbpsol: $(SRC)/vbpsol.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp $(SRC)/common.cpp
+	$(CC) -o $(BIN)/vbpsol $(CFLAGS) $(SRC)/vbpsol.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp $(SRC)/common.cpp
+
 $(BIN)/solve_gurobi: $(SRC)/solve_gurobi.cpp
 	$(CC) -o $(BIN)/solve_gurobi $(CFLAGS) $(SRC)/solve_gurobi.cpp $(GUROBI_OPTS)
 
 $(BIN)/solve_glpk: $(SRC)/solve_glpk.cpp
 	$(CC) -o $(BIN)/solve_glpk $(CFLAGS) $(SRC)/solve_glpk.cpp $(GLPK_OPTS)
-
-$(BIN)/vbpsol: $(SRC)/vbpsol.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp $(SRC)/common.cpp
-	$(CC) -o $(BIN)/vbpsol $(CFLAGS) $(SRC)/vbpsol.cpp $(SRC)/instance.cpp $(SRC)/graph.cpp $(SRC)/arcflow.cpp $(SRC)/arcflowsol.cpp $(SRC)/common.cpp
 
 clean:
 	rm -rf $(BIN)/*

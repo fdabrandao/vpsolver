@@ -28,21 +28,10 @@ Links
 * `GiHub repository <https://github.com/fdabrandao/vpsolver>`_
 * `BitBucket repository <https://bitbucket.org/fdabrandao/vpsolver>`_
 """
-
 import os
 import re
 import ast
-from setuptools import setup
-from setuptools.command.install import install
-
-
-class CustomInstallCommand(install):
-    """Custom Install Command."""
-
-    def run(self):
-        assert os.system("/bin/bash build.sh") == 0
-        os.system("/bin/cp bin/* {0}/".format(self.install_scripts))
-        install.run(self)
+from distutils.core import setup, Extension
 
 
 def ls_dir(base_dir):
@@ -57,6 +46,51 @@ def ls_dir(base_dir):
             not f.startswith(".")
         )
     ]
+
+_vbp2afg = Extension(
+    "_vbp2afg",
+    sources=[
+        "src/vbp2afg_wrap.cxx", "src/vbp2afg.cpp",
+        "src/instance.cpp", "src/graph.cpp",
+        "src/arcflow.cpp", "src/common.cpp"
+    ],
+    extra_compile_args=["-std=c++11", "-Wall", "-O2"],
+    undef_macros=['NDEBUG'],
+)
+
+_afg2lp = Extension(
+    "_afg2lp",
+    sources=[
+        "src/afg2lp_wrap.cxx", "src/afg2lp.cpp",
+        "src/instance.cpp", "src/graph.cpp",
+        "src/arcflow.cpp", "src/common.cpp"
+    ],
+    extra_compile_args=["-std=c++11", "-Wall", "-O2"],
+    undef_macros=['NDEBUG'],
+)
+
+_afg2mps = Extension(
+    "_afg2mps",
+    sources=[
+        "src/afg2mps_wrap.cxx", "src/afg2mps.cpp",
+        "src/instance.cpp", "src/graph.cpp",
+        "src/arcflow.cpp", "src/common.cpp"
+    ],
+    extra_compile_args=["-std=c++11", "-Wall", "-O2"],
+    undef_macros=['NDEBUG'],
+)
+
+_vbpsol = Extension(
+    "_vbpsol",
+    sources=[
+        "src/vbpsol_wrap.cxx", "src/vbpsol.cpp",
+        "src/instance.cpp", "src/graph.cpp",
+        "src/arcflow.cpp", "src/arcflowsol.cpp",
+        "src/common.cpp"
+    ],
+    extra_compile_args=["-std=c++11", "-Wall", "-O2"],
+    undef_macros=['NDEBUG'],
+)
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 with open("pyvpsolver/__init__.py", "rb") as f:
@@ -86,5 +120,5 @@ setup(
         "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
         "Topic :: Scientific/Engineering"
     ],
-    cmdclass={"install": CustomInstallCommand},
+    ext_modules=[_vbp2afg, _afg2lp, _afg2mps, _vbpsol],
 )
