@@ -33,7 +33,7 @@ class AFGUtils(object):
     """Tools for manipulating arc-flow graphs."""
 
     @staticmethod
-    def read_graph(afg_file):
+    def read_graph(afg_file, labels):
         """Reads graphs from .afg files."""
         f = open(afg_file, "r")
         s = f.read()
@@ -81,10 +81,10 @@ class AFGUtils(object):
             u, v, i = lst[i:i+3]
             V.add(u)
             V.add(v)
-            if i != LOSS:
-                A.append((u, v, ids[i]))
+            if i == LOSS:
+                A.append((u, v, LOSS))
             else:
-                A.append((u, v, i))
+                A.append((u, v, labels[ids[i]]))
         V = sorted(V)
         return V, A, S, T, LOSS
 

@@ -40,6 +40,7 @@ class VBP(object):
 
     def __init__(self, W, w, b, verbose=None):
         self.vbp_file = VPSolver.new_tmp_file(".vbp")
+        self.labels = {}
         with open(self.vbp_file, "w") as f:
             if isinstance(W, int):
                 W = [W]
@@ -53,6 +54,7 @@ class VBP(object):
             print(len(w), file=f)
             # items
             for i in range(len(w)):
+                self.labels[i] = i
                 if isinstance(w[i], int):
                     row = [w[i], b[i]]
                 else:
@@ -94,6 +96,7 @@ class MVP(object):
 
     def __init__(self, Ws, Cs, Qs, ws, b, verbose=None):
         self.mvp_file = VPSolver.new_tmp_file(".mvp")
+        self.labels = {}
         with open(self.mvp_file, "w") as f:
             # ndims
             ndims = len(Ws[0])
@@ -112,11 +115,14 @@ class MVP(object):
             assert len(ws) == len(b)
             print(len(ws), file=f)
             # items
+            p = 0
             for i in range(len(ws)):
                 print("{} {}".format(len(ws[i]), b[i]), file=f)
-                for w in ws[i]:
+                for j, w in enumerate(ws[i]):
                     assert len(w) == ndims
                     print(" ".join(map(str, w)), file=f)
+                    self.labels[p] = (i, j)
+                    p += 1
         if verbose:
             with open(self.mvp_file, "r") as f:
                 print(f.read())
@@ -165,6 +171,7 @@ class AFG(object):
             verbose=None):
         assert isinstance(instance, (VBP, MVP))
         self.instance = instance
+        self.labels = instance.labels
         self.afg_file = VPSolver.new_tmp_file(".afg")
         if isinstance(instance, VBP):
             instance_file = instance.vbp_file
@@ -179,7 +186,7 @@ class AFG(object):
 
     def graph(self):
         """Returns the graph as an AFGraph object."""
-        return AFGraph.from_file(self.afg_file)
+        return AFGraph.from_file(self.afg_file, self.labels)
 
     def __del__(self):
         try:
