@@ -23,10 +23,7 @@ from __future__ import print_function
 
 import os
 import sys
-import wolsey
-import twostage
-import instance_vbp
-import instance_mvp
+from pympl import PyMPL, Tools, glpkutils
 
 if __name__ == "__main__":
     sdir = os.path.dirname(__file__)
@@ -35,20 +32,31 @@ if __name__ == "__main__":
 
 
 def main():
-    """Runs all PyMPL examples."""
+    """Parses 'instance_mvp.mod'"""
 
-    print("wolsey:")
-    wolsey.main()
+    mod_in = "instance_mvp.mod"
+    mod_out = "tmp/instance_mvp.out.mod"
+    parser = PyMPL(locals_=locals(), globals_=globals())
+    parser.parse(mod_in, mod_out)
 
-    print("twostage:")
-    twostage.main()
+    lp_out = "tmp/instance_mvp.lp"
+    glpkutils.mod2lp(mod_out, lp_out, True)
+    out, varvalues = Tools.script(
+        "glpk_wrapper.sh", lp_out, verbose=True
+    )
+    sol = parser["MVP_FLOW"].extract(
+        lambda varname: varvalues.get(varname, 0),
+        verbose=True
+    )
 
-    print("instance_vbp:")
-    instance_vbp.main()
+    print("")
+    print("sol:", sol)
+    print("varvalues:", [(k, v) for k, v in sorted(varvalues.items())])
+    print("")
+    assert varvalues["cost"] == 8  # check the solution objective value
 
-    print("instance_mvp:")
-    instance_mvp.main()
-
+    exit_code = os.system("glpsol --math {0}".format(mod_out))
+    assert exit_code == 0
 
 if __name__ == "__main__":
     main()

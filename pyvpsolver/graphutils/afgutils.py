@@ -37,11 +37,12 @@ class AFGUtils(object):
         """Reads graphs from .afg files."""
         f = open(afg_file, "r")
         s = f.read()
-
         lst = s.split()
-        m = int(lst[lst.index("M:")+1])
+
         lst = lst[lst.index("IDS:")+1:]
-        ids = list(map(int, lst[:m]))
+        ids = []
+        while lst[0].isdigit():
+            ids.append(int(lst.pop(0)))
 
         s = s[s.find("#GRAPH_BEGIN#"):]
         s = s[:s.find("#GRAPH_END#\n")]
@@ -55,7 +56,7 @@ class AFGUtils(object):
         assert lst[0] == "Ts:"
         lst.pop(0)  # ignore "Ts:"
         Ts = []
-        while lst[0] != "LOSS:":
+        while lst[0].isdigit():
             Ts.append(int(lst.pop(0)))
         if len(Ts) == 1:
             T = Ts[0]

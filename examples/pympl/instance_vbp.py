@@ -32,14 +32,14 @@ if __name__ == "__main__":
 
 
 def main():
-    """Parses 'instance.mod'"""
+    """Parses 'instance_vbp.mod'"""
 
-    mod_in = "instance.mod"
-    mod_out = "tmp/instance.out.mod"
+    mod_in = "instance_vbp.mod"
+    mod_out = "tmp/instance_vbp.out.mod"
     parser = PyMPL(locals_=locals(), globals_=globals())
     parser.parse(mod_in, mod_out)
 
-    lp_out = "tmp/instance.lp"
+    lp_out = "tmp/instance_vbp.lp"
     glpkutils.mod2lp(mod_out, lp_out, True)
     out, varvalues = Tools.script(
         "glpk_wrapper.sh", lp_out, verbose=True
