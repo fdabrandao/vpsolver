@@ -357,7 +357,13 @@ void Arcflow::finalize(){
     S = 0;
     Ts.clear();
     for(int i = 0; i < nbtypes; i++)
-        Ts.push_back(NS.size()+i);
+        Ts.push_back(i);
+    sort(All(Ts), [this](int a, int b) {
+        return this->Ws[a] < this->Ws[b];
+    });
+    for(int i = 0; i < nbtypes; i++)
+        Ts[i] += NS.size();
+
     for(int i = 0; i < nbtypes; i++)
         A.push_back(Arc(Ts[i], S, nsizes));
 
@@ -409,6 +415,7 @@ void Arcflow::write(FILE *fout){
     }
     fprintf(fout, "\n");
 
+    int lastv = NS.size()-1;
     fprintf(fout, "NV: %d\n", int(NS.size()+Ts.size()));
     fprintf(fout, "NA: %d\n", int(A.size()));
 
@@ -416,8 +423,8 @@ void Arcflow::write(FILE *fout){
     for(int i = 0; i < 3; i++){
         ForEach(a, A){
             if(i == 1 && a->u != iS) continue;
-            if(i == 2 && a->v < Ts[0]) continue;
-            if(i == 0 && (a->u == iS || a->v >= Ts[0])) continue;
+            if(i == 2 && a->v <= lastv) continue;
+            if(i == 0 && (a->u == iS || a->v > lastv)) continue;
             fprintf(fout, "%d %d %d\n", a->u, a->v, a->label);
         }
     }

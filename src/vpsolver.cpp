@@ -60,11 +60,13 @@ public:
         sort(All(A));
         //reverse(All(A));
         map<Arc, GRBVar> va;
+        int lastv = Ts[0]-1;
+        for(int i = 0; i < inst.nbtypes; i++) lastv = min(lastv, Ts[i]-1);
         for(int i = 0; i < 3; i++){
             ForEach(a, A){
                 if(i == 1 && a->u != S) continue;
-                if(i == 2 && a->v < Ts[0]) continue;
-                if(i == 0 && (a->u == S || a->v >= Ts[0])) continue;
+                if(i == 2 && a->v <= lastv) continue;
+                if(i == 0 && (a->u == S || a->v > lastv)) continue;
 
                 if(a->label == nsizes || inst.relax_domains)
                     va[*a] = model.addVar(0.0, inst.n, 0, vtype);

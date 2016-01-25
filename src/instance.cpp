@@ -271,7 +271,7 @@ void Instance::write(FILE *fout) const{
         for(int i = 0; i < ndims; i++){
             fprintf(fout, " %d", Ws[t][i]);
         }
-        fprintf(fout, " Ci: %d\n", Cs[t]);
+        fprintf(fout, " Ci: %d", Cs[t]);
         fprintf(fout, " Qi: %d\n", Qs[t]);
     }
 
