@@ -81,7 +81,7 @@ bool Arc::operator<(const Arc &o) const{
 }
 
 bool Arc::operator==(const Arc &o) const{
-    return u == o.u && v == o.v && label < o.label;
+    return u == o.u && v == o.v && label == o.label;
 }
 
 

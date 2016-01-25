@@ -351,55 +351,80 @@ void Arcflow::final_compression_step(){
     NS.sort();
 }
 
+void Arcflow::reduce_redundancy(){
+    //remove redundant parallel arcs
+    vector<int> types;
+    for(int i = 0; i < nsizes; i++)
+        types.push_back(items[i].type);
+    types.push_back(-1);
+    auto comp_less = [&types](const Arc &a, const Arc &b) {
+        return (a.u < b.u) ||
+               (a.u == b.u && a.v < b.v) ||
+               (a.u == b.u && a.v == b.v && types[a.label] < types[b.label]);
+    };
+    auto comp_equal = [&types](const Arc &a, const Arc &b) {
+        return a.u == b.u && a.v == b.v && types[a.label] == types[b.label];
+    };
+    sort(All(A), comp_less);
+    A.erase(unique(All(A), comp_equal), A.end());
+}
+
 void Arcflow::finalize(){
     assert(ready == false);
+    if(nbtypes == 1){
+        S = 0;
+        Ts.assign({NS.size()});
+        A.push_back(Arc(Ts[0], S, nsizes));
+        for(int i = 1; i < (int)NS.size(); i++)
+        A.push_back(Arc(i, Ts[0], nsizes));
+    }else{
+        S = 0;
+        Ts.clear();
+        for(int i = 0; i < nbtypes; i++)
+            Ts.push_back(i);
+        sort(All(Ts), [this](int a, int b) {
+            return this->Ws[a] < this->Ws[b];
+        });
+        for(int i = 0; i < nbtypes; i++)
+            Ts[i] += NS.size();
 
-    S = 0;
-    Ts.clear();
-    for(int i = 0; i < nbtypes; i++)
-        Ts.push_back(i);
-    sort(All(Ts), [this](int a, int b) {
-        return this->Ws[a] < this->Ws[b];
-    });
-    for(int i = 0; i < nbtypes; i++)
-        Ts[i] += NS.size();
+        for(int i = 0; i < nbtypes; i++)
+            A.push_back(Arc(Ts[i], S, nsizes));
 
-    for(int i = 0; i < nbtypes; i++)
-        A.push_back(Arc(Ts[i], S, nsizes));
-
-    vector<vector<int> > bigger_than(nbtypes);
-    for(int t1 = 0; t1 < nbtypes; t1++)
-        for(int t2 = 0; t2 < nbtypes; t2++)
-            if(t1 != t2 && is_valid(Ws[t1], Ws[t2]))
-                if(Ws[t1] != Ws[t2] || (t1 < t2 && Ws[t1] == Ws[t2]))
-                    bigger_than[t1].push_back(t2);
-
-    vector<bool> valid_tgts(nbtypes);
-    for(int i = 1; i < (int)NS.size(); i++){
-        const vector<int> &u = NS.get_label(i);
-        for(int t = 0; t < nbtypes; t++)
-            valid_tgts[t] = is_valid(u, Ws[t]);
+        vector<vector<int> > bigger_than(nbtypes);
         for(int t1 = 0; t1 < nbtypes; t1++)
-            if(valid_tgts[t1])
-                for(int t2 : bigger_than[t1]) valid_tgts[t2] = false;
-        for(int t = 0; t < nbtypes; t++)
-            if(valid_tgts[t])
-                A.push_back(Arc(i, Ts[t], nsizes));
-    }
+            for(int t2 = 0; t2 < nbtypes; t2++)
+                if(t1 != t2 && is_valid(Ws[t1], Ws[t2]))
+                    if(Ws[t1] != Ws[t2] || (t1 < t2 && Ws[t1] == Ws[t2]))
+                        bigger_than[t1].push_back(t2);
 
-    for(int t1 = 0; t1 < nbtypes; t1++){
-        valid_tgts.assign(nbtypes, false);
-        for(int t2 : bigger_than[t1])
-            valid_tgts[t2] = true;
-        for(int t2 : bigger_than[t1])
-            if(valid_tgts[t2])
-                for(int t3 : bigger_than[t2])
-                    valid_tgts[t3] = false;
-        for(int t2 : bigger_than[t1])
-            if(valid_tgts[t2])
-                A.push_back(Arc(Ts[t1], Ts[t2], nsizes));
-    }
+        vector<bool> valid_tgts(nbtypes);
+        for(int i = 1; i < (int)NS.size(); i++){
+            const vector<int> &u = NS.get_label(i);
+            for(int t = 0; t < nbtypes; t++)
+                valid_tgts[t] = is_valid(u, Ws[t]);
+            for(int t1 = 0; t1 < nbtypes; t1++)
+                if(valid_tgts[t1])
+                    for(int t2 : bigger_than[t1]) valid_tgts[t2] = false;
+            for(int t = 0; t < nbtypes; t++)
+                if(valid_tgts[t])
+                    A.push_back(Arc(i, Ts[t], nsizes));
+        }
 
+        for(int t1 = 0; t1 < nbtypes; t1++){
+            valid_tgts.assign(nbtypes, false);
+            for(int t2 : bigger_than[t1])
+                valid_tgts[t2] = true;
+            for(int t2 : bigger_than[t1])
+                if(valid_tgts[t2])
+                    for(int t3 : bigger_than[t2])
+                        valid_tgts[t3] = false;
+            for(int t2 : bigger_than[t1])
+                if(valid_tgts[t2])
+                    A.push_back(Arc(Ts[t1], Ts[t2], nsizes));
+        }
+    }
+    reduce_redundancy();
     ready = true;
 }
 

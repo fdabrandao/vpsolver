@@ -31,8 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "instance.hpp"
 using namespace std;
 
-
-
 class Arcflow{
 private:
     set<Arc> AS;
@@ -67,6 +65,7 @@ protected:
     void relabel_graph(const vector<int> &label);
     void build();
     void final_compression_step();
+    void reduce_redundancy();
     void finalize();
 public:
     Arcflow(const Instance &inst);
