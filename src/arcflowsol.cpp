@@ -87,7 +87,7 @@ vector<pattern_pair> ArcflowSol::extract_solution(vector<int> &dem, int T){
         if(v != S) adj[v].push_back(a->first);
     }
 
-    int &zflow = flow[Arc(T, S, inst.nsizes)];
+    int &zflow = flow[Arc(T, S, LOSS)];
 
     vector<int> lst(All(nodes));
 
@@ -119,7 +119,7 @@ vector<pattern_pair> ArcflowSol::extract_solution(vector<int> &dem, int T){
             Arc a = pred[v];
             int u = a.u;
             int lbl = a.label;
-            if(lbl < inst.nsizes) // != LOSS
+            if(lbl != LOSS)
                 patt.second.push_back(lbl);
             flow[a] -= f;
             v = u;

@@ -64,6 +64,10 @@ int main(int argc, char *argv[]){
         assert(fscanf(fafg, " %d ", &Ts[t])==1);
     }
 
+    int LOSS;
+    assert(fscanf(fafg, " LOSS: ") >= 0);
+    assert(fscanf(fafg, " %d ", &LOSS)==1);
+
     int NV, NA;
     assert(fscanf(fafg, " NV: %d ", &NV)==1);
     assert(fscanf(fafg, " NA: %d ", &NA)==1);
@@ -92,7 +96,7 @@ int main(int argc, char *argv[]){
         }
     }
 
-    ArcflowSol sol(inst, flow, S, Ts, inst.binary);
+    ArcflowSol sol(inst, flow, S, Ts, LOSS, inst.binary);
     sol.print_solution(inst, print_inst, pyout, true);
     return 0;
 }

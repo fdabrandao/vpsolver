@@ -68,7 +68,7 @@ public:
                 if(i == 2 && a->v <= lastv) continue;
                 if(i == 0 && (a->u == S || a->v > lastv)) continue;
 
-                if(a->label == nsizes || inst.relax_domains)
+                if(a->label == LOSS || inst.relax_domains)
                     va[*a] = model.addVar(0.0, inst.n, 0, vtype);
                 else
                     va[*a] = model.addVar(0.0, items[a->label].demand, 0, vtype);
@@ -77,7 +77,7 @@ public:
         model.update();
 
         for(int i = 0; i < inst.nbtypes; i++){
-            GRBVar &feedback = va[Arc(Ts[i], S, nsizes)];
+            GRBVar &feedback = va[Arc(Ts[i], S, LOSS)];
             feedback.set(GRB_DoubleAttr_Obj, inst.Cs[i]);
             if(inst.Qs[i] >= 0)
                 feedback.set(GRB_DoubleAttr_UB, inst.Qs[i]);
@@ -88,7 +88,7 @@ public:
         vector<vector<Arc> > out(NS.size()+Ts.size());
 
         ForEach(itr, A){
-            if(itr->label != nsizes)
+            if(itr->label != LOSS)
                 Al[itr->label].push_back(*itr);
             out[itr->u].push_back(*itr);
             in[itr->v].push_back(*itr);
@@ -136,7 +136,7 @@ public:
                     flow[a] = rx;
                 }
             }
-            ArcflowSol sol(inst, flow, S, Ts, binary);
+            ArcflowSol sol(inst, flow, S, Ts, LOSS, binary);
             sol.print_solution(inst, print_inst, pyout, true);
         }
 

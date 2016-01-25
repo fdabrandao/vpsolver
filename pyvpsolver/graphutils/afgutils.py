@@ -55,12 +55,16 @@ class AFGUtils(object):
         assert lst[0] == "Ts:"
         lst.pop(0)  # ignore "Ts:"
         Ts = []
-        while lst[0] != "NV:":
+        while lst[0] != "LOSS:":
             Ts.append(int(lst.pop(0)))
         if len(Ts) == 1:
             T = Ts[0]
         else:
             T = Ts
+
+        assert lst[0] == "LOSS:"
+        lst.pop(0)  # ignore "LOSS:"
+        LOSS = int(lst.pop(0))
 
         assert lst[0] == "NV:"
         lst.pop(0)  # ignore "NV:"
@@ -77,12 +81,12 @@ class AFGUtils(object):
             u, v, i = lst[i:i+3]
             V.add(u)
             V.add(v)
-            if i < m:
+            if i != LOSS:
                 A.append((u, v, ids[i]))
             else:
                 A.append((u, v, i))
         V = sorted(V)
-        return V, A, S, T
+        return V, A, S, T, LOSS
 
     @staticmethod
     def relabel(V, A, fv, fa=lambda x: x):

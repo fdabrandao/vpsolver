@@ -56,6 +56,7 @@ protected:
     vector<Arc> A;
     int S;
     vector<int> Ts;
+    int LOSS;
 
     vector<int> max_rep(const vector<int> &W, const vector<int> &u, int i0, int sub_i0) const;
     void lift_state(const vector<int> &valid_opts, vector<int> &u, int it, int ic) const;

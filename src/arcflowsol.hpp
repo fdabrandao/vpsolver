@@ -39,8 +39,8 @@ private:
     map<Arc, int> flow;
     int S;
     vector<int> Ts;
-    bool binary;
     int LOSS;
+    bool binary;
 
     vector<pattern_pair> remove_excess(
         const vector<pattern_int> &sol, vector<int> &dem) const;
@@ -52,8 +52,8 @@ private:
 public:
     ArcflowSol(
         const Instance &_inst, const map<Arc, int> &_flow,
-        int _S, const vector<int> &_Ts, bool _binary = false):
-        inst(_inst), flow(_flow), S(_S), Ts(_Ts), binary(_binary){}
+        int _S, const vector<int> &_Ts, int _LOSS, bool _binary = false):
+        inst(_inst), flow(_flow), S(_S), Ts(_Ts), LOSS(_LOSS), binary(_binary){}
 
     vector<pattern_pair> extract_solution(vector<int> &dem, int T);
 

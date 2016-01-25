@@ -29,9 +29,9 @@ inf = float("inf")
 class AFGraph(object):
     """Manipulable graph objects."""
 
-    def __init__(self, V, A, S, T):
+    def __init__(self, V, A, S, T, LOSS=None):
         self.V, self.A = list(set(V)), list(set(A))
-        self.S, self.T = S, T
+        self.S, self.T, self.LOSS = S, T, LOSS
         self.names = {}
         self.flow = None
         self.labels = None
@@ -39,18 +39,18 @@ class AFGraph(object):
     @classmethod
     def from_file(cls, afg_file):
         """Loads a graph from a .afg file."""
-        V, A, S, T = AFGUtils.read_graph(afg_file)
+        V, A, S, T, LOSS = AFGUtils.read_graph(afg_file)
         lbls = {}
         lbls[S] = "S"
         if isinstance(T, list):
-            newT = ["T{}".format(i) for i in range(len(T))]
+            newT = ["T{}".format(i+1) for i in range(len(T))]
             for t, newt in zip(T, newT):
                 lbls[t] = newt
         else:
             newT = "T"
             lbls[T] = newT
         V, A = AFGUtils.relabel(V, A, lambda u: lbls.get(u, u))
-        return cls(V, A, "S", newT)
+        return cls(V, A, "S", newT, LOSS)
 
     def relabel(self, fv, fa=lambda x: x):
         """Relabels the graph."""

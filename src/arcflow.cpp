@@ -36,6 +36,7 @@ Arcflow::Arcflow(const Instance &inst){
     tstart = CURTIME;
     ready = false;
     nsizes = inst.nsizes;
+    LOSS = inst.nsizes;
     nbtypes = inst.nbtypes;
     Ws = inst.Ws;
     ndims = inst.ndims;
@@ -290,7 +291,7 @@ int Arcflow::go(vector<int> su){
             int iu = NS.get_index(mu);
             AS.insert(Arc(iu, iv, it));
             if(up != -1 && iu != up)
-                AS.insert(Arc(iu, up, nsizes));
+                AS.insert(Arc(iu, up, LOSS));
         }
     }
 
@@ -334,7 +335,7 @@ void Arcflow::final_compression_step(){
             for(int d = 0; d < ndims; d++)
                 lbl[d] = max(lbl[d], lv[d]+items[it][d]);
             if(binary){
-                if(it == nsizes)
+                if(it == LOSS)
                     lbl[ndims] = max(lbl[ndims], lv[ndims]);
                 else
                     lbl[ndims] = max(lbl[ndims], max(lv[ndims], it));
@@ -374,9 +375,9 @@ void Arcflow::finalize(){
     if(nbtypes == 1){
         S = 0;
         Ts.assign({NS.size()});
-        A.push_back(Arc(Ts[0], S, nsizes));
+        A.push_back(Arc(Ts[0], S, LOSS));
         for(int i = 1; i < (int)NS.size(); i++)
-        A.push_back(Arc(i, Ts[0], nsizes));
+        A.push_back(Arc(i, Ts[0], LOSS));
     }else{
         S = 0;
         Ts.clear();
@@ -389,7 +390,7 @@ void Arcflow::finalize(){
             Ts[i] += NS.size();
 
         for(int i = 0; i < nbtypes; i++)
-            A.push_back(Arc(Ts[i], S, nsizes));
+            A.push_back(Arc(Ts[i], S, LOSS));
 
         vector<vector<int> > bigger_than(nbtypes);
         for(int t1 = 0; t1 < nbtypes; t1++)
@@ -408,7 +409,7 @@ void Arcflow::finalize(){
                     for(int t2 : bigger_than[t1]) valid_tgts[t2] = false;
             for(int t = 0; t < nbtypes; t++)
                 if(valid_tgts[t])
-                    A.push_back(Arc(i, Ts[t], nsizes));
+                    A.push_back(Arc(i, Ts[t], LOSS));
         }
 
         for(int t1 = 0; t1 < nbtypes; t1++){
@@ -421,7 +422,7 @@ void Arcflow::finalize(){
                         valid_tgts[t3] = false;
             for(int t2 : bigger_than[t1])
                 if(valid_tgts[t2])
-                    A.push_back(Arc(Ts[t1], Ts[t2], nsizes));
+                    A.push_back(Arc(Ts[t1], Ts[t2], LOSS));
         }
     }
     reduce_redundancy();
@@ -439,6 +440,8 @@ void Arcflow::write(FILE *fout){
         fprintf(fout, " %d", Ts[t]);
     }
     fprintf(fout, "\n");
+
+    fprintf(fout, "LOSS: %d\n", LOSS);
 
     int lastv = NS.size()-1;
     fprintf(fout, "NV: %d\n", int(NS.size()+Ts.size()));

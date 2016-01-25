@@ -72,6 +72,10 @@ int main(int argc, char *argv[]){
         assert(fscanf(fin, " %d ", &Ts[t])==1);
     }
 
+    int LOSS;
+    assert(fscanf(fin, " LOSS: ") >= 0);
+    assert(fscanf(fin, " %d ", &LOSS)==1);
+
     int NV, NA;
     assert(fscanf(fin, " NV: %d ", &NV)==1);
     assert(fscanf(fin, " NA: %d ", &NA)==1);
@@ -102,7 +106,7 @@ int main(int argc, char *argv[]){
                 }
             }
         }else{
-            if(label < inst.nsizes && !inst.relax_domains)
+            if(label != LOSS && !inst.relax_domains)
                 ub[i] = inst.items[label].demand;
             else
                 ub[i] = inst.n;
