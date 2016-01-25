@@ -1,5 +1,5 @@
 include README.md CHANGES.md COPYING LICENSE requirements.txt
-include Makefile build.sh bin/.gitignore
+include bin/.gitignore
 recursive-include pyvpsolver *
 recursive-include src *.cpp
 recursive-include src *.cxx
