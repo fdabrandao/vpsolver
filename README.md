@@ -1,7 +1,7 @@
 ## Arc-flow Vector Packing Solver (VPSolver)
 
-Copyright (C) 2013-2015, Filipe Brandão  
-Faculdade de Ciencias, Universidade do Porto  
+Copyright (C) 2013-2016, Filipe Brandão  
+Faculdade de Ciências, Universidade do Porto  
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
 ---
@@ -12,7 +12,7 @@ solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MI
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.
 
-![](https://img.shields.io/badge/license-GPL-blue.svg)
+![](https://img.shields.io/badge/license-AGPLv3+-blue.svg)
 [![](https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master)](https://travis-ci.org/fdabrandao/vpsolver)
 
 For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling toolbox ([PyMPL](https://github.com/fdabrandao/pympl/)), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a [Docker container](#docker).
@@ -38,7 +38,6 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and [Web App](#vpsolver-web-app):
 
 * `python-2.7` or `python-3.x`
-* `python-setuptools`
 * `python-pip`
 * `python-dev`
 * `glpk-utils`
@@ -55,21 +54,16 @@ It has been successfully compiled and run on the following platforms:
 Without the python interface: 
 
 ```bash
-$ bash build.sh  
+$ ./configure
+$ make
+$ make install
+$ bash test.sh
 ```
 With the python interface: 
 
 ```
-$ bash build.sh
 $ pip install -r requirements.txt
 $ pip install . --upgrade
-$ bash test.sh
-```
-or simply:
-
-
-```
-$ bash install.sh
 $ bash test.sh
 ```
 
@@ -139,8 +133,6 @@ The Web App can then be accessed on a web browser at `http://127.0.0.1:5555/`.
 * `$ bin/vbp2afg instance.vbp graph.afg`: builds an arc-flow graph `graph.afg` for `instance.vbp`;
 * `$ bin/afg2mps graph.afg model.mps`: creates a MPS model `model.mps` for `graph.afg`;
 * `$ bin/afg2lp graph.afg model.lp`: creates a LP model `model.lp` for `graph.afg`;
-* `$ bin/solve_gurobi model.mps vars.sol`: solves `model.mps` using Gurobi and writes the solution to `vars.sol`;
-* `$ bin/solve_glpk model.mps vars.sol`: solves `model.mps` using GLPK and writes the solution to `vars.sol`;
 * `$ bin/vbpsol graph.afg vars.sol`: extracts a vector packing solution from an arc-flow solution `vars.sol` associated with the graph `graph.afg`.
 
 Usage:
@@ -150,8 +142,8 @@ Usage:
 $ bin/vbp2afg example.vbp graph.afg  
 # 2. Convert the arc-flow graph into a .mps file model.mps:  
 $ bin/afg2mps graph.afg model.mps  
-# 3. Solve the MIP model and stores the solution in vars.sol:  
-$ bin/solve_gurobi model.mps vars.sol  
+# 3. Solve the MIP model and store the solution in vars.sol:
+$ scritps/vpsolver_gurobi.sh --mps model.mps --wsol vars.sol
 # 4. Extract the vector packing solution:  
 $ bin/vbpsol graph.afg vars.sol  
 ```
