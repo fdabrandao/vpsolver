@@ -133,7 +133,7 @@ def solve(
     graph.relabel(lambda u: newlbl.get(u, u))
 
     newlbl = {}
-    for u in sorted(graph.V):
+    for u in graph.V:
         if isinstance(u, tuple):
             newlbl[u] = len(newlbl)
 
