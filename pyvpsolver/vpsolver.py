@@ -42,10 +42,6 @@ class VBP(object):
         self.vbp_file = VPSolver.new_tmp_file(".vbp")
         self.labels = {}
         with open(self.vbp_file, "w") as f:
-            if isinstance(W, int):
-                W = [W]
-            else:
-                W = list(W)
             # ndims
             print(len(W), file=f)
             # W
@@ -55,10 +51,7 @@ class VBP(object):
             # items
             for i in range(len(w)):
                 self.labels[i] = i
-                if isinstance(w[i], int):
-                    row = [w[i], b[i]]
-                else:
-                    row = list(w[i])+[b[i]]
+                row = list(w[i])+[b[i]]
                 assert len(row) == len(W)+1
                 print(" ".join(map(str, row)), file=f)
         if verbose:

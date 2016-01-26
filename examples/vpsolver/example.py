@@ -36,8 +36,12 @@ def main():
     """Examples: how to use VBP, AFG, MPS, LP and VPSolver"""
 
     # Create instanceA:
-    instanceA = VBP([5180], [1120, 1250, 520, 1066, 1000, 1150],
-                            [9, 5, 91, 18, 11, 64], verbose=False)
+    instanceA = VBP(
+        (5180,),
+        [(1120,), (1250,), (520,), (1066,), (1000,), (1150,)],
+        [9, 5, 91, 18, 11, 64],
+        verbose=False
+    )
 
     # Create instanceB from a .vbp file
     instanceB = VBP.from_file("instance.vbp", verbose=False)
