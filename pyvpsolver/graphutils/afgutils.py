@@ -58,10 +58,6 @@ class AFGUtils(object):
         Ts = []
         while lst[0].isdigit():
             Ts.append(int(lst.pop(0)))
-        if len(Ts) == 1:
-            T = Ts[0]
-        else:
-            T = Ts
 
         assert lst[0] == "LOSS:"
         lst.pop(0)  # ignore "LOSS:"
@@ -87,7 +83,7 @@ class AFGUtils(object):
             else:
                 A.append((u, v, labels[ids[i]]))
         V = sorted(V)
-        return V, A, S, T, LOSS
+        return V, A, S, Ts, LOSS
 
     @staticmethod
     def relabel(V, A, fv, fa=lambda x: x):

@@ -181,8 +181,6 @@ class AFG(object):
             instance_file, self.afg_file, compress, binary, vtype,
             verbose=verbose
         )
-        self.V, self.A = None, None
-        self.S, self.T, self.LOSS = None, None, None
 
     def graph(self):
         """Returns the graph as an AFGraph object."""

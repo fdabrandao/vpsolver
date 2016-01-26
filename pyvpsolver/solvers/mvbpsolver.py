@@ -68,12 +68,13 @@ def solve(
         symb = "G{0}".format(i)
         instances[i] = VBP(Ws[i], ww, bbi, verbose=False)
         graphs[i] = AFG(instances[i], verbose=verbose).graph()
+        loss = graphs[i].LOSS
         graphs[i].relabel(
             lambda u: "{0}{1}".format(symb, u),
-            lambda lbl: lbl if lbl < len(ww) else LOSS
+            lambda lbl: lbl if lbl != loss else LOSS
         )
-        Ss[i] = symb+"S"
-        Ts[i] = symb+"T"
+        Ss[i] = graphs[i].S
+        Ts[i] = graphs[i].Ts[0]
         graphs[i].A.remove((Ts[i], Ss[i], LOSS))
         if svg_file.endswith(".svg"):
             try:
@@ -89,7 +90,7 @@ def solve(
     A += [(t, T, LOSS) for t in Ts]
     A += [(T, S, LOSS)]
 
-    graph = AFGraph(V, A, S, T)
+    graph = AFGraph(V, A, S, [T])
     if svg_file.endswith(".svg"):
         try:
             graph.draw(svg_file, ignore=[(T, S)])
@@ -162,7 +163,7 @@ def solve(
             used.add((u, v, k))
 
     A = At
-    graph = AFGraph(V, A, S, T)
+    graph = AFGraph(V, A, S, [T])
 
     nv3, na3 = len(V), len(A)
     VPSolver.log("  #V3: {0} #A3: {1}".format(nv3, na3), verbose)

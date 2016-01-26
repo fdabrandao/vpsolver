@@ -29,9 +29,9 @@ inf = float("inf")
 class AFGraph(object):
     """Manipulable graph objects."""
 
-    def __init__(self, V, A, S, T, LOSS=None):
+    def __init__(self, V, A, S, Ts, LOSS=None):
         self.V, self.A = list(set(V)), list(set(A))
-        self.S, self.T, self.LOSS = S, T, LOSS
+        self.S, self.Ts, self.LOSS = S, Ts, LOSS
         self.names = {}
         self.flow = None
         self.labels = None
@@ -39,27 +39,28 @@ class AFGraph(object):
     @classmethod
     def from_file(cls, afg_file, labels):
         """Loads a graph from a .afg file."""
-        V, A, S, T, LOSS = AFGUtils.read_graph(afg_file, labels)
+        V, A, S, Ts, LOSS = AFGUtils.read_graph(afg_file, labels)
         lbls = {}
         lbls[S] = "S"
-        if isinstance(T, list):
-            newT = ["T{}".format(i+1) for i in range(len(T))]
-            for t, newt in zip(T, newT):
+        if len(Ts) > 1:
+            newTs = ["T{}".format(i+1) for i in range(len(Ts))]
+            for t, newt in zip(Ts, newTs):
                 lbls[t] = newt
         else:
-            newT = "T"
-            lbls[T] = newT
+            newTs = ["T"]
+            lbls[Ts[0]] = "T"
         V, A = AFGUtils.relabel(V, A, lambda u: lbls.get(u, u))
-        return cls(V, A, "S", newT, LOSS)
+        return cls(V, A, "S", newTs, LOSS)
 
     def relabel(self, fv, fa=lambda x: x):
         """Relabels the graph."""
-        self.S = fv(self.S)
-        if isinstance(self.T, list):
-            self.T = list(map(fv, self.T))
-        else:
-            self.T = fv(self.T)
         self.V, self.A = AFGUtils.relabel(self.V, self.A, fv, fa)
+        if self.LOSS is not None:
+            self.LOSS = fa(self.LOSS)
+        if self.S is not None:
+            self.S = fv(self.S)
+        if self.Ts is not None:
+            self.Ts = [fv(t) for t in self.Ts]
 
     def draw(
             self, svg_file, multigraph=True, showlabel=False, ignore=None,
