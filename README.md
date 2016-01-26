@@ -8,7 +8,7 @@ Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 [VPSolver](https://github.com/fdabrandao/vpsolver) is a vector packing solver based on an arc-flow formulation with graph
 compression.  VPSolver generates very strong models (equivalent to Gilmore and
 Gomory's) that can be solved using general-purpose mixed-integer programming
-solvers such as Gurobi and GLPK [1]. VPSolver does not explicitly require any MIP
+solvers such as Gurobi and GLPK (see, e.g., [1] and [2]). VPSolver does not explicitly require any MIP
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.
 
@@ -56,8 +56,7 @@ Without the python interface:
 ```bash
 $ ./configure
 $ make
-$ make install
-$ bash test.sh
+$ sudo make install
 ```
 With the python interface: 
 
@@ -66,6 +65,12 @@ $ pip install -r requirements.txt
 $ pip install . --upgrade
 $ bash test.sh
 ```
+Or simply install from the [repository](https://pypi.python.org/pypi/pyvpsolver):
+
+```
+$ pip install pyvpsolver
+```
+Note: use `pip install pyvpsolver --pre` if you want to install the latest pre-release.
 
 ## Docker
 
@@ -181,26 +186,30 @@ $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg
 ## Reports
 VPSolver was proposed in:
 
-* [1] Brandão, F. and Pedroso, J. P. (2013). Bin Packing and Related Problems:
+* [1] Brandão, F. and Pedroso, J. P. (2016). Bin packing and related problems: General arc-flow formulation with graph compression.
+Computers & Operations Research, 69:56 – 67.  
+doi: [http://dx.doi.org/10.1016/j.cor.2015.11.009](http://authors.elsevier.com/a/1SKHP15N8Rug2A).
+
+* [2] Brandão, F. and Pedroso, J. P. (2013). Bin Packing and Related Problems:
 General Arc-flow Formulation with Graph Compression. Technical Report
 DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do
-Porto, Portugal.
+Porto, Portugal.  
 Available at: [http://arxiv.org/abs/1310.6887](http://arxiv.org/abs/1310.6887).
 
 See also:
 
-* [2] Brandão, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
+* [3] Brandão, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
 Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
 Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.
 
-* [3] Brandão, F. and Pedroso, J. P. (2013). Cutting Stock with Binary Patterns:
+* [4] Brandão, F. and Pedroso, J. P. (2013). Cutting Stock with Binary Patterns:
 Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-09,
 Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.
 
-* [4] Brandão, F. (2012). Bin Packing and Related Problems: Pattern-Based Approaches 
+* [5] Brandão, F. (2012). Bin Packing and Related Problems: Pattern-Based Approaches 
 Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.
 
-* [5] Computational results on several benchmark test data sets:  
+* [6] Computational results on several benchmark test data sets:  
 http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/
 
 
