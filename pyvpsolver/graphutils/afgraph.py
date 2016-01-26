@@ -37,7 +37,7 @@ class AFGraph(object):
         self.labels = None
 
     @classmethod
-    def from_file(cls, afg_file, labels):
+    def from_file(cls, afg_file, labels=None):
         """Loads a graph from a .afg file."""
         V, A, S, Ts, LOSS = AFGUtils.read_graph(afg_file, labels)
         lbls = {}
