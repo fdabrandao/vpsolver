@@ -428,7 +428,9 @@ class VPSolver(object):
         return output
 
     @staticmethod
-    def script(script_name, arg1=None, arg2=None, options=None, verbose=None):
+    def script(
+            script_name, arg1=None, arg2=None,
+            options=None, pyout=True, verbose=None):
         """Calls VPSolver scripts and returns vector packing solutions."""
         cmd = script_name
         for arg in [arg1, arg2]:
@@ -457,7 +459,8 @@ class VPSolver(object):
                     raise Exception("Invalid file extension!")
         if options is not None:
             cmd += " --options \"{}\"".format(options)
-        cmd += " --pyout"
+        if pyout is True:
+            cmd += " --pyout"
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(cmd, tee=out_file, verbose=verbose)
         with open(out_file) as f:

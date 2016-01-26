@@ -191,8 +191,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
         afg = AFG(instance, verbose=True)
         lp_model = LP(afg, verbose=False)
         out, sol = VPSolver.script(
-            form["script"], lp_model, afg,
-            verbose=True
+            form["script"], lp_model, afg, pyout=False, verbose=True
         )
     elif app_name == "pympl":
         tmpfile = VPSolver.new_tmp_file(ext=".mod")
