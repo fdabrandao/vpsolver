@@ -3035,7 +3035,7 @@ namespace swig {
 
 
 /* Put header files here or function declarations like below */
-extern int main(int argc, char **argv);
+extern int swig_main(int argc, char **argv);
 
 
 #include <limits.h>
@@ -3192,7 +3192,7 @@ SWIGINTERNINLINE PyObject*
 #ifdef __cplusplus
 extern "C" {
 #endif
-SWIGINTERN PyObject *_wrap_main(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_swig_main(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
   char **arg2 = (char **) 0 ;
@@ -3202,10 +3202,10 @@ SWIGINTERN PyObject *_wrap_main(PyObject *SWIGUNUSEDPARM(self), PyObject *args) 
   PyObject * obj1 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:main",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:swig_main",&obj0,&obj1)) SWIG_fail;
   ecode1 = SWIG_AsVal_int(obj0, &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "main" "', argument " "1"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "swig_main" "', argument " "1"" of type '" "int""'");
   } 
   arg1 = static_cast< int >(val1);
   {
@@ -3230,7 +3230,7 @@ SWIGINTERN PyObject *_wrap_main(PyObject *SWIGUNUSEDPARM(self), PyObject *args) 
       return NULL;
     }
   }
-  result = (int)main(arg1,arg2);
+  result = (int)swig_main(arg1,arg2);
   resultobj = SWIG_From_int(static_cast< int >(result));
   {
     free((char *) arg2);
@@ -3246,7 +3246,7 @@ fail:
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
-	 { (char *)"main", _wrap_main, METH_VARARGS, NULL},
+	 { (char *)"swig_main", _wrap_swig_main, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 

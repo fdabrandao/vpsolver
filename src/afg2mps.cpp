@@ -81,7 +81,7 @@ public:
     }
 };
 
-int main(int argc, char *argv[]){
+int swig_main(int argc, char *argv[]){
     printf("Copyright (C) 2013-2016, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if(argc != 3){
@@ -90,8 +90,11 @@ int main(int argc, char *argv[]){
     }
 
     FILE *fin = fopen(argv[1], "r");
-    FILE *fout = fopen(argv[2], "w");
+    if(fin == NULL) perror("fopen");
     assert(fin != NULL);
+
+    FILE *fout = fopen(argv[2], "w");
+    if(fout == NULL) perror("fopen");
     assert(fout != NULL);
 
     printf("Generating the .MPS model...");
@@ -213,4 +216,8 @@ int main(int argc, char *argv[]){
     fclose(fout);
     printf("DONE!\n");
     return 0;
+}
+
+int main(int argc, char *argv[]){
+    return swig_main(argc, argv);
 }

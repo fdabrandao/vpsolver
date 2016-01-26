@@ -21,4 +21,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
 from pyvpsolver.swig import afg2mps
-afg2mps.main(len(sys.argv), [x.encode('ascii') for x in sys.argv])
+afg2mps.swig_main(len(sys.argv), [x.encode('ascii') for x in sys.argv])

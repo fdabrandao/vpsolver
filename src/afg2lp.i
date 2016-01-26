@@ -52,7 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 %{
 /* Put header files here or function declarations like below */
-extern int main(int argc, char **argv);
+extern int swig_main(int argc, char **argv);
 %}
 
-extern int main(int argc, char **argv);
+extern int swig_main(int argc, char **argv);

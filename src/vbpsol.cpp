@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "arcflowsol.hpp"
 using namespace std;
 
-int main(int argc, char *argv[]){
+int swig_main(int argc, char *argv[]){
     printf("Copyright (C) 2013-2016, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if(argc < 3 || argc > 5){
@@ -37,9 +37,14 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+
+
     FILE *fafg = fopen(argv[1], "r");
+    if(fafg == NULL) perror("fopen");
     assert(fafg != NULL);
+
     FILE *fsol = fopen(argv[2], "r");
+    if(fsol == NULL) perror("fopen");
     assert(fsol != NULL);
 
     bool print_inst = false;
@@ -99,4 +104,8 @@ int main(int argc, char *argv[]){
     ArcflowSol sol(inst, flow, S, Ts, LOSS, inst.binary);
     sol.print_solution(inst, print_inst, pyout, true);
     return 0;
+}
+
+int main(int argc, char *argv[]){
+    return swig_main(argc, argv);
 }

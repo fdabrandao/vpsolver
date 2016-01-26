@@ -70,9 +70,9 @@ except AttributeError:
 
 
 
-def main(*args):
-  return _afg2lp.main(*args)
-main = _afg2lp.main
+def swig_main(*args):
+  return _afg2lp.swig_main(*args)
+swig_main = _afg2lp.swig_main
 # This file is compatible with both classic and new-style classes.
 
 

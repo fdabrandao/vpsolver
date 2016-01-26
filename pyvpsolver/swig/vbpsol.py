@@ -70,9 +70,9 @@ except AttributeError:
 
 
 
-def main(*args):
-  return _vbpsol.main(*args)
-main = _vbpsol.main
+def swig_main(*args):
+  return _vbpsol.swig_main(*args)
+swig_main = _vbpsol.swig_main
 # This file is compatible with both classic and new-style classes.
 
 
