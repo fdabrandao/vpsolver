@@ -50,7 +50,8 @@
 
       <div class="row">
         <form action="{{ solver_url }}" method="post" target="_blank">
-
+        <p><b>DISCLAIMER:</b> This demo allows arbitrary code execution (through PyMPL) and
+        should only be used locally (and ideally inside a docker container)</p>
         {% if examples is defined %}
         <div class="form-group">
           <label for="examples">Load example:</label>
