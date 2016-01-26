@@ -23,7 +23,7 @@ from __future__ import print_function
 
 import os
 import sys
-from pyvpsolver.solvers import mvbpsolver
+from pyvpsolver.solvers import mvpsolver as mvpsolver
 
 if __name__ == "__main__":
     sdir = os.path.dirname(__file__)
@@ -35,7 +35,7 @@ def main():
     """Examples: Multiple-choice Vector Bin Packing"""
 
     """
-    'solvers.mvbp' uses the method proposed in:
+    'solvers.mvpsolver' uses the method proposed in:
     Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
     Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
     Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
@@ -59,14 +59,14 @@ def main():
     ws = [ws1, ws2, ws3]
 
     # Solve Example 1:
-    obj, sol = mvbpsolver.solve(
+    obj, sol = mvpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graphA_mvbp.svg",
         verbose=True, script="vpsolver_glpk.sh"
     )
     print("obj:", obj)
     print("sol:", sol)
-    mvbpsolver.print_solution(obj, sol)
+    mvpsolver.print_solution(obj, sol)
 
     ## Example 2
     # Bins:
@@ -82,7 +82,7 @@ def main():
     ws = [ws1, ws2]
 
     # Solve Example 2:
-    obj, sol = mvbpsolver.solve(
+    obj, sol = mvpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graphB_mvbp.svg",
         script="vpsolver_glpk.sh",
@@ -90,7 +90,7 @@ def main():
     )
     print("obj:", obj)
     print("sol:", sol)
-    mvbpsolver.print_solution(obj, sol)
+    mvpsolver.print_solution(obj, sol)
 
     assert obj == 5  # check the solution objective value
 

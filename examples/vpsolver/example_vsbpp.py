@@ -23,7 +23,7 @@ from __future__ import print_function
 
 import os
 import sys
-from pyvpsolver.solvers import mvbpsolver
+from pyvpsolver.solvers import mvpsolver as mvpsolver
 
 if __name__ == "__main__":
     sdir = os.path.dirname(__file__)
@@ -61,7 +61,7 @@ def main():
     b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
 
     # Solve the variable-sized bin packing instance:
-    obj, sol = mvbpsolver.solve(
+    obj, sol = mvpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graph_vsbpp.svg",
         script="vpsolver_glpk.sh",
@@ -69,7 +69,7 @@ def main():
     )
     print("obj:", obj)
     print("sol:", sol)
-    mvbpsolver.print_solution(obj, sol)
+    mvpsolver.print_solution(obj, sol)
 
     assert obj == 1280  # check the solution objective value
 
