@@ -378,7 +378,7 @@ class VPSolver(object):
         elif isinstance(instance_file, MVP):
             instance_file = instance_file.mvp_file
         out_file = VPSolver.new_tmp_file()
-        opts = "{} {} {}".format(compress, binary, vtype)
+        opts = "{:d} {:d} {}".format(compress, binary, vtype)
         VPSolver.run(
             "{} {} {} {}".format(
                 VPSolver.VBP2AFG_PATH, instance_file, afg_file, opts
