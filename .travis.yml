@@ -11,14 +11,9 @@ addons:
   apt:
     packages:
     - glpk-utils
+    - g++-4.8
 git:
   submodules: false
-before_install:
-  - sudo apt-get install python-software-properties
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update
-  - sudo apt-get install g++-4.8
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50
 install:
   - pip install -r requirements.txt
   - pip install .
