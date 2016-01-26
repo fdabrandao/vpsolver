@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 import sys
-import afg2lp
+from pyvpsolver.swig import afg2lp
 afg2lp.main(len(sys.argv), [x.encode('ascii') for x in sys.argv])
