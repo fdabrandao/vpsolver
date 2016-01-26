@@ -16,5 +16,10 @@ RUN bash virtualenv.sh -p python2.7 --venv venv2.7
 RUN rm -rf venv3.5
 RUN bash virtualenv.sh -p python3.5 --venv venv3.5
 
+# c++
+RUN ./configure
+RUN make
+RUN make install
+
 EXPOSE 5555
 CMD bash webapp.sh --venv venv2.7 --port 5555
