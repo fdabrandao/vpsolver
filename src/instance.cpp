@@ -131,7 +131,7 @@ void Instance::read(FILE *fin, ftype type){
 
         int qi, bi;
         if(type == MVP){
-            assert(fscanf(fin, " qi: ") >= 0);
+            assert(fscanf(fin, " nopti: ") >= 0);
             assert(fscanf(fin, "%d", &qi) == 1);
             assert(fscanf(fin, " bi: ") >= 0);
             assert(fscanf(fin, "%d", &bi) == 1);
@@ -222,7 +222,7 @@ void Instance::read(FILE *fin, ftype type){
             for(int i = 0; i < (int)items.size(); i++)
                 assert(fscanf(fin, "%d", &items[i].id)==1);
         }else if(!strcmp(buf, "SORT:")){
-            int tsort;
+            int tsort = 1;
             assert(fscanf(fin, "%d", &tsort)==1);
             assert(tsort == 0 || tsort == 1);
             sort = tsort;
@@ -230,12 +230,12 @@ void Instance::read(FILE *fin, ftype type){
             assert(fscanf(fin, "%d", &method)==1);
             assert(method >= MIN_METHOD && method <= MAX_METHOD);
         }else if(!strcmp(buf, "RELAX:")){
-            int trelax;
+            int trelax = 0;
             assert(fscanf(fin, "%d", &trelax)==1);
             assert(trelax == 0 || trelax == 1);
             relax_domains = trelax;
         }else if(!strcmp(buf, "BINARY:")){
-            int tbinary;
+            int tbinary = 0;
             assert(fscanf(fin, "%d", &tbinary)==1);
             assert(tbinary == 0 || tbinary == 1);
             binary = tbinary;
@@ -280,7 +280,7 @@ void Instance::write(FILE *fout) const{
     vector<int> rid(items.size());
     for(int it = 0; it < (int)items.size(); it++) rid[items[it].id] = it;
     for(int i = 0; i < m; i++){
-        fprintf(fout, "qi: %d bi: %d\n", nopts[i], demands[i]);
+        fprintf(fout, "nopti: %d bi: %d\n", nopts[i], demands[i]);
         for(int q = 0; q < nopts[i]; q++){
             fprintf(fout, "wi:");
             for(int j = 0; j < ndims; j++){
