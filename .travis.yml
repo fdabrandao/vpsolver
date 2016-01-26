@@ -13,6 +13,10 @@ addons:
     - glpk-utils
 git:
   submodules: false
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get -qq update
+  - sudo apt-get -qq install g++-4.8
 install:
   - pip install -r requirements.txt
   - pip install .
