@@ -95,13 +95,13 @@ bool Arcflow::is_full(const vector<int> &u, const vector<int> &W) const{
     return true;
 }
 
-void Arcflow::relabel_graph(const vector<int> &label){
+void Arcflow::relabel_graph(const vector<int> &labels){
     set<Arc> arcs;
-    ForEach(itr, A){
-        int u = label[itr->u];
-        int v = label[itr->v];
+    for(const Arc &a: A){
+        int u = labels[a.u];
+        int v = labels[a.v];
         if(u != v)
-            arcs.insert(Arc(u, v, itr->label));
+            arcs.insert(Arc(u, v, a.label));
     }
     A.assign(All(arcs));
 }
@@ -321,16 +321,16 @@ void Arcflow::build(){
 void Arcflow::final_compression_step(){
     assert(ready == false);
     int nv = NS.size();
-    vector<int> label(nv);
+    vector<int> labels(nv);
     vector<vector<int_pair> > adj = get_adj(nv, A, TRANSPOSE);
 
     NodeSet NStmp;
     for(int u = 0; u < NS.size(); u++){
         vector<int> lbl(lsize, 0);
-        ForEach(itr, adj[u]){
-            assert(itr->first < u);
-            int v = label[itr->first];
-            int it = itr->second;
+        for(const auto &pa: adj[u]){
+            assert(pa.first < u);
+            int v = labels[pa.first];
+            int it = pa.second;
             const vector<int> &lv = NStmp.get_label(v);
             for(int d = 0; d < ndims; d++)
                 lbl[d] = max(lbl[d], lv[d]+items[it][d]);
@@ -341,14 +341,14 @@ void Arcflow::final_compression_step(){
                     lbl[ndims] = max(lbl[ndims], max(lv[ndims], it));
             }
         }
-        label[u] = NStmp.get_index(lbl);
+        labels[u] = NStmp.get_index(lbl);
     }
 
     NS = NStmp;
     vector<int> order = NS.topological_order();
-    ForEach(itr, label)
-        *itr = order[*itr];
-    relabel_graph(label);
+    for(int &v: labels)
+        v = order[v];
+    relabel_graph(labels);
     NS.sort();
 }
 
@@ -449,11 +449,11 @@ void Arcflow::write(FILE *fout){
 
     sort(All(A));
     for(int i = 0; i < 3; i++){
-        ForEach(a, A){
-            if(i == 1 && a->u != iS) continue;
-            if(i == 2 && a->v <= lastv) continue;
-            if(i == 0 && (a->u == iS || a->v > lastv)) continue;
-            fprintf(fout, "%d %d %d\n", a->u, a->v, a->label);
+        for(const Arc &a: A){
+            if(i == 1 && a.u != iS) continue;
+            if(i == 2 && a.v <= lastv) continue;
+            if(i == 0 && (a.u == iS || a.v > lastv)) continue;
+            fprintf(fout, "%d %d %d\n", a.u, a.v, a.label);
         }
     }
 }

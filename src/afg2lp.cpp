@@ -128,7 +128,7 @@ int swig_main(int argc, char *argv[]){
         fprintf(fout, "\tB%d:", i);
         for(int j = 0; j < inst.nsizes; j++){
             if(inst.items[j].type == i)
-                ForEach(ai, Ai[j]) fprintf(fout, " + X%x", *ai);
+                for(const int &ai: Ai[j]) fprintf(fout, " + X%x", ai);
         }
         if(inst.ctypes[i] == '=' && !inst.relax_domains)
             fprintf(fout, " = %d", inst.demands[i]);
@@ -141,10 +141,10 @@ int swig_main(int argc, char *argv[]){
 
     for(int i = 0; i < NV; i++){
         fprintf(fout, "\tF%x:", i);
-        ForEach(ai, in[i])
-            fprintf(fout, " + X%x", *ai);
-        ForEach(ai, out[i])
-            fprintf(fout, " - X%x", *ai);
+        for(const int &ai: in[i])
+            fprintf(fout, " + X%x", ai);
+        for(const int &ai: out[i])
+            fprintf(fout, " - X%x", ai);
         fprintf(fout, " = 0\n");
     }
 

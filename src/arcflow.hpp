@@ -63,7 +63,7 @@ protected:
     int min_slack(const vector<int> &b, int i0, int d, const vector<int> &caps) const;
     bool is_valid(const vector<int> &u, const vector<int> &W) const;
     bool is_full(const vector<int> &u, const vector<int> &W) const;
-    void relabel_graph(const vector<int> &label);
+    void relabel_graph(const vector<int> &labels);
     void build();
     void final_compression_step();
     void reduce_redundancy();

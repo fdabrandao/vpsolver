@@ -63,15 +63,15 @@ public:
         int lastv = Ts[0]-1;
         for(int i = 0; i < inst.nbtypes; i++) lastv = min(lastv, Ts[i]-1);
         for(int i = 0; i < 3; i++){
-            ForEach(a, A){
-                if(i == 1 && a->u != S) continue;
-                if(i == 2 && a->v <= lastv) continue;
-                if(i == 0 && (a->u == S || a->v > lastv)) continue;
+            for(const Arc &a: A){
+                if(i == 1 && a.u != S) continue;
+                if(i == 2 && a.v <= lastv) continue;
+                if(i == 0 && (a.u == S || a.v > lastv)) continue;
 
-                if(a->label == LOSS || inst.relax_domains)
-                    va[*a] = model.addVar(0.0, inst.n, 0, vtype);
+                if(a.label == LOSS || inst.relax_domains)
+                    va[a] = model.addVar(0.0, inst.n, 0, vtype);
                 else
-                    va[*a] = model.addVar(0.0, items[a->label].demand, 0, vtype);
+                    va[a] = model.addVar(0.0, items[a.label].demand, 0, vtype);
             }
         }
         model.update();
@@ -87,17 +87,18 @@ public:
         vector<vector<Arc> > in(NS.size()+Ts.size());
         vector<vector<Arc> > out(NS.size()+Ts.size());
 
-        ForEach(itr, A){
-            if(itr->label != LOSS)
-                Al[itr->label].push_back(*itr);
-            out[itr->u].push_back(*itr);
-            in[itr->v].push_back(*itr);
+        for(const Arc &a: A){
+            if(a.label != LOSS)
+                Al[a.label].push_back(a);
+            out[a.u].push_back(a);
+            in[a.v].push_back(a);
         }
 
         for(int i = 0; i < inst.m; i++){
             GRBLinExpr lin = 0;
             for(int it = 0; it < nsizes; it++)
-                if(items[it].type == i) ForEach(a, Al[it]) lin += va[*a];
+                if(items[it].type == i)
+                    for(const Arc &a: Al[it]) lin += va[a];
             if(inst.ctypes[i] == '>' || inst.relax_domains)
                 model.addConstr(lin >= inst.demands[i]);
             else
@@ -106,8 +107,8 @@ public:
 
         for(int u = 0; u < NS.size()+nbtypes; u++){
             GRBLinExpr lin = 0;
-            ForEach(a, in[u]) lin += va[*a];
-            ForEach(a, out[u]) lin -= va[*a];
+            for(const Arc &a: in[u]) lin += va[a];
+            for(const Arc &a: out[u]) lin -= va[a];
             model.addConstr(lin == 0);
         }
 
@@ -124,14 +125,14 @@ public:
 
         if(inst.vtype == 'I'){
             map<Arc, int> flow;
-            ForEach(a, va){
-                double x = a->second.get(GRB_DoubleAttr_X);
+            for(const auto &a: va){
+                double x = a.second.get(GRB_DoubleAttr_X);
                 int rx = (int)round(x);
                 assert(x - rx <= EPS);
                 if(rx > 0){
-                    int u = a->first.u;
-                    int v = a->first.v;
-                    int lbl = a->first.label;
+                    int u = a.first.u;
+                    int v = a.first.v;
+                    int lbl = a.first.label;
                     Arc a(u, v, lbl);
                     flow[a] = rx;
                 }

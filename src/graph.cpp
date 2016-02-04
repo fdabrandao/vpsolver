@@ -58,16 +58,15 @@ void NodeSet::sort(){
     index.clear();
     ::sort(All(labels));
     int pos = 0;
-    ForEach(itr, labels)
-        index[*itr] = pos++;
+    for(const vector<int> &lbl: labels)
+        index[lbl] = pos++;
 }
 
 vector<int> NodeSet::topological_order() const{
-    vector<pair<vector<int>, int> > tmp(All(index));
-    vector<int> ord(tmp.size());
+    vector<int> ord(index.size());
     int pos = 0;
-    ForEach(itr, tmp)
-        ord[itr->second] = pos++;
+    for(const auto &kvpair: index)
+        ord[kvpair.second] = pos++;
     return ord;
 }
 
@@ -89,14 +88,12 @@ bool Arc::operator==(const Arc &o) const{
 
 adj_list get_adj(int nv, const vector<Arc> &arcs, bool transpose){
     adj_list adj(nv);
-    ForEach(itr, arcs){
-        const int u = itr->u;
-        const int v = itr->v;
-        assert(u < nv && v < nv);
+    for(const Arc &a: arcs){
+        assert(a.u < nv && a.v < nv);
         if(!transpose)
-            adj[u].push_back(MP(v, itr->label));
+            adj[a.u].push_back(MP(a.v, a.label));
         else
-            adj[v].push_back(MP(u, itr->label));
+            adj[a.v].push_back(MP(a.u, a.label));
     }
     return adj;
 }
