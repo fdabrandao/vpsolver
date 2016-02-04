@@ -24,13 +24,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include <cmath>
 #include <map>
+#include "config.hpp"
 #include "common.hpp"
 #include "instance.hpp"
 #include "arcflowsol.hpp"
 using namespace std;
 
 int swig_main(int argc, char *argv[]){
-    printf("Copyright (C) 2013-2016, Filipe Brandao\n");
+    printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if(argc < 3 || argc > 5){
         printf("Usage: vbpsol graph.afg vars.sol [print_instance:0] [pyout:0]\n");

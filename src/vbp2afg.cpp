@@ -21,12 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
+#include "config.hpp"
 #include "arcflow.hpp"
 #include "instance.hpp"
 using namespace std;
 
 int swig_main(int argc, char *argv[]){
-    printf("Copyright (C) 2013-2016, Filipe Brandao\n");
+    printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if(argc < 3 || argc > 6){
         printf("Usage: vbp2afg instance.vbp/instance.mvp graph.afg [method:-2] [binary:0] [vtype:I]\n");
