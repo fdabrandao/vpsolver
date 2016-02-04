@@ -181,12 +181,8 @@ void ArcflowSol::print_solution(
     }
 
 
-    if(!pyout){
-        printf("Objective: %d\n", obj);
-        printf("Solution:\n");
-    }else{
-        printf("PYSOL=(%d, [", obj);
-    }
+    printf("Objective: %d\n", obj);
+    printf("Solution:\n");
     for(int t = 0; t < inst.nbtypes; t++){
         if(!pyout){
             if(inst.nbtypes > 1)
@@ -207,36 +203,16 @@ void ArcflowSol::print_solution(
                     tmp.push_back(MP(t, opt));
             }
             sort(All(tmp));
-
-            if(!pyout){
-                printf("%d x [", pat->first);
-                ForEach(p, tmp){
-                    if(p != tmp.begin()) printf(", ");
-                    if(p->second == -1)
-                        printf("i=%d", p->first+1);
-                    else
-                        printf("i=%d opt=%d", p->first+1, p->second+1);
-                }
-                printf("]\n");
-            }else{
-                if(pat != sol.begin()) printf(", ");
-                printf("(%d, [", pat->first);
-                ForEach(p, tmp){
-                    if(p != tmp.begin()) printf(", ");
-                    if(p->second == -1)
-                        printf("(%d, 0)", p->first);
-                    else
-                        printf("(%d, %d)", p->first, p->second);
-                }
-                printf("])");
+            printf("%d x [", pat->first);
+            ForEach(p, tmp){
+                if(p != tmp.begin()) printf(", ");
+                if(p->second == -1)
+                    printf("i=%d", p->first+1);
+                else
+                    printf("i=%d opt=%d", p->first+1, p->second+1);
             }
+            printf("]\n");
         }
-        if(pyout){
-            printf("]");
-        }
-    }
-    if(pyout){
-        printf("])\n");
     }
 
     if(print_inst){
@@ -257,5 +233,36 @@ void ArcflowSol::print_solution(
                 p++;
             }
         }
+    }
+
+    if(pyout){
+        printf("PYSOL=(%d, [", obj);
+        for(int t = 0; t < inst.nbtypes; t++){
+            printf(t == 0 ? "[" : ", [");
+            vector<pattern_pair> &sol = sols[t];
+            ForEach(pat, sol){
+                vector<int_pair> tmp;
+                ForEach(itr, pat->second){
+                    int t = inst.items[itr->first].type;
+                    int opt = inst.items[itr->first].opt;
+                    for(int i = 0; i < itr->second; i++)
+                        tmp.push_back(MP(t, opt));
+                }
+                sort(All(tmp));
+
+                if(pat != sol.begin()) printf(", ");
+                printf("(%d, [", pat->first);
+                ForEach(p, tmp){
+                    if(p != tmp.begin()) printf(", ");
+                    if(p->second == -1)
+                        printf("(%d, 0)", p->first);
+                    else
+                        printf("(%d, %d)", p->first, p->second);
+                }
+                printf("])");
+            }
+            printf("]");
+        }
+        printf("])\n");
     }
 }
