@@ -57,8 +57,8 @@ public:
         //model.getEnv().set(GRB_DoubleParam_ImproveStartTime, 60);
         //model.getEnv().set(GRB_DoubleParam_ImproveStartGap, 1);
 
-        sort(All(A));
-        //reverse(All(A));
+        sort(all(A));
+        //reverse(all(A));
         map<Arc, GRBVar> va;
         int lastv = Ts[0]-1;
         for(int i = 0; i < inst.nbtypes; i++) lastv = min(lastv, Ts[i]-1);

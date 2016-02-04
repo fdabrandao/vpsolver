@@ -256,8 +256,8 @@ void Instance::read(FILE *fin, ftype type){
     nsizes = items.size();
 
     if(sort){
-        stable_sort(All(items));
-        reverse(All(items));
+        stable_sort(all(items));
+        reverse(all(items));
     }
 }
 

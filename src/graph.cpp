@@ -56,7 +56,7 @@ void NodeSet::clear(){
 
 void NodeSet::sort(){
     index.clear();
-    ::sort(All(labels));
+    ::sort(all(labels));
     int pos = 0;
     for(const vector<int> &lbl: labels)
         index[lbl] = pos++;

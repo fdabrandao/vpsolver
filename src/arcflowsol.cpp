@@ -56,7 +56,7 @@ vector<pattern_pair> ArcflowSol::remove_excess(
             }
             rep -= f;
 
-            tmp.push_back(MP(f, vector<int_pair>(All(count))));
+            tmp.push_back(MP(f, vector<int_pair>(all(count))));
             for(const auto &kvpair: count){
                 int type = inst.items[kvpair.first].type;
                 dem[type] -= f * kvpair.second;
@@ -66,7 +66,7 @@ vector<pattern_pair> ArcflowSol::remove_excess(
 
     map<vector<int_pair>, int> mp;
     for(pattern_pair &pp: tmp){
-        sort(All(pp.second));
+        sort(all(pp.second));
         mp[pp.second] += pp.first;
     }
 
@@ -89,7 +89,7 @@ vector<pattern_pair> ArcflowSol::extract_solution(vector<int> &dem, int T){
 
     int &zflow = flow[Arc(T, S, LOSS)];
 
-    vector<int> lst(All(nodes));
+    vector<int> lst(all(nodes));
 
     vector<pattern_int> sol;
     while(true){
@@ -202,7 +202,7 @@ void ArcflowSol::print_solution(
                 for(int i = 0; i < itpair.second; i++)
                     tmp.push_back(MP(t, opt));
             }
-            sort(All(tmp));
+            sort(all(tmp));
             printf("%d x [", pat.first);
             bool first = true;
             for(const int_pair &p: tmp){
@@ -252,7 +252,7 @@ void ArcflowSol::print_solution(
                     for(int i = 0; i < itpair.second; i++)
                         tmp.push_back(MP(t, opt));
                 }
-                sort(All(tmp));
+                sort(all(tmp));
 
                 printf("(%d,[", pat.first);
                 for(const int_pair &p: tmp){

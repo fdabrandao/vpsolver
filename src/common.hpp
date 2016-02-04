@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define EPS 1e-5
 #define MAX_LEN 256
 #define TRANSPOSE (1)
-#define All(x) (x).begin(),(x).end()
+#define all(x) (x).begin(),(x).end()
 #define MP(x,y) make_pair(x,y)
 
 #define MIN_METHOD -2

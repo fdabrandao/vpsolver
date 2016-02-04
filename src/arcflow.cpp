@@ -103,7 +103,7 @@ void Arcflow::relabel_graph(const vector<int> &labels){
         if(u != v)
             arcs.insert(Arc(u, v, a.label));
     }
-    A.assign(All(arcs));
+    A.assign(all(arcs));
 }
 
 vector<int> Arcflow::max_rep(
@@ -183,8 +183,8 @@ void Arcflow::lift_state(
                 for(int t : valid_opts)
                     caps.push_back(Ws[t][d]-u[d]);
                 if(caps.size() > 1){
-                    sort(All(caps));
-                    caps.erase(unique(All(caps)), caps.end());
+                    sort(all(caps));
+                    caps.erase(unique(all(caps)), caps.end());
                 }
                 u[d] += min_slack(r, it, d, caps);
             }
@@ -311,7 +311,7 @@ void Arcflow::build(){
     printf("  #dp: %d\n", (int)dp.size());
 
     dp.clear();
-    A.assign(All(AS));
+    A.assign(all(AS));
     AS.clear();
 
     relabel_graph(NS.topological_order());
@@ -366,8 +366,8 @@ void Arcflow::reduce_redundancy(){
     auto comp_equal = [&types](const Arc &a, const Arc &b) {
         return a.u == b.u && a.v == b.v && types[a.label] == types[b.label];
     };
-    sort(All(A), comp_less);
-    A.erase(unique(All(A), comp_equal), A.end());
+    sort(all(A), comp_less);
+    A.erase(unique(all(A), comp_equal), A.end());
 }
 
 void Arcflow::finalize(){
@@ -383,7 +383,7 @@ void Arcflow::finalize(){
         Ts.clear();
         for(int i = 0; i < nbtypes; i++)
             Ts.push_back(i);
-        sort(All(Ts), [this](int a, int b) {
+        sort(all(Ts), [this](int a, int b) {
             return this->Ws[a] < this->Ws[b];
         });
         for(int i = 0; i < nbtypes; i++)
@@ -431,7 +431,7 @@ void Arcflow::finalize(){
 
 void Arcflow::write(FILE *fout){
     assert(ready == true);
-    sort(All(A));
+    sort(all(A));
 
     int iS = 0;
     fprintf(fout, "S: %d\n", iS);
@@ -447,7 +447,7 @@ void Arcflow::write(FILE *fout){
     fprintf(fout, "NV: %d\n", int(NS.size()+Ts.size()));
     fprintf(fout, "NA: %d\n", int(A.size()));
 
-    sort(All(A));
+    sort(all(A));
     for(int i = 0; i < 3; i++){
         for(const Arc &a: A){
             if(i == 1 && a.u != iS) continue;
