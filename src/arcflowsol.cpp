@@ -206,10 +206,10 @@ void ArcflowSol::print_solution(
             printf("%d x [", pat.first);
             bool first = true;
             for(const int_pair &p: tmp){
-                if(first){
-                    printf(", ");
+                if(first)
                     first = false;
-                }
+                else
+                    printf(", ");
                 if(p.second == -1)
                     printf("i=%d", p.first+1);
                 else

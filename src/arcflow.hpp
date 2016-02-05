@@ -33,30 +33,16 @@ using namespace std;
 
 class Arcflow{
 private:
+    bool ready;
     set<Arc> AS;
+    NodeSet NS;
+    vector<int> maxW;
     map<vector<int>, int> dp;
     int go(vector<int> su);
     inline vector<int> hash(const vector<int> &su);
     vector<int> max_label;
-    vector<int> min_label;
-    int lsize;
-protected:
-    bool ready;
-    clock_t tstart;
-
-    bool binary;
-    int ndims;
-    int nsizes;
-    int nbtypes;
-    vector<Item> items;
-    vector<int> maxW;
-    vector<vector<int> > Ws;
-
-    NodeSet NS;
-    vector<Arc> A;
-    int S;
-    vector<int> Ts;
-    int LOSS;
+    vector<int> max_state;
+    int label_size;
 
     vector<int> max_rep(const vector<int> &W, const vector<int> &u, int i0, int sub_i0) const;
     void lift_state(const vector<int> &valid_opts, vector<int> &u, int it, int ic) const;
@@ -68,8 +54,17 @@ protected:
     void final_compression_step();
     void reduce_redundancy();
     void finalize();
+protected:
+    clock_t tstart;
+    Instance inst;
+    int NV;
+    int NA;
+    int S;
+    vector<int> Ts;
+    vector<Arc> A;
+    int LOSS;
 public:
-    Arcflow(const Instance &inst);
+    Arcflow(const Instance &_inst);
     void write(const char *fname);
     void write(FILE *fout);
 };

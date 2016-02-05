@@ -32,43 +32,39 @@ using namespace std;
 
 /* Class Arcflow */
 
-Arcflow::Arcflow(const Instance &inst){
-    tstart = CURTIME;
+Arcflow::Arcflow(const Instance &_inst): inst(_inst){
     ready = false;
-    nsizes = inst.nsizes;
+    tstart = CURTIME;
     LOSS = inst.nsizes;
-    nbtypes = inst.nbtypes;
-    Ws = inst.Ws;
-    ndims = inst.ndims;
-    items = inst.items;
-    binary = inst.binary;
-    int method = inst.method;
+    label_size = inst.ndims;
 
-    maxW.resize(ndims, 0);
-    for(int d = 0; d < ndims; d++){
-        for(int t = 0; t < nbtypes; t++)
-            maxW[d] = max(maxW[d], Ws[t][d]);
+    maxW.resize(inst.ndims, 0);
+    for(int d = 0; d < inst.ndims; d++){
+        for(int t = 0; t < inst.nbtypes; t++)
+            maxW[d] = max(maxW[d], inst.Ws[t][d]);
     }
 
-    lsize = ndims;
     max_label = maxW;
-    if(binary){
-        lsize = ndims+1;
+    if(inst.binary){
+        label_size = inst.ndims+1;
         max_label.push_back(INT_MAX);
     }
 
-    Item loss(ndims);
-    for(int d = 0; d < ndims; d++)
-        loss[d] = 0;
-    loss.demand = INT_MAX;
-    items.push_back(loss);
+    max_state = maxW;
+    max_state.push_back(inst.nsizes);
+    if(!inst.binary){
+        int maxb = 0;
+        for(int it = 0; it < inst.nsizes; it++)
+            maxb = max(maxb, inst.items[it].demand);
+        max_state.push_back(maxb);
+    }
 
-    printf("Build (method = %d)\n", method);
-    assert(method >= MIN_METHOD && method <= MAX_METHOD);
+    printf("Build (method = %d)\n", inst.method);
+    assert(inst.method >= MIN_METHOD && inst.method <= MAX_METHOD);
 
     build(); // build step-3' graph
-    int nv1 = NS.size()+nbtypes;
-    int na1 = A.size()+(NS.size()-1)*nbtypes+1;
+    int nv1 = NS.size()+inst.nbtypes;
+    int na1 = A.size()+(NS.size()-1)*inst.nbtypes+1;
     printf("  Step-3' Graph: %d vertices and %d arcs (%.2fs)\n",
         nv1, na1, TIMEDIF(tstart));
 
@@ -81,16 +77,17 @@ Arcflow::Arcflow(const Instance &inst){
     printf("  #V4/#V3 = %.2f\n", nv2/double(nv1));
     printf("  #A4/#A3 = %.2f\n", na2/double(na1));
     printf("Ready! (%.2fs)\n", TIMEDIF(tstart));
+    assert(ready == true);
 }
 
 bool Arcflow::is_valid(const vector<int> &u, const vector<int> &W) const{
-    for(int i = 0; i < ndims; i++)
+    for(int i = 0; i < inst.ndims; i++)
         if(u[i] > W[i]) return false;
     return true;
 }
 
 bool Arcflow::is_full(const vector<int> &u, const vector<int> &W) const{
-    for(int i = 0; i < ndims; i++)
+    for(int i = 0; i < inst.ndims; i++)
         if(u[i] != W[i]) return false;
     return true;
 }
@@ -109,16 +106,16 @@ void Arcflow::relabel_graph(const vector<int> &labels){
 vector<int> Arcflow::max_rep(
         const vector<int> &W, const vector<int> &u,
         int i0 = 0, int sub_i0 = 0) const {
-    vector<int> r(nsizes);
-    for(int i = i0; i < nsizes; i++){
-        int dem = binary ? 1 : items[i].demand;
+    vector<int> r(inst.nsizes);
+    for(int i = i0; i < inst.nsizes; i++){
+        int dem = inst.binary ? 1 : inst.items[i].demand;
         if(i != i0)
             r[i] = dem;
         else
             r[i] = max(0, dem-sub_i0);
-        for(int d = 0; d < ndims && r[i] > 0; d++)
-            if(items[i][d] != 0)
-                r[i] = min(r[i], (W[d]-u[d])/items[i][d]);
+        for(int d = 0; d < inst.ndims && r[i] > 0; d++)
+            if(inst.items[i][d] != 0)
+                r[i] = min(r[i], (W[d]-u[d])/inst.items[i][d]);
     }
     return r;
 }
@@ -132,8 +129,8 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d, const vector<int> &c
     vis[0] = true;
     Q.push_back(0);
     int res = 0;
-    for(int i = i0; i < nsizes; i++){
-        int w = items[i][d];
+    for(int i = i0; i < inst.nsizes; i++){
+        int w = inst.items[i][d];
         int qs = Q.size();
         for(int j = 0; j < qs; j++){
             int u = Q[j];
@@ -165,23 +162,23 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d, const vector<int> &c
 
 void Arcflow::lift_state(
         const vector<int> &valid_opts, vector<int> &u, int it, int ic) const {
-    if(it >= nsizes) return;
+    if(it >= inst.nsizes) return;
     const vector<int> &r = max_rep(maxW, u, it, ic);
-    for(int d = 0; d < ndims; d++){
+    for(int d = 0; d < inst.ndims; d++){
         int minw = maxW[d];
-        for(int t : valid_opts) minw = min(minw, Ws[t][d]);
+        for(int t : valid_opts) minw = min(minw, inst.Ws[t][d]);
         if(u[d] != minw){
             // lift method 1
             int maxpos = minw;
-            for(int i = it; i < nsizes && maxpos >= u[d]; i++)
-                maxpos -= r[i]*items[i][d];
+            for(int i = it; i < inst.nsizes && maxpos >= u[d]; i++)
+                maxpos -= r[i]*inst.items[i][d];
             if(maxpos >= u[d]){
                 u[d] = maxpos;
             }else{
                 // lift method 2
                 vector<int> caps;
                 for(int t : valid_opts)
-                    caps.push_back(Ws[t][d]-u[d]);
+                    caps.push_back(inst.Ws[t][d]-u[d]);
                 if(caps.size() > 1){
                     sort(all(caps));
                     caps.erase(unique(all(caps)), caps.end());
@@ -193,45 +190,40 @@ void Arcflow::lift_state(
 }
 
 inline vector<int> Arcflow::hash(const vector<int> &su){
-    if(ndims <= 1) return su;
-    static size_t last_size = 1;
-    vector<int> h(0);
-    h.reserve(last_size);
-    int *p = NULL, bits = 0;
-    const int all = sizeof(int)*8;
-    for(int d = 0; d < ndims; d++){
-        int x = su[d], xl = maxW[d];
+    if(inst.ndims <= 1) return su;
+    vector<int> h;
+    int *p = NULL, nbits = 0;
+    assert(su.size() == max_state.size());
+    for(int d = 0; d < (int)su.size(); d++){
+        int x = su[d], xl = max_state[d];
         while(xl != 0){
-            if(bits == 0){
+            if(nbits == 0){
                 h.push_back(0);
                 p = &h.back();
-                bits = all;
+                nbits = sizeof(int)*8;
             }
             *p = (*p<<1)|(x&1);
-            bits--;
+            nbits--;
             x >>= 1;
             xl >>= 1;
         }
+        assert(x == 0);
     }
-    for(int d = ndims; d < (int)su.size(); d++){
-        h.push_back(su[d]);
-    }
-    last_size = h.size();
     return h;
 }
 
 int Arcflow::go(vector<int> su){
-    int it = su[ndims];
-    int ic = binary ? 0 : su[ndims+1];
+    int it = su[inst.ndims];
+    int ic = inst.binary ? 0 : su[inst.ndims+1];
     vector<int> valid_opts;
     vector<int> mu(max_label);
-    vector<int> maxw(ndims, 0);
-    for(int t = 0; t < nbtypes; t++){
-        if(is_valid(su, Ws[t])){
+    vector<int> maxw(inst.ndims, 0);
+    for(int t = 0; t < inst.nbtypes; t++){
+        if(is_valid(su, inst.Ws[t])){
             valid_opts.push_back(t);
-            for(int d = 0; d < ndims; d++){
-                mu[d] = min(mu[d], Ws[t][d]);
-                maxw[d] = max(maxw[d], Ws[t][d]);
+            for(int d = 0; d < inst.ndims; d++){
+                mu[d] = min(mu[d], inst.Ws[t][d]);
+                maxw[d] = max(maxw[d], inst.Ws[t][d]);
             }
         }
     }
@@ -249,45 +241,44 @@ int Arcflow::go(vector<int> su){
         return itr->second;
 
     int up = -1;
-    if(it+1 < nsizes){
+    if(it+1 < inst.nsizes){
         vector<int> sv(su);
-        sv[ndims] = it+1;
-        if(!binary)
-            sv[ndims+1] = 0;
+        sv[inst.ndims] = it+1;
+        if(!inst.binary)
+            sv[inst.ndims+1] = 0;
         up = go(sv);
         assert(up != -1);
         mu = NS.get_label(up);
     }
 
-    int dem = items[it].demand;
-    if(it < nsizes && ic < dem){
+    if(it < inst.nsizes && ic < inst.items[it].demand){
         vector<int> sv(su);
-        const vector<int> &w = items[it].w;
-        for(int d = 0; d < ndims; d++){
+        const vector<int> &w = inst.items[it].w;
+        for(int d = 0; d < inst.ndims; d++){
             sv[d] += w[d];
             if(sv[d] > maxw[d]) // if invalid
                 return dp[key] = NS.get_index(mu);
         }
 
-        if(binary){
-            sv[ndims] = it+1;
+        if(inst.binary){
+            sv[inst.ndims] = it+1;
         }else{
-            if(ic+1 < dem){
-                sv[ndims] = it;
-                sv[ndims+1] = ic+1;
+            if(ic+1 < inst.items[it].demand){
+                sv[inst.ndims] = it;
+                sv[inst.ndims+1] = ic+1;
             }else{
-                sv[ndims] = it+1;
-                sv[ndims+1] = 0;
+                sv[inst.ndims] = it+1;
+                sv[inst.ndims+1] = 0;
             }
         }
         int iv = go(sv);
 
         if(iv != -1){
             const vector<int> &v = NS.get_label(iv);
-            for(int d = 0; d < ndims; d++)
+            for(int d = 0; d < inst.ndims; d++)
                 mu[d] = min(mu[d], v[d]-w[d]);
-            if(binary)
-                mu[ndims] = min(mu[ndims], it+1);
+            if(inst.binary)
+                mu[inst.ndims] = min(mu[inst.ndims], it+1);
             int iu = NS.get_index(mu);
             AS.insert(Arc(iu, iv, it));
             if(up != -1 && iu != up)
@@ -303,10 +294,10 @@ void Arcflow::build(){
     A.clear();
     NS.clear();
 
-    if(binary)
-        go(vector<int>(lsize, 0));
+    if(inst.binary)
+        go(vector<int>(label_size, 0));
     else
-        go(vector<int>(lsize+2, 0));
+        go(vector<int>(label_size+2, 0));
 
     printf("  #dp: %d\n", (int)dp.size());
 
@@ -326,19 +317,23 @@ void Arcflow::final_compression_step(){
 
     NodeSet NStmp;
     for(int u = 0; u < NS.size(); u++){
-        vector<int> lbl(lsize, 0);
+        vector<int> lbl(label_size, 0);
         for(const auto &pa: adj[u]){
             assert(pa.first < u);
             int v = labels[pa.first];
             int it = pa.second;
             const vector<int> &lv = NStmp.get_label(v);
-            for(int d = 0; d < ndims; d++)
-                lbl[d] = max(lbl[d], lv[d]+items[it][d]);
-            if(binary){
+            for(int d = 0; d < inst.ndims; d++){
                 if(it == LOSS)
-                    lbl[ndims] = max(lbl[ndims], lv[ndims]);
+                    lbl[d] = max(lbl[d], lv[d]);
                 else
-                    lbl[ndims] = max(lbl[ndims], max(lv[ndims], it));
+                    lbl[d] = max(lbl[d], lv[d]+inst.items[it][d]);
+            }
+            if(inst.binary){
+                if(it == LOSS)
+                    lbl[inst.ndims] = max(lbl[inst.ndims], lv[inst.ndims]);
+                else
+                    lbl[inst.ndims] = max(lbl[inst.ndims], max(lv[inst.ndims], it));
             }
         }
         labels[u] = NStmp.get_index(lbl);
@@ -355,8 +350,8 @@ void Arcflow::final_compression_step(){
 void Arcflow::reduce_redundancy(){
     //remove redundant parallel arcs
     vector<int> types;
-    for(int i = 0; i < nsizes; i++)
-        types.push_back(items[i].type);
+    for(int i = 0; i < inst.nsizes; i++)
+        types.push_back(inst.items[i].type);
     types.push_back(-1);
     auto comp_less = [&types](const Arc &a, const Arc &b) {
         return (a.u < b.u) ||
@@ -372,7 +367,7 @@ void Arcflow::reduce_redundancy(){
 
 void Arcflow::finalize(){
     assert(ready == false);
-    if(nbtypes == 1){
+    if(inst.nbtypes == 1){
         S = 0;
         Ts.assign({NS.size()});
         A.push_back(Arc(Ts[0], S, LOSS));
@@ -381,39 +376,39 @@ void Arcflow::finalize(){
     }else{
         S = 0;
         Ts.clear();
-        for(int i = 0; i < nbtypes; i++)
+        for(int i = 0; i < inst.nbtypes; i++)
             Ts.push_back(i);
         sort(all(Ts), [this](int a, int b) {
-            return this->Ws[a] < this->Ws[b];
+            return this->inst.Ws[a] < this->inst.Ws[b];
         });
-        for(int i = 0; i < nbtypes; i++)
+        for(int i = 0; i < inst.nbtypes; i++)
             Ts[i] += NS.size();
 
-        for(int i = 0; i < nbtypes; i++)
+        for(int i = 0; i < inst.nbtypes; i++)
             A.push_back(Arc(Ts[i], S, LOSS));
 
-        vector<vector<int> > bigger_than(nbtypes);
-        for(int t1 = 0; t1 < nbtypes; t1++)
-            for(int t2 = 0; t2 < nbtypes; t2++)
-                if(t1 != t2 && is_valid(Ws[t1], Ws[t2]))
-                    if(Ws[t1] != Ws[t2] || (t1 < t2 && Ws[t1] == Ws[t2]))
+        vector<vector<int> > bigger_than(inst.nbtypes);
+        for(int t1 = 0; t1 < inst.nbtypes; t1++)
+            for(int t2 = 0; t2 < inst.nbtypes; t2++)
+                if(t1 != t2 && is_valid(inst.Ws[t1], inst.Ws[t2]))
+                    if(inst.Ws[t1] != inst.Ws[t2] || (t1 < t2 && inst.Ws[t1] == inst.Ws[t2]))
                         bigger_than[t1].push_back(t2);
 
-        vector<bool> valid_tgts(nbtypes);
+        vector<bool> valid_tgts(inst.nbtypes);
         for(int i = 1; i < (int)NS.size(); i++){
             const vector<int> &u = NS.get_label(i);
-            for(int t = 0; t < nbtypes; t++)
-                valid_tgts[t] = is_valid(u, Ws[t]);
-            for(int t1 = 0; t1 < nbtypes; t1++)
+            for(int t = 0; t < inst.nbtypes; t++)
+                valid_tgts[t] = is_valid(u, inst.Ws[t]);
+            for(int t1 = 0; t1 < inst.nbtypes; t1++)
                 if(valid_tgts[t1])
                     for(int t2 : bigger_than[t1]) valid_tgts[t2] = false;
-            for(int t = 0; t < nbtypes; t++)
+            for(int t = 0; t < inst.nbtypes; t++)
                 if(valid_tgts[t])
                     A.push_back(Arc(i, Ts[t], LOSS));
         }
 
-        for(int t1 = 0; t1 < nbtypes; t1++){
-            valid_tgts.assign(nbtypes, false);
+        for(int t1 = 0; t1 < inst.nbtypes; t1++){
+            valid_tgts.assign(inst.nbtypes, false);
             for(int t2 : bigger_than[t1])
                 valid_tgts[t2] = true;
             for(int t2 : bigger_than[t1])
@@ -426,6 +421,8 @@ void Arcflow::finalize(){
         }
     }
     reduce_redundancy();
+    NV = NS.size()+Ts.size();
+    NA = A.size();
     ready = true;
 }
 
@@ -444,8 +441,8 @@ void Arcflow::write(FILE *fout){
     fprintf(fout, "LOSS: %d\n", LOSS);
 
     int lastv = NS.size()-1;
-    fprintf(fout, "NV: %d\n", int(NS.size()+Ts.size()));
-    fprintf(fout, "NA: %d\n", int(A.size()));
+    fprintf(fout, "NV: %d\n", NV);
+    fprintf(fout, "NA: %d\n", NA);
 
     sort(all(A));
     for(int i = 0; i < 3; i++){

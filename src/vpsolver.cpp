@@ -37,9 +37,7 @@ class GrbArcflow: public Arcflow{
 public:
     GrbArcflow(const Instance &inst): Arcflow(inst){}
 
-    void solve(
-            const Instance &inst, bool print_inst = false, bool pyout = false){
-        assert(ready == true);
+    void solve(bool print_inst = false, bool pyout = false){
         char vtype = inst.vtype;
         GRBEnv* env = new GRBEnv();
         GRBModel model = GRBModel(*env);
@@ -70,9 +68,13 @@ public:
                 if(i == 0 && (a.u == S || a.v > lastv)) continue;
 
                 if(a.label == LOSS || inst.relax_domains)
-                    va[a] = model.addVar(0.0, inst.n, 0, vtype);
+                    va[a] = model.addVar(
+                        0.0, inst.n, 0, vtype
+                    );
                 else
-                    va[a] = model.addVar(0.0, items[a.label].demand, 0, vtype);
+                    va[a] = model.addVar(
+                        0.0, inst.items[a.label].demand, 0, vtype
+                    );
             }
         }
         model.update();
@@ -84,9 +86,9 @@ public:
                 feedback.set(GRB_DoubleAttr_UB, inst.Qs[i]);
         }
 
-        vector<vector<Arc> > Al(nsizes);
-        vector<vector<Arc> > in(NS.size()+Ts.size());
-        vector<vector<Arc> > out(NS.size()+Ts.size());
+        vector<vector<Arc> > Al(inst.nsizes);
+        vector<vector<Arc> > in(NV);
+        vector<vector<Arc> > out(NV);
 
         for(const Arc &a: A){
             if(a.label != LOSS)
@@ -97,8 +99,8 @@ public:
 
         for(int i = 0; i < inst.m; i++){
             GRBLinExpr lin = 0;
-            for(int it = 0; it < nsizes; it++)
-                if(items[it].type == i)
+            for(int it = 0; it < inst.nsizes; it++)
+                if(inst.items[it].type == i)
                     for(const Arc &a: Al[it]) lin += va[a];
             if(inst.ctypes[i] == '>' || inst.relax_domains)
                 model.addConstr(lin >= inst.demands[i]);
@@ -106,7 +108,7 @@ public:
                 model.addConstr(lin == inst.demands[i]);
         }
 
-        for(int u = 0; u < NS.size()+nbtypes; u++){
+        for(int u = 0; u < NV; u++){
             GRBLinExpr lin = 0;
             for(const Arc &a: in[u]) lin += va[a];
             for(const Arc &a: out[u]) lin -= va[a];
@@ -138,7 +140,7 @@ public:
                     flow[a] = rx;
                 }
             }
-            ArcflowSol sol(inst, flow, S, Ts, LOSS, binary);
+            ArcflowSol sol(inst, flow, S, Ts, LOSS, inst.binary);
             sol.print_solution(inst, print_inst, pyout, true);
         }
 
@@ -179,7 +181,7 @@ int main(int argc, char *argv[]){
 
     try {
         GrbArcflow graph(inst);
-        graph.solve(inst, print_inst, pyout);
+        graph.solve(print_inst, pyout);
     } catch(GRBException e) {
         printf("Error code = %d\n", e.getErrorCode());
         printf("%s\n", e.getMessage().c_str());
