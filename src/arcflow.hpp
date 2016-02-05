@@ -41,7 +41,7 @@ private:
     int go(vector<int> su);
     inline vector<int> hash(const vector<int> &su);
     vector<int> max_label;
-    vector<int> max_state;
+    vector<int> hash_bits;
     int label_size;
 
     vector<int> max_rep(const vector<int> &W, const vector<int> &u, int i0, int sub_i0) const;

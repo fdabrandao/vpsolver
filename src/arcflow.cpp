@@ -50,13 +50,22 @@ Arcflow::Arcflow(const Instance &_inst): inst(_inst){
         max_label.push_back(INT_MAX);
     }
 
-    max_state = maxW;
+    vector<int> max_state = maxW;
     max_state.push_back(inst.nsizes);
     if(!inst.binary){
         int maxb = 0;
         for(int it = 0; it < inst.nsizes; it++)
             maxb = max(maxb, inst.items[it].demand);
         max_state.push_back(maxb);
+    }
+
+    for(int i = 0; i < (int)max_state.size(); i++){
+        int nbits = 0, value = max_state[i];
+        while(value){
+            nbits++;
+            value >>= 1;
+        }
+        hash_bits.push_back(nbits);
     }
 
     printf("Build (method = %d)\n", inst.method);
@@ -191,24 +200,28 @@ void Arcflow::lift_state(
 
 inline vector<int> Arcflow::hash(const vector<int> &su){
     if(inst.ndims <= 1) return su;
+    static int last_size = 1;
     vector<int> h;
-    int *p = NULL, nbits = 0;
-    assert(su.size() == max_state.size());
-    for(int d = 0; d < (int)su.size(); d++){
-        int x = su[d], xl = max_state[d];
-        while(xl != 0){
-            if(nbits == 0){
+    h.reserve(last_size);
+    int *p = NULL, dst_bits = 0;
+    for(int i = 0; i < (int)su.size(); i++){
+        int x = su[i];
+        int src_bits = hash_bits[i];
+        while(src_bits != 0){
+            if(dst_bits == 0){
                 h.push_back(0);
                 p = &h.back();
-                nbits = sizeof(int)*8;
+                dst_bits = sizeof(int)*8;
             }
-            *p = (*p<<1)|(x&1);
-            nbits--;
-            x >>= 1;
-            xl >>= 1;
+            int window_width = min(src_bits, dst_bits);
+            *p <<= window_width;
+            *p |= x&((1u<<window_width)-1);
+            x >>= window_width;
+            src_bits -= window_width;
+            dst_bits -= window_width;
         }
-        assert(x == 0);
     }
+    last_size = h.size();
     return h;
 }
 
