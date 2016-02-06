@@ -42,9 +42,10 @@ private:
     inline vector<int> hash(const vector<int> &su);
     vector<int> max_label;
     vector<int> hash_bits;
+    vector<int> max_rep;
     int label_size;
 
-    vector<int> max_rep(const vector<int> &W, const vector<int> &u, int i0, int sub_i0) const;
+    vector<int> count_max_rep(const vector<int> &space, int i0, int sub_i0) const;
     void lift_state(const vector<int> &valid_opts, vector<int> &u, int it, int ic) const;
     int min_slack(const vector<int> &b, int i0, int d, const vector<int> &caps) const;
     bool is_valid(const vector<int> &u, const vector<int> &W) const;

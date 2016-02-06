@@ -59,6 +59,8 @@ Arcflow::Arcflow(const Instance &_inst): inst(_inst){
         max_state.push_back(maxb);
     }
 
+    max_rep = count_max_rep(maxW, 0, 0);
+
     for(int i = 0; i < (int)max_state.size(); i++){
         int nbits = 0, value = max_state[i];
         while(value){
@@ -112,9 +114,8 @@ void Arcflow::relabel_graph(const vector<int> &labels){
     A.assign(all(arcs));
 }
 
-vector<int> Arcflow::max_rep(
-        const vector<int> &W, const vector<int> &u,
-        int i0 = 0, int sub_i0 = 0) const {
+vector<int> Arcflow::count_max_rep(
+        const vector<int> &space, int i0 = 0, int sub_i0 = 0) const {
     vector<int> r(inst.nsizes);
     for(int i = i0; i < inst.nsizes; i++){
         int dem = inst.binary ? 1 : inst.items[i].demand;
@@ -122,9 +123,8 @@ vector<int> Arcflow::max_rep(
             r[i] = dem;
         else
             r[i] = max(0, dem-sub_i0);
-        for(int d = 0; d < inst.ndims && r[i] > 0; d++)
-            if(inst.items[i][d] != 0)
-                r[i] = min(r[i], (W[d]-u[d])/inst.items[i][d]);
+        for(int d: inst.items[i].nonzero)
+            r[i] = min(r[i], space[d]/inst.items[i][d]);
     }
     return r;
 }
@@ -140,6 +140,7 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d, const vector<int> &c
     int res = 0;
     for(int i = i0; i < inst.nsizes; i++){
         int w = inst.items[i][d];
+        if(!w) continue;
         int qs = Q.size();
         for(int j = 0; j < qs; j++){
             int u = Q[j];
@@ -172,7 +173,9 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d, const vector<int> &c
 void Arcflow::lift_state(
         const vector<int> &valid_opts, vector<int> &u, int it, int ic) const {
     if(it >= inst.nsizes) return;
-    const vector<int> &r = max_rep(maxW, u, it, ic);
+    vector<int> space(inst.ndims);
+    for(int d = 0; d < inst.ndims; d++) space[d] = maxW[d]-u[d];
+    const vector<int> &r = count_max_rep(space, it, ic);
     for(int d = 0; d < inst.ndims; d++){
         int minw = maxW[d];
         for(int t : valid_opts) minw = min(minw, inst.Ws[t][d]);
@@ -199,7 +202,6 @@ void Arcflow::lift_state(
 }
 
 inline vector<int> Arcflow::hash(const vector<int> &su){
-    if(inst.ndims <= 1) return su;
     static int last_size = 1;
     vector<int> h;
     h.reserve(last_size);
@@ -264,10 +266,10 @@ int Arcflow::go(vector<int> su){
         mu = NS.get_label(up);
     }
 
-    if(it < inst.nsizes && ic < inst.items[it].demand){
+    if(it < inst.nsizes && ic < max_rep[it]){
         vector<int> sv(su);
         const vector<int> &w = inst.items[it].w;
-        for(int d = 0; d < inst.ndims; d++){
+        for(int d: inst.items[it].nonzero){
             sv[d] += w[d];
             if(sv[d] > maxw[d]) // if invalid
                 return dp[key] = NS.get_index(mu);
@@ -276,7 +278,7 @@ int Arcflow::go(vector<int> su){
         if(inst.binary){
             sv[inst.ndims] = it+1;
         }else{
-            if(ic+1 < inst.items[it].demand){
+            if(ic+1 < max_rep[it]){
                 sv[inst.ndims] = it;
                 sv[inst.ndims+1] = ic+1;
             }else{
