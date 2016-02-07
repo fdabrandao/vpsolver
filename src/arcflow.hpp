@@ -43,6 +43,7 @@ private:
     vector<int> max_label;
     vector<int> hash_bits;
     vector<int> max_rep;
+    vector<vector<int> > weights;
     int label_size;
 
     vector<int> count_max_rep(const vector<int> &space, int i0, int sub_i0) const;

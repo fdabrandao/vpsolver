@@ -59,6 +59,11 @@ Arcflow::Arcflow(const Instance &_inst): inst(_inst){
         max_state.push_back(maxb);
     }
 
+    weights.resize(inst.nsizes);
+    for(int i = 0; i < inst.nsizes; i++)
+        weights[i] = inst.items[i].w;
+    weights.push_back(vector<int>(inst.ndims, 0)); // loss arcs
+
     max_rep = count_max_rep(maxW, 0, 0);
 
     for(int i = 0; i < (int)max_state.size(); i++){
@@ -119,12 +124,11 @@ vector<int> Arcflow::count_max_rep(
     vector<int> r(inst.nsizes);
     for(int i = i0; i < inst.nsizes; i++){
         int dem = inst.binary ? 1 : inst.items[i].demand;
-        if(i != i0)
-            r[i] = dem;
-        else
-            r[i] = max(0, dem-sub_i0);
-        for(int d: inst.items[i].nonzero)
-            r[i] = min(r[i], space[d]/inst.items[i][d]);
+        r[i] = i != i0 ? dem : max(0, dem-sub_i0);
+        for(int d: inst.items[i].nonzero){
+            r[i] = min(r[i], space[d]/weights[i][d]);
+            if(!r[i]) break;
+        }
     }
     return r;
 }
@@ -139,7 +143,7 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d, const vector<int> &c
     Q.push_back(0);
     int res = 0;
     for(int i = i0; i < inst.nsizes; i++){
-        int w = inst.items[i][d];
+        int w = weights[i][d];
         if(!w) continue;
         int qs = Q.size();
         for(int j = 0; j < qs; j++){
@@ -183,7 +187,7 @@ void Arcflow::lift_state(
             // lift method 1
             int maxpos = minw;
             for(int i = it; i < inst.nsizes && maxpos >= u[d]; i++)
-                maxpos -= r[i]*inst.items[i][d];
+                maxpos -= r[i]*weights[i][d];
             if(maxpos >= u[d]){
                 u[d] = maxpos;
             }else{
@@ -268,7 +272,7 @@ int Arcflow::go(vector<int> su){
 
     if(it < inst.nsizes && ic < max_rep[it]){
         vector<int> sv(su);
-        const vector<int> &w = inst.items[it].w;
+        const vector<int> &w = weights[it];
         for(int d: inst.items[it].nonzero){
             sv[d] += w[d];
             if(sv[d] > maxw[d]) // if invalid
@@ -339,10 +343,7 @@ void Arcflow::final_compression_step(){
             int it = pa.second;
             const vector<int> &lv = NStmp.get_label(v);
             for(int d = 0; d < inst.ndims; d++){
-                if(it == LOSS)
-                    lbl[d] = max(lbl[d], lv[d]);
-                else
-                    lbl[d] = max(lbl[d], lv[d]+inst.items[it][d]);
+                lbl[d] = max(lbl[d], lv[d]+weights[it][d]);
             }
             if(inst.binary){
                 if(it == LOSS)
