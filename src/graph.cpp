@@ -19,6 +19,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 #include <set>
+#include <vector>
 #include <climits>
 #include <cstring>
 #include <algorithm>
@@ -28,10 +29,10 @@ using namespace std;
 
 /* Class NodeSet */
 
-int NodeSet::get_index(const vector<int> &lbl){
-    if(index.count(lbl)){
+int NodeSet::get_index(const vector<int> &lbl) {
+    if (index.count(lbl)) {
         return index[lbl];
-    }else{
+    } else {
         int ind = labels.size();
         labels.push_back(lbl);
         index[lbl] = ind;
@@ -39,60 +40,63 @@ int NodeSet::get_index(const vector<int> &lbl){
     }
 }
 
-vector<int> NodeSet::get_label(int ind) const{
-    throw_assert(ind < (int)labels.size());
+vector<int> NodeSet::get_label(int ind) const {
+    throw_assert(ind < static_cast<int>(labels.size()));
     return labels[ind];
 }
 
-int NodeSet::size() const{
+int NodeSet::size() const {
     return labels.size();
 }
 
-void NodeSet::clear(){
+void NodeSet::clear() {
     index.clear();
     labels.clear();
 }
 
-void NodeSet::sort(){
+void NodeSet::sort() {
     index.clear();
     ::sort(all(labels));
     int pos = 0;
-    for(const vector<int> &lbl: labels)
+    for (const vector<int> &lbl : labels) {
         index[lbl] = pos++;
+    }
 }
 
-vector<int> NodeSet::topological_order() const{
+vector<int> NodeSet::topological_order() const {
     vector<int> ord(index.size());
     int pos = 0;
-    for(const auto &kvpair: index)
+    for (const auto &kvpair : index) {
         ord[kvpair.second] = pos++;
+    }
     return ord;
 }
 
 
 /* Class Arc */
 
-bool Arc::operator<(const Arc &o) const{
+bool Arc::operator<(const Arc &o) const {
     return (u < o.u) ||
            (u == o.u && v < o.v) ||
            (u == o.u && v == o.v && label < o.label);
 }
 
-bool Arc::operator==(const Arc &o) const{
+bool Arc::operator==(const Arc &o) const {
     return u == o.u && v == o.v && label == o.label;
 }
 
 
 /* Additional Functions  */
 
-adj_list get_adj(int nv, const vector<Arc> &arcs, bool transpose){
+adj_list get_adj(int nv, const vector<Arc> &arcs, bool transpose) {
     adj_list adj(nv);
-    for(const Arc &a: arcs){
+    for (const Arc &a : arcs) {
         throw_assert(a.u < nv && a.v < nv);
-        if(!transpose)
+        if (!transpose) {
             adj[a.u].push_back(MP(a.v, a.label));
-        else
+        } else {
             adj[a.v].push_back(MP(a.u, a.label));
+        }
     }
     return adj;
 }

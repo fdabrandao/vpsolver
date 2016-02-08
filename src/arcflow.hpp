@@ -18,10 +18,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#ifndef _ARCFLOW_HPP_
-#define _ARCFLOW_HPP_
+#ifndef SRC_ARCFLOW_HPP_
+#define SRC_ARCFLOW_HPP_
 
-#include <map>
 #include <ctime>
 #include <set>
 #include <map>
@@ -31,8 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "instance.hpp"
 using namespace std;
 
-class Arcflow{
-private:
+class Arcflow {
+ private:
     bool ready;
     set<Arc> AS;
     NodeSet NS;
@@ -43,12 +42,15 @@ private:
     vector<int> max_label;
     vector<int> hash_bits;
     vector<int> max_rep;
-    vector<vector<int> > weights;
+    vector<vector<int>> weights;
     int label_size;
 
-    vector<int> count_max_rep(const vector<int> &space, int i0, int sub_i0) const;
-    void lift_state(const vector<int> &valid_opts, vector<int> &u, int it, int ic) const;
-    int min_slack(const vector<int> &b, int i0, int d, const vector<int> &caps) const;
+    vector<int> count_max_rep(const vector<int> &space, int i0,
+                              int sub_i0) const;
+    void lift_state(const vector<int> &valid_opts, vector<int> &u, int it,
+                    int ic) const;
+    int min_slack(const vector<int> &b, int i0, int d,
+                  const vector<int> &caps) const;
     bool is_valid(const vector<int> &u, const vector<int> &W) const;
     bool is_full(const vector<int> &u, const vector<int> &W) const;
     void relabel_graph(const vector<int> &labels);
@@ -60,7 +62,8 @@ private:
     void final_compression_step();
     void reduce_redundancy();
     void finalize();
-public:
+
+ public:
     clock_t tstart;
     Instance inst;
     int NV;
@@ -69,10 +72,10 @@ public:
     vector<int> Ts;
     vector<Arc> A;
     int LOSS;
-    Arcflow(const Instance &_inst);
-    Arcflow(const char *fname);
+    explicit Arcflow(const Instance &_inst);
+    explicit Arcflow(const char *fname);
     void write(const char *fname);
     void write(FILE *fout);
 };
 
-#endif
+#endif  // SRC_ARCFLOW_HPP_

@@ -18,17 +18,17 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#ifndef _INSTANCE_HPP_
-#define _INSTANCE_HPP_
+#ifndef SRC_INSTANCE_HPP_
+#define SRC_INSTANCE_HPP_
 
 #include <vector>
 #include <cstdio>
 using namespace std;
 
-enum ftype{VBP, MVP};
+enum ftype {VBP, MVP};
 
-class Item{
-public:
+class Item {
+ public:
     vector<int> w;
     vector<int> nonzero;
     int id;
@@ -38,10 +38,10 @@ public:
     int demand;
     int key;
 
-    Item(int _ndims): ndims(_ndims){
+    explicit Item(int _ndims): ndims(_ndims) {
         w = vector<int>(_ndims);
     }
-    void add_dim(int dw){
+    void add_dim(int dw) {
         ndims++;
         w.push_back(dw);
     }
@@ -50,17 +50,18 @@ public:
     int &operator[](int i);
 };
 
-class Instance{
-private:
+class Instance {
+ private:
     void init();
-public:
+
+ public:
     int ndims;
     int nbtypes;
     int nsizes;
     int m, n;
-    vector<vector<int> > Ws; // bin types
-    vector<int> Cs; // costs
-    vector<int> Qs; // quantities
+    vector<vector<int>> Ws;  // bin types
+    vector<int> Cs;  // costs
+    vector<int> Qs;  // quantities
     vector<Item> items;
     int method;
     bool sort;
@@ -73,12 +74,12 @@ public:
     vector<int> demands;
 
     Instance();
-    Instance(const char *fname);
-    Instance(FILE *fin, ftype type=MVP);
+    explicit Instance(const char *fname);
+    explicit Instance(FILE *fin, ftype type = MVP);
 
     void read(const char *fname);
-    void read(FILE *fin, ftype type=MVP);
+    void read(FILE *fin, ftype type = MVP);
     void write(FILE *fout) const;
 };
 
-#endif
+#endif  // SRC_INSTANCE_HPP_

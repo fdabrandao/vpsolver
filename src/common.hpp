@@ -18,8 +18,8 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#ifndef _COMMON_HPP_
-#define _COMMON_HPP_
+#ifndef SRC_COMMON_HPP_
+#define SRC_COMMON_HPP_
 
 #define EPS 1e-5
 #define MAX_LEN 256
@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_METHOD -2
 
 #define CURTIME clock()
-#define TIMEDIF(t0) (double(clock()-t0)/CLOCKS_PER_SEC)
+#define TIMEDIF(t0) (static_cast<double>(clock()-t0)/CLOCKS_PER_SEC)
 
 #include <utility>
 typedef std::pair<int, int> int_pair;
@@ -42,7 +42,7 @@ extern char _error_msg_[MAX_LEN];
 
 #define throw_error(error) \
 { \
-    sprintf(_error_msg_, \
+    snprintf(_error_msg_, MAX_LEN, \
             "Error: `%s` in \"%s\" line %d", \
             error, __FILE__, __LINE__); \
     throw _error_msg_; \
@@ -50,10 +50,10 @@ extern char _error_msg_[MAX_LEN];
 
 #define throw_assert(condition) \
 { if (!(condition)) { \
-    sprintf(_error_msg_, \
+    snprintf(_error_msg_, MAX_LEN, \
             "AssertionError: assertion `%s` failed in \"%s\" line %d", \
             #condition, __FILE__, __LINE__); \
     throw _error_msg_; \
 } }
 
-#endif
+#endif  // SRC_COMMON_HPP_

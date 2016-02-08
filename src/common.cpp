@@ -26,7 +26,7 @@ using namespace std;
 
 char _error_msg_[MAX_LEN];
 
-bool check_ext(const char* name, const char* extension){
+bool check_ext(const char* name, const char* extension) {
     const char* end = strrchr(name, '.');
     return strcmp(end, extension) == 0;
 }

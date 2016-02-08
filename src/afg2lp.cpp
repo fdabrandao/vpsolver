@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include <cstdarg>
 #include <map>
+#include <vector>
 #include "config.hpp"
 #include "common.hpp"
 #include "arcflow.hpp"
@@ -45,10 +46,10 @@ using namespace std;
     End
 */
 
-int swig_main(int argc, char *argv[]){
+int swig_main(int argc, char *argv[]) {
     printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
-    if(argc != 3){
+    if (argc != 3) {
         printf("Usage: afg2mps graph.afg model.lp\n");
         return 1;
     }
@@ -58,40 +59,44 @@ int swig_main(int argc, char *argv[]){
         Instance &inst = afg.inst;
 
         FILE *fout = fopen(argv[2], "w");
-        if(fout == NULL) perror("fopen");
+        if (fout == NULL) {
+            perror("fopen");
+        }
         throw_assert(fout != NULL);
 
         printf("Generating the .LP model...");
 
-        map<int, vector<int> > Ai;
-        map<int, vector<int> > in;
-        map<int, vector<int> > out;
+        map<int, vector<int>> Ai;
+        map<int, vector<int>> in;
+        map<int, vector<int>> out;
 
         /* objective */
 
         fprintf(fout, "Minimize");
         vector<int> ub(afg.NA);
-        for(int i = 0; i < afg.NA; i++){
+        for (int i = 0; i < afg.NA; i++) {
             const Arc &a = afg.A[i];
             Ai[a.label].push_back(i);
             in[a.v].push_back(i);
             out[a.u].push_back(i);
-            if(a.v == afg.S) {
-                for(int j = 0; j < (int)afg.Ts.size(); j++){
-                    if(afg.Ts[j] == a.u){
+            if (a.v == afg.S) {
+                for (int j = 0; j < static_cast<int>(afg.Ts.size()); j++) {
+                    if (afg.Ts[j] == a.u) {
                         ub[i] = (inst.Qs[j] >= 0) ? inst.Qs[j] : inst.n;
-                        if(inst.Cs[j] >= 0)
+                        if (inst.Cs[j] >= 0) {
                             fprintf(fout, " +%d X%x", inst.Cs[j], i);
-                        else
+                        } else {
                             fprintf(fout, " -%d X%x", abs(inst.Cs[j]), i);
+                        }
                         break;
                     }
                 }
-            }else{
-                if(a.label != afg.LOSS && !inst.relax_domains)
+            } else {
+                if (a.label != afg.LOSS && !inst.relax_domains) {
                     ub[i] = inst.items[a.label].demand;
-                else
+                } else {
                     ub[i] = inst.n;
+                }
             }
         }
         fprintf(fout, "\n");
@@ -102,28 +107,36 @@ int swig_main(int argc, char *argv[]){
 
         // demand constraints
 
-        for(int i = 0; i < inst.m; i++){
-            if(inst.items[i].demand == 0) continue;
-            fprintf(fout, "\tB%d:", i);
-            for(int j = 0; j < inst.nsizes; j++){
-                if(inst.items[j].type == i)
-                    for(const int &ai: Ai[j]) fprintf(fout, " + X%x", ai);
+        for (int i = 0; i < inst.m; i++) {
+            if (inst.items[i].demand == 0) {
+                continue;
             }
-            if(inst.ctypes[i] == '=' && !inst.relax_domains)
+            fprintf(fout, "\tB%d:", i);
+            for (int j = 0; j < inst.nsizes; j++) {
+                if (inst.items[j].type == i) {
+                    for (const int &ai : Ai[j]) {
+                        fprintf(fout, " + X%x", ai);
+                    }
+                }
+            }
+            if (inst.ctypes[i] == '=' && !inst.relax_domains) {
                 fprintf(fout, " = %d", inst.demands[i]);
-            else
+            } else {
                 fprintf(fout, " >= %d", inst.demands[i]);
+            }
             fprintf(fout, "\n");
         }
 
         // flow conservation constraints
 
-        for(int i = 0; i < afg.NV; i++){
+        for (int i = 0; i < afg.NV; i++) {
             fprintf(fout, "\tF%x:", i);
-            for(const int &ai: in[i])
+            for (const int &ai : in[i]) {
                 fprintf(fout, " + X%x", ai);
-            for(const int &ai: out[i])
+            }
+            for (const int &ai : out[i]) {
                 fprintf(fout, " - X%x", ai);
+            }
             fprintf(fout, " = 0\n");
         }
 
@@ -131,20 +144,22 @@ int swig_main(int argc, char *argv[]){
 
         fprintf(fout, "Bounds\n");
 
-        for(int i = 0; i < afg.NA; i++)
+        for (int i = 0; i < afg.NA; i++) {
             fprintf(fout, "0 <= X%x <= %d\n", i, ub[i]);
+        }
 
         /* integer variables */
 
-        if(inst.vtype == 'I'){
+        if (inst.vtype == 'I') {
             fprintf(fout, "General\n");
 
             fprintf(fout, "\t");
-            for(int i = 0; i < afg.NA; i++){
-                if(!i)
+            for (int i = 0; i < afg.NA; i++) {
+                if (!i) {
                     fprintf(fout, "X%x", i);
-                else
+                } else {
                     fprintf(fout, " X%x", i);
+                }
             }
         }
 
@@ -161,6 +176,6 @@ int swig_main(int argc, char *argv[]){
     }
 }
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
     return swig_main(argc, argv);
 }

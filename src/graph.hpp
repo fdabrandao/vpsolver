@@ -18,10 +18,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#ifndef _GRAPH_HPP_
-#define _GRAPH_HPP_
+#ifndef SRC_GRAPH_HPP_
+#define SRC_GRAPH_HPP_
 
-#include <map>
 #include <ctime>
 #include <set>
 #include <map>
@@ -29,13 +28,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.hpp"
 using namespace std;
 
-typedef vector<vector<int_pair> > adj_list;
+typedef vector<vector<int_pair>> adj_list;
 
-class NodeSet{
-private:
+class NodeSet {
+ private:
     map<vector<int>, int> index;
-    vector<vector<int> > labels;
-public:
+    vector<vector<int>> labels;
+ public:
     int get_index(const vector<int> &lbl);
     vector<int> get_label(int ind) const;
     int size() const;
@@ -44,17 +43,17 @@ public:
     vector<int> topological_order() const;
 };
 
-class Arc{
-public:
+class Arc {
+ public:
     int u;
     int v;
     int label;
-    Arc(const int &_u = -1, const int &_v = -1, int _label = -1):
-        u(_u), v(_v), label(_label){}
+    explicit Arc(const int &_u = -1, const int &_v = -1, int _label = -1):
+        u(_u), v(_v), label(_label) {}
     bool operator<(const Arc &o) const;
     bool operator==(const Arc &o) const;
 };
 
 adj_list get_adj(int nv, const vector<Arc> &arcs, bool transpose = false);
 
-#endif
+#endif  // SRC_GRAPH_HPP_

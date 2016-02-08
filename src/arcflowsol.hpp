@@ -18,23 +18,24 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#ifndef _ARCFLOWSOL_HPP_
-#define _ARCFLOWSOL_HPP_
+#ifndef SRC_ARCFLOWSOL_HPP_
+#define SRC_ARCFLOWSOL_HPP_
 
 #include <ctime>
 #include <set>
 #include <map>
 #include <vector>
+#include <utility>
 #include "graph.hpp"
 #include "common.hpp"
 #include "instance.hpp"
 using namespace std;
 
-typedef pair<int, vector<int> > pattern_int;
-typedef pair<int, vector<int_pair> > pattern_pair;
+typedef pair<int, vector<int>> pattern_int;
+typedef pair<int, vector<int_pair>> pattern_pair;
 
-class ArcflowSol{
-private:
+class ArcflowSol {
+ private:
     Instance inst;
     map<Arc, int> flow;
     int S;
@@ -42,18 +43,17 @@ private:
     int LOSS;
     bool binary;
 
-    vector<pattern_pair> remove_excess(
-        const vector<pattern_int> &sol, vector<int> &dem) const;
+    vector<pattern_pair> remove_excess(const vector<pattern_int> &sol,
+                                       vector<int> &dem) const;
 
-    bool is_valid(
-        const vector<pattern_pair> &sol, const Instance &inst,
-        vector<int> dem, int btype) const;
+    bool is_valid(const vector<pattern_pair> &sol, const Instance &inst,
+                  vector<int> dem, int btype) const;
 
-public:
-    ArcflowSol(
-        const Instance &_inst, const map<Arc, int> &_flow,
-        int _S, const vector<int> &_Ts, int _LOSS, bool _binary = false):
-        inst(_inst), flow(_flow), S(_S), Ts(_Ts), LOSS(_LOSS), binary(_binary){}
+ public:
+    ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow, int _S,
+               const vector<int> &_Ts, int _LOSS, bool _binary = false):
+        inst(_inst), flow(_flow), S(_S), Ts(_Ts), LOSS(_LOSS),
+        binary(_binary) {}
 
     vector<pattern_pair> extract_solution(vector<int> &dem, int T);
 
@@ -61,4 +61,4 @@ public:
         const Instance &inst, bool print_inst, bool pyout, bool validate);
 };
 
-#endif
+#endif  // SRC_ARCFLOWSOL_HPP_

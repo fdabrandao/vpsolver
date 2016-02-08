@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 #include <cstdio>
 #include <cmath>
-#include <queue>
+#include <map>
+#include <vector>
 #include <algorithm>
 #include "gurobi_c.h"
 #include "gurobi_c++.h"
@@ -32,11 +33,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 
-class GrbArcflow: public Arcflow{
-public:
-    GrbArcflow(const Instance &inst): Arcflow(inst){}
+class GrbArcflow: public Arcflow {
+ public:
+    GrbArcflow(const Instance &inst): Arcflow(inst) {}
 
-    void solve(bool print_inst = false, bool pyout = false){
+    void solve(bool print_inst = false, bool pyout = false) {
         char vtype = inst.vtype;
         GRBEnv* env = new GRBEnv();
         GRBModel model = GRBModel(*env);
@@ -45,72 +46,90 @@ public:
         model.getEnv().set(GRB_IntParam_OutputFlag, 1);
         model.getEnv().set(GRB_IntParam_Threads, 1);
         model.getEnv().set(GRB_IntParam_Presolve, 1);
-        //model.getEnv().set(GRB_IntParam_Method, 0);
+        // model.getEnv().set(GRB_IntParam_Method, 0);
         model.getEnv().set(GRB_IntParam_Method, 2);
         model.getEnv().set(GRB_IntParam_MIPFocus, 1);
-        //model.getEnv().set(GRB_IntParam_RINS, 1);
+        // model.getEnv().set(GRB_IntParam_RINS, 1);
         model.getEnv().set(GRB_DoubleParam_Heuristics, 1);
         model.getEnv().set(GRB_DoubleParam_MIPGap, 0);
         model.getEnv().set(GRB_DoubleParam_MIPGapAbs, 1-1e-5);
-        //model.getEnv().set(GRB_DoubleParam_ImproveStartTime, 60);
-        //model.getEnv().set(GRB_DoubleParam_ImproveStartGap, 1);
+        // model.getEnv().set(GRB_DoubleParam_ImproveStartTime, 60);
+        // model.getEnv().set(GRB_DoubleParam_ImproveStartGap, 1);
 
         sort(all(A));
-        //reverse(all(A));
+        // reverse(all(A));
         map<Arc, GRBVar> va;
         int lastv = Ts[0]-1;
-        for(int i = 0; i < inst.nbtypes; i++) lastv = min(lastv, Ts[i]-1);
-        for(int i = 0; i < 3; i++){
-            for(const Arc &a: A){
-                if(i == 1 && a.u != S) continue;
-                if(i == 2 && a.v <= lastv) continue;
-                if(i == 0 && (a.u == S || a.v > lastv)) continue;
+        for (int i = 0; i < inst.nbtypes; i++) {
+            lastv = min(lastv, Ts[i]-1);
+        }
+        for (int i = 0; i < 3; i++) {
+            for (const Arc &a : A) {
+                if (i == 1 && a.u != S) {
+                    continue;
+                }
+                if (i == 2 && a.v <= lastv) {
+                    continue;
+                }
+                if (i == 0 && (a.u == S || a.v > lastv)) {
+                    continue;
+                }
 
-                if(a.label == LOSS || inst.relax_domains)
+                if (a.label == LOSS || inst.relax_domains) {
                     va[a] = model.addVar(
-                        0.0, inst.n, 0, vtype
-                    );
-                else
+                        0.0, inst.n, 0, vtype);
+                } else {
                     va[a] = model.addVar(
-                        0.0, inst.items[a.label].demand, 0, vtype
-                    );
+                        0.0, inst.items[a.label].demand, 0, vtype);
+                }
             }
         }
         model.update();
 
-        for(int i = 0; i < inst.nbtypes; i++){
+        for (int i = 0; i < inst.nbtypes; i++) {
             GRBVar &feedback = va[Arc(Ts[i], S, LOSS)];
             feedback.set(GRB_DoubleAttr_Obj, inst.Cs[i]);
-            if(inst.Qs[i] >= 0)
+            if (inst.Qs[i] >= 0) {
                 feedback.set(GRB_DoubleAttr_UB, inst.Qs[i]);
+            }
         }
 
-        vector<vector<Arc> > Al(inst.nsizes);
-        vector<vector<Arc> > in(NV);
-        vector<vector<Arc> > out(NV);
+        vector<vector<Arc>> Al(inst.nsizes);
+        vector<vector<Arc>> in(NV);
+        vector<vector<Arc>> out(NV);
 
-        for(const Arc &a: A){
-            if(a.label != LOSS)
+        for (const Arc &a : A) {
+            if (a.label != LOSS) {
                 Al[a.label].push_back(a);
+            }
             out[a.u].push_back(a);
             in[a.v].push_back(a);
         }
 
-        for(int i = 0; i < inst.m; i++){
+        for (int i = 0; i < inst.m; i++) {
             GRBLinExpr lin = 0;
-            for(int it = 0; it < inst.nsizes; it++)
-                if(inst.items[it].type == i)
-                    for(const Arc &a: Al[it]) lin += va[a];
-            if(inst.ctypes[i] == '>' || inst.relax_domains)
+            for (int it = 0; it < inst.nsizes; it++) {
+                if (inst.items[it].type == i) {
+                    for (const Arc &a : Al[it]) {
+                        lin += va[a];
+                    }
+                }
+            }
+            if (inst.ctypes[i] == '>' || inst.relax_domains) {
                 model.addConstr(lin >= inst.demands[i]);
-            else
+            } else {
                 model.addConstr(lin == inst.demands[i]);
+            }
         }
 
-        for(int u = 0; u < NV; u++){
+        for (int u = 0; u < NV; u++) {
             GRBLinExpr lin = 0;
-            for(const Arc &a: in[u]) lin += va[a];
-            for(const Arc &a: out[u]) lin -= va[a];
+            for (const Arc &a : in[u]) {
+                lin += va[a];
+            }
+            for (const Arc &a : out[u]) {
+                lin -= va[a];
+            }
             model.addConstr(lin == 0);
         }
 
@@ -125,13 +144,13 @@ public:
         printf("Gurobi run time: %.2f seconds\n", tg);
         printf("Total run time: %.2f seconds\n", tg+pre);
 
-        if(inst.vtype == 'I'){
+        if (inst.vtype == 'I') {
             map<Arc, int> flow;
-            for(const auto &a: va){
+            for (const auto &a : va) {
                 double x = a.second.get(GRB_DoubleAttr_X);
-                int rx = (int)round(x);
+                int rx = static_cast<int>(round(x));
                 assert(x - rx <= EPS);
-                if(rx > 0){
+                if (rx > 0) {
                     int u = a.first.u;
                     int v = a.first.v;
                     int lbl = a.first.label;
@@ -147,10 +166,10 @@ public:
     }
 };
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
     printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
-    if(argc < 2 || argc > 7){
+    if (argc < 2 || argc > 7) {
         printf("Usage: vpsolver instance.vbp/instance.mvp "
                "[method:-2] [binary:0] [vtype:I] "
                "[print_instance:0] [pyout:0]\n");
@@ -158,23 +177,27 @@ int main(int argc, char *argv[]){
     }
     try {
         Instance inst(argv[1]);
-        if(argc >= 3) {
+        if (argc >= 3) {
             inst.method = atoi(argv[2]);
-            throw_assert(inst.method >= MIN_METHOD && inst.method <= MAX_METHOD);
+            throw_assert(inst.method >= MIN_METHOD &&
+                         inst.method <= MAX_METHOD);
         }
-        if(argc >= 4){
-            inst.binary = atoi(argv[3]);
+        if (argc >= 4) {
+            int value = atoi(argv[3]);
+            if (value >= 0) {
+                inst.binary = value;
+            }
         }
-        if(argc >= 5){
+        if (argc >= 5) {
             inst.vtype = argv[4][0];
             throw_assert(inst.vtype == 'I' || inst.vtype == 'C');
         }
         bool print_inst = false;
-        if(argc >= 6){
+        if (argc >= 6) {
             print_inst = atoi(argv[5]) != 0;
         }
         bool pyout = false;
-        if(argc >= 7){
+        if (argc >= 7) {
             pyout = atoi(argv[6]) != 0;
         }
         GrbArcflow graph(inst);

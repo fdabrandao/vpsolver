@@ -25,27 +25,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "instance.hpp"
 using namespace std;
 
-int swig_main(int argc, char *argv[]){
+int swig_main(int argc, char *argv[]) {
     printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
-    if(argc < 3 || argc > 6){
-        printf("Usage: vbp2afg instance.vbp/instance.mvp graph.afg [method:-2] [binary:0] [vtype:I]\n");
+    if (argc < 3 || argc > 6) {
+        printf("Usage: vbp2afg instance.vbp/instance.mvp graph.afg "
+               "[method:-2] [binary:0] [vtype:I]\n");
         return 1;
     }
     try {
         FILE *fout = fopen(argv[2], "w");
-        if(fout == NULL) perror("fopen");
+        if (fout == NULL) {
+            perror("fopen");
+        }
         throw_assert(fout != NULL);
 
         Instance inst(argv[1]);
-        if(argc >= 4) {
+        if (argc >= 4) {
             inst.method = atoi(argv[3]);
-            throw_assert(inst.method >= MIN_METHOD && inst.method <= MAX_METHOD);
+            throw_assert(inst.method >= MIN_METHOD &&
+                         inst.method <= MAX_METHOD);
         }
-        if(argc >= 5){
-            inst.binary = atoi(argv[4]);
+        if (argc >= 5) {
+            int value = atoi(argv[4]);
+            if (value >= 0) {
+                inst.binary = value;
+            }
         }
-        if(argc >= 6){
+        if (argc >= 6) {
             inst.vtype = argv[5][0];
             throw_assert(inst.vtype == 'I' || inst.vtype == 'C');
         }
@@ -71,6 +78,6 @@ int swig_main(int argc, char *argv[]){
     }
 }
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
     return swig_main(argc, argv);
 }
