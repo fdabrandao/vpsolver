@@ -38,7 +38,7 @@ inf = float("inf")
 class VBP(object):
     """Wrapper for .vbp files."""
 
-    def __init__(self, W, w, b, verbose=None):
+    def __init__(self, W, w, b, binary=False, verbose=None):
         self.vbp_file = VPSolver.new_tmp_file(".vbp")
         self.labels = {}
         with open(self.vbp_file, "w") as f:
@@ -54,11 +54,13 @@ class VBP(object):
                 row = list(w[i])+[b[i]]
                 assert len(row) == len(W)+1
                 print(" ".join(map(str, row)), file=f)
+            print("BINARY: {:d}".format(binary), file=f)
         if verbose:
             with open(self.vbp_file, "r") as f:
                 print(f.read())
         self.m = len(b)
         self.ndims = len(W)
+        self.binary = binary
         self.W, self.w, self.b = W, w, b
 
     @classmethod
@@ -75,7 +77,8 @@ class VBP(object):
                 lst = lst[ndims:]
                 b.append(lst.pop(0))
             assert lst == []
-        return cls(W, w, b, verbose)
+            binary = False
+        return cls(W, w, b, binary, verbose)
 
     def __del__(self):
         try:
@@ -87,7 +90,7 @@ class VBP(object):
 class MVP(object):
     """Wrapper for .mvp files."""
 
-    def __init__(self, Ws, Cs, Qs, ws, b, verbose=None):
+    def __init__(self, Ws, Cs, Qs, ws, b, binary=False, verbose=None):
         self.mvp_file = VPSolver.new_tmp_file(".mvp")
         self.labels = {}
         with open(self.mvp_file, "w") as f:
@@ -116,18 +119,21 @@ class MVP(object):
                     print(" ".join(map(str, w)), file=f)
                     self.labels[p] = (i, j)
                     p += 1
+            print("BINARY: {:d}".format(binary), file=f)
         if verbose:
             with open(self.mvp_file, "r") as f:
                 print(f.read())
         self.m = len(b)
         self.ndims = ndims
+        self.binary = binary
         self.Ws, self.Cs, self.Qs = Ws, Cs, Qs
         self.ws, self.b = ws, b
 
     @classmethod
     def from_file(cls, mvp_file, verbose=None):
         with open(mvp_file, "r") as f:
-            lst = list(map(int, f.read().split()))
+            txt = f.read()
+            lst = list(map(int, txt.split()))
             ndims = lst.pop(0)
             nbtypes = lst.pop(0)
             Ws, Cs, Qs = [], [], []
@@ -147,7 +153,8 @@ class MVP(object):
                     ws[i].append(lst[:ndims])
                     lst = lst[ndims:]
             assert lst == []
-        return cls(Ws, Cs, Qs, ws, b, verbose)
+            binary = False
+        return cls(Ws, Cs, Qs, ws, b, binary, verbose)
 
     def __del__(self):
         try:
@@ -160,7 +167,7 @@ class AFG(object):
     """Wrapper for .afg files."""
 
     def __init__(
-            self, instance, compress=-2, binary=False, vtype="I",
+            self, instance, compress=-2, binary=None, vtype="I",
             verbose=None):
         assert isinstance(instance, (VBP, MVP))
         self.instance = instance
@@ -168,8 +175,10 @@ class AFG(object):
         self.afg_file = VPSolver.new_tmp_file(".afg")
         if isinstance(instance, VBP):
             instance_file = instance.vbp_file
+            binary = instance.binary
         elif isinstance(instance, MVP):
             instance_file = instance.mvp_file
+            binary = instance.binary
         self.output = VPSolver.vbp2afg(
             instance_file, self.afg_file, compress, binary, vtype,
             verbose=verbose
@@ -225,11 +234,11 @@ class LP(object):
 class VPSolver(object):
     """Tools for calling VPSolver binaries and scripts."""
 
-    VPSOLVER_PATH = "vpsolver"
-    VBP2AFG_PATH = "vbp2afg"
-    AFG2MPS_PATH = "afg2mps"
-    AFG2LP_PATH = "afg2lp"
-    VBPSOL_PATH = "vbpsol"
+    VPSOLVER_EXEC = "vpsolver"
+    VBP2AFG_EXEC = "vbp2afg"
+    AFG2MPS_EXEC = "afg2mps"
+    AFG2LP_EXEC = "afg2lp"
+    VBPSOL_EXEC = "vbpsol"
 
     TMP_DIR = tempfile.mkdtemp()
     TMP_CNT = 0
@@ -335,7 +344,7 @@ class VPSolver(object):
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
             "{} {} {} {}".format(
-                VPSolver.VBPSOL_PATH, afg_file, sol_file, opts
+                VPSolver.VBPSOL_EXEC, afg_file, sol_file, opts
             ),
             tee=out_file,
             verbose=verbose
@@ -347,19 +356,27 @@ class VPSolver(object):
 
     @staticmethod
     def vpsolver(
-            instance_file, compress=-2, binary=False, vtype="I",
+            instance_file, compress=-2, binary=None, vtype="I",
             print_inst=False, pyout=True, verbose=None):
         """Calls 'vpsolver' to solve .vbp instances."""
         if isinstance(instance_file, VBP):
+            if binary is None:
+                binary = int(instance_file.binary)
             instance_file = instance_file.vbp_file
         elif isinstance(instance_file, MVP):
+            if binary is None:
+                binary = int(instance_file.binary)
             instance_file = instance_file.mvp_file
+        else:
+            instance_file = instance_file
+            if binary is None:
+                binary = -1
         out_file = VPSolver.new_tmp_file()
         opts = "{:d} {:d} {} {:d} {:d}".format(
             compress, binary, vtype, print_inst, pyout
         )
         VPSolver.run(
-            "{} {} {}".format(VPSolver.VPSOLVER_PATH, instance_file, opts),
+            "{} {} {}".format(VPSolver.VPSOLVER_EXEC, instance_file, opts),
             tee=out_file,
             verbose=verbose
         )
@@ -370,18 +387,25 @@ class VPSolver(object):
 
     @staticmethod
     def vbp2afg(
-            instance_file, afg_file, compress=-2, binary=False, vtype="I",
+            instance_file, afg_file, compress=-2, binary=None, vtype="I",
             verbose=None):
         """Calls 'vbp2afg' to create arc-flow graphs for .vbp instances."""
         if isinstance(instance_file, VBP):
+            if binary is None:
+                binary = int(instance_file.binary)
             instance_file = instance_file.vbp_file
         elif isinstance(instance_file, MVP):
+            if binary is None:
+                binary = int(instance_file.binary)
             instance_file = instance_file.mvp_file
+        else:
+            if binary is None:
+                binary = -1
         out_file = VPSolver.new_tmp_file()
         opts = "{:d} {:d} {}".format(compress, binary, vtype)
         VPSolver.run(
             "{} {} {} {}".format(
-                VPSolver.VBP2AFG_PATH, instance_file, afg_file, opts
+                VPSolver.VBP2AFG_EXEC, instance_file, afg_file, opts
             ),
             tee=out_file,
             verbose=verbose
@@ -399,7 +423,7 @@ class VPSolver(object):
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
             "{} {} {} {}".format(
-                VPSolver.AFG2MPS_PATH, afg_file, mps_file, opts
+                VPSolver.AFG2MPS_EXEC, afg_file, mps_file, opts
             ),
             tee=out_file,
             verbose=verbose
@@ -417,7 +441,7 @@ class VPSolver(object):
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
             "{} {} {} {}".format(
-                VPSolver.AFG2LP_PATH, afg_file, lp_file, opts
+                VPSolver.AFG2LP_EXEC, afg_file, lp_file, opts
             ),
             tee=out_file,
             verbose=verbose
