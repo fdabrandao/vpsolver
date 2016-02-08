@@ -161,7 +161,7 @@ void ArcflowSol::print_solution(
     for(int t = 0; t < inst.nbtypes; t++){
         sols[t] = extract_solution(dem, Ts[t]);
         if(validate && !is_valid(sols[t], inst, dem, t))
-            exit_error("Invalid solution! (capacity)");
+            throw_error("Invalid solution! (capacity)");
 
         for(const pattern_pair &pat: sols[t]){
             obj += pat.first * inst.Cs[t];
@@ -171,12 +171,12 @@ void ArcflowSol::print_solution(
 
     if(validate){
         for(int i = 0; i < inst.m; i++){
-            if(dem[i] > 0) exit_error("Invalid solution! (demand)");
+            if(dem[i] > 0) throw_error("Invalid solution! (demand)");
         }
 
         int fs = 0;
         for(const auto &kvpair: flow) fs += kvpair.second;
-        if(fs != 0) exit_error("Invalid solution! (flow)");
+        if(fs != 0) throw_error("Invalid solution! (flow)");
     }
 
 

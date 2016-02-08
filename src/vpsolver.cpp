@@ -183,12 +183,12 @@ int main(int argc, char *argv[]){
     } catch(GRBException e) {
         printf("Error code = %d\n", e.getErrorCode());
         printf("GurobiError: %s\n", e.getMessage().c_str());
-        return -1;
+        return 1;
     } catch(const char *e) {
         printf("%s\n", e);
-        return -1;
+        return 1;
     } catch (...) {
         printf("UnknownError\n");
-        return -1;
+        return 1;
     }
 }

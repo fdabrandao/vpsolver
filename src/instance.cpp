@@ -77,13 +77,14 @@ Instance::Instance(const char *fname){
 
 void Instance::read(const char *fname){
     FILE *fin = fopen(fname, "r");
+    if(fin == NULL) perror("fopen");
     throw_assert(fin != NULL);
     if(check_ext(fname, ".vbp")){
         read(fin, VBP);
     } else if(check_ext(fname, ".mvp")){
         read(fin, MVP);
     } else {
-        exit_error("Invalid file extension!");
+        throw_error("Invalid file extension!");
     }
     fclose(fin);
 }

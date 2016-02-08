@@ -195,10 +195,10 @@ int swig_main(int argc, char *argv[]){
         return 0;
     } catch(const char *e) {
         printf("%s\n", e);
-        return -1;
+        return 1;
     } catch (...) {
         printf("UnknownError\n");
-        return -1;
+        return 1;
     }
 }
 

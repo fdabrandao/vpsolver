@@ -117,7 +117,7 @@ void Arcflow::init(const char *fname){
     } else if(check_ext(fname, ".afg")){
         read(fname);
     } else {
-        exit_error("Invalid file extension!");
+        throw_error("Invalid file extension!");
     }
     throw_assert(ready == true);
 }
@@ -540,6 +540,7 @@ void Arcflow::read(FILE *fin){
 void Arcflow::write(const char *fname){
     throw_assert(ready == true);
     FILE *fout = fopen(fname, "w");
+    if(fout == NULL) perror("fopen");
     throw_assert(fout != NULL);
     write(fout);
     fclose(fout);
@@ -549,6 +550,7 @@ void Arcflow::read(const char *fname){
     throw_assert(ready == false);
     throw_assert(check_ext(fname, ".afg"));
     FILE *fin = fopen(fname, "r");
+    if(fin == NULL) perror("fopen");
     throw_assert(fin != NULL);
     read(fin);
     fclose(fin);

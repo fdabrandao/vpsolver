@@ -24,14 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.hpp"
 using namespace std;
 
-char _assert_msg_[MAX_LEN];
+char _error_msg_[MAX_LEN];
 
 bool check_ext(const char* name, const char* extension){
     const char* end = strrchr(name, '.');
     return strcmp(end, extension) == 0;
-}
-
-void exit_error(const char *msg){
-    printf("Error: %s\n", msg);
-    exit(-1);
 }
