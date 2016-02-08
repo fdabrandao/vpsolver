@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <set>
 #include <climits>
 #include <cstring>
-#include <cassert>
 #include <algorithm>
 #include "graph.hpp"
 #include "common.hpp"
@@ -41,7 +40,7 @@ int NodeSet::get_index(const vector<int> &lbl){
 }
 
 vector<int> NodeSet::get_label(int ind) const{
-    assert(ind < (int)labels.size());
+    throw_assert(ind < (int)labels.size());
     return labels[ind];
 }
 
@@ -89,7 +88,7 @@ bool Arc::operator==(const Arc &o) const{
 adj_list get_adj(int nv, const vector<Arc> &arcs, bool transpose){
     adj_list adj(nv);
     for(const Arc &a: arcs){
-        assert(a.u < nv && a.v < nv);
+        throw_assert(a.u < nv && a.v < nv);
         if(!transpose)
             adj[a.u].push_back(MP(a.v, a.label));
         else

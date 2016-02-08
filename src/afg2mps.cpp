@@ -19,7 +19,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 #include <cstdio>
-#include <cassert>
 #include <cstring>
 #include <cstdarg>
 #include <map>
@@ -55,7 +54,7 @@ private:
     }
 
     void add_field(const char *str){
-        assert(cur_field < NFIELDS);
+        throw_assert(cur_field < NFIELDS);
         p = field_start[cur_field];
         for(int i = 0; str[i]; i++){
             buf[p++] = str[i];
@@ -76,7 +75,7 @@ public:
             add_field(va_arg(v, const char *));
         va_end(v);
 
-        assert(p < BUF_LEN);
+        throw_assert(p < BUF_LEN);
         buf[p] = 0;
         fprintf(fout, "%s\n", buf);
         clear();
@@ -90,110 +89,117 @@ int swig_main(int argc, char *argv[]){
         printf("Usage: afg2mps graph.afg model.mps\n");
         return 1;
     }
+    try {
+        throw_assert(check_ext(argv[1], ".afg"));
+        Arcflow afg(argv[1]);
+        Instance &inst = afg.inst;
 
-    assert(check_ext(argv[1], ".afg"));
-    Arcflow afg(argv[1]);
-    Instance &inst = afg.inst;
+        FILE *fout = fopen(argv[2], "w");
+        if(fout == NULL) perror("fopen");
+        throw_assert(fout != NULL);
 
-    FILE *fout = fopen(argv[2], "w");
-    if(fout == NULL) perror("fopen");
-    assert(fout != NULL);
+        printf("Generating the .MPS model...");
 
-    printf("Generating the .MPS model...");
+        MPS mps(fout);
+        mps.write(4, "NAME", "", "", "ARCFLOW");
+        mps.write(1, "ROWS");
+        mps.write(3, "", "N", "OBJ");
 
-    MPS mps(fout);
-    mps.write(4, "NAME", "", "", "ARCFLOW");
-    mps.write(1, "ROWS");
-    mps.write(3, "", "N", "OBJ");
+        char buf[BUF_LEN];
+        char buf1[BUF_LEN];
+        char buf2[BUF_LEN];
 
-    char buf[BUF_LEN];
-    char buf1[BUF_LEN];
-    char buf2[BUF_LEN];
+        /* demand constraints */
 
-    /* demand constraints */
-
-    for(int i = 0; i < inst.m; i++){
-        char ctype = inst.ctypes[i];
-        assert(ctype == '>' || ctype == '=');
-        sprintf(buf, "B%d", i);
-        if(ctype == '=' && !inst.relax_domains)
-            mps.write(3, "", "E", buf);
-        else
-            mps.write(3, "", "G", buf);
-    }
-
-    /* flow conservation constraints */
-
-    for(int i = 0; i < afg.NV; i++){
-        sprintf(buf, "F%x", i);
-        mps.write(3, "", "E", buf);
-    }
-
-    /* A-matrix */
-
-    mps.write(1, "COLUMNS");
-
-    if(inst.vtype == 'I')
-        mps.write(6, "", "", "MARKER", "'MARKER'", "", "'INTORG'");
-
-    vector<int> labels;
-    vector<int> ub(afg.NA);
-    for(int i = 0; i < afg.NA; i++){
-        const Arc &a = afg.A[i];
-        labels.push_back(a.label);
-        sprintf(buf, "X%x", i);
-        sprintf(buf1, "F%x", a.u);
-        sprintf(buf2, "F%x", a.v);
-        mps.write(7, "", "", buf, buf1, "-1", buf2, "1");
-        if(a.label != afg.LOSS){
-            sprintf(buf1, "B%d", inst.items[a.label].type);
-            mps.write(5, "", "", buf, buf1, "1");
-        }
-        if(a.v == afg.S) {
-            for(int j = 0; j < (int)afg.Ts.size(); j++){
-                if(afg.Ts[j] == a.u){
-                    ub[i] = (inst.Qs[j] >= 0) ? inst.Qs[j] : inst.n;
-                    sprintf(buf1, "%d", inst.Cs[j]);
-                    mps.write(5, "", "", buf, "OBJ", buf1);
-                    break;
-                }
-            }
-        }else{
-            if(a.label != afg.LOSS && !inst.relax_domains)
-                ub[i] = inst.items[a.label].demand;
+        for(int i = 0; i < inst.m; i++){
+            char ctype = inst.ctypes[i];
+            throw_assert(ctype == '>' || ctype == '=');
+            sprintf(buf, "B%d", i);
+            if(ctype == '=' && !inst.relax_domains)
+                mps.write(3, "", "E", buf);
             else
-                ub[i] = inst.n;
+                mps.write(3, "", "G", buf);
         }
+
+        /* flow conservation constraints */
+
+        for(int i = 0; i < afg.NV; i++){
+            sprintf(buf, "F%x", i);
+            mps.write(3, "", "E", buf);
+        }
+
+        /* A-matrix */
+
+        mps.write(1, "COLUMNS");
+
+        if(inst.vtype == 'I')
+            mps.write(6, "", "", "MARKER", "'MARKER'", "", "'INTORG'");
+
+        vector<int> labels;
+        vector<int> ub(afg.NA);
+        for(int i = 0; i < afg.NA; i++){
+            const Arc &a = afg.A[i];
+            labels.push_back(a.label);
+            sprintf(buf, "X%x", i);
+            sprintf(buf1, "F%x", a.u);
+            sprintf(buf2, "F%x", a.v);
+            mps.write(7, "", "", buf, buf1, "-1", buf2, "1");
+            if(a.label != afg.LOSS){
+                sprintf(buf1, "B%d", inst.items[a.label].type);
+                mps.write(5, "", "", buf, buf1, "1");
+            }
+            if(a.v == afg.S) {
+                for(int j = 0; j < (int)afg.Ts.size(); j++){
+                    if(afg.Ts[j] == a.u){
+                        ub[i] = (inst.Qs[j] >= 0) ? inst.Qs[j] : inst.n;
+                        sprintf(buf1, "%d", inst.Cs[j]);
+                        mps.write(5, "", "", buf, "OBJ", buf1);
+                        break;
+                    }
+                }
+            }else{
+                if(a.label != afg.LOSS && !inst.relax_domains)
+                    ub[i] = inst.items[a.label].demand;
+                else
+                    ub[i] = inst.n;
+            }
+        }
+
+        if(inst.vtype == 'I')
+            mps.write(6, "", "", "MARKER", "'MARKER'", "", "'INTEND'");
+
+        /* right-hand-side vector */
+
+        mps.write(1, "RHS");
+
+        for(int i = 0; i < inst.m; i++){
+            sprintf(buf, "B%d", i);
+            sprintf(buf1, "%d", inst.demands[i]);
+            mps.write(5, "", "", "RHS1", buf, buf1);
+        }
+
+        /* bounds */
+
+        mps.write(1, "BOUNDS");
+
+        for(int i = 0; i < afg.NA; i++){
+            sprintf(buf, "X%x", i);
+            mps.write(5, "", "LO", "BND1", buf, "0");
+            sprintf(buf1, "%d", ub[i]);
+            mps.write(5, "", "UP", "BND1", buf, buf1);
+        }
+
+        mps.write(1, "ENDATA");
+        fclose(fout);
+        printf("DONE!\n");
+        return 0;
+    } catch(const char *e) {
+        printf("%s\n", e);
+        return -1;
+    } catch (...) {
+        printf("UnknownError\n");
+        return -1;
     }
-
-    if(inst.vtype == 'I')
-        mps.write(6, "", "", "MARKER", "'MARKER'", "", "'INTEND'");
-
-    /* right-hand-side vector */
-
-    mps.write(1, "RHS");
-
-    for(int i = 0; i < inst.m; i++){
-        sprintf(buf, "B%d", i);
-        sprintf(buf1, "%d", inst.demands[i]);
-        mps.write(5, "", "", "RHS1", buf, buf1);
-    }
-
-    /* bounds */
-
-    mps.write(1, "BOUNDS");
-
-    for(int i = 0; i < afg.NA; i++){
-        sprintf(buf, "X%x", i);
-        mps.write(5, "", "LO", "BND1", buf, "0");
-        sprintf(buf1, "%d", ub[i]);
-        mps.write(5, "", "UP", "BND1", buf, buf1);
-    }
-
-    mps.write(1, "ENDATA");
-    fclose(fout);
-    printf("DONE!\n");
-    return 0;
 }
 
 int main(int argc, char *argv[]){

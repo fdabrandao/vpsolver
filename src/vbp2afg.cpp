@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 #include <cstdio>
 #include <cstdlib>
-#include <cassert>
 #include "config.hpp"
 #include "arcflow.hpp"
 #include "instance.hpp"
@@ -33,36 +32,43 @@ int swig_main(int argc, char *argv[]){
         printf("Usage: vbp2afg instance.vbp/instance.mvp graph.afg [method:-2] [binary:0] [vtype:I]\n");
         return 1;
     }
+    try {
+        FILE *fout = fopen(argv[2], "w");
+        if(fout == NULL) perror("fopen");
+        throw_assert(fout != NULL);
 
-    FILE *fout = fopen(argv[2], "w");
-    if(fout == NULL) perror("fopen");
-    assert(fout != NULL);
+        Instance inst(argv[1]);
+        if(argc >= 4) {
+            inst.method = atoi(argv[3]);
+            throw_assert(inst.method >= MIN_METHOD && inst.method <= MAX_METHOD);
+        }
+        if(argc >= 5){
+            inst.binary = atoi(argv[4]);
+        }
+        if(argc >= 6){
+            inst.vtype = argv[5][0];
+            throw_assert(inst.vtype == 'I' || inst.vtype == 'C');
+        }
 
-    Instance inst(argv[1]);
-    if(argc >= 4) {
-        inst.method = atoi(argv[3]);
-        assert(inst.method >= MIN_METHOD && inst.method <= MAX_METHOD);
+        Arcflow graph(inst);
+
+        fprintf(fout, "#INSTANCE_BEGIN#\n");
+        inst.write(fout);
+        fprintf(fout, "#INSTANCE_END#\n");
+
+        fprintf(fout, "#GRAPH_BEGIN#\n");
+        graph.write(fout);
+        fprintf(fout, "#GRAPH_END#\n");
+
+        fclose(fout);
+        return 0;
+    } catch(const char *e) {
+        printf("%s\n", e);
+        return -1;
+    } catch (...) {
+        printf("UnknownError\n");
+        return -1;
     }
-    if(argc >= 5){
-        inst.binary = atoi(argv[4]);
-    }
-    if(argc >= 6){
-        inst.vtype = argv[5][0];
-        assert(inst.vtype == 'I' || inst.vtype == 'C');
-    }
-
-    Arcflow graph(inst);
-
-    fprintf(fout, "#INSTANCE_BEGIN#\n");
-    inst.write(fout);
-    fprintf(fout, "#INSTANCE_END#\n");
-
-    fprintf(fout, "#GRAPH_BEGIN#\n");
-    graph.write(fout);
-    fprintf(fout, "#GRAPH_END#\n");
-
-    fclose(fout);
-    return 0;
 }
 
 int main(int argc, char *argv[]){

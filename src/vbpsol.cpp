@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 #include <cstdio>
 #include <cstdlib>
-#include <cassert>
 #include <cstring>
 #include <cmath>
 #include <map>
@@ -38,41 +37,48 @@ int swig_main(int argc, char *argv[]){
         printf("Usage: vbpsol graph.afg vars.sol [print_instance:0] [pyout:0]\n");
         return 1;
     }
+    try {
+        throw_assert(check_ext(argv[1], ".afg"));
+        Arcflow afg(argv[1]);
+        Instance &inst = afg.inst;
 
-    assert(check_ext(argv[1], ".afg"));
-    Arcflow afg(argv[1]);
-    Instance &inst = afg.inst;
+        FILE *fsol = fopen(argv[2], "r");
+        if(fsol == NULL) perror("fopen");
+        throw_assert(fsol != NULL);
 
-    FILE *fsol = fopen(argv[2], "r");
-    if(fsol == NULL) perror("fopen");
-    assert(fsol != NULL);
+        bool print_inst = false;
+        if(argc >= 4){
+            print_inst = atoi(argv[3]) != 0;
+        }
+        bool pyout = false;
+        if(argc >= 5){
+            pyout = atoi(argv[4]) != 0;
+        }
 
-    bool print_inst = false;
-    if(argc >= 4){
-        print_inst = atoi(argv[3]) != 0;
+        int ind;
+        double x;
+        char buf[MAX_LEN];
+        map<Arc, int> flow;
+        while(fscanf(fsol, "%s %lf", buf, &x) != EOF){
+            if(strlen(buf) <= 1) continue;
+            sscanf(&buf[1], "%x", &ind);
+            throw_assert(ind < afg.NA);
+            int rx = (int)round(x);
+            throw_assert(x - rx <= EPS);
+            if(rx > 0) flow[afg.A[ind]] = rx;
+        }
+        fclose(fsol);
+
+        ArcflowSol sol(inst, flow, afg.S, afg.Ts, afg.LOSS, inst.binary);
+        sol.print_solution(inst, print_inst, pyout, true);
+        return 0;
+    } catch(const char *e) {
+        printf("%s\n", e);
+        return -1;
+    } catch (...) {
+        printf("UnknownError\n");
+        return -1;
     }
-    bool pyout = false;
-    if(argc >= 5){
-        pyout = atoi(argv[4]) != 0;
-    }
-
-    int ind;
-    double x;
-    char buf[MAX_LEN];
-    map<Arc, int> flow;
-    while(fscanf(fsol, "%s %lf", buf, &x) != EOF){
-        if(strlen(buf) <= 1) continue;
-        sscanf(&buf[1], "%x", &ind);
-        assert(ind < afg.NA);
-        int rx = (int)round(x);
-        assert(x - rx <= EPS);
-        if(rx > 0) flow[afg.A[ind]] = rx;
-    }
-    fclose(fsol);
-
-    ArcflowSol sol(inst, flow, afg.S, afg.Ts, afg.LOSS, inst.binary);
-    sol.print_solution(inst, print_inst, pyout, true);
-    return 0;
 }
 
 int main(int argc, char *argv[]){

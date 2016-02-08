@@ -18,7 +18,6 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#include <cassert>
 #include <cstring>
 #include <cmath>
 #include <algorithm>
@@ -31,7 +30,7 @@ using namespace std;
 /* Class Item */
 
 bool Item::operator<(const Item &o) const{
-    assert(ndims == o.ndims);
+    throw_assert(ndims == o.ndims);
     if(abs(key-o.key) >= 1e-5) return key < o.key;
     for(int i = 0; i < ndims; i++){
         if(w[i] != o.w[i]) return w[i] < o.w[i];
@@ -40,12 +39,12 @@ bool Item::operator<(const Item &o) const{
 }
 
 int Item::operator[](int i) const{
-    assert(i < ndims);
+    throw_assert(i < ndims);
     return w[i];
 }
 
 int &Item::operator[](int i){
-    assert(i < ndims);
+    throw_assert(i < ndims);
     return w[i];
 }
 
@@ -78,7 +77,7 @@ Instance::Instance(const char *fname){
 
 void Instance::read(const char *fname){
     FILE *fin = fopen(fname, "r");
-    assert(fin != NULL);
+    throw_assert(fin != NULL);
     if(check_ext(fname, ".vbp")){
         read(fin, VBP);
     } else if(check_ext(fname, ".mvp")){
@@ -90,13 +89,13 @@ void Instance::read(const char *fname){
 }
 
 void Instance::read(FILE *fin, ftype type){
-    assert(fscanf(fin, " #INSTANCE_BEGIN# ")==0);
-    assert(fscanf(fin, " NDIMS: ") >= 0);
-    assert(fscanf(fin, "%d", &ndims) == 1);
+    throw_assert(fscanf(fin, " #INSTANCE_BEGIN# ") == 0);
+    throw_assert(fscanf(fin, " NDIMS: ") == 0);
+    throw_assert(fscanf(fin, "%d", &ndims) == 1);
 
     if(type == MVP){
-        assert(fscanf(fin, " NBTYPES: ") >= 0);
-        assert(fscanf(fin, "%d", &nbtypes) == 1);
+        throw_assert(fscanf(fin, " NBTYPES: ") == 0);
+        throw_assert(fscanf(fin, "%d", &nbtypes) == 1);
     }else{
         nbtypes = 1;
     }
@@ -106,22 +105,22 @@ void Instance::read(FILE *fin, ftype type){
     Qs.resize(nbtypes);
     for(int t = 0; t < nbtypes; t++){
         Ws[t].resize(ndims);
-        assert(fscanf(fin, " Wi: ") >= 0);
+        throw_assert(fscanf(fin, " Wi: ") == 0);
         for(int d = 0; d < ndims; d++)
-            assert(fscanf(fin, "%d", &Ws[t][d])==1);
+            throw_assert(fscanf(fin, "%d", &Ws[t][d]) == 1);
         if(type == MVP){
-            assert(fscanf(fin, " Ci: ") >= 0);
-            assert(fscanf(fin, "%d", &Cs[t])==1);
-            assert(fscanf(fin, " Qi: ") >= 0);
-            assert(fscanf(fin, "%d", &Qs[t])==1);
+            throw_assert(fscanf(fin, " Ci: ") == 0);
+            throw_assert(fscanf(fin, "%d", &Cs[t]) == 1);
+            throw_assert(fscanf(fin, " Qi: ") == 0);
+            throw_assert(fscanf(fin, "%d", &Qs[t]) == 1);
         } else {
             Cs[t] = 1;
             Qs[t] = -1;
         }
     }
 
-    assert(fscanf(fin, " M: ") >= 0);
-    assert(fscanf(fin, "%d", &m) == 1);
+    throw_assert(fscanf(fin, " M: ") == 0);
+    throw_assert(fscanf(fin, "%d", &m) == 1);
 
     items.clear();
     nopts.clear();
@@ -132,10 +131,10 @@ void Instance::read(FILE *fin, ftype type){
 
         int qi, bi;
         if(type == MVP){
-            assert(fscanf(fin, " nopti: ") >= 0);
-            assert(fscanf(fin, "%d", &qi) == 1);
-            assert(fscanf(fin, " bi: ") >= 0);
-            assert(fscanf(fin, "%d", &bi) == 1);
+            throw_assert(fscanf(fin, " oi: ") == 0);
+            throw_assert(fscanf(fin, "%d", &qi) == 1);
+            throw_assert(fscanf(fin, " bi: ") == 0);
+            throw_assert(fscanf(fin, "%d", &bi) == 1);
             demands.push_back(bi);
         } else {
             qi = 1;
@@ -153,17 +152,17 @@ void Instance::read(FILE *fin, ftype type){
                 item.opt = -1;
             }
 
-            assert(fscanf(fin, " wi: ") >= 0);
+            throw_assert(fscanf(fin, " wi: ") == 0);
             for(int d = 0; d < ndims; d++){
-                assert(fscanf(fin, "%d", &item[d])==1);
+                throw_assert(fscanf(fin, "%d", &item[d]) == 1);
                 if(item[d] != 0)
                     item.nonzero.push_back(d);
             }
-            assert(!item.nonzero.empty());
+            throw_assert(!item.nonzero.empty());
 
             if(type == VBP){
-                assert(fscanf(fin, " bi: ") >= 0);
-                assert(fscanf(fin, "%d", &bi)==1);
+                throw_assert(fscanf(fin, " bi: ") == 0);
+                throw_assert(fscanf(fin, "%d", &bi) == 1);
                 demands.push_back(bi);
             }
             item.demand = bi;
@@ -191,7 +190,7 @@ void Instance::read(FILE *fin, ftype type){
                     }
                     if(fits) break;
                 }
-                assert(fits == true);
+                throw_assert(fits == true);
             }
             item.key = S;
             item.type = it_type;
@@ -203,42 +202,42 @@ void Instance::read(FILE *fin, ftype type){
     while(fscanf(fin, "%s", buf) != EOF){
         if(!strcmp(buf, "#INSTANCE_END#")) break;
         else if(!strcmp(buf, "VTYPE:")){
-            assert(fscanf(fin, "%s", buf)==1);
+            throw_assert(fscanf(fin, "%s", buf) == 1);
             vtype = buf[0];
-            assert(vtype == 'C' || vtype == 'I');
+            throw_assert(vtype == 'C' || vtype == 'I');
         }else if(!strcmp(buf, "CTYPE:")){
             ctypes.clear();
             for(int i = 0; i < m; i++){
-                assert(fscanf(fin, "%s", buf)==1);
+                throw_assert(fscanf(fin, "%s", buf) == 1);
                 if(!strcmp(buf, ">")){
                     ctypes.push_back('>');
                 }else if(!strcmp(buf, "=")){
                     ctypes.push_back('=');
                 }else{
-                    assert(!strcmp(buf, "*"));
+                    throw_assert(!strcmp(buf, "*"));
                     ctypes.push_back('*');
                 }
             }
         }else if(!strcmp(buf, "IDS:")){
             for(int i = 0; i < (int)items.size(); i++)
-                assert(fscanf(fin, "%d", &items[i].id)==1);
+                throw_assert(fscanf(fin, "%d", &items[i].id) == 1);
         }else if(!strcmp(buf, "SORT:")){
             int tsort = 1;
-            assert(fscanf(fin, "%d", &tsort)==1);
-            assert(tsort == 0 || tsort == 1);
+            throw_assert(fscanf(fin, "%d", &tsort) == 1);
+            throw_assert(tsort == 0 || tsort == 1);
             sort = tsort;
         }else if(!strcmp(buf, "METHOD:")){
-            assert(fscanf(fin, "%d", &method)==1);
-            assert(method >= MIN_METHOD && method <= MAX_METHOD);
+            throw_assert(fscanf(fin, "%d", &method) == 1);
+            throw_assert(method >= MIN_METHOD && method <= MAX_METHOD);
         }else if(!strcmp(buf, "RELAX:")){
             int trelax = 0;
-            assert(fscanf(fin, "%d", &trelax)==1);
-            assert(trelax == 0 || trelax == 1);
+            throw_assert(fscanf(fin, "%d", &trelax) == 1);
+            throw_assert(trelax == 0 || trelax == 1);
             relax_domains = trelax;
         }else if(!strcmp(buf, "BINARY:")){
             int tbinary = 0;
-            assert(fscanf(fin, "%d", &tbinary)==1);
-            assert(tbinary == 0 || tbinary == 1);
+            throw_assert(fscanf(fin, "%d", &tbinary) == 1);
+            throw_assert(tbinary == 0 || tbinary == 1);
             binary = tbinary;
         }else{
             printf("Invalid option '%s'!\n", buf);
@@ -281,7 +280,7 @@ void Instance::write(FILE *fout) const{
     vector<int> rid(items.size());
     for(int it = 0; it < (int)items.size(); it++) rid[items[it].id] = it;
     for(int i = 0; i < m; i++){
-        fprintf(fout, "nopti: %d bi: %d\n", nopts[i], demands[i]);
+        fprintf(fout, "oi: %d bi: %d\n", nopts[i], demands[i]);
         for(int q = 0; q < nopts[i]; q++){
             fprintf(fout, "wi:");
             for(int j = 0; j < ndims; j++){

@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdio>
 #include <cmath>
 #include <queue>
-#include <cassert>
 #include <algorithm>
 #include "gurobi_c.h"
 #include "gurobi_c++.h"
@@ -157,36 +156,39 @@ int main(int argc, char *argv[]){
                "[print_instance:0] [pyout:0]\n");
         return 1;
     }
-
-    Instance inst(argv[1]);
-    if(argc >= 3) {
-        inst.method = atoi(argv[2]);
-        assert(inst.method >= MIN_METHOD && inst.method <= MAX_METHOD);
-    }
-    if(argc >= 4){
-        inst.binary = atoi(argv[3]);
-    }
-    if(argc >= 5){
-        inst.vtype = argv[4][0];
-        assert(inst.vtype == 'I' || inst.vtype == 'C');
-    }
-    bool print_inst = false;
-    if(argc >= 6){
-        print_inst = atoi(argv[5]) != 0;
-    }
-    bool pyout = false;
-    if(argc >= 7){
-        pyout = atoi(argv[6]) != 0;
-    }
-
     try {
+        Instance inst(argv[1]);
+        if(argc >= 3) {
+            inst.method = atoi(argv[2]);
+            throw_assert(inst.method >= MIN_METHOD && inst.method <= MAX_METHOD);
+        }
+        if(argc >= 4){
+            inst.binary = atoi(argv[3]);
+        }
+        if(argc >= 5){
+            inst.vtype = argv[4][0];
+            throw_assert(inst.vtype == 'I' || inst.vtype == 'C');
+        }
+        bool print_inst = false;
+        if(argc >= 6){
+            print_inst = atoi(argv[5]) != 0;
+        }
+        bool pyout = false;
+        if(argc >= 7){
+            pyout = atoi(argv[6]) != 0;
+        }
         GrbArcflow graph(inst);
         graph.solve(print_inst, pyout);
+        return 0;
     } catch(GRBException e) {
         printf("Error code = %d\n", e.getErrorCode());
-        printf("%s\n", e.getMessage().c_str());
+        printf("GurobiError: %s\n", e.getMessage().c_str());
+        return -1;
+    } catch(const char *e) {
+        printf("%s\n", e);
+        return -1;
     } catch (...) {
-        printf("Error during optimization\n");
+        printf("UnknownError\n");
+        return -1;
     }
-    return 0;
 }

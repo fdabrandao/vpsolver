@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <set>
 #include <climits>
 #include <cstring>
-#include <cassert>
 #include <ctime>
 #include <algorithm>
 #include "graph.hpp"
@@ -100,7 +99,7 @@ vector<pattern_pair> ArcflowSol::extract_solution(vector<int> &dem, int T){
             int &val = dp[v];
             Arc &p = pred[v];
             for(const Arc &a: adj[v]){
-                assert(dp.count(a.u) != 0);
+                throw_assert(dp.count(a.u) != 0);
                 int mf = min(dp[a.u], flow[a]);
                 if(mf > val){
                     p = a;

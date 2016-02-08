@@ -39,4 +39,14 @@ typedef std::pair<int, int> int_pair;
 bool check_ext(const char* name, const char* extension);
 void exit_error(const char *msg);
 
+extern char _assert_msg_[MAX_LEN];
+
+#define throw_assert(condition) \
+{ if (!(condition)) { \
+    sprintf(_assert_msg_, \
+            "AssertionError: assertion `%s` failed in \"%s\" line %d", \
+            #condition, __FILE__, __LINE__); \
+    throw _assert_msg_; \
+} }
+
 #endif
