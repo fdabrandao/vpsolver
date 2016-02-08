@@ -52,11 +52,15 @@ private:
     bool is_valid(const vector<int> &u, const vector<int> &W) const;
     bool is_full(const vector<int> &u, const vector<int> &W) const;
     void relabel_graph(const vector<int> &labels);
+    void init(const Instance &_inst);
+    void init(const char *fname);
+    void read(const char *fname);
+    void read(FILE *fin);
     void build();
     void final_compression_step();
     void reduce_redundancy();
     void finalize();
-protected:
+public:
     clock_t tstart;
     Instance inst;
     int NV;
@@ -65,8 +69,8 @@ protected:
     vector<int> Ts;
     vector<Arc> A;
     int LOSS;
-public:
     Arcflow(const Instance &_inst);
+    Arcflow(const char *fname);
     void write(const char *fname);
     void write(FILE *fout);
 };

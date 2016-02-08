@@ -74,10 +74,10 @@ public:
 
     Instance();
     Instance(const char *fname);
-    Instance(FILE *fin, ftype type);
+    Instance(FILE *fin, ftype type=MVP);
 
     void read(const char *fname);
-    void read(FILE *fin, ftype type);
+    void read(FILE *fin, ftype type=MVP);
     void write(FILE *fout) const;
 };
 

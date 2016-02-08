@@ -32,12 +32,25 @@ using namespace std;
 
 /* Class Arcflow */
 
-Arcflow::Arcflow(const Instance &_inst): inst(_inst){
+Arcflow::Arcflow(const Instance &_inst){
     ready = false;
     tstart = CURTIME;
+    init(_inst);
+    assert(ready == true);
+}
+
+Arcflow::Arcflow(const char *fname){
+    ready = false;
+    tstart = CURTIME;
+    init(fname);
+    assert(ready == true);
+}
+
+void Arcflow::init(const Instance &_inst){
+    assert(ready == false);
+    inst = _inst;
     LOSS = inst.nsizes;
     label_size = inst.ndims;
-
     maxW.resize(inst.ndims, 0);
     for(int d = 0; d < inst.ndims; d++){
         for(int t = 0; t < inst.nbtypes; t++)
@@ -93,6 +106,20 @@ Arcflow::Arcflow(const Instance &_inst): inst(_inst){
     printf("  #V4/#V3 = %.2f\n", nv2/double(nv1));
     printf("  #A4/#A3 = %.2f\n", na2/double(na1));
     printf("Ready! (%.2fs)\n", TIMEDIF(tstart));
+    assert(ready == true);
+}
+
+void Arcflow::init(const char *fname){
+    assert(ready == false);
+    if(check_ext(fname, ".vbp")){
+        init(Instance(fname));
+    } else if(check_ext(fname, ".mvp")){
+        init(Instance(fname));
+    } else if(check_ext(fname, ".afg")){
+        read(fname);
+    } else {
+        exit_error("Invalid file extension!");
+    }
     assert(ready == true);
 }
 
@@ -309,6 +336,7 @@ int Arcflow::go(vector<int> su){
 }
 
 void Arcflow::build(){
+    assert(ready == false);
     dp.clear();
     A.clear();
     NS.clear();
@@ -364,6 +392,7 @@ void Arcflow::final_compression_step(){
 }
 
 void Arcflow::reduce_redundancy(){
+    assert(ready == false);
     //remove redundant parallel arcs
     vector<int> types;
     for(int i = 0; i < inst.nsizes; i++)
@@ -447,6 +476,7 @@ void Arcflow::write(FILE *fout){
     sort(all(A));
 
     int iS = 0;
+    fprintf(fout, "NBTYPES: %d\n", inst.nbtypes);
     fprintf(fout, "S: %d\n", iS);
     fprintf(fout, "Ts:");
     for(int t = 0; t < (int)Ts.size(); t++){
@@ -471,9 +501,57 @@ void Arcflow::write(FILE *fout){
     }
 }
 
+void Arcflow::read(FILE *fin){
+    assert(ready == false);
+    tstart = CURTIME;
+    inst = Instance(fin);
+    assert(fscanf(fin, " #GRAPH_BEGIN# ")==0);
+
+    int nbtypes;
+    assert(fscanf(fin, " NBTYPES: ") >= 0);
+    assert(fscanf(fin, "%d", &nbtypes) == 1);
+    assert(nbtypes == inst.nbtypes);
+
+    assert(fscanf(fin, " S: ") >= 0);
+    assert(fscanf(fin, "%d", &S) == 1);
+
+    Ts.resize(nbtypes);
+    assert(fscanf(fin, " Ts: ") >= 0);
+    for(int i = 0; i < nbtypes; i++)
+        assert(fscanf(fin, "%d", &Ts[i]) == 1);
+
+    assert(fscanf(fin, " LOSS: ") >= 0);
+    assert(fscanf(fin, "%d", &LOSS) == 1);
+
+    assert(fscanf(fin, " NV: ") >= 0);
+    assert(fscanf(fin, "%d", &NV) == 1);
+
+    assert(fscanf(fin, " NA: ") >= 0);
+    assert(fscanf(fin, "%d", &NA) == 1);
+
+    for(int i = 0; i < NA; i++){
+        int i_u, i_v, label;
+        assert(fscanf(fin, " %d %d %d ", &i_u, &i_v, &label)==3);
+        A.push_back(Arc(i_u, i_v, label));
+    }
+    assert(fscanf(fin, " #GRAPH_END# ")==0);
+    ready = true;
+}
+
 void Arcflow::write(const char *fname){
+    assert(ready == true);
     FILE *fout = fopen(fname, "w");
     assert(fout != NULL);
     write(fout);
     fclose(fout);
+}
+
+void Arcflow::read(const char *fname){
+    assert(ready == false);
+    assert(check_ext(fname, ".afg"));
+    FILE *fin = fopen(fname, "r");
+    assert(fin != NULL);
+    read(fin);
+    fclose(fin);
+    assert(ready == true);
 }

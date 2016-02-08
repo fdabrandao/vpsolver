@@ -90,6 +90,7 @@ void Instance::read(const char *fname){
 }
 
 void Instance::read(FILE *fin, ftype type){
+    assert(fscanf(fin, " #INSTANCE_BEGIN# ")==0);
     assert(fscanf(fin, " NDIMS: ") >= 0);
     assert(fscanf(fin, "%d", &ndims) == 1);
 

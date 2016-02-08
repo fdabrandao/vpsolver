@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdarg>
 #include <map>
 #include "config.hpp"
+#include "arcflow.hpp"
 #include "instance.hpp"
 using namespace std;
 
@@ -34,18 +35,18 @@ Field:     1          2          3         4         5         6
 Columns:  2-3        5-12      15-22     25-36     40-47     50-61
 */
 
-#define MAX_LEN 80
+#define BUF_LEN 80
 #define NFIELDS 7
 
 int field_start[NFIELDS] = {0, 1, 4, 14, 24, 39, 49};
 
-class Mps{
+class MPS{
 private:
 
     FILE *fout;
     int p;
     int cur_field;
-    char buf[MAX_LEN];
+    char buf[BUF_LEN];
 
     void clear(){
         p = 0;
@@ -64,7 +65,7 @@ private:
 
 public:
 
-    Mps(FILE *_fout = stdout): fout(_fout){}
+    MPS(FILE *_fout = stdout): fout(_fout){}
 
     void write(int count, ...){
         clear();
@@ -75,7 +76,7 @@ public:
             add_field(va_arg(v, const char *));
         va_end(v);
 
-        assert(p < MAX_LEN);
+        assert(p < BUF_LEN);
         buf[p] = 0;
         fprintf(fout, "%s\n", buf);
         clear();
@@ -90,9 +91,9 @@ int swig_main(int argc, char *argv[]){
         return 1;
     }
 
-    FILE *fin = fopen(argv[1], "r");
-    if(fin == NULL) perror("fopen");
-    assert(fin != NULL);
+    assert(check_ext(argv[1], ".afg"));
+    Arcflow afg(argv[1]);
+    Instance &inst = afg.inst;
 
     FILE *fout = fopen(argv[2], "w");
     if(fout == NULL) perror("fopen");
@@ -100,35 +101,14 @@ int swig_main(int argc, char *argv[]){
 
     printf("Generating the .MPS model...");
 
-    assert(fscanf(fin, " #INSTANCE_BEGIN# ")==0);
-    Instance inst(fin, MVP);
-
-    assert(fscanf(fin, " #GRAPH_BEGIN# ")==0);
-
-    int S;
-    vector<int> Ts(inst.nbtypes);
-    assert(fscanf(fin, " S: %d ", &S)==1);
-    assert(fscanf(fin, " Ts: ") >= 0);
-    for(int t = 0; t < inst.nbtypes; t++){
-        assert(fscanf(fin, " %d ", &Ts[t])==1);
-    }
-
-    int LOSS;
-    assert(fscanf(fin, " LOSS: ") >= 0);
-    assert(fscanf(fin, " %d ", &LOSS)==1);
-
-    int NV, NA;
-    assert(fscanf(fin, " NV: %d ", &NV)==1);
-    assert(fscanf(fin, " NA: %d ", &NA)==1);
-
-    Mps mps(fout);
+    MPS mps(fout);
     mps.write(4, "NAME", "", "", "ARCFLOW");
     mps.write(1, "ROWS");
     mps.write(3, "", "N", "OBJ");
 
-    char buf[MAX_LEN];
-    char buf1[MAX_LEN];
-    char buf2[MAX_LEN];
+    char buf[BUF_LEN];
+    char buf1[BUF_LEN];
+    char buf2[BUF_LEN];
 
     /* demand constraints */
 
@@ -144,7 +124,7 @@ int swig_main(int argc, char *argv[]){
 
     /* flow conservation constraints */
 
-    for(int i = 0; i < NV; i++){
+    for(int i = 0; i < afg.NV; i++){
         sprintf(buf, "F%x", i);
         mps.write(3, "", "E", buf);
     }
@@ -157,22 +137,21 @@ int swig_main(int argc, char *argv[]){
         mps.write(6, "", "", "MARKER", "'MARKER'", "", "'INTORG'");
 
     vector<int> labels;
-    vector<int> ub(NA);
-    for(int i = 0; i < NA; i++){
-        int i_u, i_v, label;
-        assert(fscanf(fin, " %d %d %d ", &i_u, &i_v, &label)==3);
-        labels.push_back(label);
+    vector<int> ub(afg.NA);
+    for(int i = 0; i < afg.NA; i++){
+        const Arc &a = afg.A[i];
+        labels.push_back(a.label);
         sprintf(buf, "X%x", i);
-        sprintf(buf1, "F%x", i_u);
-        sprintf(buf2, "F%x", i_v);
+        sprintf(buf1, "F%x", a.u);
+        sprintf(buf2, "F%x", a.v);
         mps.write(7, "", "", buf, buf1, "-1", buf2, "1");
-        if(label != LOSS){
-            sprintf(buf1, "B%d", inst.items[label].type);
+        if(a.label != afg.LOSS){
+            sprintf(buf1, "B%d", inst.items[a.label].type);
             mps.write(5, "", "", buf, buf1, "1");
         }
-        if(i_v == S) {
-            for(int j = 0; j < (int)Ts.size(); j++){
-                if(Ts[j] == i_u){
+        if(a.v == afg.S) {
+            for(int j = 0; j < (int)afg.Ts.size(); j++){
+                if(afg.Ts[j] == a.u){
                     ub[i] = (inst.Qs[j] >= 0) ? inst.Qs[j] : inst.n;
                     sprintf(buf1, "%d", inst.Cs[j]);
                     mps.write(5, "", "", buf, "OBJ", buf1);
@@ -180,8 +159,8 @@ int swig_main(int argc, char *argv[]){
                 }
             }
         }else{
-            if(label != LOSS && !inst.relax_domains)
-                ub[i] = inst.items[label].demand;
+            if(a.label != afg.LOSS && !inst.relax_domains)
+                ub[i] = inst.items[a.label].demand;
             else
                 ub[i] = inst.n;
         }
@@ -204,7 +183,7 @@ int swig_main(int argc, char *argv[]){
 
     mps.write(1, "BOUNDS");
 
-    for(int i = 0; i < NA; i++){
+    for(int i = 0; i < afg.NA; i++){
         sprintf(buf, "X%x", i);
         mps.write(5, "", "LO", "BND1", buf, "0");
         sprintf(buf1, "%d", ub[i]);
@@ -212,8 +191,6 @@ int swig_main(int argc, char *argv[]){
     }
 
     mps.write(1, "ENDATA");
-
-    fclose(fin);
     fclose(fout);
     printf("DONE!\n");
     return 0;

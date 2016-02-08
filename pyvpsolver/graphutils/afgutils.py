@@ -49,6 +49,10 @@ class AFGUtils(object):
         s = s.replace("#GRAPH_BEGIN#", "")
         lst = s.split()
 
+        assert lst[0] == "NBTYPES:"
+        lst.pop(0)  # ignore "NBTYPES:"
+        NBTYPES = int(lst.pop(0))
+
         assert lst[0] == "S:"
         lst.pop(0)  # ignore "S:"
         S = int(lst.pop(0))
@@ -56,7 +60,7 @@ class AFGUtils(object):
         assert lst[0] == "Ts:"
         lst.pop(0)  # ignore "Ts:"
         Ts = []
-        while lst[0].isdigit():
+        for i in range(NBTYPES):
             Ts.append(int(lst.pop(0)))
 
         assert lst[0] == "LOSS:"

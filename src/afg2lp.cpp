@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include "config.hpp"
 #include "common.hpp"
+#include "arcflow.hpp"
 #include "instance.hpp"
 using namespace std;
 
@@ -53,36 +54,15 @@ int swig_main(int argc, char *argv[]){
         return 1;
     }
 
-    FILE *fin = fopen(argv[1], "r");
-    if(fin == NULL) perror("fopen");
-    assert(fin != NULL);
+    assert(check_ext(argv[1], ".afg"));
+    Arcflow afg(argv[1]);
+    Instance &inst = afg.inst;
 
     FILE *fout = fopen(argv[2], "w");
     if(fout == NULL) perror("fopen");
     assert(fout != NULL);
 
     printf("Generating the .LP model...");
-
-    assert(fscanf(fin, " #INSTANCE_BEGIN# ")==0);
-    Instance inst(fin, MVP);
-
-    assert(fscanf(fin, " #GRAPH_BEGIN# ")==0);
-
-    int S;
-    vector<int> Ts(inst.nbtypes);
-    assert(fscanf(fin, " S: %d ", &S)==1);
-    assert(fscanf(fin, " Ts: ") >= 0);
-    for(int t = 0; t < inst.nbtypes; t++){
-        assert(fscanf(fin, " %d ", &Ts[t])==1);
-    }
-
-    int LOSS;
-    assert(fscanf(fin, " LOSS: ") >= 0);
-    assert(fscanf(fin, " %d ", &LOSS)==1);
-
-    int NV, NA;
-    assert(fscanf(fin, " NV: %d ", &NV)==1);
-    assert(fscanf(fin, " NA: %d ", &NA)==1);
 
     map<int, vector<int> > Ai;
     map<int, vector<int> > in;
@@ -91,16 +71,15 @@ int swig_main(int argc, char *argv[]){
     /* objective */
 
     fprintf(fout, "Minimize");
-    vector<int> ub(NA);
-    for(int i = 0; i < NA; i++){
-        int i_u, i_v, label;
-        assert(fscanf(fin, " %d %d %d ", &i_u, &i_v, &label)==3);
-        Ai[label].push_back(i);
-        in[i_v].push_back(i);
-        out[i_u].push_back(i);
-        if(i_v == S) {
-            for(int j = 0; j < (int)Ts.size(); j++){
-                if(Ts[j] == i_u){
+    vector<int> ub(afg.NA);
+    for(int i = 0; i < afg.NA; i++){
+        const Arc &a = afg.A[i];
+        Ai[a.label].push_back(i);
+        in[a.v].push_back(i);
+        out[a.u].push_back(i);
+        if(a.v == afg.S) {
+            for(int j = 0; j < (int)afg.Ts.size(); j++){
+                if(afg.Ts[j] == a.u){
                     ub[i] = (inst.Qs[j] >= 0) ? inst.Qs[j] : inst.n;
                     if(inst.Cs[j] >= 0)
                         fprintf(fout, " +%d X%x", inst.Cs[j], i);
@@ -110,8 +89,8 @@ int swig_main(int argc, char *argv[]){
                 }
             }
         }else{
-            if(label != LOSS && !inst.relax_domains)
-                ub[i] = inst.items[label].demand;
+            if(a.label != afg.LOSS && !inst.relax_domains)
+                ub[i] = inst.items[a.label].demand;
             else
                 ub[i] = inst.n;
         }
@@ -140,7 +119,7 @@ int swig_main(int argc, char *argv[]){
 
     // flow conservation constraints
 
-    for(int i = 0; i < NV; i++){
+    for(int i = 0; i < afg.NV; i++){
         fprintf(fout, "\tF%x:", i);
         for(const int &ai: in[i])
             fprintf(fout, " + X%x", ai);
@@ -153,7 +132,7 @@ int swig_main(int argc, char *argv[]){
 
     fprintf(fout, "Bounds\n");
 
-    for(int i = 0; i < NA; i++)
+    for(int i = 0; i < afg.NA; i++)
         fprintf(fout, "0 <= X%x <= %d\n", i, ub[i]);
 
     /* integer variables */
@@ -162,7 +141,7 @@ int swig_main(int argc, char *argv[]){
         fprintf(fout, "General\n");
 
         fprintf(fout, "\t");
-        for(int i = 0; i < NA; i++){
+        for(int i = 0; i < afg.NA; i++){
             if(!i)
                 fprintf(fout, "X%x", i);
             else
@@ -171,8 +150,6 @@ int swig_main(int argc, char *argv[]){
     }
 
     fprintf(fout, "\nEnd\n");
-
-    fclose(fin);
     fclose(fout);
     printf("DONE!\n");
     return 0;
