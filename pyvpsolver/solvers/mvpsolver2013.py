@@ -33,8 +33,9 @@ LOSS = "L"
 
 
 def solve(
-        Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="",
-        script="vpsolver_glpk.sh", verbose=False):
+        Ws, Cs, Qs, ws, b, transitive_reduction=True,
+        svg_file="", lp_file="", mps_file="",
+        script="vpsolver_glpk.sh", stats=False, verbose=False):
     """
     Solves multiple-choice vector bin packing instances
     using the method proposed in:
@@ -44,6 +45,8 @@ def solve(
     do Porto, Portugal.
     """
     assert svg_file == "" or svg_file.endswith(".svg")
+    if verbose:
+        stats = True
     nbtypes = len(Ws)
     ndims = len(Ws[0])
 
@@ -64,8 +67,9 @@ def solve(
         for j in range(len(ww)):
             if any(a > b for a, b in zip(ww[j], Ws[i])):
                 bbi[j] = 0
+                print("cenas")
                 continue
-        symb = "G{0}".format(i)
+        symb = "G{0}:".format(i)
         instances[i] = VBP(Ws[i], ww, bbi, verbose=False)
         graphs[i] = AFG(instances[i], verbose=verbose).graph()
         loss = graphs[i].LOSS
@@ -78,7 +82,7 @@ def solve(
         graphs[i].A.remove((Ts[i], Ss[i], LOSS))
         if svg_file.endswith(".svg"):
             try:
-                graphs[i].draw(svg_file.replace(".svg", "{0}.svg".format(i)))
+                graphs[i].draw(svg_file.replace(".svg", "{0}.svg".format(i+1)))
             except Exception as e:
                 VPSolver.log(e, verbose)
 
@@ -90,7 +94,7 @@ def solve(
     A += [(t, T, LOSS) for t in Ts]
     A += [(T, S, LOSS)]
 
-    graph = AFGraph(V, A, S, [T])
+    graph = AFGraph(V, A, S, [T], LOSS)
     if svg_file.endswith(".svg"):
         try:
             graph.draw(svg_file, ignore=[(T, S)])
@@ -104,7 +108,7 @@ def solve(
     VPSolver.log("Final compression steps:", verbose)
 
     nv1, na1 = len(V), len(A)
-    VPSolver.log("  #V1: {0} #A1: {1}".format(nv1, na1), verbose)
+    VPSolver.log("  #V1: {0} #A1: {1}".format(nv1, na1), verbose=stats)
     zero = tuple([0]*ndims)
 
     def compress(u):
@@ -120,6 +124,7 @@ def solve(
         newlbl[u] = lbl
         return lbl
 
+    # Relabel the graph using the longest path from the source:
     newlbl = {}
     compress(T)
     newlbl[S] = S
@@ -129,21 +134,72 @@ def solve(
     for u in newlbl:
         if newlbl[u] == zero:
             newlbl[u] = S
-
     graph.relabel(lambda u: newlbl.get(u, u))
 
-    newlbl = {}
-    for u in graph.V:
-        if isinstance(u, tuple):
-            newlbl[u] = len(newlbl)
+    if transitive_reduction:
+        # Reduce graph size by connecting nodes to non-dominated targets only:
+        tadj = {}
+        for (u, v, i) in graph.A:
+            if isinstance(u, tuple):
+                if v in Ts:
+                    if u not in tadj:
+                        tadj[u] = []
+                    tadj[u].append(Ts.index(v))
 
+        graph.A = [
+            (u, v, i) for (u, v, i) in graph.A if v not in Ts
+        ]
+        V, A = set(graph.V), set(graph.A)
+
+        def fits(w1, w2):
+            return all(x <= y for x, y in zip(w1, w2))
+
+        dominatedby = {i: [] for i in range(nbtypes)}
+        for i in range(nbtypes):
+            for j in range(nbtypes):
+                if i < j and Ws[i] == Ws[j]:
+                    dominatedby[i].append(j)
+                elif i != j and fits(Ws[i], Ws[j]):
+                    dominatedby[i].append(j)
+
+        for v in tadj:
+            tgts = set(tadj[v])
+            for i in range(nbtypes):
+                if i not in tgts:
+                    continue
+                for j in dominatedby[i]:
+                    try:
+                        tgts.remove(j)
+                    except:
+                        pass
+            for t in tgts:
+                A.add((v, Ts[t], LOSS))
+
+        for i in range(nbtypes):
+            tgts = set(dominatedby[i])
+            for j in dominatedby[i]:
+                for t in dominatedby[j]:
+                    try:
+                        tgts.remove(t)
+                    except:
+                        pass
+            for t in tgts:
+                A.add((Ts[i], Ts[t], LOSS))
+
+        graph.V, graph.A = V, A
+
+    # Relabel the graph with indices:
+    newlbl = {}
+    for u in graph.get_vertices_sorted():
+        if isinstance(u, tuple):
+            newlbl[u] = len(newlbl)+1
     graph.relabel(lambda u: newlbl.get(u, u))
     V, A = graph.V, graph.A
 
     nv2, na2 = len(V), len(A)
-    VPSolver.log("  #V2: {0} #A2: {1}".format(nv2, na2), verbose)
-    VPSolver.log("  #V2/#V1 = {0:.2f}".format(nv2/nv1), verbose)
-    VPSolver.log("  #A2/#A1 = {0:.2f}".format(na2/na1), verbose)
+    VPSolver.log("  #V2: {0} #A2: {1}".format(nv2, na2), verbose=stats)
+    VPSolver.log("  #V2/#V1 = {0:.2f}".format(nv2/nv1), verbose=stats)
+    VPSolver.log("  #A2/#A1 = {0:.2f}".format(na2/na1), verbose=stats)
 
     if svg_file.endswith(".svg"):
         try:
@@ -153,7 +209,7 @@ def solve(
         except Exception as e:
                 VPSolver.log(e, verbose)
 
-    # remove redudant parallel arcs
+    # Remove redudant parallel arcs:
     At = []
     used = set()
     for (u, v, i) in A:
@@ -161,17 +217,16 @@ def solve(
         if (u, v, k) not in used:
             At.append((u, v, i))
             used.add((u, v, k))
-
     A = At
-    graph = AFGraph(V, A, S, [T])
+    graph = AFGraph(V, A, S, [T], LOSS)
 
     nv3, na3 = len(V), len(A)
-    VPSolver.log("  #V3: {0} #A3: {1}".format(nv3, na3), verbose)
-    VPSolver.log("  #V3/#V1 = {0:.2f}".format(nv3/nv1), verbose)
-    VPSolver.log("  #A3/#A1 = {0:.2f}".format(na3/na1), verbose)
+    VPSolver.log("  #V3: {0} #A3: {1}".format(nv3, na3), verbose=stats)
+    VPSolver.log("  #V3/#V1 = {0:.2f}".format(nv3/nv1), verbose=stats)
+    VPSolver.log("  #A3/#A1 = {0:.2f}".format(na3/na1), verbose=stats)
 
+    # Generate the model:
     varl, cons = graph.get_flow_cons()
-
     assocs = graph.get_assocs()
     for i in range(len(b)):
         lincomb = [
@@ -179,7 +234,6 @@ def solve(
             for it, (j, t) in enumerate(itlabel) if j == i
             for var in assocs[it]
         ]
-        # cons.append((lincomb, ">=", b[i]))
         if b[i] > 1:
             cons.append((lincomb, ">=", b[i]))
         else:

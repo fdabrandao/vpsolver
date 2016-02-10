@@ -20,5 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from . import vbpsolver
-from . import mvpsolver
-from . import mvpsolver_new
+from . import mvpsolver2013
+from . import mvpsolver2016
+from . import mvpsolver2016 as mvpsolver

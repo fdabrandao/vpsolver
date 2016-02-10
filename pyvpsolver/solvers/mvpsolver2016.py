@@ -26,7 +26,7 @@ from .. import VPSolver, MVP, AFG, MPS
 
 def solve(
         Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="",
-        script="vpsolver_glpk.sh", verbose=False):
+        script="vpsolver_glpk.sh", stats=False, verbose=False):
     """
     Solves multiple-choice vector bin packing instances
     using the method similar to the method proposed in:
@@ -36,11 +36,14 @@ def solve(
     do Porto, Portugal.
     """
     assert svg_file == "" or svg_file.endswith(".svg")
+    if verbose:
+        stats = True
     instance = MVP(Ws, Cs, Qs, ws, b, verbose=False)
-    if svg_file == "" and lp_file == "" and mps_file == "":
+    if (stats == verbose and svg_file == "" and
+            lp_file == "" and mps_file == ""):
         out, (obj, sol) = VPSolver.script(script, instance, verbose=verbose)
     else:
-        afg = AFG(instance, verbose=verbose)
+        afg = AFG(instance, verbose=stats)
         if svg_file.endswith(".svg"):
             VPSolver.log("Generating .SVG file...", verbose)
             try:
