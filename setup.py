@@ -19,7 +19,7 @@ System requirements
 ```````````````````
 
 * UNIX-like operating system or a UNIX-like environment such as Cygwin
-* g++ >= 4.8; make >= 3.0; bash >= 3.0
+* g++ >= 4.8; bash >= 3.0
 
 Links
 `````
