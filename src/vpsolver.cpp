@@ -158,8 +158,8 @@ class GrbArcflow: public Arcflow {
                     flow[a] = rx;
                 }
             }
-            ArcflowSol sol(inst, flow, S, Ts, LOSS, inst.binary);
-            sol.print_solution(inst, print_inst, pyout, true);
+            ArcflowSol sol(inst, flow, S, Ts, LOSS, true);
+            sol.print_solution(print_inst, pyout);
         }
 
         free(env);

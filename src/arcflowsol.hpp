@@ -41,24 +41,22 @@ class ArcflowSol {
     int S;
     vector<int> Ts;
     int LOSS;
-    bool binary;
+    int objvalue;
+    vector<int> nbins;
+    vector<vector<pattern_pair>> sols;
+
+    vector<pattern_pair> extract_solution(vector<int> *_dem, int T);
 
     vector<pattern_pair> remove_excess(const vector<pattern_int> &sol,
-                                       vector<int> &dem) const;
+                                       vector<int> *_dem) const;
 
-    bool is_valid(const vector<pattern_pair> &sol, const Instance &inst,
-                  vector<int> dem, int btype) const;
+    bool is_valid(const vector<pattern_pair> &sol, int btype) const;
 
  public:
     ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow, int _S,
-               const vector<int> &_Ts, int _LOSS, bool _binary = false):
-        inst(_inst), flow(_flow), S(_S), Ts(_Ts), LOSS(_LOSS),
-        binary(_binary) {}
+               const vector<int> &_Ts, int _LOSS, bool validate = true);
 
-    vector<pattern_pair> extract_solution(vector<int> &dem, int T);
-
-    void print_solution(
-        const Instance &inst, bool print_inst, bool pyout, bool validate);
+    void print_solution(bool print_inst, bool pyout);
 };
 
 #endif  // SRC_ARCFLOWSOL_HPP_

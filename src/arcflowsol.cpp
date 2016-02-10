@@ -33,8 +33,50 @@ using namespace std;
 
 /* Class ArcflowSol */
 
+ArcflowSol::ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow,
+                       int _S, const vector<int> &_Ts, int _LOSS,
+                       bool validate):
+        inst(_inst), flow(_flow), S(_S), Ts(_Ts), LOSS(_LOSS) {
+    vector<int> dem(inst.m);
+    for (int i = 0; i < inst.m; i++) {
+        dem[i] = inst.demands[i];
+    }
+
+    objvalue = 0;
+    nbins.resize(inst.nbtypes);
+    sols.resize(inst.nbtypes);
+    for (int t = 0; t < inst.nbtypes; t++) {
+        sols[t] = extract_solution(&dem, Ts[t]);
+        if (validate && !is_valid(sols[t], t)) {
+            throw_error("Invalid solution! (capacity)");
+        }
+
+        for (const pattern_pair &pat : sols[t]) {
+            objvalue += pat.first * inst.Cs[t];
+            nbins[t] += pat.first;
+        }
+    }
+
+    if (validate) {
+        for (int i = 0; i < inst.m; i++) {
+            if (dem[i] > 0) {
+                throw_error("Invalid solution! (demand)");
+            }
+        }
+
+        int fs = 0;
+        for (const auto &kvpair : flow) {
+            fs += kvpair.second;
+        }
+        if (fs != 0) {
+            throw_error("Invalid solution! (flow)");
+        }
+    }
+}
+
 vector<pattern_pair> ArcflowSol::remove_excess(const vector<pattern_int> &sol,
-                                               vector<int> &dem) const {
+                                               vector<int> *_dem) const {
+    vector<int> &dem = *_dem;
     vector<pattern_pair> tmp;
     for (const pattern_int &pat : sol) {
         map<int, int> count;
@@ -84,7 +126,8 @@ vector<pattern_pair> ArcflowSol::remove_excess(const vector<pattern_int> &sol,
     return finalsol;
 }
 
-vector<pattern_pair> ArcflowSol::extract_solution(vector<int> &dem, int T) {
+vector<pattern_pair> ArcflowSol::extract_solution(vector<int> *_dem, int T) {
+    vector<int> &dem = *_dem;
     set<int> nodes;
     map<int, vector<Arc>> adj;
     for (const auto &kvpair : flow) {
@@ -138,23 +181,20 @@ vector<pattern_pair> ArcflowSol::extract_solution(vector<int> &dem, int T) {
             v = u;
         }
     }
-    return remove_excess(sol, dem);
+    return remove_excess(sol, &dem);
 }
 
-bool ArcflowSol::is_valid(const vector<pattern_pair> &sol,
-                          const Instance &inst, vector<int> dem,
-                          int btype) const {
+bool ArcflowSol::is_valid(const vector<pattern_pair> &sol, int btype) const {
     for (const pattern_pair &pat : sol) {
         vector<int> w(inst.ndims);
         for (const auto &itpair : pat.second) {
-            if (binary && itpair.second > 1) {
+            if (inst.binary && itpair.second > 1) {
                 return false;
             }
             const Item &it = inst.items[itpair.first];
             for (int i = 0; i < inst.ndims; i++) {
                 w[i] += it[i];
             }
-            dem[it.type] -= pat.first * itpair.second;
         }
         for (int i = 0; i < inst.ndims; i++) {
             if (w[i] > inst.Ws[btype][i]) {
@@ -165,60 +205,12 @@ bool ArcflowSol::is_valid(const vector<pattern_pair> &sol,
     return true;
 }
 
-void ArcflowSol::print_solution(const Instance &inst, bool print_inst = true,
-                                bool pyout = false, bool validate = true) {
-    vector<int> dem(inst.m), id(inst.m), rid(inst.m);
-    for (int i = 0; i < inst.m; i++) {
-        dem[i] = inst.demands[i];
-        int t = inst.items[i].type;
-        rid[t] = i;
-    }
-
-    int obj = 0;
-    vector<int> nbins(inst.nbtypes);
-    vector<vector<pattern_pair>> sols(inst.nbtypes);
-    for (int t = 0; t < inst.nbtypes; t++) {
-        sols[t] = extract_solution(dem, Ts[t]);
-        if (validate && !is_valid(sols[t], inst, dem, t)) {
-            throw_error("Invalid solution! (capacity)");
-        }
-
-        for (const pattern_pair &pat : sols[t]) {
-            obj += pat.first * inst.Cs[t];
-            nbins[t] += pat.first;
-        }
-    }
-
-    if (validate) {
-        for (int i = 0; i < inst.m; i++) {
-            if (dem[i] > 0) {
-                throw_error("Invalid solution! (demand)");
-            }
-        }
-
-        int fs = 0;
-        for (const auto &kvpair : flow) {
-            fs += kvpair.second;
-        }
-        if (fs != 0) {
-            throw_error("Invalid solution! (flow)");
-        }
-    }
-
-
-    printf("Objective: %d\n", obj);
+void ArcflowSol::print_solution(bool print_inst = true, bool pyout = false) {
+    printf("Objective: %d\n", objvalue);
     printf("Solution:\n");
     for (int t = 0; t < inst.nbtypes; t++) {
-        if (!pyout) {
-            if (inst.nbtypes > 1) {
-                printf("Bins of type %d: %d\n", t+1, nbins[t]);
-            }
-        } else {
-            if (t == 0) {
-                printf("[");
-            } else {
-                printf(", [");
-            }
+        if (inst.nbtypes > 1) {
+            printf("Bins of type %d: %d\n", t+1, nbins[t]);
         }
         vector<pattern_pair> &sol = sols[t];
         for (const pattern_pair &pat : sol) {
@@ -274,7 +266,7 @@ void ArcflowSol::print_solution(const Instance &inst, bool print_inst = true,
     }
 
     if (pyout) {
-        printf("PYSOL=(%d,[", obj);
+        printf("PYSOL=(%d,[", objvalue);
         for (int t = 0; t < inst.nbtypes; t++) {
             printf("[");
             vector<pattern_pair> &sol = sols[t];

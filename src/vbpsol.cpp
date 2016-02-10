@@ -76,8 +76,8 @@ int swig_main(int argc, char *argv[]) {
         }
         fclose(fsol);
 
-        ArcflowSol sol(inst, flow, afg.S, afg.Ts, afg.LOSS, inst.binary);
-        sol.print_solution(inst, print_inst, pyout, true);
+        ArcflowSol sol(inst, flow, afg.S, afg.Ts, afg.LOSS, true);
+        sol.print_solution(print_inst, pyout);
         return 0;
     } catch(const char *e) {
         printf("%s\n", e);
