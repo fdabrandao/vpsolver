@@ -18,7 +18,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from builtins import map
 from builtins import range
+from builtins import sorted
 from builtins import object
 
 from .afgutils import AFGUtils
@@ -66,6 +68,8 @@ class AFGraph(object):
             self, svg_file, multigraph=True, showlabel=False, ignore=None,
             loss=None, verbose=None):
         """Draws the arc-flow graph in .svg format."""
+        if loss is None:
+            loss = self.LOSS
         AFGUtils.draw(
             svg_file, self.V, self.A, multigraph=multigraph,
             showlabel=showlabel, ignore=ignore, loss=loss, verbose=verbose
@@ -81,20 +85,32 @@ class AFGraph(object):
         # vnames[u, v, i] = "F_{0}_{1}_{2}".format(u, v, i)
         return vnames[u, v, i]
 
+    def get_arcs_sorted(self, reverse=False):
+        """Returns the list of arcs sorted."""
+        return sorted(
+            self.A, key=lambda a: tuple(map(lambda k: (repr(type(k)), k), a)),
+            reverse=reverse
+        )
+
+    def get_vertices_sorted(self, reverse=False):
+        """Returns the list of vertices sorted."""
+        return sorted(
+            self.V, key=lambda k: (repr(type(k)), k),
+            reverse=reverse
+        )
+
     def get_flow_cons(self, vnames=None):
         """Returns the list of flow conservation constraints."""
-        def keyval(a):
-            return tuple((repr(type(ai)), ai) for ai in a)
         Ain = {u: [] for u in self.V}
         Aout = {u: [] for u in self.V}
         varl = []
-        for (u, v, i) in sorted(self.A, key=keyval):
+        for (u, v, i) in self.get_arcs_sorted():
             name = self.vname(u, v, i, vnames)
             Aout[u].append(name)
             Ain[v].append(name)
             varl.append(name)
         cons = []
-        for u in sorted(self.V, key=repr):
+        for u in self.get_vertices_sorted():
             if Ain[u] != [] and Aout[u] != []:
                 lincomb = []
                 if u in Ain:
@@ -107,10 +123,8 @@ class AFGraph(object):
 
     def get_assocs(self, vnames=None):
         """Returns the arc variables grouped by label."""
-        def keyval(a):
-            return tuple((repr(type(ai)), ai) for ai in a)
         assocs = {}
-        for (u, v, i) in sorted(self.A, key=keyval):
+        for (u, v, i) in self.get_arcs_sorted():
             if i not in assocs:
                 assocs[i] = []
             name = self.vname(u, v, i, vnames)
@@ -119,10 +133,8 @@ class AFGraph(object):
 
     def get_assocs_multi(self, vnames=None):
         """Returns the arc variables grouped by label (multi-label variant)."""
-        def keyval(a):
-            return tuple((repr(type(ai)), ai) for ai in a)
         assocs = {}
-        for (u, v, l) in sorted(self.A, key=keyval):
+        for (u, v, l) in self.get_arcs_sorted():
             if not isinstance(l, (list, tuple)):
                 lst = [l]
             else:

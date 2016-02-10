@@ -120,13 +120,15 @@ class AFGUtils(object):
         g.node_attr["fontstyle"] = "bold"
         g.node_attr["penwidth"] = "2.0"
 
-        lbls = list(set(i for (u, v, i) in A))
-        lbls.sort()
+        lbls = sorted(
+            set(i for (u, v, i) in A if i not in loss),
+            key=lambda lbl: (repr(type(lbl)), lbl)
+        )
         M = len(lbls)
 
         if multigraph:
             colors = Colors.uniquecolors(2*M)
-            random.shuffle(colors)
+            #random.shuffle(colors)
 
             for (u, v, i) in A:
                 if ignore is not None and (u, v) in ignore:
@@ -145,7 +147,7 @@ class AFGUtils(object):
 
         else:
             colors = Colors.uniquecolors(M+1)
-            random.shuffle(colors)
+            #random.shuffle(colors)
 
             links = {}
             for (u, v, i) in A:
