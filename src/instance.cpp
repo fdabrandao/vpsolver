@@ -96,12 +96,12 @@ void Instance::read(const char *fname) {
 }
 
 void Instance::read(FILE *fin, ftype type) {
-    throw_assert(fscanf(fin, " #INSTANCE_BEGIN# ") == 0);
-    throw_assert(fscanf(fin, " NDIMS: ") == 0);
+    throw_assert(fscanf(fin, " #INSTANCE_BEGIN#") == 0);
+    throw_assert(fscanf(fin, " NDIMS:") == 0);
     throw_assert(fscanf(fin, "%d", &ndims) == 1);
 
     if (type == MVP) {
-        throw_assert(fscanf(fin, " NBTYPES: ") == 0);
+        throw_assert(fscanf(fin, " NBTYPES:") == 0);
         throw_assert(fscanf(fin, "%d", &nbtypes) == 1);
     } else {
         nbtypes = 1;
@@ -112,14 +112,14 @@ void Instance::read(FILE *fin, ftype type) {
     Qs.resize(nbtypes);
     for (int t = 0; t < nbtypes; t++) {
         Ws[t].resize(ndims);
-        throw_assert(fscanf(fin, " Wi: ") == 0);
+        throw_assert(fscanf(fin, " Wi:") == 0);
         for (int d = 0; d < ndims; d++) {
             throw_assert(fscanf(fin, "%d", &Ws[t][d]) == 1);
         }
         if (type == MVP) {
-            throw_assert(fscanf(fin, " Ci: ") == 0);
+            throw_assert(fscanf(fin, " Ci:") == 0);
             throw_assert(fscanf(fin, "%d", &Cs[t]) == 1);
-            throw_assert(fscanf(fin, " Qi: ") == 0);
+            throw_assert(fscanf(fin, " Qi:") == 0);
             throw_assert(fscanf(fin, "%d", &Qs[t]) == 1);
         } else {
             Cs[t] = 1;
@@ -127,7 +127,7 @@ void Instance::read(FILE *fin, ftype type) {
         }
     }
 
-    throw_assert(fscanf(fin, " M: ") == 0);
+    throw_assert(fscanf(fin, " M:") == 0);
     throw_assert(fscanf(fin, "%d", &m) == 1);
 
     items.clear();
@@ -138,9 +138,9 @@ void Instance::read(FILE *fin, ftype type) {
     for (int it_type = 0; it_type < m; it_type++) {
         int qi, bi;
         if (type == MVP) {
-            throw_assert(fscanf(fin, " ti: ") == 0);
+            throw_assert(fscanf(fin, " ti:") == 0);
             throw_assert(fscanf(fin, "%d", &qi) == 1);
-            throw_assert(fscanf(fin, " bi: ") == 0);
+            throw_assert(fscanf(fin, " bi:") == 0);
             throw_assert(fscanf(fin, "%d", &bi) == 1);
             demands.push_back(bi);
         } else {
@@ -159,7 +159,7 @@ void Instance::read(FILE *fin, ftype type) {
                 item.opt = -1;
             }
 
-            throw_assert(fscanf(fin, " wi: ") == 0);
+            throw_assert(fscanf(fin, " wi:") == 0);
             for (int d = 0; d < ndims; d++) {
                 throw_assert(fscanf(fin, "%d", &item[d]) == 1);
                 if (item[d] != 0) {
@@ -169,7 +169,7 @@ void Instance::read(FILE *fin, ftype type) {
             throw_assert(!item.nonzero.empty());
 
             if (type == VBP) {
-                throw_assert(fscanf(fin, " bi: ") == 0);
+                throw_assert(fscanf(fin, " bi:") == 0);
                 throw_assert(fscanf(fin, "%d", &bi) == 1);
                 demands.push_back(bi);
             }
@@ -279,6 +279,7 @@ void Instance::read(FILE *fin, ftype type) {
 }
 
 void Instance::write(FILE *fout) const {
+    fprintf(fout, "#INSTANCE_BEGIN#\n");
     fprintf(fout, "NDIMS: %d\n", ndims);
 
     fprintf(fout, "NBTYPES: %d\n", nbtypes);
@@ -331,4 +332,5 @@ void Instance::write(FILE *fout) const {
         fprintf(fout, " %d", items[i].id);
     }
     fprintf(fout, "\n");
+    fprintf(fout, "#INSTANCE_END#\n");
 }

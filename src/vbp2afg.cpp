@@ -58,14 +58,8 @@ int swig_main(int argc, char *argv[]) {
         }
 
         Arcflow graph(inst);
-
-        fprintf(fout, "#INSTANCE_BEGIN#\n");
         inst.write(fout);
-        fprintf(fout, "#INSTANCE_END#\n");
-
-        fprintf(fout, "#GRAPH_BEGIN#\n");
         graph.write(fout);
-        fprintf(fout, "#GRAPH_END#\n");
 
         fclose(fout);
         return 0;

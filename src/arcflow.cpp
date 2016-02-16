@@ -546,6 +546,7 @@ void Arcflow::write(FILE *fout) {
     sort(all(A));
 
     int iS = 0;
+    fprintf(fout, "#GRAPH_BEGIN#\n");
     fprintf(fout, "NBTYPES: %d\n", inst.nbtypes);
     fprintf(fout, "S: %d\n", iS);
     fprintf(fout, "Ts:");
@@ -573,35 +574,36 @@ void Arcflow::write(FILE *fout) {
             fprintf(fout, "%d %d %d\n", a.u, a.v, a.label);
         }
     }
+    fprintf(fout, "#GRAPH_END#\n");
 }
 
 void Arcflow::read(FILE *fin) {
     throw_assert(ready == false);
     tstart = CURTIME;
     inst = Instance(fin);
-    throw_assert(fscanf(fin, " #GRAPH_BEGIN# ") == 0);
+    throw_assert(fscanf(fin, " #GRAPH_BEGIN#") == 0);
 
     int nbtypes;
-    throw_assert(fscanf(fin, " NBTYPES: ") == 0);
+    throw_assert(fscanf(fin, " NBTYPES:") == 0);
     throw_assert(fscanf(fin, "%d", &nbtypes) == 1);
     throw_assert(nbtypes == inst.nbtypes);
 
-    throw_assert(fscanf(fin, " S: ") == 0);
+    throw_assert(fscanf(fin, " S:") == 0);
     throw_assert(fscanf(fin, "%d", &S) == 1);
 
     Ts.resize(nbtypes);
-    throw_assert(fscanf(fin, " Ts: ") == 0);
+    throw_assert(fscanf(fin, " Ts:") == 0);
     for (int i = 0; i < nbtypes; i++) {
         throw_assert(fscanf(fin, "%d", &Ts[i]) == 1);
     }
 
-    throw_assert(fscanf(fin, " LOSS: ") == 0);
+    throw_assert(fscanf(fin, " LOSS:") == 0);
     throw_assert(fscanf(fin, "%d", &LOSS) == 1);
 
-    throw_assert(fscanf(fin, " NV: ") == 0);
+    throw_assert(fscanf(fin, " NV:") == 0);
     throw_assert(fscanf(fin, "%d", &NV) == 1);
 
-    throw_assert(fscanf(fin, " NA: ") == 0);
+    throw_assert(fscanf(fin, " NA:") == 0);
     throw_assert(fscanf(fin, "%d", &NA) == 1);
 
     for (int i = 0; i < NA; i++) {
@@ -609,7 +611,7 @@ void Arcflow::read(FILE *fin) {
         throw_assert(fscanf(fin, " %d %d %d ", &i_u, &i_v, &label) == 3);
         A.push_back(Arc(i_u, i_v, label));
     }
-    throw_assert(fscanf(fin, " #GRAPH_END# ") == 0);
+    throw_assert(fscanf(fin, " #GRAPH_END#") == 0);
     ready = true;
 }
 
