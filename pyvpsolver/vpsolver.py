@@ -306,6 +306,8 @@ class VPSolver(object):
                 if grepv is not None and grepv in line:
                     continue
                 for f in fout_list:
+                    if f is sys.stdout and line.startswith("PYSOL="):
+                        continue
                     f.write(line)
                     f.flush()
 
