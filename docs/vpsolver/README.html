@@ -57,10 +57,8 @@ Porto, Portugal. All rights reserved. E-mail: <a href="mailto:fdabrandao@dcc.fc.
 
 <hr>
 
-<p><a href="https://github.com/fdabrandao/vpsolver">VPSolver</a> is a vector packing solver based on an arc-flow formulation with graph
-compression.  VPSolver generates very strong models (equivalent to Gilmore and
-Gomory's) that can be solved using general-purpose mixed-integer programming
-solvers such as Gurobi and GLPK (see, e.g., [1] and [2]). VPSolver does not explicitly require any MIP
+<p><a href="https://github.com/fdabrandao/vpsolver">VPSolver</a> is a multiple-choice vector packing solver based on an arc-flow formulation with graph compression (see, e.g., <a href="#references">[1]</a>). VPSolver generates very strong models (equivalent to Gilmore and Gomory's) that can be solved using general-purpose mixed-integer programming
+solvers such as Gurobi and GLPK (see, e.g., <a href="#references">[2]</a> and <a href="#references">[3]</a>). VPSolver does not explicitly require any MIP
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.</p>
 
@@ -135,7 +133,7 @@ large models.</p>
 
 <p>Without the python interface: </p>
 
-<div class="highlight highlight-source-shell"><pre>$ ./configure
+<div class="highlight highlight-source-shell"><pre>$ ./configure CXXFLAGS=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span> LDFLAGS=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
 $ make
 $ sudo make install</pre></div>
 
@@ -169,7 +167,7 @@ $ bash test.sh
 
 <p>Option 2: <code>clone</code> VPSolver and <code>build</code> locally:</p>
 
-<div class="highlight highlight-source-shell"><pre>$ git clone git@github.com:fdabrandao/vpsolver.git vpsolver
+<div class="highlight highlight-source-shell"><pre>$ git clone https://github.com/fdabrandao/vpsolver.git vpsolver
 $ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
 
 <h3>
@@ -215,9 +213,9 @@ URL: http://172.17.0.60:5555/
 
 <ul>
 <li>
-<code>$ bin/vpsolver intance.vbp</code>: solves a vector packing instance using the method proposed in [1]. Note: requires Gurobi 5.0.0 or superior;</li>
+<code>$ bin/vpsolver intance.vbp/.mvp</code>: solves a multiple-choice vector packing instance using the method described in <a href="#references">[1]</a>. Note: requires Gurobi 5.0.0 or superior;</li>
 <li>
-<code>$ bin/vbp2afg instance.vbp graph.afg</code>: builds an arc-flow graph <code>graph.afg</code> for <code>instance.vbp</code>;</li>
+<code>$ bin/vbp2afg instance.vbp/.mvp graph.afg</code>: builds an arc-flow graph <code>graph.afg</code> for <code>instance.vbp/.mvp</code>;</li>
 <li>
 <code>$ bin/afg2mps graph.afg model.mps</code>: creates a MPS model <code>model.mps</code> for <code>graph.afg</code>;</li>
 <li>
@@ -261,7 +259,7 @@ solvers:</p>
 
 <p>Usage:</p>
 
-<div class="highlight highlight-source-shell"><pre>$ vpsolver_X.sh --vbp instance.vbp
+<div class="highlight highlight-source-shell"><pre>$ vpsolver_X.sh --vbp/--mvp instance.vbp/.mvp
 $ vpsolver_X.sh --afg graph.afg
 $ vpsolver_X.sh --mps/--lp model.mps/.lp
 $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
@@ -275,8 +273,6 @@ $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
 <li>
 <code>scripts/</code>: vpsolver scripts</li>
 <li>
-<code>bin/</code>: vpsolver executables</li>
-<li>
 <code>src/</code>: vpsolver source code in C++</li>
 <li>
 <code>pyvpsolver/</code>: pyvpsolver source code in Python</li>
@@ -287,33 +283,38 @@ $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
 </ul>
 
 <h2>
-<a id="user-content-reports" class="anchor" href="#reports" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reports</h2>
+<a id="user-content-references" class="anchor" href="#references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>References</h2>
+
+<p>The current solution method is described in:</p>
+
+<ul>
+<li>[1] Brandão, F. (2016). <em>VPSolver 3: Multiple-choice Vector Packing Solver.</em> <a href="http://arxiv.org/abs/1602.04876">arXiv:1602.04876</a>.</li>
+</ul>
 
 <p>VPSolver was proposed in:</p>
 
 <ul>
-<li><p>[1] Brandão, F. and Pedroso, J. P. (2016). Bin packing and related problems: General arc-flow formulation with graph compression.
+<li><p>[2] Brandão, F. and Pedroso, J. P. (2016). <em>Bin packing and related problems: General arc-flow formulation with graph compression.</em>
 Computers &amp; Operations Research, 69:56 – 67.<br>
-doi: <a href="http://authors.elsevier.com/a/1SKHP15N8Rug2A">http://dx.doi.org/10.1016/j.cor.2015.11.009</a>.</p></li>
-<li><p>[2] Brandão, F. and Pedroso, J. P. (2013). Bin Packing and Related Problems:
-General Arc-flow Formulation with Graph Compression. Technical Report
+doi: <a href="http://dx.doi.org/10.1016/j.cor.2015.11.009">http://dx.doi.org/10.1016/j.cor.2015.11.009</a>.</p></li>
+<li><p>[3] Brandão, F. and Pedroso, J. P. (2013). <em>Bin Packing and Related Problems:
+General Arc-flow Formulation with Graph Compression.</em> Technical Report
 DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do
-Porto, Portugal.<br>
-Available at: <a href="http://arxiv.org/abs/1310.6887">http://arxiv.org/abs/1310.6887</a>.</p></li>
+Porto, Portugal. <a href="http://arxiv.org/abs/1310.6887">arXiv:1310.6887</a>.</p></li>
 </ul>
 
 <p>See also:</p>
 
 <ul>
-<li><p>[3] Brandão, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
-Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
-Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.</p></li>
-<li><p>[4] Brandão, F. and Pedroso, J. P. (2013). Cutting Stock with Binary Patterns:
-Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-09,
-Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal.</p></li>
-<li><p>[5] Brandão, F. (2012). Bin Packing and Related Problems: Pattern-Based Approaches 
+<li><p>[4] Brandão, F. and Pedroso, J. P. (2013). <em>Multiple-choice Vector Bin Packing:
+Arc-flow Formulation with Graph Compression.</em> Technical Report DCC-2013-13,
+Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal. <a href="http://arxiv.org/abs/1312.3836">arXiv:1312.3836</a></p></li>
+<li><p>[5] Brandão, F. and Pedroso, J. P. (2013). <em>Cutting Stock with Binary Patterns:
+Arc-flow Formulation with Graph Compression.</em> Technical Report DCC-2013-09,
+Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal. <a href="http://arxiv.org/abs/1502.02899">arXiv:1502.02899</a>.</p></li>
+<li><p>[6] Brandão, F. (2012). <em>Bin Packing and Related Problems: Pattern-Based Approaches.</em> 
 Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.</p></li>
-<li><p>[6] Computational results on several benchmark test data sets:<br>
+<li><p>[7] Computational results on several benchmark test data sets:<br>
 <a href="http://www.dcc.fc.up.pt/%7Efdabrandao/research/vpsolver/results/">http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/</a></p></li>
 </ul>
 
