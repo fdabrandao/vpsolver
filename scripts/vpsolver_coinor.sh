@@ -47,7 +47,11 @@ solve(){
     local model_file=$1
     echo -e "\n>>> solving the MIP model using COIN-OR CBC..."
     echo -e "Note: different parameter settings may improve the performance substantially!"
-    stdbuf -i0 -o0 -e0 cbc $model_file $options -solve -solu $TMP_DIR/sol.out &
+    if ! [ -x "$(command -v stdbuf)" ]; then
+        cbc $model_file $options -solve -solu $TMP_DIR/sol.out &
+    else
+        stdbuf -i0 -o0 -e0 cbc $model_file $options -solve -solu $TMP_DIR/sol.out &
+    fi
     local pid=$!
     trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
     wait $pid

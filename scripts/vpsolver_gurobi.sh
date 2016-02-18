@@ -51,7 +51,8 @@ solve(){
     local pid=$!
     trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
     wait $pid
-    sed -i '/#/d' $TMP_DIR/vars.sol
+    sed '/#/d' $TMP_DIR/vars.sol > $TMP_DIR/vars.sol2
+    mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol
 }
 
 options="Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0 MIPGapAbs=0.99999"

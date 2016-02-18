@@ -50,7 +50,7 @@ solve(){
     rm -rf $TMP_DIR/vars.sol;
     (
         echo "read $model_file"
-        echo $options
+        echo "$options"
         echo "optimize"
         echo "write solution $TMP_DIR/vars.sol"
     ) | scip &
@@ -145,11 +145,11 @@ do
   esac
 done
 
-if [[ -z "$vbp_file" && -z "$model_file" && -z "$afg_file" ]]; then
+if [[ -z "$instance_file" && -z "$model_file" && -z "$afg_file" ]]; then
     error
 fi
 
-if [[ -n "$vbp_file" ]]; then
+if [[ -n "$instance_file" ]]; then
     if [[ -n "$afg_file" || -n "$model_file" ]]; then
         error
     fi
@@ -158,7 +158,7 @@ if [[ -n "$vbp_file" ]]; then
     model_file=$TMP_DIR/model.mps
 
     echo -e "\n>>> vbp2afg..."
-    vbp2afg $vbp_file $afg_file -2 &
+    vbp2afg $instance_file $afg_file -2 &
     pid=$!
     trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
     wait $pid
@@ -166,7 +166,7 @@ if [[ -n "$vbp_file" ]]; then
     echo -e "\n>>> afg2mps..."
     afg2mps $afg_file $model_file
 elif [[ -n "$afg_file" ]]; then
-    if [[ -n "$vbp_file" ]]; then
+    if [[ -n "$instance_file" ]]; then
         error
     fi
 

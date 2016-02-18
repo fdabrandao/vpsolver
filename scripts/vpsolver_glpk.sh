@@ -58,11 +58,14 @@ solve(){
         trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
         wait $pid
     fi
-
-    sed -ni '/Column name/,/^$/p' $TMP_DIR/sol.out
-    sed -i '1,2d' $TMP_DIR/sol.out
-    sed -i ':a;N;$!ba;s/\n\s\{20\}/ /g' $TMP_DIR/sol.out
-    sed -i 's/\*/ /g' $TMP_DIR/sol.out
+    sed -n '/Column name/,/^$/p' $TMP_DIR/sol.out > $TMP_DIR/sol.out2
+    mv $TMP_DIR/sol.out2 $TMP_DIR/sol.out
+    sed '1,2d' $TMP_DIR/sol.out > $TMP_DIR/sol.out2
+    mv $TMP_DIR/sol.out2 $TMP_DIR/sol.out
+    sed ':a;N;$!ba;s/\n\s\{20\}/ /g' $TMP_DIR/sol.out > $TMP_DIR/sol.out2
+    mv $TMP_DIR/sol.out2 $TMP_DIR/sol.out
+    sed 's/\*/ /g' $TMP_DIR/sol.out > $TMP_DIR/sol.out2
+    mv $TMP_DIR/sol.out2 $TMP_DIR/sol.out
     awk '{ if ( $3 ~ /^[0-9][^\s]*$/  ){ print $2, $3 }else{ print $2, $4 } } ' $TMP_DIR/sol.out > $TMP_DIR/vars.sol
 }
 

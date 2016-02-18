@@ -59,7 +59,7 @@ solve(){
         trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
         wait $pid
     fi
-    sed -e '1,/variables:/d' < $TMP_DIR/sol.out > $TMP_DIR/vars.sol
+    sed -e '1,/variables:/d' $TMP_DIR/sol.out > $TMP_DIR/vars.sol
 }
 
 options=""
