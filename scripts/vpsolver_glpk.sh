@@ -66,7 +66,9 @@ solve(){
     mv $TMP_DIR/sol.out2 $TMP_DIR/sol.out
     sed 's/\*/ /g' $TMP_DIR/sol.out > $TMP_DIR/sol.out2
     mv $TMP_DIR/sol.out2 $TMP_DIR/sol.out
-    awk '{ if ( $3 ~ /^[0-9][^\s]*$/  ){ print $2, $3 }else{ print $2, $4 } } ' $TMP_DIR/sol.out > $TMP_DIR/vars.sol
+    tr '\n' '$' < $TMP_DIR/sol.out | sed 's/$        //g' | tr '$' '\n' > $TMP_DIR/sol.out2
+    mv $TMP_DIR/sol.out2 $TMP_DIR/sol.out
+    awk '{ if ( $3 ~ /^[0-9][^\s]*$/  ){ print $2, $3 }else{ print $2, $4 } }' $TMP_DIR/sol.out > $TMP_DIR/vars.sol
 }
 
 options=""
