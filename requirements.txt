@@ -1,4 +1,4 @@
 future >= 0.15.0
 six >= 1.5.2
 flask >= 0.10.1
-pympl >= 0.9.0b0
+pympl >= 1.0.0b1
