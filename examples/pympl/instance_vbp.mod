@@ -21,8 +21,4 @@ s.t. flow_con{k in V}:
 s.t. assocs{it in I}: x[it] = sum{(u, v, i) in A: i == it} f[u, v, i];
 s.t. zvalue: Z = f['T', 'S', 'LOSS'];
 */
-
-solve;
-display Z;
-display x;
 end;

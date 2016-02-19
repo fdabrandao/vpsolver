@@ -44,6 +44,4 @@ for height in HS:
 s.t. demand{it in I}: sum{h in HS} x[h, it] >= b[it];
 
 minimize obj: Z;
-
-solve;
 end;

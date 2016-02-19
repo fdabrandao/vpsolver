@@ -36,8 +36,4 @@ minimize obj: cost;
 s.t. demand{i in 1..m}: x[i] >= b[i];
 s.t. zub{t in T: Qs[t] != -1}: Z[t] <= Qs[t];
 s.t. total_cost: cost = sum{t in T} Z[t]*Cs[t];
-
-solve;
-display{t in 1..nbtypes} Z[t];
-display x;
 end;
