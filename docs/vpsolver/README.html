@@ -137,6 +137,8 @@ large models.</p>
 $ make
 $ sudo make install</pre></div>
 
+<p>Note: In order to compile only the components that do not require Gurobi, use <code>./configure GUROBI_HOME=""</code>. In order to link the optional components that require Gurobi, the environment variable <code>$GUROBI_HOME</code> must be set, and some additional flags may also need to be set (e.g., <code>./configure LDFLAGS="-L${GUROBI_HOME}/lib/ -lgurobi_stdc++"</code>).</p>
+
 <p>With the python interface: </p>
 
 <pre><code>$ pip install -r requirements.txt

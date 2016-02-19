@@ -56,6 +56,8 @@ $ ./configure CXXFLAGS="" LDFLAGS=""
 $ make
 $ sudo make install
 ```
+Note: In order to compile only the components that do not require Gurobi, use `./configure GUROBI_HOME=""`. In order to link the optional components that require Gurobi, the environment variable `$GUROBI_HOME` must be set, and some additional flags may also need to be set (e.g., `./configure LDFLAGS="-L${GUROBI_HOME}/lib/ -lgurobi_stdc++"`).
+
 With the python interface: 
 
 ```
