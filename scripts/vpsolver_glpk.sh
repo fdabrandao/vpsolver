@@ -71,7 +71,7 @@ solve(){
     awk '{ if ( $3 ~ /^[0-9][^\s]*$/  ){ print $2, $3 }else{ print $2, $4 } }' $TMP_DIR/sol.out > $TMP_DIR/vars.sol
 }
 
-options=""
+options="--seed 1234"
 instance_file=""
 model_file=""
 afg_file=""
@@ -138,7 +138,7 @@ do
         shift 1;;
 
     --options)
-        if [[ -z "$options" && -n "$2" ]]; then
+        if [[ -n "$2" ]]; then
             options=$2
         else
             error

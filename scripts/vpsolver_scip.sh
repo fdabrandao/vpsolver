@@ -50,7 +50,7 @@ solve(){
     rm -rf $TMP_DIR/vars.sol;
     (
         echo "read $model_file"
-        echo "$options"
+        echo -e "$options"
         echo "optimize"
         echo "write solution $TMP_DIR/vars.sol"
     ) | scip &
@@ -129,7 +129,7 @@ do
         shift 1;;
 
     --options)
-        if [[ -z "$options" && -n "$2" ]]; then
+        if [[ -n "$2" ]]; then
             options=$2
         else
             error

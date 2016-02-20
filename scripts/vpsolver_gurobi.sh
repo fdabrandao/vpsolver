@@ -55,7 +55,7 @@ solve(){
     mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol
 }
 
-options="Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0 MIPGapAbs=0.99999"
+options="Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0 MIPGapAbs=0.99999 Seed=1234"
 instance_file=""
 model_file=""
 afg_file=""
@@ -122,7 +122,7 @@ do
         shift 1;;
 
     --options)
-        if [[ -z "$options" && -n "$2" ]]; then
+        if [[ -n "$2" ]]; then
             options=$2
         else
             error

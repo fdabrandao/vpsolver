@@ -129,7 +129,7 @@ do
         shift 1;;
 
     --options)
-        if [[ -z "$options" && -n "$2" ]]; then
+        if [[ -n "$2" ]]; then
             options=$2
         else
             error

@@ -58,7 +58,7 @@ solve(){
     tail -n +2 $TMP_DIR/sol.out | awk '{ print $2, $3 }' > $TMP_DIR/vars.sol
 }
 
-options="-cuts off"
+options="-cuts off -randomSeed 1234 -randomCbcSeed 1234"
 instance_file=""
 model_file=""
 afg_file=""
@@ -125,7 +125,7 @@ do
         shift 1;;
 
     --options)
-        if [[ -z "$options" && -n "$2" ]]; then
+        if [[ -n "$2" ]]; then
             options=$2
         else
             error

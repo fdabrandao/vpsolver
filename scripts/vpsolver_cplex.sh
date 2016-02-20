@@ -50,7 +50,7 @@ solve(){
     rm -rf $TMP_DIR/vars.sol;
     (
         echo "read $model_file"
-        echo $options
+        echo -e "$options"
         echo "optimize"
         echo "write $TMP_DIR/vars.sol"
     ) | cplex &
@@ -62,7 +62,7 @@ solve(){
     mv $TMP_DIR/vars.sol2 $TMP_DIR/vars.sol
 }
 
-options=""
+options="set randomseed 1234\n"
 instance_file=""
 model_file=""
 afg_file=""
@@ -129,7 +129,7 @@ do
         shift 1;;
 
     --options)
-        if [[ -z "$options" && -n "$2" ]]; then
+        if [[ -n "$2" ]]; then
             options=$2
         else
             error
