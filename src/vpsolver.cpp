@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
     setvbuf(stdout, NULL, _IONBF, 0);
     if (argc < 2 || argc > 7) {
         printf("Usage: vpsolver instance.vbp/instance.mvp "
-               "[method:-2] [binary:0] [vtype:I] "
+               "[method:-3] [binary:0] [vtype:I] "
                "[print_instance:0] [pyout:0]\n");
         return 1;
     }

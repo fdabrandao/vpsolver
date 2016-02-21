@@ -60,7 +60,7 @@ void Instance::init() {
     relax_domains = false;
     binary = false;
     sort = true;
-    method = -2;
+    method = -3;
     vtype = 'I';
     ndims = 0;
     m = 0;

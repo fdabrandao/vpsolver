@@ -25,6 +25,7 @@ from builtins import object
 
 import os
 import sys
+import re
 import signal
 import atexit
 import shutil
@@ -64,9 +65,15 @@ class VBP(object):
         self.W, self.w, self.b = W, w, b
 
     @classmethod
-    def from_file(cls, vbp_file, verbose=None):
+    def from_file(cls, vbp_file, binary=None, verbose=None):
         with open(vbp_file, "r") as f:
-            lst = list(map(int, f.read().split()))
+            lst = f.read().split()
+            for i in range(len(lst)):
+                try:
+                    assert int(lst[i]) == float(lst[i])
+                    lst[i] = int(lst[i])
+                except:
+                    break
             ndims = lst.pop(0)
             W = lst[:ndims]
             lst = lst[ndims:]
@@ -76,8 +83,13 @@ class VBP(object):
                 w.append(lst[:ndims])
                 lst = lst[ndims:]
                 b.append(lst.pop(0))
-            assert lst == []
-            binary = False
+            if lst != [] and not str(lst[0]).isdigit():
+                opts = dict(re.findall("([A-Z]+): (\d+)", " ".join(lst)))
+                if binary is None:
+                    binary = bool(int(opts.get("BINARY", 0)))
+            else:
+                assert lst == []
+                binary = False
         return cls(W, w, b, binary, verbose)
 
     def __del__(self):
@@ -130,10 +142,15 @@ class MVP(object):
         self.ws, self.b = ws, b
 
     @classmethod
-    def from_file(cls, mvp_file, verbose=None):
+    def from_file(cls, mvp_file, binary=None, verbose=None):
         with open(mvp_file, "r") as f:
-            txt = f.read()
-            lst = list(map(int, txt.split()))
+            lst = f.read().split()
+            for i in range(len(lst)):
+                try:
+                    assert int(lst[i]) == float(lst[i])
+                    lst[i] = int(lst[i])
+                except:
+                    break
             ndims = lst.pop(0)
             nbtypes = lst.pop(0)
             Ws, Cs, Qs = [], [], []
@@ -152,8 +169,13 @@ class MVP(object):
                 for j in range(qi):
                     ws[i].append(lst[:ndims])
                     lst = lst[ndims:]
-            assert lst == []
-            binary = False
+            if lst != [] and not str(lst[0]).isdigit():
+                opts = dict(re.findall("([A-Z]+): (\d+)", " ".join(lst)))
+                if binary is None:
+                    binary = bool(int(opts.get("BINARY", 0)))
+            else:
+                assert lst == []
+                binary = False
         return cls(Ws, Cs, Qs, ws, b, binary, verbose)
 
     def __del__(self):
@@ -166,8 +188,7 @@ class MVP(object):
 class AFG(object):
     """Wrapper for .afg files."""
 
-    def __init__(
-            self, instance, compress=-2, binary=None, vtype="I",
+    def __init__(self, instance, method=-3, binary=None, vtype="I",
             verbose=None):
         assert isinstance(instance, (VBP, MVP))
         self.instance = instance
@@ -180,7 +201,7 @@ class AFG(object):
             instance_file = instance.mvp_file
             binary = instance.binary
         self.output = VPSolver.vbp2afg(
-            instance_file, self.afg_file, compress, binary, vtype,
+            instance_file, self.afg_file, method, binary, vtype,
             verbose=verbose
         )
 
@@ -324,7 +345,7 @@ class VPSolver(object):
         exit_code = proc.wait()
         proc.stdout.close()
         if exit_code != 0:
-            raise Exception("failed to run '{}'".format(cmd))
+            raise RuntimeError("failed to run '{}'".format(cmd))
 
     @staticmethod
     def parse_vbpsol(vpsol_output):
@@ -357,8 +378,7 @@ class VPSolver(object):
         return VPSolver.parse_vbpsol(output)
 
     @staticmethod
-    def vpsolver(
-            instance_file, compress=-2, binary=None, vtype="I",
+    def vpsolver(instance_file, method=-3, binary=None, vtype="I",
             print_inst=False, pyout=True, verbose=None):
         """Calls 'vpsolver' to solve .vbp instances."""
         if isinstance(instance_file, VBP):
@@ -375,7 +395,7 @@ class VPSolver(object):
                 binary = -1
         out_file = VPSolver.new_tmp_file()
         opts = "{:d} {:d} {} {:d} {:d}".format(
-            compress, binary, vtype, print_inst, pyout
+            method, binary, vtype, print_inst, pyout
         )
         VPSolver.run(
             "{} {} {}".format(VPSolver.VPSOLVER_EXEC, instance_file, opts),
@@ -388,8 +408,7 @@ class VPSolver(object):
         return output, VPSolver.parse_vbpsol(output)
 
     @staticmethod
-    def vbp2afg(
-            instance_file, afg_file, compress=-2, binary=None, vtype="I",
+    def vbp2afg(instance_file, afg_file, method=-3, binary=None, vtype="I",
             verbose=None):
         """Calls 'vbp2afg' to create arc-flow graphs for .vbp instances."""
         if isinstance(instance_file, VBP):
@@ -404,7 +423,7 @@ class VPSolver(object):
             if binary is None:
                 binary = -1
         out_file = VPSolver.new_tmp_file()
-        opts = "{:d} {:d} {}".format(compress, binary, vtype)
+        opts = "{:d} {:d} {}".format(method, binary, vtype)
         VPSolver.run(
             "{} {} {} {}".format(
                 VPSolver.VBP2AFG_EXEC, instance_file, afg_file, opts
@@ -454,9 +473,8 @@ class VPSolver(object):
         return output
 
     @staticmethod
-    def script(
-            script_name, arg1=None, arg2=None,
-            options=None, pyout=True, verbose=None):
+    def script(script_name, arg1=None, arg2=None, options=None, pyout=True,
+            verbose=None):
         """Calls VPSolver scripts and returns vector packing solutions."""
         cmd = script_name
         for arg in [arg1, arg2]:

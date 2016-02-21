@@ -167,7 +167,7 @@ if [[ -n "$instance_file" ]]; then
     model_file=$TMP_DIR/model.mps
 
     echo -e "\n>>> vbp2afg..."
-    vbp2afg $instance_file $afg_file -2 &
+    vbp2afg $instance_file $afg_file &
     pid=$!
     trap "kill $pid &> /dev/null" SIGHUP SIGINT SIGTERM
     wait $pid

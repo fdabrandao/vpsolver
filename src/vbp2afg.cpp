@@ -30,7 +30,7 @@ int swig_main(int argc, char *argv[]) {
     setvbuf(stdout, NULL, _IONBF, 0);
     if (argc < 3 || argc > 6) {
         printf("Usage: vbp2afg instance.vbp/instance.mvp graph.afg "
-               "[method:-2] [binary:0] [vtype:I]\n");
+               "[method:-3] [binary:0] [vtype:I]\n");
         return 1;
     }
     try {

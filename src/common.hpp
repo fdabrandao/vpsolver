@@ -27,8 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define all(x) (x).begin(),(x).end()
 #define MP(x,y) make_pair(x,y)
 
-#define MIN_METHOD -2
-#define MAX_METHOD -2
+#define MIN_METHOD -3
+#define MAX_METHOD -3
 
 #define CURTIME clock()
 #define TIMEDIF(t0) (static_cast<double>(clock()-t0)/CLOCKS_PER_SEC)
