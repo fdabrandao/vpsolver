@@ -39,7 +39,7 @@ inf = float("inf")
 class VBP(object):
     """Wrapper for .vbp files."""
 
-    def __init__(self, W, w, b, binary=False, verbose=None):
+    def __init__(self, W, w, b, binary=False, verbose=False):
         self.vbp_file = VPSolver.new_tmp_file(".vbp")
         self.labels = {}
         with open(self.vbp_file, "w") as f:
@@ -102,7 +102,7 @@ class VBP(object):
 class MVP(object):
     """Wrapper for .mvp files."""
 
-    def __init__(self, Ws, Cs, Qs, ws, b, binary=False, verbose=None):
+    def __init__(self, Ws, Cs, Qs, ws, b, binary=False, verbose=False):
         self.mvp_file = VPSolver.new_tmp_file(".mvp")
         self.labels = {}
         with open(self.mvp_file, "w") as f:
