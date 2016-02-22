@@ -24,23 +24,22 @@ import sys
 from .. import VPSolver, MVP, AFG, MPS
 
 
-def solve(
-        Ws, Cs, Qs, ws, b, svg_file="", lp_file="", mps_file="",
-        script="vpsolver_glpk.sh", stats=False, verbose=False):
+def solve(Ws, Cs, Qs, ws, b,
+        svg_file="", lp_file="", mps_file="",
+        script=None, script_options=None, stats=None, verbose=None):
     """
     Solves multiple-choice vector bin packing instances
-    using the method similar to the method proposed in:
-    Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector
-    Bin Packing: Arc-flow Formulation with Graph Compression. Technical Report
-    DCC-2013-13, Faculdade de Ciencias da Universidade do Porto, Universidade
-    do Porto, Portugal.
+    using the method the method proposed in:
+    Brandao, F. (2016). VPSolver 3: Multiple-choice Vector Packing Solver.
+    arXiv:1602.04876. http://arxiv.org/abs/1602.04876
     """
+    assert script is not None
     assert svg_file == "" or svg_file.endswith(".svg")
-    if verbose:
-        stats = True
+    if stats is None and verbose is not None:
+        stats = verbose
     instance = MVP(Ws, Cs, Qs, ws, b, verbose=False)
-    if (stats == verbose and svg_file == "" and
-            lp_file == "" and mps_file == ""):
+    if (stats == verbose and svg_file == ""
+            and lp_file == "" and mps_file == ""):
         out, (obj, sol) = VPSolver.script(script, instance, verbose=verbose)
     else:
         afg = AFG(instance, verbose=stats)
@@ -61,7 +60,7 @@ def solve(
             VPSolver.log(".MPS model successfully generated!", verbose)
         mps_model = MPS(afg, verbose=verbose)
         out, (obj, sol) = VPSolver.script(
-            script, mps_model, afg, verbose=verbose
+            script, mps_model, afg, options=script_options, verbose=verbose
         )
     return obj, sol
 

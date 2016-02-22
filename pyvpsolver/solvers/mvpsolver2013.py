@@ -29,13 +29,10 @@ from .. import VPSolver, VBP, AFG
 from .. import AFGraph
 from pympl import Model
 
-LOSS = "L"
 
-
-def solve(
-        Ws, Cs, Qs, ws, b, transitive_reduction=True,
+def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
         svg_file="", lp_file="", mps_file="",
-        script="vpsolver_glpk.sh", stats=False, verbose=False):
+        script=None, script_options=None, stats=None, verbose=None):
     """
     Solves multiple-choice vector bin packing instances
     using the method proposed in:
@@ -44,9 +41,10 @@ def solve(
     DCC-2013-13, Faculdade de Ciencias da Universidade do Porto, Universidade
     do Porto, Portugal.
     """
+    assert script is not None
     assert svg_file == "" or svg_file.endswith(".svg")
-    if verbose:
-        stats = True
+    if stats is None and verbose is not None:
+        stats = verbose
     nbtypes = len(Ws)
     ndims = len(Ws[0])
 
@@ -59,6 +57,7 @@ def solve(
             ww.append(ws[i][j])
             bb.append(b[i])
 
+    LOSS = "L"
     instances = [None] * nbtypes
     graphs = [None] * nbtypes
     Ss, Ts = [None] * nbtypes, [None] * nbtypes

@@ -24,9 +24,9 @@ import sys
 from .. import VPSolver, VBP, AFG, MPS
 
 
-def solve(
-        W, w, b, svg_file="", lp_file="", mps_file="",
-        script="vpsolver_glpk.sh", verbose=False):
+def solve(W, w, b,
+        svg_file="", lp_file="", mps_file="",
+        script=None, script_options=None, stats=None, verbose=None):
     """
     Solves vector packing instances using the method proposed in:
     Brandao, F. and Pedroso, J. P. (2013). Bin Packing and Related
@@ -34,12 +34,16 @@ def solve(
     Report DCC-2013-08, Faculdade de Ciencias da Universidade do Porto,
     Universidade do Porto, Portugal.
     """
+    assert script is not None
     assert svg_file == "" or svg_file.endswith(".svg")
+    if stats is None and verbose is not None:
+        stats = verbose
     instance = VBP(W, w, b, verbose=False)
-    if svg_file == "" and lp_file == "" and mps_file == "":
+    if (stats == verbose and svg_file == ""
+            and lp_file == "" and mps_file == ""):
         out, (obj, sol) = VPSolver.script(script, instance, verbose=verbose)
     else:
-        afg = AFG(instance, verbose=verbose)
+        afg = AFG(instance, verbose=stats)
         if svg_file.endswith(".svg"):
             VPSolver.log("Generating .SVG file...", verbose)
             try:
@@ -54,7 +58,7 @@ def solve(
             VPSolver.log(".MPS model successfully generated!", verbose)
         mps_model = MPS(afg, verbose=verbose)
         out, (obj, sol) = VPSolver.script(
-            script, mps_model, afg, verbose=verbose
+            script, mps_model, afg, options=script_options, verbose=verbose
         )
     return obj, sol
 
