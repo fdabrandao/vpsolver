@@ -25,8 +25,8 @@ import os
 import sys
 import example
 import example_vbp
+import example_mvp
 import example_vsbpp
-import example_mvbp
 
 if __name__ == "__main__":
     sdir = os.path.dirname(__file__)
@@ -43,11 +43,11 @@ def main():
     print("example_vbp:")
     example_vbp.main()
 
+    print("example_mvp:")
+    example_mvp.main()
+
     print("example_vsbpp:")
     example_vsbpp.main()
-
-    print("example_mvbp:")
-    example_mvbp.main()
 
 
 if __name__ == "__main__":

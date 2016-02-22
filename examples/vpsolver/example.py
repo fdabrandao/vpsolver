@@ -23,8 +23,8 @@ from __future__ import print_function
 
 import os
 import sys
-from pyvpsolver import VPSolver, VBP, AFG, MPS, LP
-from pyvpsolver.solvers import vbpsolver
+from pyvpsolver import VPSolver, VBP, MVP, AFG, MPS, LP
+from pyvpsolver.solvers import vbpsolver, mvpsolver
 
 if __name__ == "__main__":
     sdir = os.path.dirname(__file__)
@@ -33,18 +33,17 @@ if __name__ == "__main__":
 
 
 def main():
-    """Examples: how to use VBP, AFG, MPS, LP and VPSolver"""
+    """Examples: how to use VBP, MVP, AFG, MPS, LP and VPSolver"""
 
     # Create instanceA:
     instanceA = VBP(
         (5180,),
         [(1120,), (1250,), (520,), (1066,), (1000,), (1150,)],
-        [9, 5, 91, 18, 11, 64],
-        verbose=False
+        [9, 5, 91, 18, 11, 64]
     )
 
     # Create instanceB from a .vbp file
-    instanceB = VBP.from_file("instance.vbp", verbose=False)
+    instanceB = VBP.from_file("instance.vbp")
 
     # Create an arc-flow graph for instanceA
     afg = AFG(instanceA, verbose=False)
@@ -87,8 +86,36 @@ def main():
 
     # Pretty-print the solution:
     vbpsolver.print_solution(obj, patterns)
-
     assert obj == 21  # check the solution objective value
+
+    # Create instanceC:
+    W1 = (100, 100)
+    W2 = (50, 120)
+    W3 = (150, 25)
+    ws1, b1 = [(50, 25), (25, 50), (0, 75)], 1
+    ws2, b2 = [(40, 40), (60, 25), (25, 60)], 1
+    ws3, b3 = [(30, 10), (20, 40), (10, 50)], 1
+    Ws = [W1, W2, W3]     # capacities
+    Cs = [3, 7, 2]        # costs
+    Qs = [-1, -1, -1]     # number of bins available
+    ws = [ws1, ws2, ws3]  # items
+    b = [b1, b2, b3]      # demands
+    instanceC = MVP(Ws, Cs, Qs, ws, b)
+
+    # Solve an instance directly without creating AFG, MPS or LP objects:
+    out, sol = VPSolver.script("vpsolver_glpk.sh", instanceC, verbose=True)
+    obj, patterns = sol
+    mvpsolver.print_solution(obj, patterns)
+    assert obj == 3  # check the solution objective value
+
+    # Create instanceD from a .mvp file
+    instanceD = MVP.from_file("instance.mvp")
+
+    # Solve an instance directly without creating AFG, MPS or LP objects:
+    out, sol = VPSolver.script("vpsolver_glpk.sh", instanceD, verbose=True)
+    obj, patterns = sol
+    mvpsolver.print_solution(obj, patterns)
+    assert obj == 8  # check the solution objective value
 
 
 if __name__ == "__main__":

@@ -34,15 +34,6 @@ if __name__ == "__main__":
 def main():
     """Examples: Multiple-choice Vector Bin Packing"""
 
-    """
-    'solvers.mvpsolver' uses the method proposed in:
-    Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
-    Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
-    Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
-    """
-
-    inf = float("inf")
-
     # Example 1:
     # Bins:
     W1 = (100, 100)
@@ -50,7 +41,7 @@ def main():
     W3 = (150, 25)
     Ws = [W1, W2, W3]    # Capacities
     Cs = [3, 7, 2]       # Costs
-    Qs = [inf, inf, inf] # Number of available bins
+    Qs = [-1, -1, -1] # Number of available bins
     # Items:
     ws1, b1 = [(50, 25), (25, 50), (0, 75)], 1
     ws2, b2 = [(40, 40), (60, 25), (25, 60)], 1
@@ -62,11 +53,12 @@ def main():
     obj, sol = mvpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graphA_mvbp.svg",
-        verbose=True, script="vpsolver_glpk.sh"
+        script="vpsolver_glpk.sh", verbose=True
     )
     print("obj:", obj)
     print("sol:", sol)
     mvpsolver.print_solution(obj, sol)
+    assert obj == 3  # check the solution objective value
 
     ## Example 2
     # Bins:
@@ -74,7 +66,7 @@ def main():
     W2 = (75, 50)
     Ws = [W1, W2]
     Cs = [3, 2]
-    Qs = [inf, inf]
+    Qs = [-1, -1]
     # Items
     ws1, b1 = [(75, 50)], 2
     ws2, b2 = [(40, 15), (25, 25)], 1
@@ -85,13 +77,11 @@ def main():
     obj, sol = mvpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graphB_mvbp.svg",
-        script="vpsolver_glpk.sh",
-        verbose=True
+        script="vpsolver_glpk.sh", verbose=True
     )
     print("obj:", obj)
     print("sol:", sol)
     mvpsolver.print_solution(obj, sol)
-
     assert obj == 5  # check the solution objective value
 
 

@@ -42,13 +42,11 @@ def main():
     obj, sol = vbpsolver.solve(
         W, w, b,
         svg_file="tmp/graph_vbp.svg",
-        script="vpsolver_glpk.sh",
-        verbose=True
+        script="vpsolver_glpk.sh", verbose=True
     )
     print("obj:", obj)
     print("sol:", sol)
     vbpsolver.print_solution(obj, sol)
-
     assert obj == 33  # check the solution objective value
 
 

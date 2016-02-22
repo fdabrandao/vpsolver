@@ -34,15 +34,6 @@ if __name__ == "__main__":
 def main():
     """ Variable-sized Bin Packing Example """
 
-    """
-    'solvers.mvbp' the method proposed in:
-    Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector Bin Packing:
-    Arc-flow Formulation with Graph Compression. Technical Report DCC-2013-13,
-    Faculdade de Ciencias da Universidade do Porto, Universidade do Porto, Portugal.
-    """
-
-    inf = float("inf")
-
     # Capacities:
     Ws = [[100], [120], [150]]
 
@@ -50,12 +41,14 @@ def main():
     Cs = [100, 120, 150]
 
     # Number of bins available of each type:
-    Qs = [inf, inf, inf]
+    Qs = [-1, -1, -1]
 
     # Item weights:
-    ws = [[[10]], [[14]], [[17]], [[19]], [[24]], [[29]], [[32]], [[33]], [[36]],
-          [[38]], [[40]], [[50]], [[54]], [[55]], [[63]], [[66]], [[71]], [[77]],
-          [[79]], [[83]], [[92]], [[95]], [[99]]]
+    ws = [
+        [[10]], [[14]], [[17]], [[19]], [[24]], [[29]], [[32]], [[33]], [[36]],
+        [[38]], [[40]], [[50]], [[54]], [[55]], [[63]], [[66]], [[71]], [[77]],
+        [[79]], [[83]], [[92]], [[95]], [[99]]
+    ]
 
     # Item demands:
     b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
@@ -64,13 +57,11 @@ def main():
     obj, sol = mvpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graph_vsbpp.svg",
-        script="vpsolver_glpk.sh",
-        verbose=True
+        script="vpsolver_glpk.sh", verbose=True
     )
     print("obj:", obj)
     print("sol:", sol)
     mvpsolver.print_solution(obj, sol)
-
     assert obj == 1280  # check the solution objective value
 
 

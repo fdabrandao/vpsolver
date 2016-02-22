@@ -1,6 +1,6 @@
 $EXEC{
 from pyvpsolver import MVP
-inst = MVP.from_file("data/small.mvp")
+inst = MVP.from_file("data/instance.mvp")
 };
 $PARAM[nbtypes]{len(inst.Ws)};
 $PARAM[Cs]{inst.Cs, i0=1};
