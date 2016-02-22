@@ -21,4 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
 from pyvpsolver.swig import vbp2afg
-vbp2afg.swig_main(len(sys.argv), [x.encode('ascii') for x in sys.argv])
+sys.exit(
+    vbp2afg.swig_main(len(sys.argv), [x.encode("ascii") for x in sys.argv])
+)
