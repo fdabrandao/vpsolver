@@ -30,19 +30,13 @@ import signal
 from flask import Flask, Response
 from flask import render_template, json, request, redirect, url_for
 from multiprocessing import Process
-from pyvpsolver import VPSolver, VBP, AFG, LP
+from pyvpsolver import VPSolver, VBP, MVP, AFG, LP
 from pympl import PyMPL
 
 DEBUG = False
 PORT = 5555
 
 if __name__ == "__main__":
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-        __file__ = os.path.basename(__file__)
-        sys.argv[0] = __file__
-
     if len(sys.argv) >= 2 and sys.argv[1].isdigit():
         PORT = int(sys.argv[1])
 
@@ -57,7 +51,7 @@ def inject_globals():
         app_name="VPSolver App",
         pages=[
             ("/vbp", "Vector Packing"),
-            ("/pympl", "PyMPL"),
+            ("/mvp", "Multiple-choice"),
         ],
     )
     return data
@@ -87,10 +81,12 @@ def load(fname):
 @app.route("/vbp/", defaults={"example": None})
 @app.route("/vbp/<example>")
 def vbp(example):
-    """Renders the input page."""
+    """Renders the input page for VBP."""
     title = "Vector Packing"
 
-    example_folder = "data/examples/vbp/"
+    example_folder = os.path.join(
+        os.path.dirname(__file__), "data", "examples", "vbp"
+    )
     examples = [
         ("/vbp/", "", None),
         ("/vbp/bpp", "BPP", "bpp.vbp"),
@@ -102,7 +98,7 @@ def vbp(example):
     for url, description, fname in examples:
         if request.path == url:
             if fname is not None:
-                input_data = load(example_folder+fname)
+                input_data = load(os.path.join(example_folder, fname))
             break
 
     scripts = [
@@ -124,41 +120,44 @@ def vbp(example):
     )
 
 
-@app.route("/pympl/", defaults={"example": None})
-@app.route("/pympl/<example>")
-def pympl(example):
-    """Renders the input page."""
-    title = "PyMPL: AMPL extension"
+@app.route("/mvp/", defaults={"example": None})
+@app.route("/mvp/<example>")
+def mvp(example):
+    """Renders the input page for MVP."""
+    title = "Multiple-choice Vector Packing"
 
-    example_folder = "data/examples/pympl/"
+    example_folder = os.path.join(
+        os.path.dirname(__file__), "data", "examples", "mvp"
+    )
     examples = [
-        ("/pympl/", "", None),
-        (
-            "/pympl/vbp", "Vector Packing", "vector_packing.mod"
-        ),
-        (
-            "/pympl/vsbpp", "Variable Sized Bin Packing",
-            "variable_size_bin_packing.mod"
-        ),
-        (
-            "/pympl/pwl", "Piecewise Linear Function",
-            "piecewise_linear.mod"
-        ),
+        ("/mvp/", "", None),
+        ("/mvp/vsbpp", "VSBPP", "vsbpp.mvp"),
+        ("/mvp/mvp", "MVP", "mvp.mvp"),
     ]
 
     input_data = ""
     for url, description, fname in examples:
         if request.path == url:
             if fname is not None:
-                input_data = load(example_folder+fname)
+                input_data = load(os.path.join(example_folder, fname))
             break
+
+    scripts = [
+        ("vpsolver_glpk.sh", "GLPK"),
+        ("vpsolver_gurobi.sh", "GUROBI"),
+        ("vpsolver_cplex.sh", "CPLEX"),
+        ("vpsolver_coinor.sh", "COIN-OR"),
+        ("vpsolver_lpsolve.sh", "LPSOLVE"),
+        ("vpsolver_scip.sh", "SCIP"),
+    ]
 
     return render_template(
         "input.html",
         title=title,
         examples=examples,
+        scripts=scripts,
         input_data=input_data,
-        solver_url="/solve/pympl",
+        solver_url="/solve/mvp",
     )
 
 
@@ -193,16 +192,15 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
         out, sol = VPSolver.script(
             form["script"], lp_model, afg, pyout=False, verbose=True
         )
-    elif app_name == "pympl":
-        tmpfile = VPSolver.new_tmp_file(ext=".mod")
-        parser = PyMPL()
-        parser.input = input_
-        parser.parse()
-        parser.write(tmpfile)
-        VPSolver.run(
-            "glpsol --math {0}".format(tmpfile),
-            grepv="Generating",
-            verbose=True
+    elif app_name == "mvp":
+        tmpfile = VPSolver.new_tmp_file(ext=".mvp")
+        with open(tmpfile, "w") as f:
+            f.write(input_)
+        instance = MVP.from_file(tmpfile, verbose=False)
+        afg = AFG(instance, verbose=True)
+        lp_model = LP(afg, verbose=False)
+        out, sol = VPSolver.script(
+            form["script"], lp_model, afg, pyout=False, verbose=True
         )
 
     print("EOF\n")
