@@ -19,7 +19,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = "3.0.0b2"
+__version__ = "3.0.0rc0"
 
 from .graphutils import AFGraph
 from .vpsolver import VPSolver, VBP, MVP, AFG, MPS, LP
