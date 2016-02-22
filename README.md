@@ -217,5 +217,4 @@ http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/
 
 
 ***
-Copyright © Filipe Brandão. All rights reserved.  
-E-mail: <fdabrandao@dcc.fc.up.pt>. [[Homepage](http://www.dcc.fc.up.pt/~fdabrandao/)]
+Copyright © 2013-2016 [Filipe Brandão](http://www.dcc.fc.up.pt/~fdabrandao/) <<fdabrandao@dcc.fc.up.pt>>. All rights reserved.
