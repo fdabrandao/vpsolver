@@ -15,7 +15,7 @@ large models.
 
 For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling toolbox ([PyMPL](https://github.com/fdabrandao/pympl/)), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a [Docker container](#docker).
 
-For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki) or to the manual.
+For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki) or to the [manual](https://github.com/fdabrandao/vpsolver/tree/master/docs/vpsolver_manual.pdf).
 
 #### Repositories
 * Project Homepage: <http://vpsolver.dcc.fc.up.pt>
@@ -153,6 +153,8 @@ $ scritps/vpsolver_gurobi.sh --mps model.mps --wsol vars.sol
 $ bin/vbpsol graph.afg vars.sol  
 ```
 
+For more details, please refer to the [manual](https://github.com/fdabrandao/vpsolver/tree/master/docs/vpsolver_manual.pdf).
+
 ## VPSolver Scripts
 VPSolver includes several scripts for solving arc-flow models using different
 solvers:
@@ -172,6 +174,8 @@ $ vpsolver_X.sh --afg graph.afg
 $ vpsolver_X.sh --mps/--lp model.mps/.lp
 $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg
 ```
+
+For more details, please refer to the [manual](https://github.com/fdabrandao/vpsolver/tree/master/docs/vpsolver_manual.pdf).
 
 ## Folders
 

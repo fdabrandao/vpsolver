@@ -112,7 +112,7 @@ setup(
     scripts=[os.path.join("scripts", f) for f in ls_dir("scripts/")],
     install_requires=open("requirements.txt").read().split("\n"),
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Science/Research",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",

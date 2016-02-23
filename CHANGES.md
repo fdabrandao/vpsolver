@@ -3,6 +3,16 @@ VPSolver Changelog
 
 Here you can see the full list of changes between each VPSolver release.
 
+Version 3.0.0
+-------------
+
+Released on February 23th 2016, codename Onyx Panther
+
+- Various bugfixes.
+- Replaced GPLv3+ license by AGPLv3+.
+- New graph construction and compression algorithm for multiple-choice vector packing.
+- Dropped backwards support for all previous graph construction and compression algorithms.
+
 Version 2.0.0
 -------------
 
