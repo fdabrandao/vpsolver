@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  Home.md
+  CHANGES.md
   
     - Grip
   
@@ -44,43 +44,77 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  Home.md
+                  CHANGES.md
                 </h3>
               
               <div class="markdown-body entry-content">
-                <h2>
-<a id="user-content-home" class="anchor" href="#home" aria-hidden="true"><span class="octicon octicon-link"></span></a>Home</h2>
+                <h1>
+<a id="user-content-vpsolver-changelog" class="anchor" href="#vpsolver-changelog" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>VPSolver Changelog</h1>
 
-<p><a href="https://github.com/fdabrandao/vpsolver">VPSolver</a> is a vector packing solver based on an arc-flow formulation with graph compression [<a href="http://www.dcc.fc.up.pt/%7Efdabrandao/papers/arcflow_poster.pdf">Poster</a>]. VPSolver generates very strong models (equivalent to Gilmore and Gomory's) that can be solved using general-purpose mixed-integer programming solvers such as Gurobi and GLPK [<a href="http://www.dcc.fc.up.pt/%7Efdabrandao/Vector_Packing_Solver">Paper</a>].</p>
+<p>Here you can see the full list of changes between each VPSolver release.</p>
 
-<h3>
-<a id="user-content-wiki-pages" class="anchor" href="#wiki-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Wiki pages</h3>
+<h2>
+<a id="user-content-version-300" class="anchor" href="#version-300" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 3.0.0</h2>
 
-<ul>
-<li><a href="README.html">README</a></li>
-<li><a href="Docker.html">Docker setup</a></li>
-<li><a href="Python-API.html">Python API</a></li>
-<li><a href="PyMPL.html">PyMPL modelling toolbox</a></li>
-</ul>
-
-<h3>
-<a id="user-content-useful-links" class="anchor" href="#useful-links" aria-hidden="true"><span class="octicon octicon-link"></span></a>Useful links</h3>
+<p>Released on February 23th 2016, codename Onyx Panther</p>
 
 <ul>
-<li>Project Homepage: <a href="http://vpsolver.dcc.fc.up.pt/">http://vpsolver.dcc.fc.up.pt/</a>
-</li>
-<li>GiHub repository: <a href="https://github.com/fdabrandao/vpsolver">https://github.com/fdabrandao/vpsolver</a>
-</li>
-<li>BitBucket repository: <a href="https://bitbucket.org/fdabrandao/vpsolver">https://bitbucket.org/fdabrandao/vpsolver</a>
-</li>
-<li>Docker repository: <a href="https://hub.docker.com/r/fdabrandao/vpsolver/">https://hub.docker.com/r/fdabrandao/vpsolver/</a>
-</li>
+<li>Various bugfixes.</li>
+<li>Replaced GPLv3+ license by AGPLv3+.</li>
+<li>New graph construction and compression algorithm for multiple-choice vector packing.</li>
+<li>Dropped backwards support for all previous graph construction and compression algorithms.</li>
 </ul>
 
-<hr>
+<h2>
+<a id="user-content-version-200" class="anchor" href="#version-200" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 2.0.0</h2>
 
-<p>Copyright © Filipe Brandão. All rights reserved.<br>
-E-mail: <a href="mailto:fdabrandao@dcc.fc.up.pt">fdabrandao@dcc.fc.up.pt</a>. [<a href="http://www.dcc.fc.up.pt/%7Efdabrandao/">Homepage</a>]</p>
+<p>Released on October 16th 2015, codename Hidden Zebra</p>
+
+<ul>
+<li>Various bugfixes.</li>
+<li>Added documentation.</li>
+<li>Various improvements.</li>
+<li>Full compatibility with both python 2 and 3.</li>
+<li>Dropped backwards support for <code>bin/gg_afg</code>, <code>bin/solve_glpk</code>, and
+<code>bin/solve_gurobi</code> from v1.0.0.</li>
+</ul>
+
+<h2>
+<a id="user-content-version-130" class="anchor" href="#version-130" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.3.0</h2>
+
+<p>Released on July 27th 2015, codename Covert Rain</p>
+
+<ul>
+<li>Added an initial version of PyMPL.</li>
+</ul>
+
+<h2>
+<a id="user-content-version-120" class="anchor" href="#version-120" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.2.0</h2>
+
+<p>Released on July 21th 2015, codename Glass Piranha</p>
+
+<ul>
+<li>Various improvements on the python API.</li>
+<li>Added a Flask web app.</li>
+</ul>
+
+<h2>
+<a id="user-content-version-110" class="anchor" href="#version-110" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.1.0</h2>
+
+<p>Released on May 20th 2015, codename Coral Falcon</p>
+
+<ul>
+<li>Added the python API (pyvpsolver).</li>
+</ul>
+
+<h2>
+<a id="user-content-version-100" class="anchor" href="#version-100" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.0.0</h2>
+
+<p>Released on August 6th November 2013, codename Space Cheetah</p>
+
+<ul>
+<li>First official release.</li>
+</ul>
 
               </div>
             </div>
