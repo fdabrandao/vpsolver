@@ -3,6 +3,13 @@ VPSolver Changelog
 
 Here you can see the full list of changes between each VPSolver release.
 
+Version 3.0.1
+-------------
+
+Bugfix release, released on February 23th 2016
+
+- Fixed a minor compatibility issue with Python 2.7.
+
 Version 3.0.0
 -------------
 

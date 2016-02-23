@@ -1,6 +1,6 @@
 # autoreconf -i (to update)
 # Initialize autoconf.
-AC_INIT([VPSolver], [3.0.0], [fdabrandao@dcc.fc.up.pt],
+AC_INIT([VPSolver], [3.0.1], [fdabrandao@dcc.fc.up.pt],
         [vpsolver], [http://vpsolver.dcc.fc.up.pt/])
 # Force autoconf to be at least this version number:
 AC_PREREQ([2.68])

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  CHANGES.md
+  README.md
   
     - Grip
   
@@ -44,86 +44,289 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  CHANGES.md
+                  README.md
                 </h3>
               
               <div class="markdown-body entry-content">
-                <h1>
-<a id="user-content-vpsolver-changelog" class="anchor" href="#vpsolver-changelog" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>VPSolver Changelog</h1>
+                <h2>
+<a id="user-content-arc-flow-vector-packing-solver-vpsolver" class="anchor" href="#arc-flow-vector-packing-solver-vpsolver" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arc-flow Vector Packing Solver (VPSolver)</h2>
 
-<p>Here you can see the full list of changes between each VPSolver release.</p>
+<p>Copyright (C) 2013-2016, Filipe Brandão<br>
+Faculdade de Ciências, Universidade do Porto<br>
+Porto, Portugal. All rights reserved. E-mail: <a href="mailto:fdabrandao@dcc.fc.up.pt">fdabrandao@dcc.fc.up.pt</a>.</p>
 
-<h2>
-<a id="user-content-version-301" class="anchor" href="#version-301" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 3.0.1</h2>
+<hr>
 
-<p>Bugfix release, released on February 23th 2016</p>
+<p><a href="https://github.com/fdabrandao/vpsolver">VPSolver</a> is a multiple-choice vector packing solver based on an arc-flow formulation with graph compression (see, e.g., <a href="#references">[1]</a>). VPSolver generates very strong models (equivalent to Gilmore and Gomory's) that can be solved using general-purpose mixed-integer programming
+solvers such as Gurobi and GLPK (see, e.g., <a href="#references">[2]</a> and <a href="#references">[3]</a>). VPSolver does not explicitly require any MIP
+solver in particular, though a good  MIP solver may be necessary for solving
+large models.</p>
+
+<p><a href="https://camo.githubusercontent.com/e15eac835647261101377ddd6389f09a740e5836/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4147504c76332b2d626c75652e737667" target="_blank"><img src="https://camo.githubusercontent.com/e15eac835647261101377ddd6389f09a740e5836/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4147504c76332b2d626c75652e737667" alt="" data-canonical-src="https://img.shields.io/badge/license-AGPLv3+-blue.svg" style="max-width:100%;"></a>
+<a href="https://travis-ci.org/fdabrandao/vpsolver"><img src="https://camo.githubusercontent.com/b5a9500005427c1ae535605357273db19e847a70/68747470733a2f2f7472617669732d63692e6f72672f6664616272616e64616f2f7670736f6c7665722e7376673f6272616e63683d6d6173746572" alt="" data-canonical-src="https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master" style="max-width:100%;"></a></p>
+
+<p>For modelling other problems easily, VPSolver includes a <a href="Python-API.html">Python API</a>, a modelling toolbox (<a href="https://github.com/fdabrandao/pympl/">PyMPL</a>), and a <a href="#vpsolver-web-app">Web App</a>. VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a <a href="#docker">Docker container</a>.</p>
+
+<p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/wiki">project wiki</a> or to the <a href="https://github.com/fdabrandao/vpsolver/tree/master/docs/vpsolver_manual.pdf">manual</a>.</p>
+
+<h4>
+<a id="user-content-repositories" class="anchor" href="#repositories" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Repositories</h4>
 
 <ul>
-<li>Fixed a minor compatibility issue with Python 2.7.</li>
+<li>Project Homepage: <a href="http://vpsolver.dcc.fc.up.pt">http://vpsolver.dcc.fc.up.pt</a>
+</li>
+<li>GiHub repository: <a href="https://github.com/fdabrandao/vpsolver">https://github.com/fdabrandao/vpsolver</a>
+</li>
+<li>BitBucket repository: <a href="https://bitbucket.org/fdabrandao/vpsolver">https://bitbucket.org/fdabrandao/vpsolver</a>
+</li>
+<li>Docker repository: <a href="https://hub.docker.com/r/fdabrandao/vpsolver">https://hub.docker.com/r/fdabrandao/vpsolver</a>
+</li>
+<li>PyPI repository: <a href="https://pypi.python.org/pypi/pyvpsolver">https://pypi.python.org/pypi/pyvpsolver</a>
+</li>
 </ul>
 
 <h2>
-<a id="user-content-version-300" class="anchor" href="#version-300" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 3.0.0</h2>
+<a id="user-content-requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h2>
 
-<p>Released on February 23th 2016, codename Onyx Panther</p>
+<h4>
+<a id="user-content-mandatory" class="anchor" href="#mandatory" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mandatory</h4>
 
 <ul>
-<li>Various bugfixes.</li>
-<li>Replaced GPLv3+ license by AGPLv3+.</li>
-<li>New graph construction and compression algorithm for multiple-choice vector packing.</li>
-<li>Dropped backwards support for all previous graph construction and compression algorithms.</li>
+<li>MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...<br>
+</li>
+<li>UNIX-like operating system or a UNIX-like environment such as <a href="https://www.cygwin.com/">Cygwin</a>
+</li>
+<li>
+<code>g++ &gt;= 4.8</code>; <code>make &gt;= 3.0</code>; <code>bash &gt;= 3.0</code>
+</li>
+</ul>
+
+<h4>
+<a id="user-content-optional" class="anchor" href="#optional" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Optional</h4>
+
+<p>For the <a href="Python-API.html">Python API</a> and <a href="#vpsolver-web-app">Web App</a>:</p>
+
+<ul>
+<li>
+<code>python-2.7</code> or <code>python-3.x</code>
+</li>
+<li><code>python-pip</code></li>
+<li><code>python-dev</code></li>
+<li><code>glpk-utils</code></li>
+</ul>
+
+<h4>
+<a id="user-content-platforms" class="anchor" href="#platforms" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Platforms</h4>
+
+<p>It has been successfully compiled and run on the following platforms:</p>
+
+<ul>
+<li><strong>Linux</strong></li>
+<li><strong>Mac OS X</strong></li>
+<li>On a large variety of platforms including <strong>Windows</strong> using a <a href="#docker">Docker container</a>
+</li>
+<li>It also runs on <strong>Windows</strong> using <a href="https://www.cygwin.com/">Cygwin</a> (a Unix-like environment and command-line interface)</li>
 </ul>
 
 <h2>
-<a id="user-content-version-200" class="anchor" href="#version-200" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 2.0.0</h2>
+<a id="user-content-setup" class="anchor" href="#setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup</h2>
 
-<p>Released on October 16th 2015, codename Hidden Zebra</p>
+<p>Without the python interface: </p>
+
+<div class="highlight highlight-source-shell"><pre>$ ./configure CXXFLAGS=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span> LDFLAGS=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
+$ make
+$ sudo make install</pre></div>
+
+<p>Note: In order to compile only the components that do not require Gurobi, use <code>./configure GUROBI_HOME=""</code>. In order to link the optional components that require Gurobi, the environment variable <code>$GUROBI_HOME</code> must be set, and some additional flags may also need to be set (e.g., <code>./configure LDFLAGS="-L${GUROBI_HOME}/lib/ -lgurobi_stdc++"</code>).</p>
+
+<p>With the python interface: </p>
+
+<pre><code>$ pip install -r requirements.txt
+$ pip install . --upgrade
+$ bash test.sh
+</code></pre>
+
+<p>Or simply install from the <a href="https://pypi.python.org/pypi/pyvpsolver">repository</a>:</p>
+
+<pre><code>$ pip install pyvpsolver
+</code></pre>
+
+<p>Note: use <code>pip install pyvpsolver --pre</code> if you want to install the latest pre-release.</p>
+
+<h2>
+<a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Docker</h2>
+
+<h3>
+<a id="user-content-docker-setup" class="anchor" href="#docker-setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Docker Setup</h3>
+
+<p>Docker is an open platform for building, shipping and running applications. Docker allows VPSolver to run on a large variety of platforms with very little effort.</p>
+
+<p>Install Docker [<a href="https://docs.docker.com/installation/">Docker installation instructions</a>].</p>
+
+<p>Option 1: simply <code>pull</code> VPSolver from Docker repository (without building):</p>
+
+<div class="highlight highlight-source-shell"><pre>$ docker pull fdabrandao/vpsolver</pre></div>
+
+<p>Option 2: <code>clone</code> VPSolver and <code>build</code> locally:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ git clone https://github.com/fdabrandao/vpsolver.git vpsolver
+$ docker build -t fdabrandao/vpsolver vpsolver</pre></div>
+
+<h3>
+<a id="user-content-usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
+
+<p>Directly using the command line interface:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ docker run --rm -it fdabrandao/vpsolver bash
+root@55d14f6b6f32:<span class="pl-k">~</span># <span class="pl-c1">source</span> venv2.7/bin/activate <span class="pl-c"># load a virtualenv</span>
+(venv2.7)root@55d14f6b6f32:<span class="pl-k">~</span># python examples/vpsolver/example_vbp.py
+...</pre></div>
+
+<p>or through the VPSolver Web App (example URL: <code>http://172.17.0.60:5555/</code>):</p>
+
+<div class="highlight highlight-source-shell"><pre>$ docker run --rm -it -p 5555 fdabrandao/vpsolver 
+eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
+          inet addr:172.17.0.60  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
+          UP BROADCAST  MTU:1500  Metric:1
+          RX packets:2 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
+
+URL: http://172.17.0.60:5555/
+ <span class="pl-k">*</span> Running on http://0.0.0.0:5555/
+...</pre></div>
+
+<p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/wiki/docker">project wiki</a>.</p>
+
+<h2>
+<a id="user-content-vpsolver-web-app" class="anchor" href="#vpsolver-web-app" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>VPSolver Web App</h2>
+
+<p>VPSolver includes a Web App that can be started as follows:</p>
+
+<pre><code>$ python -m pyvpsolver.webapp.app
+</code></pre>
+
+<p>The Web App can then be accessed on a web browser at <code>http://127.0.0.1:5555/</code>.</p>
+
+<h2>
+<a id="user-content-vpsolver-binaries" class="anchor" href="#vpsolver-binaries" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>VPSolver binaries</h2>
 
 <ul>
-<li>Various bugfixes.</li>
-<li>Added documentation.</li>
-<li>Various improvements.</li>
-<li>Full compatibility with both python 2 and 3.</li>
-<li>Dropped backwards support for <code>bin/gg_afg</code>, <code>bin/solve_glpk</code>, and
-<code>bin/solve_gurobi</code> from v1.0.0.</li>
+<li>
+<code>$ bin/vpsolver intance.vbp/.mvp</code>: solves a multiple-choice vector packing instance using the method described in <a href="#references">[1]</a>. Note: requires Gurobi 5.0.0 or superior;</li>
+<li>
+<code>$ bin/vbp2afg instance.vbp/.mvp graph.afg</code>: builds an arc-flow graph <code>graph.afg</code> for <code>instance.vbp/.mvp</code>;</li>
+<li>
+<code>$ bin/afg2mps graph.afg model.mps</code>: creates a MPS model <code>model.mps</code> for <code>graph.afg</code>;</li>
+<li>
+<code>$ bin/afg2lp graph.afg model.lp</code>: creates a LP model <code>model.lp</code> for <code>graph.afg</code>;</li>
+<li>
+<code>$ bin/vbpsol graph.afg vars.sol</code>: extracts a vector packing solution from an arc-flow solution <code>vars.sol</code> associated with the graph <code>graph.afg</code>.</li>
+</ul>
+
+<p>Usage:</p>
+
+<pre><code># 1. Build the arc-flow graph graph.afg for example.vbp:  
+$ bin/vbp2afg example.vbp graph.afg  
+# 2. Convert the arc-flow graph into a .mps file model.mps:  
+$ bin/afg2mps graph.afg model.mps  
+# 3. Solve the MIP model and store the solution in vars.sol:
+$ scritps/vpsolver_gurobi.sh --mps model.mps --wsol vars.sol
+# 4. Extract the vector packing solution:  
+$ bin/vbpsol graph.afg vars.sol  
+</code></pre>
+
+<p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/tree/master/docs/vpsolver_manual.pdf">manual</a>.</p>
+
+<h2>
+<a id="user-content-vpsolver-scripts" class="anchor" href="#vpsolver-scripts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>VPSolver Scripts</h2>
+
+<p>VPSolver includes several scripts for solving arc-flow models using different
+solvers:</p>
+
+<ul>
+<li>
+<code>scripts/vpsolver_gurobi.sh</code>: Gurobi</li>
+<li>
+<code>scripts/vpsolver_cplex.sh</code>: IBM CPLEX</li>
+<li>
+<code>scripts/vpsolver_coinor.sh</code>: COIN-OR CBC</li>
+<li>
+<code>scripts/vpsolver_glpk.sh</code>: GLPK</li>
+<li>
+<code>scripts/vpsolver_scip.sh</code>: SCIP</li>
+<li>
+<code>scripts/vpsolver_lpsolve.sh</code>: lp_solve</li>
+</ul>
+
+<p>Usage:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ vpsolver_X.sh --vbp/--mvp instance.vbp/.mvp
+$ vpsolver_X.sh --afg graph.afg
+$ vpsolver_X.sh --mps/--lp model.mps/.lp
+$ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
+
+<p>For more details, please refer to the <a href="https://github.com/fdabrandao/vpsolver/tree/master/docs/vpsolver_manual.pdf">manual</a>.</p>
+
+<h2>
+<a id="user-content-folders" class="anchor" href="#folders" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Folders</h2>
+
+<ul>
+<li>
+<code>docs/</code>: documentation</li>
+<li>
+<code>scripts/</code>: vpsolver scripts</li>
+<li>
+<code>src/</code>: vpsolver source code in C++</li>
+<li>
+<code>pyvpsolver/</code>: pyvpsolver source code in Python</li>
+<li>
+<code>examples/</code>: vpsolver and pyvpsolver examples</li>
+<li>
+<code>docs/reports/</code>: technical reports on the underlying algorithms and models</li>
 </ul>
 
 <h2>
-<a id="user-content-version-130" class="anchor" href="#version-130" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.3.0</h2>
+<a id="user-content-references" class="anchor" href="#references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>References</h2>
 
-<p>Released on July 27th 2015, codename Covert Rain</p>
-
-<ul>
-<li>Added an initial version of PyMPL.</li>
-</ul>
-
-<h2>
-<a id="user-content-version-120" class="anchor" href="#version-120" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.2.0</h2>
-
-<p>Released on July 21th 2015, codename Glass Piranha</p>
+<p>The current solution method is described in:</p>
 
 <ul>
-<li>Various improvements on the python API.</li>
-<li>Added a Flask web app.</li>
+<li>[1] Brandão, F. (2016). <em>VPSolver 3: Multiple-choice Vector Packing Solver.</em> <a href="http://arxiv.org/abs/1602.04876">arXiv:1602.04876</a>.</li>
 </ul>
 
-<h2>
-<a id="user-content-version-110" class="anchor" href="#version-110" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.1.0</h2>
-
-<p>Released on May 20th 2015, codename Coral Falcon</p>
+<p>VPSolver was proposed in:</p>
 
 <ul>
-<li>Added the python API (pyvpsolver).</li>
+<li><p>[2] Brandão, F. and Pedroso, J. P. (2016). <em>Bin packing and related problems: General arc-flow formulation with graph compression.</em>
+Computers &amp; Operations Research, 69:56 – 67.<br>
+doi: <a href="http://dx.doi.org/10.1016/j.cor.2015.11.009">http://dx.doi.org/10.1016/j.cor.2015.11.009</a>.</p></li>
+<li><p>[3] Brandão, F. and Pedroso, J. P. (2013). <em>Bin Packing and Related Problems:
+General Arc-flow Formulation with Graph Compression.</em> Technical Report
+DCC-2013-08, Faculdade de Ciências da Universidade do Porto, Universidade do
+Porto, Portugal. <a href="http://arxiv.org/abs/1310.6887">arXiv:1310.6887</a>.</p></li>
 </ul>
 
-<h2>
-<a id="user-content-version-100" class="anchor" href="#version-100" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.0.0</h2>
-
-<p>Released on August 6th November 2013, codename Space Cheetah</p>
+<p>See also:</p>
 
 <ul>
-<li>First official release.</li>
+<li><p>[4] Brandão, F. and Pedroso, J. P. (2013). <em>Multiple-choice Vector Bin Packing:
+Arc-flow Formulation with Graph Compression.</em> Technical Report DCC-2013-13,
+Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal. <a href="http://arxiv.org/abs/1312.3836">arXiv:1312.3836</a></p></li>
+<li><p>[5] Brandão, F. and Pedroso, J. P. (2013). <em>Cutting Stock with Binary Patterns:
+Arc-flow Formulation with Graph Compression.</em> Technical Report DCC-2013-09,
+Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal. <a href="http://arxiv.org/abs/1502.02899">arXiv:1502.02899</a>.</p></li>
+<li><p>[6] Brandão, F. (2012). <em>Bin Packing and Related Problems: Pattern-Based Approaches.</em> 
+Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.</p></li>
+<li><p>[7] Computational results on several benchmark test data sets:<br>
+<a href="http://www.dcc.fc.up.pt/%7Efdabrandao/research/vpsolver/results/">http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/</a></p></li>
 </ul>
+
+<hr>
+
+<p>Copyright © 2013-2016 <a href="http://www.dcc.fc.up.pt/%7Efdabrandao/">Filipe Brandão</a> &lt;<a href="mailto:fdabrandao@dcc.fc.up.pt">fdabrandao@dcc.fc.up.pt</a>&gt;. All rights reserved.</p>
 
               </div>
             </div>

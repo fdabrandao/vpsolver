@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>
-  CHANGES.md
+  Python-API.md
   
     - Grip
   
@@ -44,86 +44,521 @@
               
                 <h3>
                   <span class="octicon octicon-book"></span>
-                  CHANGES.md
+                  Python-API.md
                 </h3>
               
               <div class="markdown-body entry-content">
-                <h1>
-<a id="user-content-vpsolver-changelog" class="anchor" href="#vpsolver-changelog" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>VPSolver Changelog</h1>
+                <h2>
+<a id="user-content-python-api" class="anchor" href="#python-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Python API</h2>
 
-<p>Here you can see the full list of changes between each VPSolver release.</p>
-
-<h2>
-<a id="user-content-version-301" class="anchor" href="#version-301" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 3.0.1</h2>
-
-<p>Bugfix release, released on February 23th 2016</p>
+<p>The VPSolver Python API has 3 levels:</p>
 
 <ul>
-<li>Fixed a minor compatibility issue with Python 2.7.</li>
+<li>
+<a href="#high-level-api">High-level API</a>: high level wrapper functions (easy and direct usage);</li>
+<li>
+<a href="#mid-level-api">Mid-level API</a>: objects that wrap calls to VPSolver executables;</li>
+<li>
+<a href="#low-level-api">Low-level API</a>: direct calls to VPSolver scripts and executables.</li>
 </ul>
 
-<h2>
-<a id="user-content-version-300" class="anchor" href="#version-300" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 3.0.0</h2>
+<h3>
+<a id="user-content-high-level-api" class="anchor" href="#high-level-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>High-level API</h3>
 
-<p>Released on February 23th 2016, codename Onyx Panther</p>
+<p>Example:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> pyvpsolver.solvers <span class="pl-k">import</span> vbpsolver
+
+<span class="pl-c1">W</span> <span class="pl-k">=</span> (<span class="pl-c1">5180</span>, <span class="pl-c1">2</span>)
+w <span class="pl-k">=</span> [(<span class="pl-c1">1120</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">1250</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">520</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">1066</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">1000</span>,<span class="pl-c1">1</span>), (<span class="pl-c1">1150</span>,<span class="pl-c1">1</span>)]
+b <span class="pl-k">=</span> [<span class="pl-c1">9</span>, <span class="pl-c1">5</span>, <span class="pl-c1">91</span>, <span class="pl-c1">18</span>, <span class="pl-c1">11</span>, <span class="pl-c1">64</span>]
+
+<span class="pl-c"># Solve a vector packing instance:</span>
+obj, sol <span class="pl-k">=</span> vbpsolver.solve(
+    <span class="pl-c1">W</span>, w, b, <span class="pl-v">script</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>vpsolver_glpk.sh<span class="pl-pds">"</span></span>, <span class="pl-v">verbose</span><span class="pl-k">=</span><span class="pl-c1">False</span>
+)
+<span class="pl-c"># Print the solution:</span>
+vbpsolver.print_solution(obj, sol)</pre></div>
+
+<p>The high level API (<code>pyvpsolver.solvers</code>) includes:</p>
 
 <ul>
-<li>Various bugfixes.</li>
-<li>Replaced GPLv3+ license by AGPLv3+.</li>
-<li>New graph construction and compression algorithm for multiple-choice vector packing.</li>
-<li>Dropped backwards support for all previous graph construction and compression algorithms.</li>
+<li>
+<code>vbpsolver</code> - for vector packing;</li>
+<li>
+<code>mvpsolver</code> - for multiple-choice vector packing;</li>
+<li>additional solvers for other applications will be added soon.</li>
 </ul>
 
-<h2>
-<a id="user-content-version-200" class="anchor" href="#version-200" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 2.0.0</h2>
+<h4>
+<a id="user-content-vector-packing-solver-functions" class="anchor" href="#vector-packing-solver-functions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Vector Packing Solver functions</h4>
 
-<p>Released on October 16th 2015, codename Hidden Zebra</p>
+<p>How to import: </p>
 
 <ul>
-<li>Various bugfixes.</li>
-<li>Added documentation.</li>
-<li>Various improvements.</li>
-<li>Full compatibility with both python 2 and 3.</li>
-<li>Dropped backwards support for <code>bin/gg_afg</code>, <code>bin/solve_glpk</code>, and
-<code>bin/solve_gurobi</code> from v1.0.0.</li>
+<li>
+<code>from pyvpsolver.solvers import vbpsolver</code>.</li>
 </ul>
 
-<h2>
-<a id="user-content-version-130" class="anchor" href="#version-130" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.3.0</h2>
-
-<p>Released on July 27th 2015, codename Covert Rain</p>
+<p>How to use:</p>
 
 <ul>
-<li>Added an initial version of PyMPL.</li>
-</ul>
-
-<h2>
-<a id="user-content-version-120" class="anchor" href="#version-120" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.2.0</h2>
-
-<p>Released on July 21th 2015, codename Glass Piranha</p>
+<li>
+<code>obj, lst_sol = vbpsolver.solve(W, w, b, script=None, script_options=None, verbose=None)</code>
 
 <ul>
-<li>Various improvements on the python API.</li>
-<li>Added a Flask web app.</li>
-</ul>
-
-<h2>
-<a id="user-content-version-110" class="anchor" href="#version-110" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.1.0</h2>
-
-<p>Released on May 20th 2015, codename Coral Falcon</p>
+<li>Important parameters:
 
 <ul>
-<li>Added the python API (pyvpsolver).</li>
+<li>
+<code>W</code>: bin capacity;</li>
+<li>
+<code>w</code>: item weights;</li>
+<li>
+<code>b</code>: item demands;</li>
+<li>
+<code>script</code>: script that should be used to solve the model  (e.g., <code>vpsolver_glpk.sh</code>);</li>
+<li>
+<code>script_options</code>: options to pass to the script (optional).</li>
 </ul>
-
-<h2>
-<a id="user-content-version-100" class="anchor" href="#version-100" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.0.0</h2>
-
-<p>Released on August 6th November 2013, codename Space Cheetah</p>
+</li>
+<li>Returns:
 
 <ul>
-<li>First official release.</li>
+<li>
+<code>obj</code>: objective value;</li>
+<li>
+<code>lst_sol</code>: solution.</li>
 </ul>
+</li>
+</ul>
+</li>
+<li>
+<code>vbpsolver.print_solution(obj, lst_sol)</code>
+
+<ul>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>obj</code>: objective value;</li>
+<li>
+<code>lst_sol</code>: solution.</li>
+</ul>
+</li>
+<li>Outputs:
+
+<ul>
+<li>The solution formatted.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples: <a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example_vbp.py">example_vbp.py</a>.</p>
+
+<h4>
+<a id="user-content-multiple-choice-vector-packing-solver-functions" class="anchor" href="#multiple-choice-vector-packing-solver-functions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Multiple-choice Vector Packing Solver functions</h4>
+
+<p>How to import:</p>
+
+<ul>
+<li>
+<code>from pyvpsolver.solvers import mvpsolver</code>.</li>
+</ul>
+
+<p>How to use:</p>
+
+<ul>
+<li>
+<p><code>obj, lst_sol = mvpsolver.solve(Ws, Cs, Qs, ws, b, script=None, script_options=None, verbose=False)</code></p>
+
+<ul>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>Ws</code>: bin capacities for each bin type;</li>
+<li>
+<code>Cs</code>: bin costs for each bin type;</li>
+<li>
+<code>Qs</code>: number of bins available for each type (-1 if infinity);</li>
+<li>
+<code>ws</code>: item weights;</li>
+<li>
+<code>b</code>: item demands;</li>
+<li>
+<code>script</code>: script that should be used to solve the model (e.g., <code>vpsolver_glpk.sh</code>);</li>
+<li>
+<code>script_options</code>: options to pass to the script (optional).</li>
+</ul>
+</li>
+<li>Returns:
+
+<ul>
+<li>
+<code>obj</code>: objective value;</li>
+<li>
+<code>lst_sol</code>: a list of solutions for each bin type.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>mvpsolver.print_solution(obj, lst_sol)</code></p>
+
+<ul>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>obj</code>: objective value</li>
+<li>
+<code>sol</code>: solution</li>
+</ul>
+</li>
+<li>Outputs:
+
+<ul>
+<li>The solution formatted.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples: <a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example_mvp.py">example_mvp.py</a> and <a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example_vsbpp.py">example_vsbpp.py</a>.</p>
+
+<h3>
+<a id="user-content-mid-level-api" class="anchor" href="#mid-level-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mid-level API</h3>
+
+<p>Example:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> pyvpsolver <span class="pl-k">import</span> VPSolver           <span class="pl-c"># from the low-level API</span>
+<span class="pl-k">from</span> pyvpsolver <span class="pl-k">import</span> <span class="pl-c1">VBP</span>, <span class="pl-c1">AFG</span>, <span class="pl-c1">MPS</span>, <span class="pl-c1">LP</span>  <span class="pl-c"># from the mid-level API</span>
+<span class="pl-k">from</span> pyvpsolver.solvers <span class="pl-k">import</span> vbpsolver  <span class="pl-c"># from the high-level API</span>
+
+<span class="pl-c"># Create a vector packing instance:</span>
+instance <span class="pl-k">=</span> VBP(
+    (<span class="pl-c1">5180</span>,), <span class="pl-c"># bin capacity</span>
+    [(<span class="pl-c1">1120</span>,), (<span class="pl-c1">1250</span>,), (<span class="pl-c1">520</span>,), (<span class="pl-c1">1066</span>,), (<span class="pl-c1">1000</span>,), (<span class="pl-c1">1150</span>,)], <span class="pl-c"># item weights</span>
+    [<span class="pl-c1">9</span>, <span class="pl-c1">5</span>, <span class="pl-c1">91</span>, <span class="pl-c1">18</span>, <span class="pl-c1">11</span>, <span class="pl-c1">64</span>] <span class="pl-c"># item demands</span>
+)
+
+<span class="pl-c"># Create an arc-flow graph for the instance:</span>
+afg <span class="pl-k">=</span> AFG(instanceA, <span class="pl-v">verbose</span><span class="pl-k">=</span><span class="pl-c1">True</span>)
+
+<span class="pl-c"># Create .mps model for the graph:</span>
+mps_model <span class="pl-k">=</span> MPS(afg, <span class="pl-v">verbose</span><span class="pl-k">=</span><span class="pl-c1">False</span>)
+
+<span class="pl-c"># Solve the model an extract the solution:</span>
+out, solution <span class="pl-k">=</span> VPSolver.script(<span class="pl-s"><span class="pl-pds">"</span>vpsolver_glpk.sh<span class="pl-pds">"</span></span>, mps_model, afg, <span class="pl-v">verbose</span><span class="pl-k">=</span><span class="pl-c1">True</span>)
+
+<span class="pl-c"># Print the solution:</span>
+obj, sol <span class="pl-k">=</span> solution
+vbpsolver.print_solution(obj, sol)</pre></div>
+
+<p>How to import:</p>
+
+<ul>
+<li>
+<code>from pyvpsolver import VBP, MVP, AFG, MPS, LP</code>.</li>
+</ul>
+
+<p>Objects:</p>
+
+<ul>
+<li>
+<p><code>VBP</code> objects: <code>VBP(W, w, b, binary=False, verbose=False)</code></p>
+
+<ul>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>W</code>: bin capacity;</li>
+<li>
+<code>w</code>: item weights;</li>
+<li>
+<code>b</code>: item demands;</li>
+<li>
+<code>binary</code>:  binary patterns (if <code>True</code>) or general integer patterns (if <code>False</code>).<br>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>MVP</code> objects: <code>MVP(Ws, Cs, Qs, ws, b, binary=False, verbose=False)</code></p>
+
+<ul>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>Ws</code>: bin capacities for each bin type;</li>
+<li>
+<code>Cs</code>: bin costs for each bin type;</li>
+<li>
+<code>Qs</code>: number of bins available for each type (-1 if infinity);</li>
+<li>
+<code>ws</code>: list of lists of weights of item incarnations;</li>
+<li>
+<code>b</code>: item demands;</li>
+<li>
+<code>binary</code>:  binary patterns (if <code>True</code>) or general integer patterns (if <code>False</code>).<br>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>AFG</code> objects: <code>AFG(instance, verbose=None)</code></p>
+
+<ul>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>instance</code>: a <code>VBP</code>/<code>MVP</code> object.</li>
+</ul>
+</li>
+<li>Creates:
+
+<ul>
+<li>an arc-flow graph for the vector packing instance.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>MPS</code> objects: <code>MPS(graph, verbose=None)</code></p>
+
+<ul>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>graph</code>: an <code>AFG</code> object.</li>
+</ul>
+</li>
+<li>Creates:
+
+<ul>
+<li>a MPS model.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>LP</code> objects: <code>LP(graph, verbose=None)</code></p>
+
+<ul>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>graph</code>: an <code>AFG</code> object.</li>
+</ul>
+</li>
+<li>Creates:
+
+<ul>
+<li>a LP model.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>Examples: <a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/vpsolver/example.py">example.py</a>.</p>
+
+<h3>
+<a id="user-content-low-level-api" class="anchor" href="#low-level-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Low-level API</h3>
+
+<p>How to import:</p>
+
+<ul>
+<li>
+<code>from pyvpsolver import VPSolver</code>.</li>
+</ul>
+
+<p>How to use:</p>
+
+<ul>
+<li>
+<p><code>VPSolver.vbp2afg(instance_file, afg_file, verbose=None)</code></p>
+
+<ul>
+<li>Description: creates arc-flow graphs for vector packing instances.</li>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>vbp_file</code>: a .vbp/.mvp file or a <code>VBP</code>/<code>MVP</code> object;</li>
+<li>
+<code>afg_file</code>: a .afg file.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>bin/vbp2afg</code> to write an arc-flow graph for <code>vbp_file</code> in <code>afg_file</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>VPSolver.afg2mps(afg_file, mps_file, verbose=None)</code></p>
+
+<ul>
+<li>Description: converts arc-flow grafts to MPS models.</li>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>afg_file</code>: a .afg file or a <code>AFG</code> object;</li>
+<li>
+<code>mps_file</code>: a .mps file.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>bin/afg2mps</code> to write the MPS model for <code>afg_file</code> in <code>mps_file</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>VPSolver.afg2lp(afg_file, lp_file, verbose=None)</code></p>
+
+<ul>
+<li>Description: converts arc-flow grafts to LP models.</li>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>afg_file</code>: a .afg file or a <code>AFG</code> object;</li>
+<li>
+<code>mps_file</code>: a .lp file.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>bin/afg2lp</code> to write the LP model for <code>afg_file</code> in <code>lp_file</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>VPSolver.vbpsol(afg_file, sol_file, verbose=None)</code></p>
+
+<ul>
+<li>Description: extracts a vector packing solution from an arc-flow solution.</li>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>afg_file</code>: a .afg file or a <code>AFG</code> object;</li>
+<li>
+<code>sol_file</code>: a .sol solution file.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>bin/vbpsol</code> to extract the vector packing solution from the arc-flow solution <code>sol_file</code> associated with the graph <code>afg_file</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>VPSolver.vpsolver(instance_file, verbose=None)</code></p>
+
+<ul>
+<li>Description: calls VPSolver.</li>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>vbp_file</code>: a .vbp/.mvp file or a <code>VBP</code>/<code>MVP</code> object;.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>bin/vpsolver</code> to solve an instance (requires Gurobi).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>output, solution = VPSolver.script(script_name, arg1=None, arg2=None, options=None, verbose=None)</code></p>
+
+<ul>
+<li>Description: calls VPSolver scripts.</li>
+<li>Important parameters:
+
+<ul>
+<li>
+<code>script_name</code>: VPSolver script name (e.g., <code>vpsolver_glpk.sh</code>);</li>
+<li>
+<code>arg1</code>, <code>arg2</code>: parameters to be passed to the script;</li>
+<li>
+<code>options</code>: options to be passed to the script.</li>
+</ul>
+</li>
+<li>Actions:
+
+<ul>
+<li>calls <code>script_name</code> to solve an instance.</li>
+</ul>
+</li>
+<li>Usage examples:
+
+<ul>
+<li>
+<code>VPSolver.script(script name, .vbp file/VBP object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, .mvp file/MVP object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, .afg file/AFG object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, .lp file/LP object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, .mps file/MPS object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, .mps/.lp file, .afg file/AFG object)</code>;</li>
+<li>
+<code>VPSolver.script(script name, MPS/LP object, .afg file/AFG object)</code>;</li>
+<li>Note: the solution can only be extracted if the graph or the original instance are provided.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>VPSolver.set_verbose(verbose)</code></p>
+
+<ul>
+<li>Description: sets the default "verbose" behavior.</li>
+<li>Parameters:
+
+<ul>
+<li>
+<code>verbose</code>: <code>True</code> or <code>False</code>.</li>
+</ul>
+</li>
+<li>Note: The default behavior is overridden if the <code>verbose</code> parameter is set to a value different from <code>None</code> in any API call.</li>
+</ul>
+</li>
+</ul>
+
+<hr>
+
+<p>Copyright © 2013-2016 <a href="http://www.dcc.fc.up.pt/%7Efdabrandao/">Filipe Brandão</a> &lt;<a href="mailto:fdabrandao@dcc.fc.up.pt">fdabrandao@dcc.fc.up.pt</a>&gt;. All rights reserved.</p>
 
               </div>
             </div>
