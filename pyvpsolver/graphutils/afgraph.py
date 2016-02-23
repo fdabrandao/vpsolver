@@ -18,6 +18,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from builtins import zip
 from builtins import map
 from builtins import range
 from builtins import sorted
@@ -88,7 +89,7 @@ class AFGraph(object):
     def get_arcs_sorted(self, reverse=False):
         """Returns the list of arcs sorted."""
         return sorted(
-            self.A, key=lambda a: tuple(map(lambda k: (repr(type(k)), k), a)),
+            self.A, key=lambda a: tuple((repr(type(k)), k) for k in a),
             reverse=reverse
         )
 
