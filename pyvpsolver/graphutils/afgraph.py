@@ -65,15 +65,16 @@ class AFGraph(object):
         if self.Ts is not None:
             self.Ts = [fv(t) for t in self.Ts]
 
-    def draw(
-            self, svg_file, multigraph=True, showlabel=False, ignore=None,
+    def draw(self, svg_file, showlabels=False, ignore=None, back=None,
             loss=None, verbose=None):
         """Draws the arc-flow graph in .svg format."""
         if loss is None:
             loss = self.LOSS
+        if back is None:
+            back = set((u, v) for (u, v, i) in self.A if v == self.S)
         AFGUtils.draw(
-            svg_file, self.V, self.A, multigraph=multigraph,
-            showlabel=showlabel, ignore=ignore, loss=loss, verbose=verbose
+            svg_file, self.V, self.A, showlabels=showlabels, ignore=ignore,
+            back=back, loss=loss, verbose=verbose
         )
 
     def vname(self, u, v, i, vnames=None):

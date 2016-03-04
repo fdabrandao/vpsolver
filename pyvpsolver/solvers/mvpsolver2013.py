@@ -96,7 +96,7 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
     graph = AFGraph(V, A, S, [T], LOSS)
     if svg_file.endswith(".svg"):
         try:
-            graph.draw(svg_file, ignore=[(T, S)])
+            graph.draw(svg_file)
         except Exception as e:
                 VPSolver.log(e, verbose)
 
@@ -202,9 +202,7 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
 
     if svg_file.endswith(".svg"):
         try:
-            graph.draw(
-                svg_file.replace(".svg", ".final.svg"), ignore=[(T, S)]
-            )
+            graph.draw(svg_file.replace(".svg", ".final.svg"))
         except Exception as e:
                 VPSolver.log(e, verbose)
 

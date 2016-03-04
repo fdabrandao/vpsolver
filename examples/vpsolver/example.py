@@ -54,7 +54,7 @@ def main():
 
     # Draw the arc-flow graph for instanceA (requires pygraphviz)
     try:
-        afg.graph().draw("tmp/graph.svg")
+        afg.graph().draw("tmp/graph1.svg")
     except ImportError as e:
         print(repr(e))
 
@@ -110,6 +110,12 @@ def main():
 
     # Create instanceD from a .mvp file
     instanceD = MVP.from_file("instance.mvp")
+
+    # Draw the arc-flow graph for instanceD (requires pygraphviz)
+    try:
+        AFG(instanceD).graph().draw("tmp/graph2.svg")
+    except ImportError as e:
+        print(repr(e))
 
     # Solve an instance directly without creating AFG, MPS or LP objects:
     out, sol = VPSolver.script("vpsolver_glpk.sh", instanceD, verbose=True)

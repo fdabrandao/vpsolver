@@ -32,5 +32,5 @@ if __name__ == "__main__":
     graph.draw(
         svg_fname,
         loss=[graph.LOSS],
-        ignore=[(t, graph.S) for t in graph.Ts]
+        back=[(t, graph.S) for t in graph.Ts]
     )

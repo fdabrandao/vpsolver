@@ -99,11 +99,14 @@ class AFGUtils(object):
         return list(V), list(A)
 
     @staticmethod
-    def draw(
-            svg_file, V, A, multigraph=True, showlabel=False, ignore=None,
-            loss=None, verbose=None):
+    def draw(svg_file, V, A, showlabels=False, ignore=None, back=None,
+            loss=None, verbose=True):
         """Draws arc-flow graphs in .svg format."""
         from pygraphviz.agraph import AGraph
+        if ignore is None:
+            ignore = []
+        if back is None:
+            back = []
         if loss is None:
             loss = []
         elif not isinstance(loss, (tuple, list)):
@@ -111,70 +114,47 @@ class AFGUtils(object):
         g = AGraph(
             rankdir="LR", directed=True, bgcolor="white", text="black",
             font_color="white", ranksep="1.0", nodesep="0.10",
-            strict=not multigraph
+            strict=False
         )
-        # g.node_attr["shape"] = "point"
         g.node_attr["shape"] = "circle"
         g.node_attr["color"] = "black"
         g.node_attr["fontcolor"] = "black"
-        g.node_attr["fontstyle"] = "bold"
         g.node_attr["penwidth"] = "2.0"
 
         lbls = sorted(
             set(i for (u, v, i) in A if i not in loss),
             key=lambda lbl: (repr(type(lbl)), lbl)
         )
-        M = len(lbls)
 
-        if multigraph:
-            colors = Colors.uniquecolors(2*M)
-            #random.shuffle(colors)
+        colors = Colors.uniquecolors(len(lbls)+1, v=0.5, p=0.0)
+        #random.shuffle(colors)
 
-            for (u, v, i) in A:
-                if ignore is not None and (u, v) in ignore:
-                    continue
-                assert u != v
-                if i in loss:
-                    g.add_edge(u, v, color="black", penwidth=4)
-                else:
-                    lbl = str(i) if showlabel else ""
-                    g.add_edge(
-                        u, v,
-                        color=colors[lbls.index(i) % len(colors)],
-                        penwidth="{0}".format(4),
-                        label=lbl
-                    )
-
-        else:
-            colors = Colors.uniquecolors(M+1)
-            #random.shuffle(colors)
-
-            links = {}
-            for (u, v, i) in A:
-                if (u, v) not in links:
-                    links[u, v] = []
-                links[u, v].append(i)
-
-            for (ind, (u, v)) in enumerate(links):
-                if ignore is not None and (u, v) in ignore:
-                    continue
-                assert u != v
-                if (
-                    M in links[u, v] or
-                    any(not isinstance(e, int) for e in links[u, v])
-                ):
-                    g.add_edge(u, v, color="black", penwidth=4)
-                if len(links[u, v]) != 1:
-                    lbl = ",".join(map(str, links[u, v])) if showlabel else ""
-                    g.add_edge(
-                        u, v,
-                        color=colors[ind % len(colors)],
-                        penwidth="{0}".format(4),
-                        label=lbl
-                    )
+        for (u, v, i) in A:
+            if (u, v) in ignore:
+                continue
+            assert u != v
+            if (u, v) in back:
+                u, v = v, u
+                d = "back"
+            else:
+                d = "front"
+            if i in loss:
+                g.add_edge(
+                    u, v, color="black", style="dashed", penwidth=2, dir=d
+                )
+            else:
+                lbl = str(i) if showlabels else ""
+                g.add_edge(
+                    u, v,
+                    color=colors[lbls.index(i) % len(colors)],
+                    penwidth="{0}".format(2),
+                    label=lbl,
+                    dir=d
+                )
 
         g.draw(svg_file, format="svg", prog="dot")
-        print("SVG file '{0}' generated!".format(svg_file))
+        if verbose:
+            print("SVG file '{0}' generated!".format(svg_file))
 
 
 class Colors(object):
@@ -213,12 +193,12 @@ class Colors(object):
 
     @staticmethod
     def uniquecolors(n, v=0.5, p=0.0):
-        """Computes a list of distinct colors, ecah of which is
+        """Computes a list of distinct colors, each of which is
         represented as an RGB three-tuple."""
         import math
-        hues = (360.0/n*i for i in range(n))
-        hs = (math.floor(hue/60) % 6 for hue in hues)
-        fs = (hue/60-math.floor(hue/60) for hue in hues)
+        hues = list(360.0/n*i for i in range(n))
+        hs = list(math.floor(hue/60) % 6 for hue in hues)
+        fs = list((hue/60)%1 for hue in hues)
         return [
             Colors.rgbcode(Colors.rgbcolor(h, f, v, p))
             for h, f in zip(hs, fs)
