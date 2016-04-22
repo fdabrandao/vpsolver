@@ -98,12 +98,11 @@ void Instance::read(const char *fname) {
 
 void Instance::read(FILE *fin, ftype type) {
     throw_assert(fscanf(fin, " #INSTANCE_BEGIN#") == 0);
-    throw_assert(fscanf(fin, " NDIMS:") == 0);
+    throw_assert(fscanf(fin, " $INSTANCE {") == 0);
     throw_assert(fscanf(fin, "%d", &ndims) == 1);
     throw_assert(ndims >= 1);
 
     if (type == MVP) {
-        throw_assert(fscanf(fin, " NBTYPES:") == 0);
         throw_assert(fscanf(fin, "%d", &nbtypes) == 1);
         throw_assert(nbtypes >= 1);
     } else {
@@ -115,15 +114,12 @@ void Instance::read(FILE *fin, ftype type) {
     Qs.resize(nbtypes);
     for (int t = 0; t < nbtypes; t++) {
         Ws[t].resize(ndims);
-        throw_assert(fscanf(fin, " Wi:") == 0);
         for (int d = 0; d < ndims; d++) {
             throw_assert(fscanf(fin, "%d", &Ws[t][d]) == 1);
             throw_assert(Ws[t][d] >= 0);
         }
         if (type == MVP) {
-            throw_assert(fscanf(fin, " Ci:") == 0);
             throw_assert(fscanf(fin, "%d", &Cs[t]) == 1);
-            throw_assert(fscanf(fin, " Qi:") == 0);
             throw_assert(fscanf(fin, "%d", &Qs[t]) == 1);
         } else {
             Cs[t] = 1;
@@ -131,21 +127,17 @@ void Instance::read(FILE *fin, ftype type) {
         }
     }
 
-    throw_assert(fscanf(fin, " M:") == 0);
-    throw_assert(fscanf(fin, "%d", &m) == 1);
-
     items.clear();
     nopts.clear();
     ctypes.clear();
     demands.clear();
     int it_count = 0;
+    throw_assert(fscanf(fin, "%d", &m) == 1);
     for (int it_type = 0; it_type < m; it_type++) {
         int ti, bi;
         if (type == MVP) {
-            throw_assert(fscanf(fin, " ti:") == 0);
             throw_assert(fscanf(fin, "%d", &ti) == 1);
             throw_assert(ti >= 0);
-            throw_assert(fscanf(fin, " bi:") == 0);
             throw_assert(fscanf(fin, "%d", &bi) == 1);
             throw_assert(bi >= 0);
             demands.push_back(bi);
@@ -166,7 +158,6 @@ void Instance::read(FILE *fin, ftype type) {
                 item.opt = -1;
             }
 
-            throw_assert(fscanf(fin, " wi:") == 0);
             for (int d = 0; d < ndims; d++) {
                 throw_assert(fscanf(fin, "%d", &item[d]) == 1);
                 throw_assert(item[d] >= 0);
@@ -177,7 +168,6 @@ void Instance::read(FILE *fin, ftype type) {
             throw_assert(!item.nonzero.empty());
 
             if (type == VBP) {
-                throw_assert(fscanf(fin, " bi:") == 0);
                 throw_assert(fscanf(fin, "%d", &bi) == 1);
                 throw_assert(bi >= 0);
                 demands.push_back(bi);
@@ -221,19 +211,20 @@ void Instance::read(FILE *fin, ftype type) {
             throw_assert(nfits >= 1);
         }
     }
+    throw_assert(fscanf(fin, " } ;") <= 0);
 
     char buf[MAX_LEN];
-    while (fscanf(fin, "%s", buf) != EOF) {
-        if (!strcmp(buf, "#INSTANCE_END#")) {
-            break;
-        } else if (!strcmp(buf, "VTYPE:")) {
-            throw_assert(fscanf(fin, "%s", buf) == 1);
+    while (fscanf(fin, " $%[^{ \n]", buf) == 1) {
+        if (!strcmp(buf, "VTYPE")) {
+            throw_assert(fscanf(fin, " { %[^}, \n] } ;", buf) == 1);
             vtype = buf[0];
             throw_assert(vtype == 'C' || vtype == 'I');
-        } else if (!strcmp(buf, "CTYPE:")) {
+        } else if (!strcmp(buf, "CTYPE")) {
+            throw_assert(fscanf(fin, " {") == 0);
             ctypes.clear();
             for (int i = 0; i < m; i++) {
-                throw_assert(fscanf(fin, "%s", buf) == 1);
+                if (i) throw_assert(fscanf(fin, " ,") == 0);
+                throw_assert(fscanf(fin, " %[^}, \n]", buf) == 1);
                 if (!strcmp(buf, ">")) {
                     ctypes.push_back('>');
                 } else if (!strcmp(buf, "=")) {
@@ -243,26 +234,30 @@ void Instance::read(FILE *fin, ftype type) {
                     ctypes.push_back('*');
                 }
             }
-        } else if (!strcmp(buf, "IDS:")) {
+            throw_assert(fscanf(fin, " } ;") == 0);
+        } else if (!strcmp(buf, "IDS")) {
+            throw_assert(fscanf(fin, " {") == 0);
             for (int i = 0; i < static_cast<int>(items.size()); i++) {
+                if (i) throw_assert(fscanf(fin, " ,") == 0);
                 throw_assert(fscanf(fin, "%d", &items[i].id) == 1);
             }
-        } else if (!strcmp(buf, "SORT:")) {
+            throw_assert(fscanf(fin, " } ;") == 0);
+        } else if (!strcmp(buf, "SORT")) {
             int tsort = 1;
-            throw_assert(fscanf(fin, "%d", &tsort) == 1);
+            throw_assert(fscanf(fin, " { %d } ;", &tsort) == 1);
             throw_assert(tsort == 0 || tsort == 1);
             sort = tsort;
-        } else if (!strcmp(buf, "METHOD:")) {
-            throw_assert(fscanf(fin, "%d", &method) == 1);
+        } else if (!strcmp(buf, "METHOD")) {
+            throw_assert(fscanf(fin, " { %d } ;", &method) == 1);
             throw_assert(method >= MIN_METHOD && method <= MAX_METHOD);
-        } else if (!strcmp(buf, "RELAX:")) {
+        } else if (!strcmp(buf, "RELAX")) {
             int trelax = 0;
-            throw_assert(fscanf(fin, "%d", &trelax) == 1);
+            throw_assert(fscanf(fin, " { %d } ;", &trelax) == 1);
             throw_assert(trelax == 0 || trelax == 1);
             relax_domains = trelax;
-        } else if (!strcmp(buf, "BINARY:")) {
+        } else if (!strcmp(buf, "BINARY")) {
             int tbinary = 0;
-            throw_assert(fscanf(fin, "%d", &tbinary) == 1);
+            throw_assert(fscanf(fin, " { %d } ;", &tbinary) == 1);
             throw_assert(tbinary == 0 || tbinary == 1);
             binary = tbinary;
         } else {
@@ -270,6 +265,7 @@ void Instance::read(FILE *fin, ftype type) {
             exit(1);
         }
     }
+    throw_assert(fscanf(fin, " #INSTANCE_END#") <= 0);
 
     for (int i = 0; i < m; i++) {
         if (ctypes[i] == '*') {
@@ -292,29 +288,28 @@ void Instance::read(FILE *fin, ftype type) {
 
 void Instance::write(FILE *fout) const {
     fprintf(fout, "#INSTANCE_BEGIN#\n");
-    fprintf(fout, "NDIMS: %d\n", ndims);
+    fprintf(fout, "$INSTANCE{\n");
+    fprintf(fout, "%d\n", ndims);
 
-    fprintf(fout, "NBTYPES: %d\n", nbtypes);
+    fprintf(fout, "%d\n", nbtypes);
 
     for (int t = 0; t < nbtypes; t++) {
-        fprintf(fout, "Wi:");
         for (int i = 0; i < ndims; i++) {
             fprintf(fout, " %d", Ws[t][i]);
         }
-        fprintf(fout, " Ci: %d", Cs[t]);
-        fprintf(fout, " Qi: %d\n", Qs[t]);
+        fprintf(fout, " %d", Cs[t]);
+        fprintf(fout, " %d\n", Qs[t]);
     }
 
-    fprintf(fout, "M: %d\n", m);
+    fprintf(fout, "%d\n", m);
     int p = 0;
     vector<int> rid(items.size());
     for (int it = 0; it < static_cast<int>(items.size()); it++) {
         rid[items[it].id] = it;
     }
     for (int i = 0; i < m; i++) {
-        fprintf(fout, "ti: %d bi: %d\n", nopts[i], demands[i]);
+        fprintf(fout, "%d %d\n", nopts[i], demands[i]);
         for (int q = 0; q < nopts[i]; q++) {
-            fprintf(fout, "wi:");
             for (int j = 0; j < ndims; j++) {
                 fprintf(fout, " %d", items[rid[p]][j]);
             }
@@ -322,27 +317,31 @@ void Instance::write(FILE *fout) const {
             p++;
         }
     }
+    fprintf(fout, "};\n");
 
-    fprintf(fout, "VTYPE: %c\n", vtype);
+    fprintf(fout, "$VTYPE{%c};\n", vtype);
 
-    fprintf(fout, "CTYPE:");
+    fprintf(fout, "$CTYPE{");
     for (int i = 0; i < m; i++) {
-        fprintf(fout, " %c", ctypes[i]);
+        if (i) fprintf(fout, ",");
+        fprintf(fout, "%c", ctypes[i]);
     }
-    fprintf(fout, "\n");
+    fprintf(fout, "};\n");
 
-    fprintf(fout, "SORT: %d\n", sort);
+    fprintf(fout, "$SORT{%d};\n", sort);
 
-    fprintf(fout, "METHOD: %d\n", method);
+    fprintf(fout, "$METHOD{%d};\n", method);
 
-    fprintf(fout, "RELAX: %d\n", relax_domains);
+    fprintf(fout, "$RELAX{%d};\n", relax_domains);
 
-    fprintf(fout, "BINARY: %d\n", binary);
+    fprintf(fout, "$BINARY{%d};\n", binary);
 
-    fprintf(fout, "IDS:");
+    fprintf(fout, "$IDS{");
     for (int i = 0; i < static_cast<int>(items.size()); i++) {
-        fprintf(fout, " %d", items[i].id);
+        if (i) fprintf(fout, ",");
+        fprintf(fout, "%d", items[i].id);
     }
+    fprintf(fout, "};");
     fprintf(fout, "\n");
     fprintf(fout, "#INSTANCE_END#\n");
 }

@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef std::pair<int, int> int_pair;
 
 bool check_ext(const char* name, const char* extension);
+bool prefix(const char *pre, const char *str);
 
 extern char _error_msg_[MAX_LEN];
 

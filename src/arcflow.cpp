@@ -547,21 +547,23 @@ void Arcflow::write(FILE *fout) {
 
     int iS = 0;
     fprintf(fout, "#GRAPH_BEGIN#\n");
-    fprintf(fout, "NBTYPES: %d\n", inst.nbtypes);
-    fprintf(fout, "S: %d\n", iS);
-    fprintf(fout, "Ts:");
+    fprintf(fout, "$NBTYPES{%d};\n", inst.nbtypes);
+    fprintf(fout, "$S{%d};\n", iS);
+    fprintf(fout, "$Ts{");
     for (int t = 0; t < static_cast<int>(Ts.size()); t++) {
-        fprintf(fout, " %d", Ts[t]);
+        if (t) fprintf(fout, ",");
+        fprintf(fout, "%d", Ts[t]);
     }
-    fprintf(fout, "\n");
+    fprintf(fout, "};\n");
 
-    fprintf(fout, "LOSS: %d\n", LOSS);
+    fprintf(fout, "$LOSS{%d};\n", LOSS);
 
     int lastv = NS.size()-1;
-    fprintf(fout, "NV: %d\n", NV);
-    fprintf(fout, "NA: %d\n", NA);
+    fprintf(fout, "$NV{%d};\n", NV);
+    fprintf(fout, "$NA{%d};\n", NA);
 
     sort(all(A));
+    fprintf(fout, "$ARCS{\n");
     for (int i = 0; i < 3; i++) {
         for (const Arc &a : A) {
             if (i == 1 && a.u != iS) {
@@ -574,6 +576,7 @@ void Arcflow::write(FILE *fout) {
             fprintf(fout, "%d %d %d\n", a.u, a.v, a.label);
         }
     }
+    fprintf(fout, "};\n");
     fprintf(fout, "#GRAPH_END#\n");
 }
 
@@ -584,33 +587,32 @@ void Arcflow::read(FILE *fin) {
     throw_assert(fscanf(fin, " #GRAPH_BEGIN#") == 0);
 
     int nbtypes;
-    throw_assert(fscanf(fin, " NBTYPES:") == 0);
-    throw_assert(fscanf(fin, "%d", &nbtypes) == 1);
+    throw_assert(fscanf(fin, " $NBTYPES { %d } ;", &nbtypes) == 1);
     throw_assert(nbtypes == inst.nbtypes);
 
-    throw_assert(fscanf(fin, " S:") == 0);
-    throw_assert(fscanf(fin, "%d", &S) == 1);
+    throw_assert(fscanf(fin, " $S { %d } ;", &S) == 1);
 
     Ts.resize(nbtypes);
-    throw_assert(fscanf(fin, " Ts:") == 0);
+    throw_assert(fscanf(fin, " $Ts { ") == 0);
     for (int i = 0; i < nbtypes; i++) {
+        if (i) throw_assert(fscanf(fin, " ,") == 0);
         throw_assert(fscanf(fin, "%d", &Ts[i]) == 1);
     }
+    throw_assert(fscanf(fin, " } ;") == 0);
 
-    throw_assert(fscanf(fin, " LOSS:") == 0);
-    throw_assert(fscanf(fin, "%d", &LOSS) == 1);
+    throw_assert(fscanf(fin, " $LOSS { %d } ;", &LOSS) == 1);
 
-    throw_assert(fscanf(fin, " NV:") == 0);
-    throw_assert(fscanf(fin, "%d", &NV) == 1);
+    throw_assert(fscanf(fin, " $NV { %d } ;", &NV) == 1);
 
-    throw_assert(fscanf(fin, " NA:") == 0);
-    throw_assert(fscanf(fin, "%d", &NA) == 1);
+    throw_assert(fscanf(fin, " $NA { %d } ;", &NA) == 1);
 
+    throw_assert(fscanf(fin, " $ARCS {") == 0);
     for (int i = 0; i < NA; i++) {
         int i_u, i_v, label;
         throw_assert(fscanf(fin, " %d %d %d ", &i_u, &i_v, &label) == 3);
         A.push_back(Arc(i_u, i_v, label));
     }
+    throw_assert(fscanf(fin, " } ;") == 0);
     throw_assert(fscanf(fin, " #GRAPH_END#") == 0);
     ready = true;
 }
