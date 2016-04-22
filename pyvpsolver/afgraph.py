@@ -24,9 +24,7 @@ from builtins import range
 from builtins import sorted
 from builtins import object
 
-from .afgutils import AFGUtils
-
-inf = float("inf")
+from .utils import inf, relabel_graph, sort_vertices, sort_arcs, draw_graph
 
 
 class AFGraph(object):
@@ -39,25 +37,11 @@ class AFGraph(object):
         self.flow = None
         self.labels = None
 
-    @classmethod
-    def from_file(cls, afg_file, labels=None):
-        """Loads a graph from a .afg file."""
-        V, A, S, Ts, LOSS = AFGUtils.read_graph(afg_file, labels)
-        lbls = {}
-        lbls[S] = "S"
-        if len(Ts) > 1:
-            newTs = ["T{}".format(i+1) for i in range(len(Ts))]
-            for t, newt in zip(Ts, newTs):
-                lbls[t] = newt
-        else:
-            newTs = ["T"]
-            lbls[Ts[0]] = "T"
-        V, A = AFGUtils.relabel(V, A, lambda u: lbls.get(u, u))
-        return cls(V, A, "S", newTs, LOSS)
-
     def relabel(self, fv, fa=lambda x: x):
-        """Relabels the graph."""
-        self.V, self.A = AFGUtils.relabel(self.V, self.A, fv, fa)
+        """Relabel the graph."""
+        assert self.flow is None
+        assert self.labels is None
+        self.V, self.A = relabel_graph(self.V, self.A, fv, fa)
         if self.LOSS is not None:
             self.LOSS = fa(self.LOSS)
         if self.S is not None:
@@ -65,20 +49,49 @@ class AFGraph(object):
         if self.Ts is not None:
             self.Ts = [fv(t) for t in self.Ts]
 
-    def draw(self, svg_file, showlabels=False, ignore=None, back=None,
-            loss=None, verbose=None):
-        """Draws the arc-flow graph in .svg format."""
+    def draw(self, svg_file, show_labels=False, ignore=None, back=None,
+             loss=None, weights=None, capacities=None, lpaths=False,
+             verbose=None):
+        """Draw the arc-flow graph in .svg format."""
+        V, A = self.V, self.A
         if loss is None:
             loss = self.LOSS
         if back is None:
             back = set((u, v) for (u, v, i) in self.A if v == self.S)
-        AFGUtils.draw(
-            svg_file, self.V, self.A, showlabels=showlabels, ignore=ignore,
-            back=back, loss=loss, verbose=verbose
+
+        if lpaths:
+            assert weights is not None
+            assert capacities is not None
+            lp_source = self.lpaths_source(weights, capacities)
+            lp_targets = self.lpaths_targets(weights, capacities)
+            newlabels = {
+                v: "{}:\nL({})\nU({})".format(
+                    str(v),
+                    ",".join(map(str, lp_source[v])),
+                    ",".join(map(str, lp_targets[v]))
+                )
+                for v in V
+            }
+            if ignore is not None:
+                ignore = [
+                    (newlabels.get(u, u), newlabels.get(v, v))
+                    for (u, v) in ignore
+                ]
+            if back is not None:
+                back = [
+                    (newlabels.get(u, u), newlabels.get(v, v))
+                    for (u, v) in back
+                ]
+            V, A = relabel_graph(V, A, lambda v: newlabels.get(v, v))
+
+        draw_graph(
+            svg_file, sort_vertices(V), sort_arcs(A),
+            show_labels=show_labels, ignore=ignore, back=back, loss=loss,
+            verbose=verbose
         )
 
     def vname(self, u, v, i, vnames=None):
-        """Returns the variable name attributed to an arc."""
+        """Return the variable name attributed to the arc."""
         if vnames is None:
             vnames = self.names
         if (u, v, i) in vnames:
@@ -87,22 +100,69 @@ class AFGraph(object):
         # vnames[u, v, i] = "F_{0}_{1}_{2}".format(u, v, i)
         return vnames[u, v, i]
 
-    def get_arcs_sorted(self, reverse=False):
-        """Returns the list of arcs sorted."""
-        return sorted(
-            self.A, key=lambda a: tuple((repr(type(k)), k) for k in a),
-            reverse=reverse
-        )
+    def lpaths_source(self, weights, capacities):
+        """Compute longest paths to the source."""
+        ndims = len(capacities[0])
+        radj = {u: [] for u in self.V}
+        for u, v, lbl in self.A:
+            if v != self.S:
+                radj[v].append((u, lbl))
+
+        zero = tuple([0]*ndims)
+        minlabel = tuple([0]*ndims)
+
+        def lp_source(u, labels):
+            if u in labels:
+                return labels[u]
+            lbl = minlabel
+            for v, it in radj[u]:
+                wi = weights.get(it, zero)
+                vlbl = lp_source(v, labels)
+                lbl = tuple(max(lbl[d], vlbl[d]+wi[d]) for d in range(ndims))
+            labels[u] = lbl
+            return lbl
+
+        labels = {}
+        for t in self.Ts:
+            lp_source(t, labels)
+        return labels
+
+    def lpaths_targets(self, weights, capacities):
+        """Compute longest paths to the targets."""
+        ndims = len(capacities[0])
+        adj = {u: [] for u in self.V}
+        for u, v, lbl in self.A:
+            if v != self.S:
+                adj[u].append((v, lbl))
+
+        zero = tuple([0]*ndims)
+        maxlabel = tuple([inf]*ndims)
+
+        def lp_targets(u, labels):
+            if u in labels:
+                return labels[u]
+            lbl = maxlabel
+            for v, it in adj[u]:
+                wi = weights.get(it, zero)
+                vlbl = lp_targets(v, labels)
+                lbl = tuple(min(lbl[d], vlbl[d]-wi[d]) for d in range(ndims))
+            labels[u] = lbl
+            return lbl
+
+        labels = {t: Wt for t, Wt in zip(self.Ts, capacities)}
+        lp_targets(self.S, labels)
+        return labels
 
     def get_vertices_sorted(self, reverse=False):
-        """Returns the list of vertices sorted."""
-        return sorted(
-            self.V, key=lambda k: (repr(type(k)), k),
-            reverse=reverse
-        )
+        """Return the list of vertices sorted."""
+        return sort_vertices(self.V, reverse)
+
+    def get_arcs_sorted(self, reverse=False):
+        """Return the list of arcs sorted."""
+        return sort_arcs(self.A, reverse)
 
     def get_flow_cons(self, vnames=None):
-        """Returns the list of flow conservation constraints."""
+        """Return the list of flow conservation constraints."""
         Ain = {u: [] for u in self.V}
         Aout = {u: [] for u in self.V}
         varl = []
@@ -124,7 +184,7 @@ class AFGraph(object):
         return varl, cons
 
     def get_assocs(self, vnames=None):
-        """Returns the arc variables grouped by label."""
+        """Return the arc variables grouped by label."""
         assocs = {}
         for (u, v, i) in self.get_arcs_sorted():
             if i not in assocs:
@@ -133,24 +193,8 @@ class AFGraph(object):
             assocs[i].append(name)
         return assocs
 
-    def get_assocs_multi(self, vnames=None):
-        """Returns the arc variables grouped by label (multi-label variant)."""
-        assocs = {}
-        for (u, v, l) in self.get_arcs_sorted():
-            if not isinstance(l, (list, tuple)):
-                lst = [l]
-            else:
-                lst = l
-            name = self.vname(u, v, l, vnames)
-            for i in set(lst):
-                if i not in assocs:
-                    assocs[i] = []
-                coef = lst.count(i)
-                assocs[i].append((name, coef))
-        return assocs
-
     def set_flow(self, varvalues, vnames=None):
-        """Sets arc flows."""
+        """Set flows."""
         flow = {}
         for (u, v, i) in self.A:
             name = self.vname(u, v, i, vnames)
@@ -160,12 +204,14 @@ class AFGraph(object):
         self.flow = flow
 
     def set_labels(self, labels):
-        """Sets arc labels."""
+        """Set labels."""
         self.labels = labels
 
     def extract_solution(self, source, direction, target, flow_limit=inf):
-        """Extracts vector packing solutions form arc-flow solutions."""
+        """Extract a vector packing solution form an arc-flow solution."""
         assert direction in ("<-", "->")
+        assert self.flow is not None
+        assert self.labels is not None
         flow = self.flow
         labels = self.labels
         adj = {u: [] for u in self.V}

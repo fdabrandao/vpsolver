@@ -20,43 +20,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
 from builtins import zip
+from builtins import str
 from builtins import map
 from builtins import range
 from builtins import object
+import six
 
 import os
 import sys
-import re
 import signal
 import atexit
 import shutil
 import tempfile
 import subprocess
-from .graphutils import AFGraph
-
-inf = float("inf")
+from .afgraph import AFGraph
+from .utils import inf, get_opt
 
 
 class VBP(object):
-    """Wrapper for .vbp files."""
+    """
+    Wrapper for .vbp files.
+    """
 
     def __init__(self, W, w, b, binary=False, verbose=False):
         self.vbp_file = VPSolver.new_tmp_file(".vbp")
-        self.labels = {}
         with open(self.vbp_file, "w") as f:
-            # ndims
-            print(len(W), file=f)
-            # W
-            print(" ".join(map(str, W)), file=f)
-            # m
-            print(len(w), file=f)
-            # items
-            for i in range(len(w)):
-                self.labels[i] = i
+            print(len(W), file=f)  # ndims
+            print(" ".join(map(str, W)), file=f)  # W
+            print(len(w), file=f)  # m
+            for i in range(len(w)):  # items
                 row = list(w[i])+[b[i]]
                 assert len(row) == len(W)+1
                 print(" ".join(map(str, row)), file=f)
-            print("BINARY: {:d}".format(binary), file=f)
+            print("BINARY{{{:d}}};".format(binary), file=f)
         if verbose:
             with open(self.vbp_file, "r") as f:
                 print(f.read())
@@ -64,34 +60,43 @@ class VBP(object):
         self.ndims = len(W)
         self.binary = binary
         self.W, self.w, self.b = W, w, b
+        self.labels = list(range(self.m))
+
+    @classmethod
+    def from_str(cls, content, binary=None, verbose=None):
+        lst = content.split()
+        for i in range(len(lst)):
+            try:
+                assert int(lst[i]) == float(lst[i])
+                lst[i] = int(lst[i])
+            except:
+                break
+        ndims = lst.pop(0)
+        W = lst[:ndims]
+        lst = lst[ndims:]
+        m = lst.pop(0)
+        w, b = [], []
+        for i in range(m):
+            w.append(lst[:ndims])
+            lst = lst[ndims:]
+            b.append(lst.pop(0))
+        if binary is None:
+            binary = bool(int(get_opt("BINARY", content, False)))
+        assert lst == [] or str(lst[0]).startswith("$")
+        return cls(W, w, b, binary, verbose)
 
     @classmethod
     def from_file(cls, vbp_file, binary=None, verbose=None):
         with open(vbp_file, "r") as f:
-            lst = f.read().split()
-            for i in range(len(lst)):
-                try:
-                    assert int(lst[i]) == float(lst[i])
-                    lst[i] = int(lst[i])
-                except:
-                    break
-            ndims = lst.pop(0)
-            W = lst[:ndims]
-            lst = lst[ndims:]
-            m = lst.pop(0)
-            w, b = [], []
-            for i in range(m):
-                w.append(lst[:ndims])
-                lst = lst[ndims:]
-                b.append(lst.pop(0))
-            if lst != [] and not str(lst[0]).isdigit():
-                opts = dict(re.findall("([A-Z]+): (\d+)", " ".join(lst)))
-                if binary is None:
-                    binary = bool(int(opts.get("BINARY", 0)))
-            else:
-                assert lst == []
-                binary = False
-        return cls(W, w, b, binary, verbose)
+            return cls.from_str(f.read(), binary=None, verbose=None)
+
+    def weights(self):
+        """Return item weights."""
+        return {i: tuple(self.w[i]) for i in range(self.m)}
+
+    def capacities(self):
+        """Return bin capacities."""
+        return [tuple(self.W)]
 
     def __del__(self):
         try:
@@ -101,38 +106,33 @@ class VBP(object):
 
 
 class MVP(object):
-    """Wrapper for .mvp files."""
+    """
+    Wrapper for .mvp files.
+    """
 
     def __init__(self, Ws, Cs, Qs, ws, b, binary=False, verbose=False):
         self.mvp_file = VPSolver.new_tmp_file(".mvp")
-        self.labels = {}
         with open(self.mvp_file, "w") as f:
-            # ndims
             ndims = len(Ws[0])
-            print(ndims, file=f)
-            # nbtypes
-            print(len(Ws), file=f)
+            print(ndims, file=f)  # ndims
+            print(len(Ws), file=f)  # nbtypes
             assert len(Ws) == len(Cs)
             assert len(Ws) == len(Qs)
-            # Ws, Cs, Qs
-            for Wi, Ci, Qi in zip(Ws, Cs, Qs):
+            for Wi, Ci, Qi in zip(Ws, Cs, Qs):  # Ws, Cs, Qs
                 assert len(Wi) == ndims
                 if Qi == inf:
                     Qi = -1
                 print(" ".join(map(str, list(Wi)+[Ci]+[Qi])), file=f)
-            # m
             assert len(ws) == len(b)
-            print(len(ws), file=f)
-            # items
+            print(len(ws), file=f)  # m
             p = 0
-            for i in range(len(ws)):
+            for i in range(len(ws)):  # items
                 print("{} {}".format(len(ws[i]), b[i]), file=f)
                 for j, w in enumerate(ws[i]):
                     assert len(w) == ndims
                     print(" ".join(map(str, w)), file=f)
-                    self.labels[p] = (i, j)
                     p += 1
-            print("BINARY: {:d}".format(binary), file=f)
+            print("BINARY{{{:d}}};".format(binary), file=f)
         if verbose:
             with open(self.mvp_file, "r") as f:
                 print(f.read())
@@ -141,59 +141,77 @@ class MVP(object):
         self.binary = binary
         self.Ws, self.Cs, self.Qs = Ws, Cs, Qs
         self.ws, self.b = ws, b
+        self.labels = [
+            (i, j)
+            for i in range(len(self.ws))
+            for j in range(len(self.ws[i]))
+        ]
+
+    @classmethod
+    def from_str(cls, content, binary=None, verbose=None):
+        lst = content.split()
+        for i in range(len(lst)):
+            try:
+                assert int(lst[i]) == float(lst[i])
+                lst[i] = int(lst[i])
+            except:
+                break
+        ndims = lst.pop(0)
+        nbtypes = lst.pop(0)
+        Ws, Cs, Qs = [], [], []
+        for i in range(nbtypes):
+            Ws.append(lst[:ndims])
+            lst = lst[ndims:]
+            Cs.append(lst.pop(0))
+            Qs.append(lst.pop(0))
+        m = lst.pop(0)
+        ws, b = [], []
+        for i in range(m):
+            ws.append([])
+            qi = lst.pop(0)
+            bi = lst.pop(0)
+            b.append(bi)
+            for j in range(qi):
+                ws[i].append(lst[:ndims])
+                lst = lst[ndims:]
+        if binary is None:
+            binary = bool(int(get_opt("BINARY", content, False)))
+        assert lst == [] or str(lst[0]).startswith("$")
+        return cls(Ws, Cs, Qs, ws, b, binary, verbose)
 
     @classmethod
     def from_file(cls, mvp_file, binary=None, verbose=None):
         with open(mvp_file, "r") as f:
-            lst = f.read().split()
-            for i in range(len(lst)):
-                try:
-                    assert int(lst[i]) == float(lst[i])
-                    lst[i] = int(lst[i])
-                except:
-                    break
-            ndims = lst.pop(0)
-            nbtypes = lst.pop(0)
-            Ws, Cs, Qs = [], [], []
-            for i in range(nbtypes):
-                Ws.append(lst[:ndims])
-                lst = lst[ndims:]
-                Cs.append(lst.pop(0))
-                Qs.append(lst.pop(0))
-            m = lst.pop(0)
-            ws, b = [], []
-            for i in range(m):
-                ws.append([])
-                qi = lst.pop(0)
-                bi = lst.pop(0)
-                b.append(bi)
-                for j in range(qi):
-                    ws[i].append(lst[:ndims])
-                    lst = lst[ndims:]
-            if lst != [] and not str(lst[0]).isdigit():
-                opts = dict(re.findall("([A-Z]+): (\d+)", " ".join(lst)))
-                if binary is None:
-                    binary = bool(int(opts.get("BINARY", 0)))
-            else:
-                assert lst == []
-                binary = False
-        return cls(Ws, Cs, Qs, ws, b, binary, verbose)
+            return cls.from_str(f.read(), binary=None, verbose=None)
+
+    def weights(self):
+        """Return item weights."""
+        return {
+            (i, j): tuple(self.ws[i][j])
+            for i in range(len(self.ws))
+            for j in range(len(self.ws[i]))
+        }
+
+    def capacities(self):
+        """Return bin capacities."""
+        return list(map(tuple, self.Ws))
 
     def __del__(self):
         try:
-            os.remove(self.vbp_file)
+            os.remove(self.mvp_file)
         except:
             pass
 
 
 class AFG(object):
-    """Wrapper for .afg files."""
+    """
+    Wrapper for .afg files.
+    """
 
     def __init__(self, instance, method=-3, binary=None, vtype="I",
-            verbose=None):
+                 verbose=None):
         assert isinstance(instance, (VBP, MVP))
         self.instance = instance
-        self.labels = instance.labels
         self.afg_file = VPSolver.new_tmp_file(".afg")
         if isinstance(instance, VBP):
             instance_file = instance.vbp_file
@@ -207,8 +225,39 @@ class AFG(object):
         )
 
     def graph(self):
-        """Returns the graph as an AFGraph object."""
-        return AFGraph.from_file(self.afg_file, self.labels)
+        """Return the graph as an AFGraph object."""
+        with open(self.afg_file, "r") as f:
+            content = f.read()
+        labels = self.instance.labels
+        S = int(get_opt("S", content))
+        Ts = list(map(int, get_opt("Ts", content).split(",")))
+        ids = list(map(int, get_opt("IDS", content).split(",")))
+        arcs = list(map(int, get_opt("ARCS", content).split()))
+        LOSS = int(get_opt("LOSS", content))
+        V, A = set([]), []
+        for i in range(0, len(arcs), 3):
+            u, v, i = arcs[i:i+3]
+            V.add(u)
+            V.add(v)
+            if i == LOSS:
+                A.append((u, v, LOSS))
+            elif labels is None:
+                A.append((u, v, ids[i]))
+            else:
+                A.append((u, v, labels[ids[i]]))
+        return AFGraph(V, A, S, Ts, LOSS)
+
+    def draw(self, svg_file, lpaths=False):
+        """Draw the arc-flow graph in .svg format."""
+        if lpaths:
+            weights = self.instance.weights()
+            capacities = self.instance.capacities()
+        else:
+            weights = None
+            capacities = None
+        self.graph().draw(
+            svg_file, weights=weights, capacities=capacities, lpaths=lpaths
+        )
 
     def __del__(self):
         try:
@@ -218,7 +267,9 @@ class AFG(object):
 
 
 class MPS(object):
-    """Wrapper for .mps files."""
+    """
+    Wrapper for .mps files.
+    """
 
     def __init__(self, graph, verbose=None):
         assert isinstance(graph, AFG)
@@ -236,7 +287,9 @@ class MPS(object):
 
 
 class LP(object):
-    """Wrapper for .lp files."""
+    """
+    Wrapper for .lp files.
+    """
 
     def __init__(self, graph, verbose=None):
         assert isinstance(graph, AFG)
@@ -254,7 +307,9 @@ class LP(object):
 
 
 class VPSolver(object):
-    """Tools for calling VPSolver binaries and scripts."""
+    """
+    Tools for calling VPSolver binaries and scripts.
+    """
 
     VPSOLVER_EXEC = "vpsolver"
     VBP2AFG_EXEC = "vbp2afg"
@@ -269,13 +324,13 @@ class VPSolver(object):
 
     @staticmethod
     def set_verbose(verbose):
-        """Enables/disables verbose output."""
+        """Enable/disable verbose output."""
         if verbose is not None:
             VPSolver.VERBOSE = verbose
 
     @staticmethod
     def new_tmp_file(ext="tmp"):
-        """Creates temporary files."""
+        """Create a temporary file."""
         if not ext.startswith("."):
             ext = ".{}".format(ext)
         fname = "{}/{}{}".format(VPSolver.TMP_DIR, VPSolver.TMP_CNT, ext)
@@ -285,7 +340,7 @@ class VPSolver(object):
     @staticmethod
     @atexit.register
     def clear():
-        """Deletes temporary files and kills child processes."""
+        """Delete temporary files and kills child processes."""
         for p in VPSolver.PLIST:
             try:
                 os.killpg(p.pid, signal.SIGTERM)
@@ -298,7 +353,7 @@ class VPSolver(object):
 
     @staticmethod
     def log(msg, verbose=None):
-        """Log function."""
+        """Log message."""
         if verbose is None:
             verbose = VPSolver.VERBOSE
         if verbose:
@@ -306,7 +361,7 @@ class VPSolver(object):
 
     @staticmethod
     def run(cmd, tee=None, grep=None, grepv=None, verbose=None):
-        """Runs system commands."""
+        """Run a system command."""
         if verbose is None:
             verbose = VPSolver.VERBOSE
 
@@ -350,7 +405,7 @@ class VPSolver(object):
 
     @staticmethod
     def parse_vbpsol(vpsol_output):
-        """Transforms 'vbpsol' plaintext solutions into python data."""
+        """Transform 'vbpsol' plaintext solutions into python data."""
         marker = "PYSOL="
         if marker in vpsol_output:
             vpsol_output = vpsol_output[vpsol_output.find(marker)+len(marker):]
@@ -362,7 +417,7 @@ class VPSolver(object):
 
     @staticmethod
     def vbpsol(afg_file, sol_file, opts="0 1", verbose=None):
-        """Calls 'vbpsol' to extract vector packing solutions."""
+        """Call 'vbpsol' to extract vector packing solutions."""
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
@@ -380,8 +435,8 @@ class VPSolver(object):
 
     @staticmethod
     def vpsolver(instance_file, method=-3, binary=None, vtype="I",
-            print_inst=False, pyout=True, verbose=None):
-        """Calls 'vpsolver' to solve .vbp instances."""
+                 print_inst=False, pyout=True, verbose=None):
+        """Call 'vpsolver' to solve .vbp instances."""
         if isinstance(instance_file, VBP):
             if binary is None:
                 binary = int(instance_file.binary)
@@ -410,8 +465,8 @@ class VPSolver(object):
 
     @staticmethod
     def vbp2afg(instance_file, afg_file, method=-3, binary=None, vtype="I",
-            verbose=None):
-        """Calls 'vbp2afg' to create arc-flow graphs for .vbp instances."""
+                verbose=None):
+        """Call 'vbp2afg' to create arc-flow graphs for .vbp instances."""
         if isinstance(instance_file, VBP):
             if binary is None:
                 binary = int(instance_file.binary)
@@ -439,7 +494,7 @@ class VPSolver(object):
 
     @staticmethod
     def afg2mps(afg_file, mps_file, opts="", verbose=None):
-        """Calls 'afg2mps' to create .mps models for arc-flow graphs."""
+        """Call 'afg2mps' to create .mps models for arc-flow graphs."""
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
@@ -457,7 +512,7 @@ class VPSolver(object):
 
     @staticmethod
     def afg2lp(afg_file, lp_file, opts="", verbose=None):
-        """Calls 'afg2lp' to create .lp models for arc-flow graphs."""
+        """Call 'afg2lp' to create .lp models for arc-flow graphs."""
         if isinstance(afg_file, AFG):
             afg_file = afg_file.afg_file
         out_file = VPSolver.new_tmp_file()
@@ -475,8 +530,8 @@ class VPSolver(object):
 
     @staticmethod
     def script(script_name, arg1=None, arg2=None, options=None, pyout=True,
-            verbose=None):
-        """Calls VPSolver scripts and returns vector packing solutions."""
+               verbose=None):
+        """Call a VPSolver scripts and return a vector packing solution."""
         cmd = script_name
         for arg in [arg1, arg2]:
             if isinstance(arg, MPS):
@@ -489,7 +544,7 @@ class VPSolver(object):
                 cmd += " --vbp {}".format(arg.vbp_file)
             elif isinstance(arg, MVP):
                 cmd += " --mvp {}".format(arg.mvp_file)
-            elif isinstance(arg, str):
+            elif isinstance(arg, six.string_types):
                 if arg.endswith(".mps"):
                     cmd += " --mps {}".format(arg)
                 elif arg.endswith(".lp"):
@@ -515,13 +570,13 @@ class VPSolver(object):
 
     @staticmethod
     def script_wsol(script_name, model, options=None, verbose=None):
-        """Calls VPSolver scripts and returns arc-flow solutions."""
+        """Call a VPSolver script and return an arc-flow solution."""
         cmd = script_name
         if isinstance(model, MPS):
             cmd += " --mps {}".format(model.mps_file)
         elif isinstance(model, LP):
             cmd += " --lp {}".format(model.lp_file)
-        elif isinstance(model, str):
+        elif isinstance(model, six.string_types):
             if model.endswith(".mps"):
                 cmd += " --mps {}".format(model)
             elif model.endswith(".lp"):
@@ -561,7 +616,7 @@ def signal_handler(signal_, frame):
     """Signal handler for a cleaner exit."""
     print("signal received: {}".format(signal_))
     VPSolver.clear()
-    sys.exit(0)
+    sys.exit(1)
 
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGHUP, signal_handler)

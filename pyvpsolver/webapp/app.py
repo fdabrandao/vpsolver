@@ -46,7 +46,7 @@ app.debug = True
 
 @app.context_processor
 def inject_globals():
-    """Sends global data to templates."""
+    """Send global data to templates."""
     data = dict(
         app_name="VPSolver App",
         pages=[
@@ -68,12 +68,12 @@ def favicon():
 
 @app.route("/")
 def index():
-    """Renders the index page."""
+    """Render the index page."""
     return redirect(url_for("vbp"))
 
 
 def load(fname):
-    """Loads a text file as a string."""
+    """Load a text file as a string."""
     with open(fname, "r") as f:
         return f.read().strip("\n")
 
@@ -81,7 +81,7 @@ def load(fname):
 @app.route("/vbp/", defaults={"example": None})
 @app.route("/vbp/<example>")
 def vbp(example):
-    """Renders the input page for VBP."""
+    """Render the input page for VBP."""
     title = "Vector Packing"
 
     example_folder = os.path.join(
@@ -123,7 +123,7 @@ def vbp(example):
 @app.route("/mvp/", defaults={"example": None})
 @app.route("/mvp/<example>")
 def mvp(example):
-    """Renders the input page for MVP."""
+    """Render the input page for MVP."""
     title = "Multiple-choice Vector Packing"
 
     example_folder = os.path.join(
@@ -209,6 +209,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
 
 class IterativeOutput(object):
     """Iterable class for retrieving workers output"""
+
     def __init__(self, target, args):
         rfd, wfd = os.pipe()
         args += (os.fdopen(wfd, "w"),)
@@ -217,7 +218,7 @@ class IterativeOutput(object):
         self.output = os.fdopen(rfd, "r")
 
     def __iter__(self):
-        """Retrieves the output iteratively."""
+        """Retrieve the output iteratively."""
         for line in iter(self.output.readline, "EOF\n"):
             yield line.rstrip() + "\n"
         if not self.proc.is_alive():
@@ -234,7 +235,7 @@ class IterativeOutput(object):
 
 @app.route("/solve/<app_name>", methods=["POST"])
 def solve(app_name):
-    """Renders the solver page."""
+    """Render the solver page."""
     try:
         args = (app_name, request.method, request.form, request.args)
         return Response(
@@ -247,7 +248,7 @@ def solve(app_name):
 
 
 def get_ip_address():
-    """Returns the ip address of 'eth0'."""
+    """Return the ip address of 'eth0'."""
     import socket
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))

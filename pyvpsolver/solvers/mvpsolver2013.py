@@ -31,10 +31,10 @@ from pympl import Model
 
 
 def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
-        svg_file="", lp_file="", mps_file="",
-        script=None, script_options=None, stats=None, verbose=None):
+          svg_file="", lp_file="", mps_file="",
+          script=None, script_options=None, stats=None, verbose=None):
     """
-    Solves multiple-choice vector bin packing instances
+    Solve multiple-choice vector bin packing instances
     using the method proposed in:
     Brandao, F. and Pedroso, J. P. (2013). Multiple-choice Vector
     Bin Packing: Arc-flow Formulation with Graph Compression. Technical Report
@@ -303,7 +303,7 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
 
 
 def validate_solution(lst_solutions, nbtypes, ndims, Ws, ws, b):
-    """Validates multiple-choice vector packing solutions."""
+    """Validate multiple-choice vector packing solutions."""
     for i in range(nbtypes):
         for r, pat in lst_solutions[i]:
             if any(
@@ -322,19 +322,23 @@ def validate_solution(lst_solutions, nbtypes, ndims, Ws, ws, b):
     return all(c[i] >= b[i] for i in range(len(b)))
 
 
-def print_solution(obj, lst_sol, fout=sys.stdout):
-    """Pretty-print function for multiple-choice vector packing solutions."""
+def print_solution(arg1, arg2=None, i0=1, fout=sys.stdout):
+    """Pretty-print a multiple-choice vector packing solution."""
+    if arg2 is None:
+        obj, lst_sol = arg1
+    else:
+        obj, lst_sol = arg1, arg2
     if obj is not None:
         print("Objective:", obj, file=fout)
     print("Solution:", file=fout)
     for i, sol in enumerate(lst_sol):
         cnt = sum(m for m, p in sol)
         print("Bins of type {0}: {1} {2}".format(
-            i+1, cnt, ["bins", "bin"][cnt == 1]
+            i+i0, cnt, ["bins", "bin"][cnt == 1]
         ), file=fout)
         for mult, patt in sol:
             print("{0} x [{1}]".format(
                 mult, ", ".join(
-                    ["i={0} opt={1}".format(it+1, opt+1) for it, opt in patt]
+                    ["i={0} opt={1}".format(it+i0, opt+i0) for it, opt in patt]
                 )
             ), file=fout)

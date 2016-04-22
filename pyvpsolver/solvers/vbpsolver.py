@@ -25,10 +25,10 @@ from .. import VPSolver, VBP, AFG, MPS
 
 
 def solve(W, w, b,
-        svg_file="", lp_file="", mps_file="",
-        script=None, script_options=None, stats=None, verbose=None):
+          svg_file="", lp_file="", mps_file="",
+          script=None, script_options=None, stats=None, verbose=None):
     """
-    Solves vector packing instances using the method proposed in:
+    Solve vector packing instances using the method proposed in:
     Brandao, F. and Pedroso, J. P. (2013). Bin Packing and Related
     Problems: General Arc-flow Formulation with Graph Compression. Technical
     Report DCC-2013-08, Faculdade de Ciencias da Universidade do Porto,
@@ -39,8 +39,8 @@ def solve(W, w, b,
     if stats is None and verbose is not None:
         stats = verbose
     instance = VBP(W, w, b, verbose=False)
-    if (stats == verbose and svg_file == ""
-            and lp_file == "" and mps_file == ""):
+    if (stats == verbose and svg_file == "" and
+            lp_file == "" and mps_file == ""):
         out, (obj, sol) = VPSolver.script(script, instance, verbose=verbose)
     else:
         afg = AFG(instance, verbose=stats)
@@ -63,8 +63,12 @@ def solve(W, w, b,
     return obj, sol
 
 
-def print_solution(obj, lst_sol, fout=sys.stdout):
-    """Pretty-print function for vector packing solutions."""
+def print_solution(arg1, arg2=None, i0=1, fout=sys.stdout):
+    """Pretty-print a vector packing solution."""
+    if arg2 is None:
+        obj, lst_sol = arg1
+    else:
+        obj, lst_sol = arg1, arg2
     assert len(lst_sol) == 1
     sol = lst_sol[0]
     if obj is not None:
@@ -74,6 +78,6 @@ def print_solution(obj, lst_sol, fout=sys.stdout):
         assert all(opt == 0 for it, opt in patt)
         print("{0} x [{1}]".format(
             mult, ", ".join(
-                ["i={0}".format(it+1) for it, opt in patt]
+                ["i={0}".format(it+i0) for it, opt in patt]
             )
         ), file=fout)
