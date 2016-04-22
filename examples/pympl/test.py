@@ -28,11 +28,6 @@ import twostage
 import instance_vbp
 import instance_mvp
 
-if __name__ == "__main__":
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-
 
 def main():
     """Runs all PyMPL examples."""
@@ -51,4 +46,8 @@ def main():
 
 
 if __name__ == "__main__":
+    import os
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
     main()

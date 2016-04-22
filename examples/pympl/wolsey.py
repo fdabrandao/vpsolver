@@ -23,18 +23,10 @@ from __future__ import print_function
 from __future__ import division
 from builtins import range
 
-import os
-import sys
-from pympl import PyMPL, Tools, glpkutils
-
-if __name__ == "__main__":
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-
 
 def main():
     """Parses 'graph.mod'"""
+    from pympl import PyMPL, Tools, glpkutils
 
     a, a0 = [65, 64, 41, 22, 13, 12, 8, 2], 80
     aS = abs(2*a0+1-sum(a))
@@ -99,4 +91,8 @@ def main():
     # assert exit_code == 0
 
 if __name__ == "__main__":
+    import os
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
     main()

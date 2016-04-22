@@ -21,18 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
 
-import os
-import sys
-from pyvpsolver.solvers import mvpsolver as mvpsolver
-
-if __name__ == "__main__":
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-
 
 def main():
     """Examples: Multiple-choice Vector Bin Packing"""
+    from pyvpsolver.solvers import mvpsolver
 
     # Example 1:
     # Bins:
@@ -41,7 +33,7 @@ def main():
     W3 = (150, 25)
     Ws = [W1, W2, W3]    # Capacities
     Cs = [3, 7, 2]       # Costs
-    Qs = [-1, -1, -1] # Number of available bins
+    Qs = [-1, -1, -1]    # Number of available bins
     # Items:
     ws1, b1 = [(50, 25), (25, 50), (0, 75)], 1
     ws2, b2 = [(40, 40), (60, 25), (25, 60)], 1
@@ -50,17 +42,19 @@ def main():
     ws = [ws1, ws2, ws3]
 
     # Solve Example 1:
-    obj, sol = mvpsolver.solve(
+    solution = mvpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graphA_mvbp.svg",
-        script="vpsolver_glpk.sh", verbose=True
+        script="vpsolver_glpk.sh",
+        verbose=True
     )
-    print("obj:", obj)
-    print("sol:", sol)
-    mvpsolver.print_solution(obj, sol)
-    assert obj == 3  # check the solution objective value
+    mvpsolver.print_solution(solution)
 
-    ## Example 2
+    # check the solution objective value
+    obj, patterns = solution
+    assert obj == 3
+
+    # Example 2
     # Bins:
     W1 = (100, 75)
     W2 = (75, 50)
@@ -74,16 +68,22 @@ def main():
     ws = [ws1, ws2]
 
     # Solve Example 2:
-    obj, sol = mvpsolver.solve(
+    solution = mvpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graphB_mvbp.svg",
-        script="vpsolver_glpk.sh", verbose=True
+        script="vpsolver_glpk.sh",
+        verbose=True
     )
-    print("obj:", obj)
-    print("sol:", sol)
-    mvpsolver.print_solution(obj, sol)
-    assert obj == 5  # check the solution objective value
+    mvpsolver.print_solution(solution)
+
+    # check the solution objective value
+    obj, patterns = solution
+    assert obj == 5
 
 
 if __name__ == "__main__":
+    import os
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
     main()

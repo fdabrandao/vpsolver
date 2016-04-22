@@ -21,34 +21,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
 
-import os
-import sys
-from pyvpsolver.solvers import vbpsolver
-
-if __name__ == "__main__":
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-
 
 def main():
-    """Example: solve a vector packing instance using 'solvers.vbp'"""
+    """Example: solve a vector packing instance using 'solvers.vbpsolver'"""
+    from pyvpsolver.solvers import vbpsolver
 
     W = (5180, 9)
-    w = [(1120,1), (1250,1), (520,1), (1066,1), (1000,1), (1150,1)]
+    w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
     b = [9, 5, 91, 18, 11, 64]
 
     # Solve:
-    obj, sol = vbpsolver.solve(
+    solution = vbpsolver.solve(
         W, w, b,
         svg_file="tmp/graph_vbp.svg",
-        script="vpsolver_glpk.sh", verbose=True
+        script="vpsolver_glpk.sh",
+        verbose=True
     )
-    print("obj:", obj)
-    print("sol:", sol)
-    vbpsolver.print_solution(obj, sol)
-    assert obj == 33  # check the solution objective value
+    vbpsolver.print_solution(solution)
+
+    # check the solution objective value
+    obj, patterns = solution
+    assert obj == 33
 
 
 if __name__ == "__main__":
+    import os
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
     main()

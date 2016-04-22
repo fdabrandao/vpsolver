@@ -21,19 +21,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
 
-import os
-import sys
-from pyvpsolver import VPSolver, VBP, MVP, AFG, MPS, LP
-from pyvpsolver.solvers import vbpsolver, mvpsolver
-
-if __name__ == "__main__":
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-
 
 def main():
     """Examples: how to use VBP, MVP, AFG, MPS, LP and VPSolver"""
+    from pyvpsolver import VPSolver, VBP, MVP, AFG, MPS, LP
+    from pyvpsolver.solvers import vbpsolver, mvpsolver
 
     # Create instanceA:
     instanceA = VBP(
@@ -54,7 +46,7 @@ def main():
 
     # Draw the arc-flow graph for instanceA (requires pygraphviz)
     try:
-        afg.graph().draw("tmp/graph1.svg")
+        afg.draw("tmp/graph1.svg")
     except ImportError as e:
         print(repr(e))
 
@@ -77,16 +69,21 @@ def main():
         print(repr(e))
 
     # Solve an instance directly without creating AFG, MPS or LP objects:
-    out, sol = VPSolver.script("vpsolver_glpk.sh", instanceB, verbose=True)
+    out, solution = VPSolver.script(
+        "vpsolver_glpk.sh", instanceB, verbose=True
+    )
 
     # Print the solution:
-    obj, patterns = sol
+    obj, patterns = solution
     print("Objective:", obj)
     print("Solution:", patterns)
 
     # Pretty-print the solution:
-    vbpsolver.print_solution(obj, patterns)
-    assert obj == 21  # check the solution objective value
+    vbpsolver.print_solution(solution)
+
+    # check the solution objective value
+    obj, patterns = solution
+    assert obj == 21
 
     # Create instanceC:
     W1 = (100, 100)
@@ -103,26 +100,38 @@ def main():
     instanceC = MVP(Ws, Cs, Qs, ws, b)
 
     # Solve an instance directly without creating AFG, MPS or LP objects:
-    out, sol = VPSolver.script("vpsolver_glpk.sh", instanceC, verbose=True)
-    obj, patterns = sol
-    mvpsolver.print_solution(obj, patterns)
-    assert obj == 3  # check the solution objective value
+    out, solution = VPSolver.script(
+        "vpsolver_glpk.sh", instanceC, verbose=True
+    )
+    mvpsolver.print_solution(solution)
+
+    # check the solution objective value
+    obj, patterns = solution
+    assert obj == 3
 
     # Create instanceD from a .mvp file
     instanceD = MVP.from_file("instance.mvp")
 
     # Draw the arc-flow graph for instanceD (requires pygraphviz)
     try:
-        AFG(instanceD).graph().draw("tmp/graph2.svg")
+        AFG(instanceD).draw("tmp/graph2.svg")
     except ImportError as e:
         print(repr(e))
 
     # Solve an instance directly without creating AFG, MPS or LP objects:
-    out, sol = VPSolver.script("vpsolver_glpk.sh", instanceD, verbose=True)
-    obj, patterns = sol
-    mvpsolver.print_solution(obj, patterns)
-    assert obj == 8  # check the solution objective value
+    out, solution = VPSolver.script(
+        "vpsolver_glpk.sh", instanceD, verbose=True
+    )
+    mvpsolver.print_solution(solution)
+
+    # check the solution objective value
+    obj, patterns = solution
+    assert obj == 8
 
 
 if __name__ == "__main__":
+    import os
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
     main()

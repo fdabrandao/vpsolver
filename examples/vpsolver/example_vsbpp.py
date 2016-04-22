@@ -21,18 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
 
-import os
-import sys
-from pyvpsolver.solvers import mvpsolver as mvpsolver
-
-if __name__ == "__main__":
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-
 
 def main():
     """ Variable-sized Bin Packing Example """
+    from pyvpsolver.solvers import mvpsolver
 
     # Capacities:
     Ws = [[100], [120], [150]]
@@ -54,16 +46,22 @@ def main():
     b = [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
 
     # Solve the variable-sized bin packing instance:
-    obj, sol = mvpsolver.solve(
+    solution = mvpsolver.solve(
         Ws, Cs, Qs, ws, b,
         svg_file="tmp/graph_vsbpp.svg",
-        script="vpsolver_glpk.sh", verbose=True
+        script="vpsolver_glpk.sh",
+        verbose=True
     )
-    print("obj:", obj)
-    print("sol:", sol)
-    mvpsolver.print_solution(obj, sol)
-    assert obj == 1280  # check the solution objective value
+    mvpsolver.print_solution(solution)
+
+    # check the solution objective value
+    obj, patterns = solution
+    assert obj == 1280
 
 
 if __name__ == "__main__":
+    import os
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
     main()

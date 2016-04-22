@@ -23,15 +23,6 @@ from __future__ import print_function
 from builtins import map
 from builtins import range
 
-import os
-import sys
-from pympl import PyMPL, Tools, glpkutils
-
-if __name__ == "__main__":
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-
 
 def read_twostage(fname):
     """Loads two-stage instances."""
@@ -50,6 +41,7 @@ def read_twostage(fname):
 
 def main():
     """Parses 'twostage.mod'."""
+    from pympl import PyMPL, Tools, glpkutils
 
     mod_in = "twostage.mod"
     mod_out = "tmp/twostage.out.mod"
@@ -77,4 +69,8 @@ def main():
     )
 
 if __name__ == "__main__":
+    import os
+    sdir = os.path.dirname(__file__)
+    if sdir != "":
+        os.chdir(sdir)
     main()
