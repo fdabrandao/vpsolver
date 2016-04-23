@@ -3,7 +3,6 @@
 *.out
 *.pyc
 *.pyo
-*.svg
 *.o
 *.egg-info
 .ipynb_checkpoints
