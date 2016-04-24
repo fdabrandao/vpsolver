@@ -62,7 +62,7 @@ def sort_arcs(A, reverse=False):
 
 
 def draw_graph(svg_file, V, A, show_labels=False, ignore=None, back=None,
-               loss=None, verbose=True):
+               loss=None, graph_attrs=None, verbose=False):
     """Draw an arc-flow graph in .svg format."""
     from pygraphviz.agraph import AGraph
     if ignore is None:
@@ -74,10 +74,13 @@ def draw_graph(svg_file, V, A, show_labels=False, ignore=None, back=None,
     elif not isinstance(loss, (tuple, list)):
         loss = [loss]
     g = AGraph(
-        rankdir="LR", directed=True, bgcolor="white", text="black",
-        font_color="white", ranksep="1.0", nodesep="0.10",
+        rankdir="LR", directed=True, bgcolor="white",
+        ranksep="1.0", nodesep="0.10",
         strict=False
     )
+    if graph_attrs is not None:
+        for attr, value in graph_attrs.items():
+            g.graph_attr[attr] = value
     g.node_attr["shape"] = "ellipse"
     g.node_attr["color"] = "black"
     g.node_attr["fontcolor"] = "black"

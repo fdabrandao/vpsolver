@@ -51,7 +51,7 @@ class AFGraph(object):
 
     def draw(self, svg_file, show_labels=False, ignore=None, back=None,
              loss=None, weights=None, capacities=None, lpaths=False,
-             verbose=None):
+             graph_attrs=None, verbose=False):
         """Draw the arc-flow graph in .svg format."""
         V, A = self.V, self.A
         if loss is None:
@@ -87,7 +87,7 @@ class AFGraph(object):
         draw_graph(
             svg_file, sort_vertices(V), sort_arcs(A),
             show_labels=show_labels, ignore=ignore, back=back, loss=loss,
-            verbose=verbose
+            graph_attrs=graph_attrs, verbose=verbose
         )
 
     def vname(self, u, v, i, vnames=None):

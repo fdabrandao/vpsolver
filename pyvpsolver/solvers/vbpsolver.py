@@ -47,7 +47,7 @@ def solve(W, w, b,
         if svg_file.endswith(".svg"):
             VPSolver.log("Generating .SVG file...", verbose)
             try:
-                afg.graph().draw(svg_file)
+                afg.graph().draw(svg_file, verbose=verbose)
             except Exception as e:
                 VPSolver.log(e, verbose)
         if lp_file.endswith(".lp"):

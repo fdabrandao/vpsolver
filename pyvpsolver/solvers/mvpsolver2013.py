@@ -81,7 +81,10 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
         graphs[i].A.remove((Ts[i], Ss[i], LOSS))
         if svg_file.endswith(".svg"):
             try:
-                graphs[i].draw(svg_file.replace(".svg", "{0}.svg".format(i+1)))
+                graphs[i].draw(
+                    svg_file.replace(".svg", "{0}.svg".format(i+1)),
+                    verbose=verbose
+                )
             except Exception as e:
                 VPSolver.log(e, verbose)
 
@@ -96,9 +99,9 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
     graph = AFGraph(V, A, S, [T], LOSS)
     if svg_file.endswith(".svg"):
         try:
-            graph.draw(svg_file)
+            graph.draw(svg_file, verbose=verbose)
         except Exception as e:
-                VPSolver.log(e, verbose)
+            VPSolver.log(e, verbose)
 
     adj = {u: [] for u in V}
     for (u, v, i) in A:
@@ -202,9 +205,9 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
 
     if svg_file.endswith(".svg"):
         try:
-            graph.draw(svg_file.replace(".svg", ".final.svg"))
+            graph.draw(svg_file.replace(".svg", ".final.svg"), verbose=verbose)
         except Exception as e:
-                VPSolver.log(e, verbose)
+            VPSolver.log(e, verbose)
 
     # Remove redudant parallel arcs:
     At = []

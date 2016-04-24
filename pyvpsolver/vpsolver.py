@@ -247,7 +247,7 @@ class AFG(object):
                 A.append((u, v, labels[ids[i]]))
         return AFGraph(V, A, S, Ts, LOSS)
 
-    def draw(self, svg_file, lpaths=False):
+    def draw(self, svg_file, lpaths=False, graph_attrs=None, verbose=False):
         """Draw the arc-flow graph in .svg format."""
         if lpaths:
             weights = self.instance.weights()
@@ -256,7 +256,8 @@ class AFG(object):
             weights = None
             capacities = None
         self.graph().draw(
-            svg_file, weights=weights, capacities=capacities, lpaths=lpaths
+            svg_file, weights=weights, capacities=capacities, lpaths=lpaths,
+            graph_attrs=graph_attrs, verbose=verbose
         )
 
     def __del__(self):
