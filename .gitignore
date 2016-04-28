@@ -9,6 +9,7 @@
 /bin/
 /build/
 /dist/
+/.cache/
 /venv*
 /swig.sh
 /clear.sh
