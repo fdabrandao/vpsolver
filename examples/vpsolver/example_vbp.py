@@ -20,11 +20,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
+import os
 
 
 def main():
     """Example: solve a vector packing instance using 'solvers.vbpsolver'"""
     from pyvpsolver.solvers import vbpsolver
+    sdir = os.path.dirname(__file__)
+    os.chdir(sdir if sdir != "" else os.curdir)
 
     W = (5180, 9)
     w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
@@ -45,8 +48,4 @@ def main():
 
 
 if __name__ == "__main__":
-    import os
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
     main()

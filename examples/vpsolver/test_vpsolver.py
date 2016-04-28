@@ -21,33 +21,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
 
-import os
-import sys
-import wolsey
-import twostage
-import instance_vbp
-import instance_mvp
+
+def test_example():
+    """Test example."""
+    import example
+    example.main()
 
 
-def main():
-    """Runs all PyMPL examples."""
+def test_example_vbp():
+    """Test example_vbp."""
+    import example_vbp
+    example_vbp.main()
 
-    print("wolsey:")
-    wolsey.main()
 
-    print("twostage:")
-    twostage.main()
+def test_example_mvp():
+    """Test example_mvp."""
+    import example_mvp
+    example_mvp.main()
 
-    print("instance_vbp:")
-    instance_vbp.main()
 
-    print("instance_mvp:")
-    instance_mvp.main()
+def test_example_vsbpp():
+    """Test example_vsbpp."""
+    import example_vsbpp
+    example_vsbpp.main()
 
 
 if __name__ == "__main__":
-    import os
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-    main()
+    test_example()
+    test_example_vbp()
+    test_example_mvp()
+    test_example_vsbpp()

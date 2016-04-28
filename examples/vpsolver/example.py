@@ -20,12 +20,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
+import os
 
 
 def main():
     """Examples: how to use VBP, MVP, AFG, MPS, LP and VPSolver"""
     from pyvpsolver import VPSolver, VBP, MVP, AFG, MPS, LP
     from pyvpsolver.solvers import vbpsolver, mvpsolver
+    sdir = os.path.dirname(__file__)
+    os.chdir(sdir if sdir != "" else os.curdir)
 
     # Create instanceA:
     instanceA = VBP(
@@ -130,8 +133,4 @@ def main():
 
 
 if __name__ == "__main__":
-    import os
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
     main()

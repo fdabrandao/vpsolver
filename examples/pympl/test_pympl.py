@@ -21,31 +21,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
 
-import example
-import example_vbp
-import example_mvp
-import example_vsbpp
+
+def test_instance_vbp():
+    """Test instance_vbp."""
+    import instance_vbp
+    instance_vbp.main()
 
 
-def main():
-    """Runs all VPSolver examples."""
+def test_instance_mvp():
+    """Test instance_mvp."""
+    import instance_mvp
+    instance_mvp.main()
 
-    print("example:")
-    example.main()
 
-    print("example_vbp:")
-    example_vbp.main()
+def test_wolsey():
+    """Test wolsey."""
+    import wolsey
+    wolsey.main()
 
-    print("example_mvp:")
-    example_mvp.main()
 
-    print("example_vsbpp:")
-    example_vsbpp.main()
+def test_twostage():
+    """Test twostage."""
+    import twostage
+    twostage.main()
 
 
 if __name__ == "__main__":
-    import os
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
-    main()
+    test_instance_vbp()
+    test_instance_mvp()
+    test_wolsey()
+    test_twostage()

@@ -20,11 +20,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
+import os
 
 
 def main():
     """ Variable-sized Bin Packing Example """
     from pyvpsolver.solvers import mvpsolver
+    sdir = os.path.dirname(__file__)
+    os.chdir(sdir if sdir != "" else os.curdir)
 
     # Capacities:
     Ws = [[100], [120], [150]]
@@ -60,8 +63,4 @@ def main():
 
 
 if __name__ == "__main__":
-    import os
-    sdir = os.path.dirname(__file__)
-    if sdir != "":
-        os.chdir(sdir)
     main()

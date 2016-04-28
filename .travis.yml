@@ -32,6 +32,6 @@ install:
   - pip install -r requirements.txt
   - pip install .
 script:
-  - bash test.sh --options quick_test
+  - py.test examples
 after_success:
   - coveralls
