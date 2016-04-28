@@ -57,5 +57,5 @@ if [[ -n "$venv" ]]; then
     source $venv/bin/activate;
 fi;
 
-python examples/vpsolver/test.py $options || exit 1
-python examples/pympl/test.py $options    || exit 1
+python examples/vpsolver/test_vpsolver.py $options || exit 1
+python examples/pympl/test_pympl.py $options    || exit 1
