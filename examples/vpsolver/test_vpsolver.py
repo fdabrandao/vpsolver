@@ -22,9 +22,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import print_function
 
 
-def test_mvpsolver2013():
-    """Test mvpsolver2013."""
-    from pyvpsolver.solvers import mvpsolver2013 as mvpsolver
+def test_vbpsolver():
+    """Test vbpsolver."""
+    from pyvpsolver import VPSolver
+    from pyvpsolver.solvers import vbpsolver
+    W = (5180, 9)
+    w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
+    b = [9, 5, 91, 18, 11, 64]
+
+    lp_file = VPSolver.new_tmp_file(".lp")
+    mps_file = VPSolver.new_tmp_file(".mps")
+    svg_file = VPSolver.new_tmp_file(".svg")
+
+    solution = vbpsolver.solve(W, w, b, script="vpsolver_glpk.sh")
+    vbpsolver.print_solution(solution)
+    obj, patterns = solution
+    assert obj == 33
+
+    solution = vbpsolver.solve(
+        W, w, b, lp_file=lp_file, mps_file=mps_file, svg_file=svg_file,
+        script="vpsolver_glpk.sh"
+    )
+    vbpsolver.print_solution(solution)
+    obj, patterns = solution
+    assert obj == 33
+
+
+def test_mvpsolvers():
+    """Test mvpsolvers."""
+    from pyvpsolver import VPSolver
+    from pyvpsolver.solvers import mvpsolver2013, mvpsolver2016
     Ws = [(100, 75), (75, 50)]
     Cs = [3, 2]
     Qs = [-1, -1]
@@ -33,16 +60,28 @@ def test_mvpsolver2013():
         [(40, 15), (25, 25)]
     ]
     b = [2, 1]
-    solution = mvpsolver.solve(Ws, Cs, Qs, ws, b, script="vpsolver_glpk.sh")
-    obj, patterns = solution
-    assert obj == 5
 
+    for mvpsolver in [mvpsolver2013, mvpsolver2016]:
+        solution = mvpsolver.solve(
+            Ws, Cs, Qs, ws, b, script="vpsolver_glpk.sh"
+        )
+        mvpsolver.print_solution(solution)
+        obj, patterns = solution
+        assert obj == 5
 
-def test_draw():
-    from pyvpsolver import MVP, AFG
-    instance = MVP.from_file("instance.mvp")
-    AFG(instance).draw("graph.svg")
+        lp_file = VPSolver.new_tmp_file(".lp")
+        mps_file = VPSolver.new_tmp_file(".mps")
+        svg_file = VPSolver.new_tmp_file(".svg")
+
+        solution = mvpsolver.solve(
+            Ws, Cs, Qs, ws, b, lp_file=lp_file, mps_file=mps_file,
+            svg_file=svg_file, script="vpsolver_glpk.sh"
+        )
+        mvpsolver.print_solution(solution)
+        obj, patterns = solution
+        assert obj == 5
 
 
 if __name__ == "__main__":
-    test_mvpsolver2013()
+    test_vbpsolver()
+    test_mvpsolvers()
