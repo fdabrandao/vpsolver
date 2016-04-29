@@ -22,27 +22,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import print_function
 
 
-def test_mvpsolver2013():
-    """Test mvpsolver2013."""
-    from pyvpsolver.solvers import mvpsolver2013 as mvpsolver
-    Ws = [(100, 75), (75, 50)]
-    Cs = [3, 2]
-    Qs = [-1, -1]
-    ws = [
-        [(75, 50)],
-        [(40, 15), (25, 25)]
-    ]
-    b = [2, 1]
-    solution = mvpsolver.solve(Ws, Cs, Qs, ws, b, script="vpsolver_glpk.sh")
-    obj, patterns = solution
-    assert obj == 5
+def test_example():
+    """Test example."""
+    import example
+    example.main()
 
 
-def test_draw():
-    from pyvpsolver import MVP, AFG
-    instance = MVP.from_file("instance.mvp")
-    AFG(instance).draw("graph.svg")
+def test_example_vbp():
+    """Test example_vbp."""
+    import example_vbp
+    example_vbp.main()
+
+
+def test_example_mvp():
+    """Test example_mvp."""
+    import example_mvp
+    example_mvp.main()
+
+
+def test_example_vsbpp():
+    """Test example_vsbpp."""
+    import example_vsbpp
+    example_vsbpp.main()
 
 
 if __name__ == "__main__":
-    test_mvpsolver2013()
+    test_example()
+    test_example_vbp()
+    test_example_mvp()
+    test_example_vsbpp()
