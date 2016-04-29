@@ -249,7 +249,10 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
     n = sum(b)
     for i in range(nbtypes):
         var = graph.vname(Ts[i], T, LOSS)
-        ub[var] = min(Qs[i], n)
+        if Qs[i] == -1:
+            ub[var] = n
+        else:
+            ub[var] = min(Qs[i], n)
 
     for var in varl:
         # model.add_var(name=var, lb=0, vtype="I")
