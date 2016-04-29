@@ -82,6 +82,40 @@ def test_mvpsolvers():
         assert obj == 5
 
 
+def test_scripts():
+    """Test scripts."""
+    from pyvpsolver import VPSolver, VBP, AFG, LP, MPS
+    W = (5180, 9)
+    w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
+    b = [9, 5, 91, 18, 11, 64]
+    VPSolver.clear()
+    instance = VBP(W, w, b, verbose=True)
+    afg = AFG(instance, verbose=True)
+    lp = LP(afg, verbose=True)
+    mps = MPS(afg, verbose=True)
+    VPSolver.set_verbose(False)
+    output, solution = VPSolver.script("vpsolver_glpk.sh", instance)
+    assert solution[0] == 33
+    output, solution = VPSolver.script("vpsolver_glpk.sh", afg)
+    assert solution[0] == 33
+    output, solution = VPSolver.script("vpsolver_glpk.sh", afg, lp)
+    assert solution[0] == 33
+    output, solution = VPSolver.script("vpsolver_glpk.sh", afg, mps)
+    assert solution[0] == 33
+    output, solution = VPSolver.script("vpsolver_glpk.sh", lp)
+    assert solution is None
+    output, solution = VPSolver.script("vpsolver_glpk.sh", mps)
+    assert solution is None
+    output, solution = VPSolver.script("vpsolver_glpk.sh", afg.afg_file)
+    assert solution[0] == 33
+    output, solution = VPSolver.script("vpsolver_glpk.sh", lp.lp_file)
+    assert solution is None
+    output, solution = VPSolver.script("vpsolver_glpk.sh", mps.mps_file)
+    assert solution is None
+    VPSolver.clear()
+
+
 if __name__ == "__main__":
     test_vbpsolver()
     test_mvpsolvers()
+    test_scripts()
