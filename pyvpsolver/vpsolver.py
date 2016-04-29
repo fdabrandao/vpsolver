@@ -336,6 +336,8 @@ class VPSolver(object):
             ext = ".{}".format(ext)
         fname = "{}/{}{}".format(VPSolver.TMP_DIR, VPSolver.TMP_CNT, ext)
         VPSolver.TMP_CNT += 1
+        if not os.path.exists(VPSolver.TMP_DIR):
+            os.makedirs(VPSolver.TMP_DIR)
         return fname
 
     @staticmethod
