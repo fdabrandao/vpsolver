@@ -20,6 +20,7 @@ before_install:
   - echo "yes" | sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   - sudo apt-get install -qq
+  - sudo apt-get install -qq python-pygraphviz
   - sudo apt-get install -qq g++-4.8 libstdc++-4.8-dev
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
@@ -27,10 +28,11 @@ before_install:
   - echo "CXX=$CXX"
   - echo "version `$CXX --version`"
 install:
+  - pip install pygraphviz
   - pip install -r requirements.txt
   - pip install .
 script:
   - cd examples
   - py.test -v --cov pyvpsolver
 after_success:
-  - coveralls
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then coveralls || echo "failed"; fi
