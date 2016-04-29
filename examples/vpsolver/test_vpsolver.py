@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
 
+inf = float("inf")
+
 
 def test_vbpsolver():
     """Test vbpsolver."""
@@ -55,10 +57,7 @@ def test_mvpsolvers():
     Ws = [(100, 75), (75, 50)]
     Cs = [3, 2]
     Qs = [-1, -1]
-    ws = [
-        [(75, 50)],
-        [(40, 15), (25, 25)]
-    ]
+    ws = [[(75, 50)], [(40, 15), (25, 25)]]
     b = [2, 1]
 
     for mvpsolver in [mvpsolver2013, mvpsolver2016]:
@@ -84,38 +83,68 @@ def test_mvpsolvers():
 
 def test_scripts():
     """Test scripts."""
-    from pyvpsolver import VPSolver, VBP, AFG, LP, MPS
+    from pyvpsolver import VPSolver, VBP, MVP, AFG, LP, MPS
+    VPSolver.clear()
     W = (5180, 9)
     w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
     b = [9, 5, 91, 18, 11, 64]
-    VPSolver.clear()
-    instance = VBP(W, w, b, verbose=True)
-    afg = AFG(instance, verbose=True)
-    lp = LP(afg, verbose=True)
-    mps = MPS(afg, verbose=True)
-    VPSolver.set_verbose(False)
-    output, solution = VPSolver.script("vpsolver_glpk.sh", instance)
-    assert solution[0] == 33
-    output, solution = VPSolver.script("vpsolver_glpk.sh", afg)
-    assert solution[0] == 33
-    output, solution = VPSolver.script("vpsolver_glpk.sh", afg, lp)
-    assert solution[0] == 33
-    output, solution = VPSolver.script("vpsolver_glpk.sh", afg, mps)
-    assert solution[0] == 33
-    output, solution = VPSolver.script("vpsolver_glpk.sh", lp)
-    assert solution is None
-    output, solution = VPSolver.script("vpsolver_glpk.sh", mps)
-    assert solution is None
-    output, solution = VPSolver.script("vpsolver_glpk.sh", afg.afg_file)
-    assert solution[0] == 33
-    output, solution = VPSolver.script("vpsolver_glpk.sh", lp.lp_file)
-    assert solution is None
-    output, solution = VPSolver.script("vpsolver_glpk.sh", mps.mps_file)
-    assert solution is None
-    VPSolver.clear()
+    vbp = VBP(W, w, b, verbose=True)
+    Ws = [(100, 75), (75, 50)]
+    Cs = [3, 2]
+    Qs = [inf, inf]
+    ws = [[(75, 50)], [(40, 15), (25, 25)]]
+    b = [2, 1]
+    mvp = MVP(Ws, Cs, Qs, ws, b, verbose=True)
+
+    for instance, obj in [(vbp, 33), (mvp, 5)]:
+        afg = AFG(instance, verbose=True)
+        lp = LP(afg, verbose=True)
+        mps = MPS(afg, verbose=True)
+        VPSolver.set_verbose(False)
+        output, solution = VPSolver.script("vpsolver_glpk.sh", instance)
+        assert solution[0] == obj
+        output, solution = VPSolver.script("vpsolver_glpk.sh", afg)
+        assert solution[0] == obj
+        output, solution = VPSolver.script("vpsolver_glpk.sh", afg, lp)
+        assert solution[0] == obj
+        output, solution = VPSolver.script("vpsolver_glpk.sh", afg, mps)
+        assert solution[0] == obj
+        output, solution = VPSolver.script("vpsolver_glpk.sh", lp)
+        assert solution is None
+        output, solution = VPSolver.script("vpsolver_glpk.sh", mps)
+        assert solution is None
+        output, solution = VPSolver.script("vpsolver_glpk.sh", afg.afg_file)
+        assert solution[0] == obj
+        output, solution = VPSolver.script("vpsolver_glpk.sh", lp.lp_file)
+        assert solution is None
+        output, solution = VPSolver.script("vpsolver_glpk.sh", mps.mps_file)
+        assert solution is None
+
+
+def test_draw():
+    """Test scripts."""
+    from pyvpsolver import VPSolver, VBP, MVP, AFG
+    W = (5180, 9)
+    w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
+    b = [9, 5, 91, 18, 11, 64]
+    vbp = VBP(W, w, b)
+    Ws = [(100, 75), (75, 50)]
+    Cs = [3, 2]
+    Qs = [inf, inf]
+    ws = [[(75, 50)], [(40, 15), (25, 25)]]
+    b = [2, 1]
+    mvp = MVP(Ws, Cs, Qs, ws, b)
+    svg_file = VPSolver.new_tmp_file(".svg")
+    for instance in [vbp, mvp]:
+        afg = AFG(instance)
+        try:
+            afg.draw(svg_file, lpaths=True)
+        except ImportError as e:
+            print(repr(e))
 
 
 if __name__ == "__main__":
     test_vbpsolver()
     test_mvpsolvers()
     test_scripts()
+    test_draw()
