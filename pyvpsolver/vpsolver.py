@@ -90,6 +90,11 @@ class VBP(object):
         with open(vbp_file, "r") as f:
             return cls.from_str(f.read(), binary=None, verbose=None)
 
+    @property
+    def filename(self):
+        """Return the filename."""
+        return self.vbp_file
+
     def weights(self):
         """Return item weights."""
         return {i: tuple(self.w[i]) for i in range(self.m)}
@@ -184,6 +189,11 @@ class MVP(object):
         with open(mvp_file, "r") as f:
             return cls.from_str(f.read(), binary=None, verbose=None)
 
+    @property
+    def filename(self):
+        """Return the filename."""
+        return self.mvp_file
+
     def weights(self):
         """Return item weights."""
         return {
@@ -213,20 +223,17 @@ class AFG(object):
         assert isinstance(instance, (VBP, MVP))
         self.instance = instance
         self.afg_file = VPSolver.new_tmp_file(".afg")
-        if isinstance(instance, VBP):
-            instance_file = instance.vbp_file
-            binary = instance.binary
-        elif isinstance(instance, MVP):
-            instance_file = instance.mvp_file
+        if isinstance(instance, (VBP, MVP)):
+            instance_file = instance.filename
             binary = instance.binary
         self.output = VPSolver.vbp2afg(
-            instance_file, self.afg_file, method, binary, vtype,
+            instance_file, self.filename, method, binary, vtype,
             verbose=verbose
         )
 
     def graph(self):
         """Return the graph as an AFGraph object."""
-        with open(self.afg_file, "r") as f:
+        with open(self.filename, "r") as f:
             content = f.read()
         labels = self.instance.labels
         S = int(get_opt("S", content))
@@ -241,8 +248,6 @@ class AFG(object):
             V.add(v)
             if i == LOSS:
                 A.append((u, v, LOSS))
-            elif labels is None:
-                A.append((u, v, ids[i]))
             else:
                 A.append((u, v, labels[ids[i]]))
         return AFGraph(V, A, S, Ts, LOSS)
@@ -259,6 +264,11 @@ class AFG(object):
             svg_file, weights=weights, capacities=capacities, lpaths=lpaths,
             graph_attrs=graph_attrs, verbose=verbose
         )
+
+    @property
+    def filename(self):
+        """Return the filename."""
+        return self.afg_file
 
     def __del__(self):
         try:
@@ -277,8 +287,13 @@ class MPS(object):
         self.afg_graph = graph
         self.mps_file = VPSolver.new_tmp_file(".mps")
         self.output = VPSolver.afg2mps(
-            graph.afg_file, self.mps_file, verbose=verbose
+            graph.filename, self.filename, verbose=verbose
         )
+
+    @property
+    def filename(self):
+        """Return the filename."""
+        return self.mps_file
 
     def __del__(self):
         try:
@@ -297,8 +312,13 @@ class LP(object):
         self.afg_graph = graph
         self.lp_file = VPSolver.new_tmp_file(".lp")
         self.output = VPSolver.afg2lp(
-            graph.afg_file, self.lp_file, verbose=verbose
+            graph.filename, self.filename, verbose=verbose
         )
+
+    @property
+    def filename(self):
+        """Return the filename."""
+        return self.lp_file
 
     def __del__(self):
         try:
@@ -422,7 +442,7 @@ class VPSolver(object):
     def vbpsol(afg_file, sol_file, opts="0 1", verbose=None):
         """Call 'vbpsol' to extract vector packing solutions."""
         if isinstance(afg_file, AFG):
-            afg_file = afg_file.afg_file
+            afg_file = afg_file.filename
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
             "{} {} {} {}".format(
@@ -440,18 +460,12 @@ class VPSolver(object):
     def vpsolver(instance_file, method=-3, binary=None, vtype="I",
                  print_inst=False, pyout=True, verbose=None):
         """Call 'vpsolver' to solve .vbp instances."""
-        if isinstance(instance_file, VBP):
+        if isinstance(instance_file, (VBP, MVP)):
             if binary is None:
                 binary = int(instance_file.binary)
-            instance_file = instance_file.vbp_file
-        elif isinstance(instance_file, MVP):
-            if binary is None:
-                binary = int(instance_file.binary)
-            instance_file = instance_file.mvp_file
-        else:
-            instance_file = instance_file
-            if binary is None:
-                binary = -1
+            instance_file = instance_file.filename
+        if binary is None:
+            binary = -1
         out_file = VPSolver.new_tmp_file()
         opts = "{:d} {:d} {} {:d} {:d}".format(
             method, binary, vtype, print_inst, pyout
@@ -470,17 +484,12 @@ class VPSolver(object):
     def vbp2afg(instance_file, afg_file, method=-3, binary=None, vtype="I",
                 verbose=None):
         """Call 'vbp2afg' to create arc-flow graphs for .vbp instances."""
-        if isinstance(instance_file, VBP):
+        if isinstance(instance_file, (VBP, MVP)):
             if binary is None:
                 binary = int(instance_file.binary)
-            instance_file = instance_file.vbp_file
-        elif isinstance(instance_file, MVP):
-            if binary is None:
-                binary = int(instance_file.binary)
-            instance_file = instance_file.mvp_file
-        else:
-            if binary is None:
-                binary = -1
+            instance_file = instance_file.filename
+        if binary is None:
+            binary = -1
         out_file = VPSolver.new_tmp_file()
         opts = "{:d} {:d} {}".format(method, binary, vtype)
         VPSolver.run(
@@ -499,7 +508,7 @@ class VPSolver(object):
     def afg2mps(afg_file, mps_file, opts="", verbose=None):
         """Call 'afg2mps' to create .mps models for arc-flow graphs."""
         if isinstance(afg_file, AFG):
-            afg_file = afg_file.afg_file
+            afg_file = afg_file.filename
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
             "{} {} {} {}".format(
@@ -517,7 +526,7 @@ class VPSolver(object):
     def afg2lp(afg_file, lp_file, opts="", verbose=None):
         """Call 'afg2lp' to create .lp models for arc-flow graphs."""
         if isinstance(afg_file, AFG):
-            afg_file = afg_file.afg_file
+            afg_file = afg_file.filename
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
             "{} {} {} {}".format(
@@ -538,15 +547,15 @@ class VPSolver(object):
         cmd = script_name
         for arg in [arg1, arg2]:
             if isinstance(arg, MPS):
-                cmd += " --mps {}".format(arg.mps_file)
+                cmd += " --mps {}".format(arg.filename)
             elif isinstance(arg, LP):
-                cmd += " --lp {}".format(arg.lp_file)
+                cmd += " --lp {}".format(arg.filename)
             elif isinstance(arg, AFG):
-                cmd += " --afg {}".format(arg.afg_file)
+                cmd += " --afg {}".format(arg.filename)
             elif isinstance(arg, VBP):
-                cmd += " --vbp {}".format(arg.vbp_file)
+                cmd += " --vbp {}".format(arg.filename)
             elif isinstance(arg, MVP):
-                cmd += " --mvp {}".format(arg.mvp_file)
+                cmd += " --mvp {}".format(arg.filename)
             elif isinstance(arg, six.string_types):
                 if arg.endswith(".mps"):
                     cmd += " --mps {}".format(arg)
@@ -576,9 +585,9 @@ class VPSolver(object):
         """Call a VPSolver script and return an arc-flow solution."""
         cmd = script_name
         if isinstance(model, MPS):
-            cmd += " --mps {}".format(model.mps_file)
+            cmd += " --mps {}".format(model.filename)
         elif isinstance(model, LP):
-            cmd += " --lp {}".format(model.lp_file)
+            cmd += " --lp {}".format(model.filename)
         elif isinstance(model, six.string_types):
             if model.endswith(".mps"):
                 cmd += " --mps {}".format(model)
