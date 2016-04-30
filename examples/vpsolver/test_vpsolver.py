@@ -59,7 +59,6 @@ def test_mvpsolvers():
     Qs = [-1, -1]
     ws = [[(75, 50)], [(40, 15), (25, 25)]]
     b = [2, 1]
-
     for mvpsolver in [mvpsolver2013, mvpsolver2016]:
         solution = mvpsolver.solve(
             Ws, Cs, Qs, ws, b, script="vpsolver_glpk.sh"
@@ -95,7 +94,6 @@ def test_scripts():
     ws = [[(75, 50)], [(40, 15), (25, 25)]]
     b = [2, 1]
     mvp = MVP(Ws, Cs, Qs, ws, b, verbose=True)
-
     for instance, obj in [(vbp, 33), (mvp, 5)]:
         afg = AFG(instance, verbose=True)
         lp = LP(afg, verbose=True)
@@ -149,8 +147,8 @@ def test_draw():
             print(repr(e))
 
 
-def test_vpsolver():
-    """Test vpsolver."""
+def test_vbp2afg():
+    """Test vbp2afg."""
     from pyvpsolver import VPSolver, VBP, MVP
     W = (5180, 9)
     w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
@@ -162,14 +160,11 @@ def test_vpsolver():
     ws = [[(75, 50)], [(40, 15), (25, 25)]]
     b = [2, 1]
     mvp = MVP(Ws, Cs, Qs, ws, b)
-    output, solution = VPSolver.vpsolver(vbp)
-    assert solution[0] == 33
-    output, solution = VPSolver.vpsolver(mvp)
-    assert solution[0] == 5
-    output, solution = VPSolver.vpsolver(vbp.vbp_file)
-    assert solution[0] == 33
-    output, solution = VPSolver.vpsolver(mvp.mvp_file)
-    assert solution[0] == 5
+    afg_file = VPSolver.new_tmp_file(".afg")
+    output = VPSolver.vbp2afg(vbp, afg_file)
+    output = VPSolver.vbp2afg(mvp, afg_file)
+    output = VPSolver.vbp2afg(vbp.vbp_file, afg_file)
+    output = VPSolver.vbp2afg(mvp.mvp_file, afg_file)
 
 
 if __name__ == "__main__":
