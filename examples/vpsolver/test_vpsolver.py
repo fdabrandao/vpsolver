@@ -28,10 +28,7 @@ def test_vbpsolver():
     """Test vbpsolver."""
     from pyvpsolver import VPSolver
     from pyvpsolver.solvers import vbpsolver
-    W = (5180, 9)
-    w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
-    b = [9, 5, 91, 18, 11, 64]
-
+    W, w, b = (1,), [(1,)], [1]
     lp_file = VPSolver.new_tmp_file(".lp")
     mps_file = VPSolver.new_tmp_file(".mps")
     svg_file = VPSolver.new_tmp_file(".svg")
@@ -39,7 +36,7 @@ def test_vbpsolver():
     solution = vbpsolver.solve(W, w, b, script="vpsolver_glpk.sh")
     vbpsolver.print_solution(solution)
     obj, patterns = solution
-    assert obj == 33
+    assert obj == 1
 
     solution = vbpsolver.solve(
         W, w, b, lp_file=lp_file, mps_file=mps_file, svg_file=svg_file,
@@ -47,25 +44,21 @@ def test_vbpsolver():
     )
     vbpsolver.print_solution(solution)
     obj, patterns = solution
-    assert obj == 33
+    assert obj == 1
 
 
 def test_mvpsolvers():
     """Test mvpsolvers."""
     from pyvpsolver import VPSolver
     from pyvpsolver.solvers import mvpsolver2013, mvpsolver2016
-    Ws = [(100, 75), (75, 50)]
-    Cs = [3, 2]
-    Qs = [-1, -1]
-    ws = [[(75, 50)], [(40, 15), (25, 25)]]
-    b = [2, 1]
+    Ws, Cs, Qs, ws, b = [(1,)], [1], [inf], [[(1,)]], [1]
     for mvpsolver in [mvpsolver2013, mvpsolver2016]:
         solution = mvpsolver.solve(
             Ws, Cs, Qs, ws, b, script="vpsolver_glpk.sh"
         )
         mvpsolver.print_solution(solution)
         obj, patterns = solution
-        assert obj == 5
+        assert obj == 1
 
         lp_file = VPSolver.new_tmp_file(".lp")
         mps_file = VPSolver.new_tmp_file(".mps")
@@ -77,48 +70,40 @@ def test_mvpsolvers():
         )
         mvpsolver.print_solution(solution)
         obj, patterns = solution
-        assert obj == 5
+        assert obj == 1
 
 
 def test_scripts():
     """Test scripts."""
     from pyvpsolver import VPSolver, VBP, MVP, AFG, LP, MPS
     VPSolver.clear()
-    W = (5180, 9)
-    w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
-    b = [9, 5, 91, 18, 11, 64]
-    vbp = VBP(W, w, b, verbose=True)
-    Ws = [(100, 75), (75, 50)]
-    Cs = [3, 2]
-    Qs = [inf, inf]
-    ws = [[(75, 50)], [(40, 15), (25, 25)]]
-    b = [2, 1]
-    mvp = MVP(Ws, Cs, Qs, ws, b, verbose=True)
-    for instance, obj in [(vbp, 33), (mvp, 5)]:
+    vbp = VBP(W=(1,), w=[(1,)], b=[1], verbose=True)
+    mvp = MVP(Ws=[(1,)], Cs=[1], Qs=[inf], ws=[[(1,)]], b=[1], verbose=True)
+    for instance in [vbp, mvp]:
         afg = AFG(instance, verbose=True)
         lp = LP(afg, verbose=True)
         mps = MPS(afg, verbose=True)
         VPSolver.set_verbose(False)
         output, solution = VPSolver.script("vpsolver_glpk.sh", instance)
-        assert solution[0] == obj
+        assert solution[0] == 1
         if isinstance(instance, VBP):
             instance_file = instance.vbp_file
         elif isinstance(instance, MVP):
             instance_file = instance.mvp_file
         output, solution = VPSolver.script("vpsolver_glpk.sh", instance_file)
-        assert solution[0] == obj
+        assert solution[0] == 1
         output, solution = VPSolver.script("vpsolver_glpk.sh", afg)
-        assert solution[0] == obj
+        assert solution[0] == 1
         output, solution = VPSolver.script("vpsolver_glpk.sh", afg, lp)
-        assert solution[0] == obj
+        assert solution[0] == 1
         output, solution = VPSolver.script("vpsolver_glpk.sh", afg, mps)
-        assert solution[0] == obj
+        assert solution[0] == 1
         output, solution = VPSolver.script("vpsolver_glpk.sh", lp)
         assert solution is None
         output, solution = VPSolver.script("vpsolver_glpk.sh", mps)
         assert solution is None
         output, solution = VPSolver.script("vpsolver_glpk.sh", afg.afg_file)
-        assert solution[0] == obj
+        assert solution[0] == 1
         output, solution = VPSolver.script("vpsolver_glpk.sh", lp.lp_file)
         assert solution is None
         output, solution = VPSolver.script("vpsolver_glpk.sh", mps.mps_file)
@@ -128,16 +113,8 @@ def test_scripts():
 def test_draw():
     """Test scripts."""
     from pyvpsolver import VPSolver, VBP, MVP, AFG
-    W = (5180, 9)
-    w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
-    b = [9, 5, 91, 18, 11, 64]
-    vbp = VBP(W, w, b)
-    Ws = [(100, 75), (75, 50)]
-    Cs = [3, 2]
-    Qs = [inf, inf]
-    ws = [[(75, 50)], [(40, 15), (25, 25)]]
-    b = [2, 1]
-    mvp = MVP(Ws, Cs, Qs, ws, b)
+    vbp = VBP(W=(1,), w=[(1,)], b=[1])
+    mvp = MVP(Ws=[(1,)], Cs=[1], Qs=[inf], ws=[[(1,)]], b=[1])
     svg_file = VPSolver.new_tmp_file(".svg")
     for instance in [vbp, mvp]:
         afg = AFG(instance)
@@ -147,24 +124,22 @@ def test_draw():
             print(repr(e))
 
 
-def test_vbp2afg():
-    """Test vbp2afg."""
-    from pyvpsolver import VPSolver, VBP, MVP
-    W = (5180, 9)
-    w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
-    b = [9, 5, 91, 18, 11, 64]
-    vbp = VBP(W, w, b)
-    Ws = [(100, 75), (75, 50)]
-    Cs = [3, 2]
-    Qs = [inf, inf]
-    ws = [[(75, 50)], [(40, 15), (25, 25)]]
-    b = [2, 1]
-    mvp = MVP(Ws, Cs, Qs, ws, b)
+def test_lowlevel():
+    """Test low-level API."""
+    from pyvpsolver import VPSolver, VBP, MVP, AFG
+    vbp = VBP(W=(1,), w=[(1,)], b=[1])
+    mvp = MVP(Ws=[(1,)], Cs=[1], Qs=[inf], ws=[[(1,)]], b=[1])
     afg_file = VPSolver.new_tmp_file(".afg")
-    output = VPSolver.vbp2afg(vbp, afg_file)
-    output = VPSolver.vbp2afg(mvp, afg_file)
-    output = VPSolver.vbp2afg(vbp.vbp_file, afg_file)
-    output = VPSolver.vbp2afg(mvp.mvp_file, afg_file)
+    lp_file = VPSolver.new_tmp_file(".lp")
+    mps_file = VPSolver.new_tmp_file(".mps")
+    VPSolver.vbp2afg(vbp, afg_file)
+    VPSolver.vbp2afg(mvp, afg_file)
+    VPSolver.vbp2afg(vbp.vbp_file, afg_file)
+    VPSolver.vbp2afg(mvp.mvp_file, afg_file)
+    VPSolver.afg2lp(afg_file, lp_file)
+    VPSolver.afg2mps(afg_file, mps_file)
+    VPSolver.afg2lp(AFG(vbp), lp_file)
+    VPSolver.afg2mps(AFG(mvp), mps_file)
 
 
 if __name__ == "__main__":
@@ -172,4 +147,4 @@ if __name__ == "__main__":
     test_mvpsolvers()
     test_scripts()
     test_draw()
-    test_vpsolver()
+    test_lowlevel()
