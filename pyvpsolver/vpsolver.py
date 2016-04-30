@@ -329,7 +329,7 @@ class LP(object):
 
 class VPSolver(object):
     """
-    Tools for calling VPSolver binaries and scripts.
+    Tools to interact with VPSolver binaries and scripts.
     """
 
     VPSOLVER_EXEC = "vpsolver"
@@ -582,46 +582,16 @@ class VPSolver(object):
 
     @staticmethod
     def script_wsol(script_name, model, options=None, verbose=None):
-        """Call a VPSolver script and return an arc-flow solution."""
-        cmd = script_name
-        if isinstance(model, MPS):
-            cmd += " --mps {}".format(model.filename)
-        elif isinstance(model, LP):
-            cmd += " --lp {}".format(model.filename)
-        elif isinstance(model, six.string_types):
-            if model.endswith(".mps"):
-                cmd += " --mps {}".format(model)
-            elif model.endswith(".lp"):
-                cmd += " --lp {}".format(model)
-            else:
-                raise Exception("Invalid file extension!")
-        if options is not None:
-            cmd += " --options \"{}\"".format(options)
-        out_file = VPSolver.new_tmp_file()
-        sol_file = VPSolver.new_tmp_file(".sol")
-        VPSolver.run(
-            "{} --wsol {}".format(cmd, sol_file),
-            tee=out_file,
+        """Call a solver script and return the solution."""
+        from pympl import Tools
+        if verbose is None:
+            verbose = VPSolver.VERBOSE
+        if isinstance(model, (LP, MPS)):
+            model = model.filename
+        return Tools.script(
+            script_name=script_name, model=model, options=options,
             verbose=verbose
         )
-        with open(out_file) as f:
-            output = f.read()
-        os.remove(out_file)
-        try:
-            with open(sol_file) as f:
-                sol = f.read().split()
-                values = {}
-                assert len(sol) % 2 == 0
-                for i in range(0, len(sol), 2):
-                    var, value = sol[i], float(sol[i+1])
-                    if int(value) == value:
-                        value = int(value)
-                    if value != 0:
-                        values[var] = value
-            os.remove(sol_file)
-        except:
-            values = None
-        return output, values
 
 
 def signal_handler(signal_, frame):
