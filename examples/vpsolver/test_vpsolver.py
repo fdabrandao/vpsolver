@@ -103,6 +103,12 @@ def test_scripts():
         VPSolver.set_verbose(False)
         output, solution = VPSolver.script("vpsolver_glpk.sh", instance)
         assert solution[0] == obj
+        if isinstance(instance, VBP):
+            instance_file = instance.vbp_file
+        elif isinstance(instance, MVP):
+            instance_file = instance.mvp_file
+        output, solution = VPSolver.script("vpsolver_glpk.sh", instance_file)
+        assert solution[0] == obj
         output, solution = VPSolver.script("vpsolver_glpk.sh", afg)
         assert solution[0] == obj
         output, solution = VPSolver.script("vpsolver_glpk.sh", afg, lp)
@@ -139,8 +145,31 @@ def test_draw():
         afg = AFG(instance)
         try:
             afg.draw(svg_file, lpaths=True)
-        except ImportError as e:
+        except Exception as e:
             print(repr(e))
+
+
+def test_vpsolver():
+    """Test vpsolver."""
+    from pyvpsolver import VPSolver, VBP, MVP
+    W = (5180, 9)
+    w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]
+    b = [9, 5, 91, 18, 11, 64]
+    vbp = VBP(W, w, b)
+    Ws = [(100, 75), (75, 50)]
+    Cs = [3, 2]
+    Qs = [inf, inf]
+    ws = [[(75, 50)], [(40, 15), (25, 25)]]
+    b = [2, 1]
+    mvp = MVP(Ws, Cs, Qs, ws, b)
+    output, solution = VPSolver.vpsolver(vbp)
+    assert solution[0] == 33
+    output, solution = VPSolver.vpsolver(mvp)
+    assert solution[0] == 5
+    output, solution = VPSolver.vpsolver(vbp.vbp_file)
+    assert solution[0] == 33
+    output, solution = VPSolver.vpsolver(mvp.mvp_file)
+    assert solution[0] == 5
 
 
 if __name__ == "__main__":
@@ -148,3 +177,4 @@ if __name__ == "__main__":
     test_mvpsolvers()
     test_scripts()
     test_draw()
+    test_vpsolver()
