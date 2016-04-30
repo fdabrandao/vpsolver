@@ -66,7 +66,6 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
         for j in range(len(ww)):
             if any(a > b for a, b in zip(ww[j], Ws[i])):
                 bbi[j] = 0
-                print("cenas")
                 continue
         symb = "G{0}:".format(i)
         instances[i] = VBP(Ws[i], ww, bbi, verbose=False)
@@ -310,13 +309,13 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
 
 def validate_solution(lst_solutions, nbtypes, ndims, Ws, ws, b):
     """Validate multiple-choice vector packing solutions."""
-    for i in range(nbtypes):
-        for r, pat in lst_solutions[i]:
-            if any(
-                sum(ws[it][t][d] for (it, t) in pat) > Ws[i][d]
-                for d in range(ndims)
-            ):
-                return False
+    if any(
+        sum(ws[it][t][d] for (it, t) in pat) > Ws[i][d]
+        for i in range(nbtypes)
+        for d in range(ndims)
+        for r, pat in lst_solutions[i]
+    ):
+        return False
 
     aggsol = sum([sol for sol in lst_solutions], [])
 
