@@ -45,20 +45,25 @@ def test_vbpsolver():
     vbpsolver.print_solution(solution)
     obj, patterns = solution
     assert obj == 1
+    vbpsolver.print_solution(obj, patterns)
 
 
 def test_mvpsolvers():
     """Test mvpsolvers."""
     from pyvpsolver import VPSolver
     from pyvpsolver.solvers import mvpsolver2013, mvpsolver2016
-    Ws, Cs, Qs, ws, b = [(1,)], [1], [inf], [[(1,)]], [1]
+    Ws = [(100, 75), (75, 50), (75, 50), (100, 100)]
+    Cs = [3, 2, 3, 100]
+    Qs = [inf, -1, -1, -1]
+    ws = [[(75, 50)], [(40, 75), (25, 25)]]
+    b = [2, 1]
     for mvpsolver in [mvpsolver2013, mvpsolver2016]:
         solution = mvpsolver.solve(
             Ws, Cs, Qs, ws, b, script="vpsolver_glpk.sh"
         )
         mvpsolver.print_solution(solution)
         obj, patterns = solution
-        assert obj == 1
+        assert obj == 5
 
         lp_file = VPSolver.new_tmp_file(".lp")
         mps_file = VPSolver.new_tmp_file(".mps")
@@ -66,11 +71,12 @@ def test_mvpsolvers():
 
         solution = mvpsolver.solve(
             Ws, Cs, Qs, ws, b, lp_file=lp_file, mps_file=mps_file,
-            svg_file=svg_file, script="vpsolver_glpk.sh"
+            svg_file=svg_file, script="vpsolver_glpk.sh", verbose=True
         )
         mvpsolver.print_solution(solution)
         obj, patterns = solution
-        assert obj == 1
+        assert obj == 5
+        mvpsolver.print_solution(obj, patterns)
 
 
 def test_scripts():
@@ -84,12 +90,12 @@ def test_scripts():
         lp = LP(afg, verbose=True)
         mps = MPS(afg, verbose=True)
         VPSolver.set_verbose(False)
-        output, solution = VPSolver.script("vpsolver_glpk.sh", instance)
+        output, solution = VPSolver.script(
+            "vpsolver_glpk.sh", instance, options="--seed 1234"
+        )
         assert solution[0] == 1
-        if isinstance(instance, VBP):
-            instance_file = instance.vbp_file
-        elif isinstance(instance, MVP):
-            instance_file = instance.mvp_file
+        if isinstance(instance, (VBP, MVP)):
+            instance_file = instance.filename
         output, solution = VPSolver.script("vpsolver_glpk.sh", instance_file)
         assert solution[0] == 1
         output, solution = VPSolver.script("vpsolver_glpk.sh", afg)
@@ -102,12 +108,31 @@ def test_scripts():
         assert solution is None
         output, solution = VPSolver.script("vpsolver_glpk.sh", mps)
         assert solution is None
-        output, solution = VPSolver.script("vpsolver_glpk.sh", afg.afg_file)
+        output, solution = VPSolver.script("vpsolver_glpk.sh", afg.filename)
         assert solution[0] == 1
-        output, solution = VPSolver.script("vpsolver_glpk.sh", lp.lp_file)
+        output, solution = VPSolver.script("vpsolver_glpk.sh", lp.filename)
         assert solution is None
-        output, solution = VPSolver.script("vpsolver_glpk.sh", mps.mps_file)
+        output, solution = VPSolver.script("vpsolver_glpk.sh", mps.filename)
         assert solution is None
+
+
+def test_vbpsol():
+    """Test vbpsol."""
+    from pyvpsolver import VPSolver, VBP, MVP, AFG, LP, MPS
+    vbp = VBP(W=(1,), w=[(1,)], b=[1], verbose=True)
+    afg = AFG(vbp, verbose=True)
+    lp = LP(afg, verbose=True)
+    sol_file = VPSolver.new_tmp_file(".sol")
+    output, solution = VPSolver.script_wsol("vpsolver_glpk.sh", lp)
+    assert isinstance(solution, dict)
+    with open(sol_file, "w") as f:
+        lst = []
+        for var, value in solution.items():
+            lst.append(str(var))
+            lst.append(str(value))
+        print(" ".join(lst), file=f)
+    obj, patterns = VPSolver.vbpsol(afg, sol_file)
+    assert obj == 1
 
 
 def test_draw():
@@ -119,7 +144,9 @@ def test_draw():
     for instance in [vbp, mvp]:
         afg = AFG(instance)
         try:
-            afg.draw(svg_file, lpaths=True)
+            afg.draw(
+                svg_file, lpaths=True, graph_attrs={"size": "8,8"}
+            )
         except Exception as e:
             print(repr(e))
 
@@ -134,8 +161,8 @@ def test_lowlevel():
     mps_file = VPSolver.new_tmp_file(".mps")
     VPSolver.vbp2afg(vbp, afg_file)
     VPSolver.vbp2afg(mvp, afg_file)
-    VPSolver.vbp2afg(vbp.vbp_file, afg_file)
-    VPSolver.vbp2afg(mvp.mvp_file, afg_file)
+    VPSolver.vbp2afg(vbp.filename, afg_file)
+    VPSolver.vbp2afg(mvp.filename, afg_file)
     VPSolver.afg2lp(afg_file, lp_file)
     VPSolver.afg2mps(afg_file, mps_file)
     VPSolver.afg2lp(AFG(vbp), lp_file)
@@ -146,5 +173,6 @@ if __name__ == "__main__":
     test_vbpsolver()
     test_mvpsolvers()
     test_scripts()
+    test_vbpsol()
     test_draw()
     test_lowlevel()
