@@ -26,8 +26,7 @@ import os
 def main():
     """Parses 'instance_vbp.mod'"""
     from pympl import PyMPL, Tools, glpkutils
-    sdir = os.path.dirname(__file__)
-    os.chdir(sdir if sdir != "" else os.curdir)
+    os.chdir(os.path.dirname(__file__) or os.curdir)
 
     mod_in = "instance_vbp.mod"
     mod_out = "tmp/instance_vbp.out.mod"

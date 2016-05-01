@@ -26,8 +26,7 @@ import os
 def main():
     """Examples: Multiple-choice Vector Bin Packing"""
     from pyvpsolver.solvers import mvpsolver
-    sdir = os.path.dirname(__file__)
-    os.chdir(sdir if sdir != "" else os.curdir)
+    os.chdir(os.path.dirname(__file__) or os.curdir)
 
     # Example 1:
     # Bins:

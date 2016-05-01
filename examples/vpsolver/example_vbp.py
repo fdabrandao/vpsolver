@@ -26,8 +26,7 @@ import os
 def main():
     """Example: solve a vector packing instance using 'solvers.vbpsolver'"""
     from pyvpsolver.solvers import vbpsolver
-    sdir = os.path.dirname(__file__)
-    os.chdir(sdir if sdir != "" else os.curdir)
+    os.chdir(os.path.dirname(__file__) or os.curdir)
 
     W = (5180, 9)
     w = [(1120, 1), (1250, 1), (520, 1), (1066, 1), (1000, 1), (1150, 1)]

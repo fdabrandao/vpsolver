@@ -43,8 +43,7 @@ def read_twostage(fname):
 def main():
     """Parses 'twostage.mod'."""
     from pympl import PyMPL, Tools, glpkutils
-    sdir = os.path.dirname(__file__)
-    os.chdir(sdir if sdir != "" else os.curdir)
+    os.chdir(os.path.dirname(__file__) or os.curdir)
 
     mod_in = "twostage.mod"
     mod_out = "tmp/twostage.out.mod"

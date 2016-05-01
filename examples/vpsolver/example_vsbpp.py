@@ -26,8 +26,7 @@ import os
 def main():
     """ Variable-sized Bin Packing Example """
     from pyvpsolver.solvers import mvpsolver
-    sdir = os.path.dirname(__file__)
-    os.chdir(sdir if sdir != "" else os.curdir)
+    os.chdir(os.path.dirname(__file__) or os.curdir)
 
     # Capacities:
     Ws = [[100], [120], [150]]

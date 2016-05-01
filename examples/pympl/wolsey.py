@@ -28,8 +28,7 @@ import os
 def main():
     """Parses 'graph.mod'"""
     from pympl import PyMPL, Tools, glpkutils
-    sdir = os.path.dirname(__file__)
-    os.chdir(sdir if sdir != "" else os.curdir)
+    os.chdir(os.path.dirname(__file__) or os.curdir)
 
     a, a0 = [65, 64, 41, 22, 13, 12, 8, 2], 80
     aS = abs(2*a0+1-sum(a))

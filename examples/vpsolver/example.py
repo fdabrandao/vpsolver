@@ -27,8 +27,7 @@ def main():
     """Examples: how to use VBP, MVP, AFG, MPS, LP and VPSolver"""
     from pyvpsolver import VPSolver, VBP, MVP, AFG, MPS, LP
     from pyvpsolver.solvers import vbpsolver, mvpsolver
-    sdir = os.path.dirname(__file__)
-    os.chdir(sdir if sdir != "" else os.curdir)
+    os.chdir(os.path.dirname(__file__) or os.curdir)
 
     # Create instanceA:
     instanceA = VBP(
