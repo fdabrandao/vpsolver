@@ -62,6 +62,13 @@
 <a href="#low-level-api">Low-level API</a>: direct calls to VPSolver scripts and executables.</li>
 </ul>
 
+<p>Jupyter Notebooks for a quick introduction:</p>
+
+<ul>
+<li><a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/notebooks/example_vbp.ipynb">Simple VBP example</a></li>
+<li><a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/notebooks/example_mvp.ipynb">Simple MVP example</a></li>
+</ul>
+
 <h3>
 <a id="user-content-high-level-api" class="anchor" href="#high-level-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>High-level API</h3>
 
@@ -74,11 +81,11 @@ w <span class="pl-k">=</span> [(<span class="pl-c1">1120</span>,<span class="pl-
 b <span class="pl-k">=</span> [<span class="pl-c1">9</span>, <span class="pl-c1">5</span>, <span class="pl-c1">91</span>, <span class="pl-c1">18</span>, <span class="pl-c1">11</span>, <span class="pl-c1">64</span>]
 
 <span class="pl-c"># Solve a vector packing instance:</span>
-obj, sol <span class="pl-k">=</span> vbpsolver.solve(
+solution <span class="pl-k">=</span> vbpsolver.solve(
     <span class="pl-c1">W</span>, w, b, <span class="pl-v">script</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>vpsolver_glpk.sh<span class="pl-pds">"</span></span>, <span class="pl-v">verbose</span><span class="pl-k">=</span><span class="pl-c1">False</span>
 )
 <span class="pl-c"># Print the solution:</span>
-vbpsolver.print_solution(obj, sol)</pre></div>
+vbpsolver.print_solution(solution)</pre></div>
 
 <p>The high level API (<code>pyvpsolver.solvers</code>) includes:</p>
 
@@ -128,22 +135,22 @@ vbpsolver.print_solution(obj, sol)</pre></div>
 <li>
 <code>obj</code>: objective value;</li>
 <li>
-<code>lst_sol</code>: solution.</li>
+<code>lst_sol</code>: patterns;</li>
+<li>
+<code>(obj, lst_sol)</code>: solution.</li>
 </ul>
 </li>
 </ul>
 </li>
 <li>
-<code>vbpsolver.print_solution(obj, lst_sol)</code>
+<code>vbpsolver.print_solution(solution)</code>
 
 <ul>
 <li>Important parameters:
 
 <ul>
 <li>
-<code>obj</code>: objective value;</li>
-<li>
-<code>lst_sol</code>: solution.</li>
+<code>solution = (obj, lst_sol)</code>: vector packing solution.</li>
 </ul>
 </li>
 <li>Outputs:
@@ -200,22 +207,20 @@ vbpsolver.print_solution(obj, sol)</pre></div>
 <li>
 <code>obj</code>: objective value;</li>
 <li>
-<code>lst_sol</code>: a list of solutions for each bin type.</li>
+<code>lst_sol</code>: a list of solutions for each bin type;</li>
 </ul>
 </li>
 </ul>
 </li>
 <li>
-<p><code>mvpsolver.print_solution(obj, lst_sol)</code></p>
+<p><code>mvpsolver.print_solution(solution)</code></p>
 
 <ul>
 <li>Important parameters:
 
 <ul>
 <li>
-<code>obj</code>: objective value</li>
-<li>
-<code>sol</code>: solution</li>
+<code>solution = (obj, lst_sol)</code>: multiple-choice vector packing solution.</li>
 </ul>
 </li>
 <li>Outputs:
@@ -255,9 +260,12 @@ mps_model <span class="pl-k">=</span> MPS(afg, <span class="pl-v">verbose</span>
 <span class="pl-c"># Solve the model an extract the solution:</span>
 out, solution <span class="pl-k">=</span> VPSolver.script(<span class="pl-s"><span class="pl-pds">"</span>vpsolver_glpk.sh<span class="pl-pds">"</span></span>, mps_model, afg, <span class="pl-v">verbose</span><span class="pl-k">=</span><span class="pl-c1">True</span>)
 
-<span class="pl-c"># Print the solution:</span>
+<span class="pl-c"># Print the objective value:</span>
 obj, sol <span class="pl-k">=</span> solution
-vbpsolver.print_solution(obj, sol)</pre></div>
+<span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Objective: <span class="pl-c1">{}</span><span class="pl-pds">"</span></span>.format(obj))
+
+<span class="pl-c"># Print the solution:</span>
+vbpsolver.print_solution(solution)</pre></div>
 
 <p>How to import:</p>
 

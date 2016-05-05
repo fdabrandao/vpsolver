@@ -31,7 +31,7 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 * MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...  
 * UNIX-like operating system or a UNIX-like environment such as [Cygwin](https://www.cygwin.com/)
 * `g++ >= 4.8`; `make >= 3.0`; `bash >= 3.0`
-
+      
 #### Optional
 
 For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and [Web App](#vpsolver-web-app):
@@ -40,7 +40,7 @@ For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and
 * `python-pip`
 * `python-dev`
 * `glpk-utils`
-
+ 
 #### Platforms
 It has been successfully compiled and run on the following platforms:
 
@@ -50,7 +50,7 @@ It has been successfully compiled and run on the following platforms:
 * It also runs on **Windows** using [Cygwin](https://www.cygwin.com/) (a Unix-like environment and command-line interface)
 
 ## Setup
-Without the python interface:
+Without the python interface: 
 
 ```bash
 $ ./configure CXXFLAGS="" LDFLAGS=""
@@ -59,7 +59,7 @@ $ sudo make install
 ```
 Note: In order to compile only the components that do not require Gurobi, use `./configure GUROBI_HOME=""`. In order to link the optional components that require Gurobi, the environment variable `$GUROBI_HOME` must be set, and some additional flags may also need to be set (e.g., `./configure LDFLAGS="-L${GUROBI_HOME}/lib/ -lgurobi_stdc++"`).
 
-With the python interface:
+With the python interface: 
 
 ```
 $ pip install -r requirements.txt
@@ -72,6 +72,15 @@ Or simply install from the [repository](https://pypi.python.org/pypi/pyvpsolver)
 $ pip install pyvpsolver
 ```
 Note: use `pip install pyvpsolver --pre` if you want to install the latest pre-release.
+
+## Python interface
+
+The python interface is fully compatible with both python 2 and 3. 
+
+Jupyter Notebooks for a quick introduction:
+
+* [Simple VBP example](https://github.com/fdabrandao/vpsolver/blob/master/examples/notebooks/example_vbp.ipynb)
+* [Simple MVP example](https://github.com/fdabrandao/vpsolver/blob/master/examples/notebooks/example_mvp.ipynb)
 
 ## Docker
 
@@ -89,7 +98,7 @@ $ docker pull fdabrandao/vpsolver
 
 Option 2: `clone` VPSolver and `build` locally:
 
-```bash
+```bash 
 $ git clone https://github.com/fdabrandao/vpsolver.git vpsolver
 $ docker build -t fdabrandao/vpsolver vpsolver
 ```
@@ -107,14 +116,14 @@ root@55d14f6b6f32:~# source venv2.7/bin/activate # load a virtualenv
 or through the VPSolver Web App (example URL: `http://172.17.0.60:5555/`):
 
 ```bash
-$ docker run --rm -it -p 5555 fdabrandao/vpsolver
+$ docker run --rm -it -p 5555 fdabrandao/vpsolver 
 eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
           inet addr:172.17.0.60  Bcast:0.0.0.0  Mask:255.255.0.0
           inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
           UP BROADCAST  MTU:1500  Metric:1
           RX packets:2 errors:0 dropped:0 overruns:0 frame:0
           TX packets:2 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0
+          collisions:0 txqueuelen:0 
           RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
 
 URL: http://172.17.0.60:5555/
@@ -215,7 +224,7 @@ Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal
 Arc-flow Formulation with Graph Compression._ Technical Report DCC-2013-09,
 Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal. [arXiv:1502.02899](http://arxiv.org/abs/1502.02899).
 
-* [6] Brandão, F. (2012). _Bin Packing and Related Problems: Pattern-Based Approaches._
+* [6] Brandão, F. (2012). _Bin Packing and Related Problems: Pattern-Based Approaches._ 
 Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.
 
 * [7] Computational results on several benchmark test data sets:  

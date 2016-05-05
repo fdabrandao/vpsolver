@@ -63,7 +63,8 @@ solver in particular, though a good  MIP solver may be necessary for solving
 large models.</p>
 
 <p><a href="https://camo.githubusercontent.com/e15eac835647261101377ddd6389f09a740e5836/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4147504c76332b2d626c75652e737667" target="_blank"><img src="https://camo.githubusercontent.com/e15eac835647261101377ddd6389f09a740e5836/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4147504c76332b2d626c75652e737667" alt="" data-canonical-src="https://img.shields.io/badge/license-AGPLv3+-blue.svg" style="max-width:100%;"></a>
-<a href="https://travis-ci.org/fdabrandao/vpsolver"><img src="https://camo.githubusercontent.com/b5a9500005427c1ae535605357273db19e847a70/68747470733a2f2f7472617669732d63692e6f72672f6664616272616e64616f2f7670736f6c7665722e7376673f6272616e63683d6d6173746572" alt="" data-canonical-src="https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master" style="max-width:100%;"></a></p>
+<a href="https://travis-ci.org/fdabrandao/vpsolver"><img src="https://camo.githubusercontent.com/b5a9500005427c1ae535605357273db19e847a70/68747470733a2f2f7472617669732d63692e6f72672f6664616272616e64616f2f7670736f6c7665722e7376673f6272616e63683d6d6173746572" alt="" data-canonical-src="https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master" style="max-width:100%;"></a>
+<a href="https://coveralls.io/github/fdabrandao/vpsolver"><img src="https://camo.githubusercontent.com/5e2cd8ccfc3643b2fb0223df9ecbddb6e9d7959e/68747470733a2f2f636f766572616c6c732e696f2f7265706f732f6769746875622f6664616272616e64616f2f7670736f6c7665722f62616467652e7376673f6272616e63683d646576656c6f70" alt="Coverage Status" data-canonical-src="https://coveralls.io/repos/github/fdabrandao/vpsolver/badge.svg?branch=develop" style="max-width:100%;"></a></p>
 
 <p>For modelling other problems easily, VPSolver includes a <a href="Python-API.html">Python API</a>, a modelling toolbox (<a href="https://github.com/fdabrandao/pympl/">PyMPL</a>), and a <a href="#vpsolver-web-app">Web App</a>. VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a <a href="#docker">Docker container</a>.</p>
 
@@ -143,7 +144,7 @@ $ sudo make install</pre></div>
 
 <pre><code>$ pip install -r requirements.txt
 $ pip install . --upgrade
-$ bash test.sh
+$ cd examples; py.test -v --cov pyvpsolver
 </code></pre>
 
 <p>Or simply install from the <a href="https://pypi.python.org/pypi/pyvpsolver">repository</a>:</p>
@@ -152,6 +153,18 @@ $ bash test.sh
 </code></pre>
 
 <p>Note: use <code>pip install pyvpsolver --pre</code> if you want to install the latest pre-release.</p>
+
+<h2>
+<a id="user-content-python-interface" class="anchor" href="#python-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Python interface</h2>
+
+<p>The python interface is fully compatible with both python 2 and 3. </p>
+
+<p>Jupyter Notebooks for a quick introduction:</p>
+
+<ul>
+<li><a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/notebooks/example_vbp.ipynb">Simple VBP example</a></li>
+<li><a href="https://github.com/fdabrandao/vpsolver/blob/master/examples/notebooks/example_mvp.ipynb">Simple MVP example</a></li>
+</ul>
 
 <h2>
 <a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Docker</h2>
@@ -275,17 +288,19 @@ $ vpsolver_X.sh --mps/--lp model.mps/.lp --afg graph.afg</pre></div>
 
 <ul>
 <li>
-<code>docs/</code>: documentation</li>
+<a href="https://github.com/fdabrandao/vpsolver/tree/develop/docs">docs</a>: documentation</li>
 <li>
-<code>scripts/</code>: vpsolver scripts</li>
+<a href="https://github.com/fdabrandao/vpsolver/tree/develop/scripts">scripts</a>: vpsolver scripts</li>
 <li>
-<code>src/</code>: vpsolver source code in C++</li>
+<a href="https://github.com/fdabrandao/vpsolver/tree/develop/src">src</a>: vpsolver source code in C++</li>
 <li>
-<code>pyvpsolver/</code>: pyvpsolver source code in Python</li>
+<a href="https://github.com/fdabrandao/vpsolver/tree/develop/pyvpsolver">pyvpsolver</a>: pyvpsolver source code in Python</li>
 <li>
-<code>examples/</code>: vpsolver and pyvpsolver examples</li>
+<a href="https://github.com/fdabrandao/vpsolver/tree/develop/examples">examples</a>: vpsolver and pyvpsolver examples</li>
 <li>
-<code>docs/reports/</code>: technical reports on the underlying algorithms and models</li>
+<a href="https://github.com/fdabrandao/vpsolver/tree/develop/examples/notebooks/">examples/notebooks</a>: jupyter notebooks</li>
+<li>
+<a href="https://github.com/fdabrandao/vpsolver/tree/develop/examples/docs/reports/">docs/reports</a>: technical reports on the underlying algorithms and models</li>
 </ul>
 
 <h2>

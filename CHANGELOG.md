@@ -2,10 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.1.0] - 2016-05-05
 
 ### Added
 - Jupyter Notebooks.
+
+### Changed
+- The syntax used in the .vbp and .afg files for additional parameters.
 
 
 ## [3.0.1] - 2016-02-23
@@ -64,7 +67,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - First official release of the C++ implementation of VPSolver.
 
-[Unreleased]: https://github.com/fdabrandao/vpsolver/compare/v3.0.1...H
+[Unreleased]: https://github.com/fdabrandao/vpsolver/compare/v3.1.0...H
+[3.1.0]: https://github.com/fdabrandao/vpsolver/compare/v3.0.1...v3.1.0
 [3.0.1]: https://github.com/fdabrandao/vpsolver/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/fdabrandao/vpsolver/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/fdabrandao/vpsolver/compare/v1.3.0...v2.0.0
