@@ -11,7 +11,7 @@
 #define PACKAGE_NAME "VPSolver"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "VPSolver 3.0.1"
+#define PACKAGE_STRING "VPSolver 3.1.0b0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "vpsolver"
@@ -20,7 +20,7 @@
 #define PACKAGE_URL "http://vpsolver.dcc.fc.up.pt/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.0.1"
+#define PACKAGE_VERSION "3.1.0b0"
 
 /* Version number of package */
-#define VERSION "3.0.1"
+#define VERSION "3.1.0b0"
