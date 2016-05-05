@@ -250,7 +250,16 @@ class AFG(object):
                 A.append((u, v, LOSS))
             else:
                 A.append((u, v, labels[ids[i]]))
-        return AFGraph(V, A, S, Ts, LOSS)
+                lbls = {}
+        graph = AFGraph(V, A, S, Ts, LOSS)
+        lbls = {S: "S"}
+        if len(Ts) > 1:
+            for t, new in zip(Ts, ["T{}".format(i+1) for i in range(len(Ts))]):
+                lbls[t] = new
+        else:
+            lbls[Ts[0]] = "T"
+        graph.relabel(lambda u: lbls.get(u, u))
+        return graph
 
     def draw(self, svg_file, lpaths=False, graph_attrs=None, verbose=False):
         """Draw the arc-flow graph in .svg format."""
