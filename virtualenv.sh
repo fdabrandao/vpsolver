@@ -60,10 +60,12 @@ else
     virtualenv --system-site-packages $venv || exit 1;
 fi
 
-source $venv/bin/activate         || exit 1
-python --version                  || exit 1
-pip install -r requirements.txt   || exit 1
-pip install pympl --pre --upgrade || exit 1
-pip install --upgrade .           || exit 1
-bash test.sh --options quick_test || exit 1
-deactivate                        || exit 1
+rm -rf build *.egg-info
+source $venv/bin/activate || exit 1
+python --version || exit 1
+pip install --upgrade --ignore-installed -r requirements.txt || exit 1
+pip install --upgrade --ignore-installed --pre pympl || exit 1
+pip install --upgrade --ignore-installed --no-deps . || exit 1
+cd examples || exit 1
+py.test -v --cov pyvpsolver || exit 1
+deactivate || exit 1

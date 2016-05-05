@@ -16,7 +16,6 @@ addons:
 git:
   submodules: false
 before_install:
-  - pip install pytest pytest-cov coveralls
   - echo "yes" | sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   - sudo apt-get install -qq
