@@ -43,7 +43,7 @@ def get_opt(key, content, default=None):
 
 
 def relabel_graph(V, A, fv, fa=lambda x: x):
-    """Relabel arc-flow graphs."""
+    """Relabel an arc-flow graph."""
     V = set(map(fv, V))
     A = set((fv(u), fv(v), fa(i)) for (u, v, i) in A if fv(u) != fv(v))
     return list(V), list(A)

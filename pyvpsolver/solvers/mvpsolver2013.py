@@ -327,12 +327,12 @@ def validate_solution(lst_solutions, nbtypes, ndims, Ws, ws, b):
     return all(c[i] >= b[i] for i in range(len(b)))
 
 
-def print_solution(arg1, arg2=None, i0=1, fout=sys.stdout):
+def print_solution(solution, arg2=None, i0=1, fout=sys.stdout):
     """Pretty-print a multiple-choice vector packing solution."""
     if arg2 is None:
-        obj, lst_sol = arg1
+        obj, lst_sol = solution
     else:
-        obj, lst_sol = arg1, arg2
+        obj, lst_sol = solution, arg2
     if obj is not None:
         print("Objective:", obj, file=fout)
     print("Solution:", file=fout)

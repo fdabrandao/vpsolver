@@ -63,12 +63,12 @@ def solve(Ws, Cs, Qs, ws, b,
     return obj, sol
 
 
-def print_solution(arg1, arg2=None, i0=1, fout=sys.stdout):
+def print_solution(solution, arg2=None, i0=1, fout=sys.stdout):
     """Pretty-print a multiple-choice vector packing solution."""
     if arg2 is None:
-        obj, lst_sol = arg1
+        obj, lst_sol = solution
     else:
-        obj, lst_sol = arg1, arg2
+        obj, lst_sol = solution, arg2
     if obj is not None:
         print("Objective:", obj, file=fout)
     print("Solution:", file=fout)

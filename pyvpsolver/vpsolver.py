@@ -96,11 +96,11 @@ class VBP(object):
         return self.vbp_file
 
     def weights(self):
-        """Return item weights."""
+        """Return the item weights."""
         return {i: tuple(self.w[i]) for i in range(self.m)}
 
     def capacities(self):
-        """Return bin capacities."""
+        """Return the bin capacities."""
         return [tuple(self.W)]
 
     def __del__(self):
@@ -195,7 +195,7 @@ class MVP(object):
         return self.mvp_file
 
     def weights(self):
-        """Return item weights."""
+        """Return the item weights."""
         return {
             (i, j): tuple(self.ws[i][j])
             for i in range(len(self.ws))
@@ -203,7 +203,7 @@ class MVP(object):
         }
 
     def capacities(self):
-        """Return bin capacities."""
+        """Return the bin capacities."""
         return list(map(tuple, self.Ws))
 
     def __del__(self):
@@ -376,7 +376,7 @@ class VPSolver(object):
 
     @staticmethod
     def log(msg, verbose=None):
-        """Log message."""
+        """Log a message."""
         if verbose is None:
             verbose = VPSolver.VERBOSE
         if verbose:
@@ -428,7 +428,7 @@ class VPSolver(object):
 
     @staticmethod
     def parse_vbpsol(vpsol_output):
-        """Transform 'vbpsol' plaintext solutions into python data."""
+        """Transform 'vbpsol' solutions into python data."""
         marker = "PYSOL="
         if marker in vpsol_output:
             vpsol_output = vpsol_output[vpsol_output.find(marker)+len(marker):]
@@ -440,7 +440,7 @@ class VPSolver(object):
 
     @staticmethod
     def vbpsol(afg_file, sol_file, opts="0 1", verbose=None):
-        """Call 'vbpsol' to extract vector packing solutions."""
+        """Call 'vbpsol' to extract a vector packing solution."""
         if isinstance(afg_file, AFG):
             afg_file = afg_file.filename
         out_file = VPSolver.new_tmp_file()
@@ -483,7 +483,7 @@ class VPSolver(object):
     @staticmethod
     def vbp2afg(instance_file, afg_file, method=-3, binary=None, vtype="I",
                 verbose=None):
-        """Call 'vbp2afg' to create arc-flow graphs for .vbp instances."""
+        """Call 'vbp2afg' to create an arc-flow graph for a .vbp instance."""
         if isinstance(instance_file, (VBP, MVP)):
             if binary is None:
                 binary = int(instance_file.binary)
@@ -506,7 +506,7 @@ class VPSolver(object):
 
     @staticmethod
     def afg2mps(afg_file, mps_file, opts="", verbose=None):
-        """Call 'afg2mps' to create .mps models for arc-flow graphs."""
+        """Call 'afg2mps' to create a .mps model for an arc-flow graph."""
         if isinstance(afg_file, AFG):
             afg_file = afg_file.filename
         out_file = VPSolver.new_tmp_file()
@@ -524,7 +524,7 @@ class VPSolver(object):
 
     @staticmethod
     def afg2lp(afg_file, lp_file, opts="", verbose=None):
-        """Call 'afg2lp' to create .lp models for arc-flow graphs."""
+        """Call 'afg2lp' to create a .lp model for an arc-flow graph."""
         if isinstance(afg_file, AFG):
             afg_file = afg_file.filename
         out_file = VPSolver.new_tmp_file()
@@ -543,7 +543,7 @@ class VPSolver(object):
     @staticmethod
     def script(script_name, arg1=None, arg2=None, options=None, pyout=True,
                verbose=None):
-        """Call a VPSolver scripts and return a vector packing solution."""
+        """Call a VPSolver script and return a vector packing solution."""
         cmd = script_name
         for arg in [arg1, arg2]:
             if isinstance(arg, MPS):

@@ -63,12 +63,12 @@ def solve(W, w, b,
     return obj, sol
 
 
-def print_solution(arg1, arg2=None, i0=1, fout=sys.stdout):
+def print_solution(solution, arg2=None, i0=1, fout=sys.stdout):
     """Pretty-print a vector packing solution."""
     if arg2 is None:
-        obj, lst_sol = arg1
+        obj, lst_sol = solution
     else:
-        obj, lst_sol = arg1, arg2
+        obj, lst_sol = solution, arg2
     assert len(lst_sol) == 1
     sol = lst_sol[0]
     if obj is not None:
