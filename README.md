@@ -12,6 +12,7 @@ large models.
 
 ![](https://img.shields.io/badge/license-AGPLv3+-blue.svg)
 [![](https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master)](https://travis-ci.org/fdabrandao/vpsolver)
+[![Coverage Status](https://coveralls.io/repos/github/fdabrandao/vpsolver/badge.svg?branch=develop)](https://coveralls.io/github/fdabrandao/vpsolver)
 
 For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling toolbox ([PyMPL](https://github.com/fdabrandao/pympl/)), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a [Docker container](#docker).
 
@@ -30,7 +31,7 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 * MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...  
 * UNIX-like operating system or a UNIX-like environment such as [Cygwin](https://www.cygwin.com/)
 * `g++ >= 4.8`; `make >= 3.0`; `bash >= 3.0`
-      
+
 #### Optional
 
 For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and [Web App](#vpsolver-web-app):
@@ -39,7 +40,7 @@ For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and
 * `python-pip`
 * `python-dev`
 * `glpk-utils`
- 
+
 #### Platforms
 It has been successfully compiled and run on the following platforms:
 
@@ -49,7 +50,7 @@ It has been successfully compiled and run on the following platforms:
 * It also runs on **Windows** using [Cygwin](https://www.cygwin.com/) (a Unix-like environment and command-line interface)
 
 ## Setup
-Without the python interface: 
+Without the python interface:
 
 ```bash
 $ ./configure CXXFLAGS="" LDFLAGS=""
@@ -58,12 +59,12 @@ $ sudo make install
 ```
 Note: In order to compile only the components that do not require Gurobi, use `./configure GUROBI_HOME=""`. In order to link the optional components that require Gurobi, the environment variable `$GUROBI_HOME` must be set, and some additional flags may also need to be set (e.g., `./configure LDFLAGS="-L${GUROBI_HOME}/lib/ -lgurobi_stdc++"`).
 
-With the python interface: 
+With the python interface:
 
 ```
 $ pip install -r requirements.txt
 $ pip install . --upgrade
-$ bash test.sh
+$ cd examples; py.test -v --cov pyvpsolver
 ```
 Or simply install from the [repository](https://pypi.python.org/pypi/pyvpsolver):
 
@@ -88,7 +89,7 @@ $ docker pull fdabrandao/vpsolver
 
 Option 2: `clone` VPSolver and `build` locally:
 
-```bash 
+```bash
 $ git clone https://github.com/fdabrandao/vpsolver.git vpsolver
 $ docker build -t fdabrandao/vpsolver vpsolver
 ```
@@ -106,14 +107,14 @@ root@55d14f6b6f32:~# source venv2.7/bin/activate # load a virtualenv
 or through the VPSolver Web App (example URL: `http://172.17.0.60:5555/`):
 
 ```bash
-$ docker run --rm -it -p 5555 fdabrandao/vpsolver 
+$ docker run --rm -it -p 5555 fdabrandao/vpsolver
 eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:3c  
           inet addr:172.17.0.60  Bcast:0.0.0.0  Mask:255.255.0.0
           inet6 addr: fe80::42:acff:fe11:3c/64 Scope:Link
           UP BROADCAST  MTU:1500  Metric:1
           RX packets:2 errors:0 dropped:0 overruns:0 frame:0
           TX packets:2 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0 
+          collisions:0 txqueuelen:0
           RX bytes:168 (168.0 B)  TX bytes:180 (180.0 B)
 
 URL: http://172.17.0.60:5555/
@@ -179,12 +180,13 @@ For more details, please refer to the [manual](https://github.com/fdabrandao/vps
 
 ## Folders
 
-* `docs/`: documentation
-* `scripts/`: vpsolver scripts
-* `src/`: vpsolver source code in C++
-* `pyvpsolver/`: pyvpsolver source code in Python
-* `examples/`: vpsolver and pyvpsolver examples
-* `docs/reports/`: technical reports on the underlying algorithms and models
+* [docs](https://github.com/fdabrandao/vpsolver/tree/develop/docs): documentation
+* [scripts](https://github.com/fdabrandao/vpsolver/tree/develop/scripts): vpsolver scripts
+* [src](https://github.com/fdabrandao/vpsolver/tree/develop/src): vpsolver source code in C++
+* [pyvpsolver](https://github.com/fdabrandao/vpsolver/tree/develop/pyvpsolver): pyvpsolver source code in Python
+* [examples](https://github.com/fdabrandao/vpsolver/tree/develop/examples): vpsolver and pyvpsolver examples
+* [examples/notebooks](https://github.com/fdabrandao/vpsolver/tree/develop/examples/notebooks/): jupyter notebooks
+* [docs/reports](https://github.com/fdabrandao/vpsolver/tree/develop/examples/docs/reports/): technical reports on the underlying algorithms and models
 
 ## References
 
@@ -213,7 +215,7 @@ Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal
 Arc-flow Formulation with Graph Compression._ Technical Report DCC-2013-09,
 Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal. [arXiv:1502.02899](http://arxiv.org/abs/1502.02899).
 
-* [6] Brandão, F. (2012). _Bin Packing and Related Problems: Pattern-Based Approaches._ 
+* [6] Brandão, F. (2012). _Bin Packing and Related Problems: Pattern-Based Approaches._
 Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.
 
 * [7] Computational results on several benchmark test data sets:  
@@ -221,4 +223,4 @@ http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/
 
 
 ***
-Copyright © 2013-2016 [Filipe Brandão](http://www.dcc.fc.up.pt/~fdabrandao/) <<fdabrandao@dcc.fc.up.pt>>. All rights reserved.
+Copyright © 2013-2016 [Filipe Brandão](http://www.dcc.fc.up.pt/~fdabrandao/) <[fdabrandao@dcc.fc.up.pt](mailto:fdabrandao@dcc.fc.up.pt)>. All rights reserved.
