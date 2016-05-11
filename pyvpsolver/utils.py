@@ -33,6 +33,12 @@ import random
 inf = float("inf")
 
 
+def get_content(fname):
+    """Read the content of a file."""
+    with open(fname, "r") as f:
+        return f.read()
+
+
 def get_opt(key, content, default=None):
     """Extract an option from the content of a .vbp/.afg file."""
     matches = re.findall("\${0}\s*{{([^}}]+)}}".format(key), content)
@@ -40,6 +46,19 @@ def get_opt(key, content, default=None):
         return default
     else:
         return matches[0]
+
+
+def get_instance_data(content):
+    """Extract the instance data from the content of a .vbp/.afg file."""
+    if "$INSTANCE" in content:
+        lst = list(map(int, get_opt("INSTANCE", content).split()))
+    else:
+        lst = []
+        for value in content.split():
+            if int(value) != float(value):
+                break
+            lst.append(int(value))
+    return lst
 
 
 def relabel_graph(V, A, fv, fa=lambda x: x):

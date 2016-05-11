@@ -34,7 +34,7 @@ import shutil
 import tempfile
 import subprocess
 from .afgraph import AFGraph
-from .utils import inf, get_opt
+from .utils import inf, get_content, get_opt, get_instance_data
 
 
 class VBP(object):
@@ -42,7 +42,7 @@ class VBP(object):
     Wrapper for .vbp files.
     """
 
-    def __init__(self, W, w, b, binary=False, verbose=False):
+    def __init__(self, W, w, b, binary=False, vtype="I", verbose=False):
         self.vbp_file = VPSolver.new_tmp_file(".vbp")
         with open(self.vbp_file, "w") as f:
             print(len(W), file=f)  # ndims
@@ -53,24 +53,19 @@ class VBP(object):
                 assert len(row) == len(W)+1
                 print(" ".join(map(str, row)), file=f)
             print("BINARY{{{:d}}};".format(binary), file=f)
+            print("VTYPE{{{}}};".format(vtype), file=f)
         if verbose:
-            with open(self.vbp_file, "r") as f:
-                print(f.read())
+            print(get_content(self.vbp_file))
         self.m = len(b)
         self.ndims = len(W)
         self.binary = binary
+        self.vtype = vtype
         self.W, self.w, self.b = W, w, b
         self.labels = list(range(self.m))
 
     @classmethod
-    def from_str(cls, content, binary=None, verbose=None):
-        lst = content.split()
-        for i in range(len(lst)):
-            try:
-                assert int(lst[i]) == float(lst[i])
-                lst[i] = int(lst[i])
-            except:
-                break
+    def from_str(cls, content, binary=None, vtype=None, verbose=None):
+        lst = get_instance_data(content)
         ndims = lst.pop(0)
         W = lst[:ndims]
         lst = lst[ndims:]
@@ -82,13 +77,16 @@ class VBP(object):
             b.append(lst.pop(0))
         if binary is None:
             binary = bool(int(get_opt("BINARY", content, False)))
-        assert lst == [] or str(lst[0]).startswith("$")
-        return cls(W, w, b, binary, verbose)
+        if vtype is None:
+            vtype = get_opt("VTYPE", content, "I")
+        assert lst == []
+        return cls(W, w, b, binary, vtype, verbose)
 
     @classmethod
-    def from_file(cls, vbp_file, binary=None, verbose=None):
-        with open(vbp_file, "r") as f:
-            return cls.from_str(f.read(), binary=None, verbose=None)
+    def from_file(cls, vbp_file, binary=None, vtype=None, verbose=None):
+        return cls.from_str(
+            get_content(vbp_file), binary=binary, vtype=vtype, verbose=verbose
+        )
 
     @property
     def filename(self):
@@ -115,7 +113,8 @@ class MVP(object):
     Wrapper for .mvp files.
     """
 
-    def __init__(self, Ws, Cs, Qs, ws, b, binary=False, verbose=False):
+    def __init__(
+            self, Ws, Cs, Qs, ws, b, binary=False, vtype="I", verbose=False):
         self.mvp_file = VPSolver.new_tmp_file(".mvp")
         with open(self.mvp_file, "w") as f:
             ndims = len(Ws[0])
@@ -138,12 +137,13 @@ class MVP(object):
                     print(" ".join(map(str, w)), file=f)
                     p += 1
             print("BINARY{{{:d}}};".format(binary), file=f)
+            print("VTYPE{{{}}};".format(vtype), file=f)
         if verbose:
-            with open(self.mvp_file, "r") as f:
-                print(f.read())
+            print(get_content(self.mvp_file))
         self.m = len(b)
         self.ndims = ndims
         self.binary = binary
+        self.vtype = vtype
         self.Ws, self.Cs, self.Qs = Ws, Cs, Qs
         self.ws, self.b = ws, b
         self.labels = [
@@ -153,14 +153,8 @@ class MVP(object):
         ]
 
     @classmethod
-    def from_str(cls, content, binary=None, verbose=None):
-        lst = content.split()
-        for i in range(len(lst)):
-            try:
-                assert int(lst[i]) == float(lst[i])
-                lst[i] = int(lst[i])
-            except:
-                break
+    def from_str(cls, content, binary=None, vtype=None, verbose=None):
+        lst = get_instance_data(content)
         ndims = lst.pop(0)
         nbtypes = lst.pop(0)
         Ws, Cs, Qs = [], [], []
@@ -181,13 +175,16 @@ class MVP(object):
                 lst = lst[ndims:]
         if binary is None:
             binary = bool(int(get_opt("BINARY", content, False)))
-        assert lst == [] or str(lst[0]).startswith("$")
-        return cls(Ws, Cs, Qs, ws, b, binary, verbose)
+        if vtype is None:
+            vtype = get_opt("VTYPE", content, "I")
+        assert lst == []
+        return cls(Ws, Cs, Qs, ws, b, binary, vtype, verbose)
 
     @classmethod
-    def from_file(cls, mvp_file, binary=None, verbose=None):
-        with open(mvp_file, "r") as f:
-            return cls.from_str(f.read(), binary=None, verbose=None)
+    def from_file(cls, mvp_file, binary=None, vtype=None, verbose=None):
+        return cls.from_str(
+            get_content(mvp_file), binary=binary, vtype=vtype, verbose=verbose
+        )
 
     @property
     def filename(self):
@@ -218,23 +215,32 @@ class AFG(object):
     Wrapper for .afg files.
     """
 
-    def __init__(self, instance, method=-3, binary=None, vtype="I",
-                 verbose=None):
-        assert isinstance(instance, (VBP, MVP))
-        self.instance = instance
-        self.afg_file = VPSolver.new_tmp_file(".afg")
-        if isinstance(instance, (VBP, MVP)):
-            instance_file = instance.filename
-            binary = instance.binary
-        self.output = VPSolver.vbp2afg(
-            instance_file, self.filename, method, binary, vtype,
-            verbose=verbose
-        )
+    def __init__(self, instance, verbose=None):
+        if instance is not None:
+            assert isinstance(instance, (VBP, MVP))
+            self.instance = instance
+            self.afg_file = VPSolver.new_tmp_file(".afg")
+            if isinstance(instance, (VBP, MVP)):
+                instance_file = instance.filename
+                binary = instance.binary
+            self.output = VPSolver.vbp2afg(
+                instance_file, self.filename,
+                binary=instance.binary,
+                vtype=instance.vtype,
+                verbose=verbose
+            )
+
+    @classmethod
+    def from_file(cls, afg_file, verbose=None):
+        obj = cls(None)
+        obj.instance = MVP.from_file(afg_file)
+        obj.afg_file = VPSolver.new_tmp_file(".afg")
+        shutil.copyfile(afg_file, obj.afg_file)
+        return obj
 
     def graph(self):
         """Return the graph as an AFGraph object."""
-        with open(self.filename, "r") as f:
-            content = f.read()
+        content = get_content(self.filename)
         labels = self.instance.labels
         S = int(get_opt("S", content))
         Ts = list(map(int, get_opt("Ts", content).split(",")))
@@ -246,18 +252,14 @@ class AFG(object):
             u, v, i = arcs[i:i+3]
             V.add(u)
             V.add(v)
-            if i == LOSS:
-                A.append((u, v, LOSS))
-            else:
-                A.append((u, v, labels[ids[i]]))
-                lbls = {}
+            A.append((u, v, labels[ids[i]] if i != LOSS else LOSS))
         graph = AFGraph(V, A, S, Ts, LOSS)
         lbls = {S: "S"}
-        if len(Ts) > 1:
+        if len(Ts) == 1:
+            lbls[Ts[0]] = "T"
+        else:
             for t, new in zip(Ts, ["T{}".format(i+1) for i in range(len(Ts))]):
                 lbls[t] = new
-        else:
-            lbls[Ts[0]] = "T"
         graph.relabel(lambda u: lbls.get(u, u))
         return graph
 
@@ -460,8 +462,7 @@ class VPSolver(object):
             tee=out_file,
             verbose=verbose
         )
-        with open(out_file) as f:
-            output = f.read()
+        output = get_content(out_file)
         os.remove(out_file)
         return VPSolver.parse_vbpsol(output)
 
@@ -484,8 +485,7 @@ class VPSolver(object):
             tee=out_file,
             verbose=verbose
         )
-        with open(out_file) as f:
-            output = f.read()
+        output = get_content(out_file)
         os.remove(out_file)
         return output, VPSolver.parse_vbpsol(output)
 
@@ -508,8 +508,7 @@ class VPSolver(object):
             tee=out_file,
             verbose=verbose
         )
-        with open(out_file) as f:
-            output = f.read()
+        output = get_content(out_file)
         os.remove(out_file)
         return output
 
@@ -526,8 +525,7 @@ class VPSolver(object):
             tee=out_file,
             verbose=verbose
         )
-        with open(out_file) as f:
-            output = f.read()
+        output = get_content(out_file)
         os.remove(out_file)
         return output
 
@@ -544,8 +542,7 @@ class VPSolver(object):
             tee=out_file,
             verbose=verbose
         )
-        with open(out_file) as f:
-            output = f.read()
+        output = get_content(out_file)
         os.remove(out_file)
         return output
 
@@ -584,8 +581,7 @@ class VPSolver(object):
             cmd += " --pyout"
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(cmd, tee=out_file, verbose=verbose)
-        with open(out_file) as f:
-            output = f.read()
+        output = get_content(out_file)
         os.remove(out_file)
         return output, VPSolver.parse_vbpsol(output)
 
