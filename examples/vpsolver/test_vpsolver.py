@@ -149,6 +149,14 @@ def test_draw():
             )
         except Exception as e:
             print(repr(e))
+        try:
+            VPSolver.afg2svg(afg, svg_file)
+        except Exception as e:
+            print(repr(e))
+        try:
+            VPSolver.afg2svg(afg.filename, svg_file)
+        except Exception as e:
+            print(repr(e))
 
 
 def test_lowlevel():
@@ -168,7 +176,6 @@ def test_lowlevel():
     VPSolver.afg2mps(afg_file, mps_file)
     VPSolver.afg2lp(AFG(vbp), lp_file)
     VPSolver.afg2mps(AFG(mvp), mps_file)
-    VPSolver.afg2svg(AFG(mvp), svg_file)
 
 
 if __name__ == "__main__":
