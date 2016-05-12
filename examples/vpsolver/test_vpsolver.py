@@ -159,6 +159,7 @@ def test_lowlevel():
     afg_file = VPSolver.new_tmp_file(".afg")
     lp_file = VPSolver.new_tmp_file(".lp")
     mps_file = VPSolver.new_tmp_file(".mps")
+    svg_file = VPSolver.new_tmp_file(".svg")
     VPSolver.vbp2afg(vbp, afg_file)
     VPSolver.vbp2afg(mvp, afg_file)
     VPSolver.vbp2afg(vbp.filename, afg_file)
@@ -167,6 +168,7 @@ def test_lowlevel():
     VPSolver.afg2mps(afg_file, mps_file)
     VPSolver.afg2lp(AFG(vbp), lp_file)
     VPSolver.afg2mps(AFG(mvp), mps_file)
+    VPSolver.afg2svg(AFG(mvp), svg_file)
 
 
 if __name__ == "__main__":

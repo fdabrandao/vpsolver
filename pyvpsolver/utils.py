@@ -26,9 +26,7 @@ from builtins import map
 from builtins import range
 from builtins import object
 from builtins import sorted
-
 import re
-import random
 
 inf = float("inf")
 
@@ -111,7 +109,6 @@ def draw_graph(svg_file, V, A, show_labels=False, ignore=None, back=None,
     )
 
     colors = Colors.uniquecolors(len(lbls)+1, v=0.5, p=0.0)
-    # random.shuffle(colors)
 
     used = set()
     for (u, v, i) in A:
