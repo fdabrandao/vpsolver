@@ -22,15 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 
 if __name__ == "__main__":
-    from pyvpsolver import AFGraph
-    assert len(sys.argv) == 3
+    from pyvpsolver import VPSolver
+    assert len(sys.argv) in (2, 3)
     afg_fname = sys.argv[1]
-    svg_fname = sys.argv[2]
     assert afg_fname.endswith(".afg")
-    assert svg_fname.endswith(".svg")
-    graph = AFGraph.from_file(afg_fname)
-    graph.draw(
-        svg_fname,
-        loss=[graph.LOSS],
-        back=[(t, graph.S) for t in graph.Ts]
-    )
+    if len(sys.argv) == 3:
+        svg_fname = sys.argv[2]
+        assert svg_fname.endswith(".svg")
+    else:
+        svg_fname = afg_fname.rstrip(".afg")+".svg"
+    VPSolver.afg2svg(afg_fname, svg_fname)
