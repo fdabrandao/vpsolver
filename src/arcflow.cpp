@@ -469,17 +469,17 @@ void Arcflow::finalize() {
         }
     } else {
         S = 0;
-        Ts.clear();
-        for (int i = 0; i < inst.nbtypes; i++) {
-            Ts.push_back(i);
+        vector<int> torder;
+        for(int i = 0; i < inst.nbtypes; i++){
+            torder.push_back(i);
         }
-        sort(all(Ts), [this](int a, int b) {
+        sort(all(torder), [this](int a, int b) {
             return this->inst.Ws[a] < this->inst.Ws[b];
         });
+        Ts.resize(inst.nbtypes);
         for (int i = 0; i < inst.nbtypes; i++) {
-            Ts[i] += NS.size();
+            Ts[torder[i]] = NS.size()+i;
         }
-
         for (int i = 0; i < inst.nbtypes; i++) {
             A.push_back(Arc(Ts[i], S, LOSS));
         }
