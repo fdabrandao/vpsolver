@@ -38,12 +38,13 @@ int swig_main(int argc, char *argv[]) {
                "[print_instance:0] [pyout:0]\n");
         return 1;
     }
+    FILE *fsol = NULL;
     try {
         throw_assert(check_ext(argv[1], ".afg"));
         Arcflow afg(argv[1]);
         Instance &inst = afg.inst;
 
-        FILE *fsol = fopen(argv[2], "r");
+        fsol = fopen(argv[2], "r");
         if (fsol == NULL) {
             perror("fopen");
         }
@@ -80,9 +81,15 @@ int swig_main(int argc, char *argv[]) {
         sol.print_solution(print_inst, pyout);
         return 0;
     } catch(const char *e) {
+        if (fsol != NULL) {
+            fclose(fsol);
+        }
         printf("%s\n", e);
         return 1;
     } catch (...) {
+        if (fsol != NULL) {
+            fclose(fsol);
+        }
         printf("UnknownError\n");
         return 1;
     }

@@ -33,8 +33,9 @@ int swig_main(int argc, char *argv[]) {
                "[method:-3] [binary:0] [vtype:I]\n");
         return 1;
     }
+    FILE *fout = NULL;
     try {
-        FILE *fout = fopen(argv[2], "w");
+        fout = fopen(argv[2], "w");
         if (fout == NULL) {
             perror("fopen");
         }
@@ -64,9 +65,15 @@ int swig_main(int argc, char *argv[]) {
         fclose(fout);
         return 0;
     } catch(const char *e) {
+        if (fout != NULL) {
+            fclose(fout);
+        }
         printf("%s\n", e);
         return 1;
     } catch (...) {
+        if (fout != NULL) {
+            fclose(fout);
+        }
         printf("UnknownError\n");
         return 1;
     }

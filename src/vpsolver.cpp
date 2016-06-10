@@ -157,7 +157,7 @@ void solve(const Instance &inst, bool print_inst = false, bool pyout = false) {
         ArcflowSol solution(inst, flow, afg.S, afg.Ts, afg.LOSS, true);
         solution.print_solution(print_inst, pyout);
     }
-    free(env);
+    delete env;
 }
 
 int main(int argc, char *argv[]) {
