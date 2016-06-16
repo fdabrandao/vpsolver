@@ -35,8 +35,8 @@ using namespace std;
 void solve(const Instance &inst, bool print_inst = false, bool pyout = false) {
     Arcflow afg(inst);
     char vtype = inst.vtype;
-    GRBEnv* env = new GRBEnv();
-    GRBModel model = GRBModel(*env);
+    GRBEnv env = GRBEnv();
+    GRBModel model = GRBModel(env);
     model.set(GRB_StringAttr_ModelName, "flow");
 
     model.getEnv().set(GRB_IntParam_OutputFlag, 1);
@@ -63,11 +63,9 @@ void solve(const Instance &inst, bool print_inst = false, bool pyout = false) {
         for (const Arc &a : As) {
             if (i == 1 && a.u != afg.S) {
                 continue;
-            }
-            if (i == 2 && a.v <= lastv) {
+            } else if (i == 2 && a.v <= lastv) {
                 continue;
-            }
-            if (i == 0 && (a.u == afg.S || a.v > lastv)) {
+            } else if (i == 0 && (a.u == afg.S || a.v > lastv)) {
                 continue;
             }
 
@@ -157,7 +155,6 @@ void solve(const Instance &inst, bool print_inst = false, bool pyout = false) {
         ArcflowSol solution(inst, flow, afg.S, afg.Ts, afg.LOSS, true);
         solution.print_solution(print_inst, pyout);
     }
-    delete env;
 }
 
 int main(int argc, char *argv[]) {

@@ -179,8 +179,7 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d,
         return 0;
     }
     vector<int> Q;
-    bool vis[C+1];
-    memset(&vis, 0, sizeof(vis));
+    vector<bool> vis(C+1);
     vis[0] = true;
     Q.push_back(0);
     int res = 0;
@@ -197,11 +196,9 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d,
                 v += w;
                 if (v > C) {
                     break;
-                }
-                if (v == C) {
+                } else if (v == C) {
                     return 0;
-                }
-                if (vis[v]) {
+                } else if (vis[v]) {
                     break;
                 }
                 res = max(res, v);
