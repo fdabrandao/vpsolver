@@ -235,13 +235,6 @@ void Instance::read(FILE *fin, ftype type) {
                 }
             }
             throw_assert(fscanf(fin, " } ;") == 0);
-        } else if (!strcmp(buf, "IDS")) {
-            throw_assert(fscanf(fin, " {") == 0);
-            for (int i = 0; i < static_cast<int>(items.size()); i++) {
-                if (i) throw_assert(fscanf(fin, " ,") == 0);
-                throw_assert(fscanf(fin, "%d", &items[i].id) == 1);
-            }
-            throw_assert(fscanf(fin, " } ;") == 0);
         } else if (!strcmp(buf, "SORT")) {
             int tsort = 1;
             throw_assert(fscanf(fin, " { %d } ;", &tsort) == 1);
@@ -336,12 +329,5 @@ void Instance::write(FILE *fout) const {
 
     fprintf(fout, "$BINARY{%d};\n", binary);
 
-    fprintf(fout, "$IDS{");
-    for (int i = 0; i < static_cast<int>(items.size()); i++) {
-        if (i) fprintf(fout, ",");
-        fprintf(fout, "%d", items[i].id);
-    }
-    fprintf(fout, "};");
-    fprintf(fout, "\n");
     fprintf(fout, "#INSTANCE_END#\n");
 }

@@ -228,7 +228,6 @@ class AFG(object):
         labels = self.instance.labels
         S = int(utils.get_opt("S", content))
         Ts = list(map(int, utils.get_opt("Ts", content).split(",")))
-        ids = list(map(int, utils.get_opt("IDS", content).split(",")))
         arcs = list(map(int, utils.get_opt("ARCS", content).split()))
         LOSS = int(utils.get_opt("LOSS", content))
         V, A = set([]), []
@@ -236,7 +235,7 @@ class AFG(object):
             u, v, i = arcs[i:i+3]
             V.add(u)
             V.add(v)
-            A.append((u, v, labels[ids[i]] if i != LOSS else LOSS))
+            A.append((u, v, labels[i] if i != LOSS else LOSS))
         graph = AFGraph(V, A, S, Ts, LOSS)
         lbls = {S: "S"}
         if len(Ts) == 1:
