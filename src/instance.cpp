@@ -80,6 +80,32 @@ Instance::Instance(const char *fname) {
     read(fname);
 }
 
+vector<Item> Instance::sorted_items() {
+    vector<Item> sitems(items);
+    stable_sort(all(sitems));
+    reverse(all(sitems));
+    return sitems;
+}
+
+void Instance::print() const {
+    printf("Instance:\n");
+    int p = 0;
+    for (int i = 0; i < m; i++) {
+        printf("i=%d (nopts: %d, demand: %d)\n", i+1, nopts[i], demands[i]);
+        for (int q = 0; q < nopts[i]; q++) {
+            printf("  opt=%d: (", q+1);
+            for (int j = 0; j < ndims; j++) {
+                if (j) {
+                    printf(", ");
+                }
+                printf("%d", items[p][j]);
+            }
+            printf(")\n");
+            p++;
+        }
+    }
+}
+
 void Instance::read(const char *fname) {
     FILE *fin = fopen(fname, "r");
     if (fin == NULL) {
@@ -235,11 +261,6 @@ void Instance::read(FILE *fin, ftype type) {
                 }
             }
             throw_assert(fscanf(fin, " } ;") == 0);
-        } else if (!strcmp(buf, "SORT")) {
-            int tsort = 1;
-            throw_assert(fscanf(fin, " { %d } ;", &tsort) == 1);
-            throw_assert(tsort == 0 || tsort == 1);
-            sort = tsort;
         } else if (!strcmp(buf, "METHOD")) {
             throw_assert(fscanf(fin, " { %d } ;", &method) == 1);
             throw_assert(method >= MIN_METHOD && method <= MAX_METHOD);
@@ -272,11 +293,6 @@ void Instance::read(FILE *fin, ftype type) {
     }
 
     nsizes = items.size();
-
-    if (sort) {
-        stable_sort(all(items));
-        reverse(all(items));
-    }
 }
 
 void Instance::write(FILE *fout) const {
@@ -320,8 +336,6 @@ void Instance::write(FILE *fout) const {
         fprintf(fout, "%c", ctypes[i]);
     }
     fprintf(fout, "};\n");
-
-    fprintf(fout, "$SORT{%d};\n", sort);
 
     fprintf(fout, "$METHOD{%d};\n", method);
 

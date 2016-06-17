@@ -77,6 +77,8 @@ class Instance {
     explicit Instance(const char *fname);
     explicit Instance(FILE *fin, ftype type = MVP);
 
+    vector<Item> sorted_items();
+    void print() const;
     void read(const char *fname);
     void read(FILE *fin, ftype type = MVP);
     void write(FILE *fout) const;

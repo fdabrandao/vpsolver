@@ -77,7 +77,7 @@ int swig_main(int argc, char *argv[]) {
         }
         fclose(fsol);
 
-        ArcflowSol sol(inst, flow, afg.S, afg.Ts, afg.LOSS, true);
+        ArcflowSol sol(inst, flow, afg.S, afg.Ts, afg.LOSS);
         sol.print_solution(print_inst, pyout);
         return 0;
     } catch(const char *e) {

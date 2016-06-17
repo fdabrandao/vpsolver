@@ -42,6 +42,7 @@ class Arcflow {
     vector<int> max_label;
     vector<int> hash_bits;
     vector<int> max_rep;
+    vector<Item> sitems;
     vector<vector<int>> weights;
     int label_size;
 

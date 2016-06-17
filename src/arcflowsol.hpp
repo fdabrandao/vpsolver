@@ -54,7 +54,7 @@ class ArcflowSol {
 
  public:
     ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow, int _S,
-               const vector<int> &_Ts, int _LOSS, bool validate = true);
+               const vector<int> &_Ts, int _LOSS);
 
     void print_solution(bool print_inst, bool pyout);
 };

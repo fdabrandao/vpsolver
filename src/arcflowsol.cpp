@@ -34,8 +34,7 @@ using namespace std;
 /* Class ArcflowSol */
 
 ArcflowSol::ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow,
-                       int _S, const vector<int> &_Ts, int _LOSS,
-                       bool validate):
+                       int _S, const vector<int> &_Ts, int _LOSS):
         inst(_inst), flow(_flow), S(_S), Ts(_Ts), LOSS(_LOSS) {
     vector<int> dem(inst.m);
     for (int i = 0; i < inst.m; i++) {
@@ -43,11 +42,11 @@ ArcflowSol::ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow,
     }
 
     objvalue = 0;
-    nbins.resize(inst.nbtypes);
     sols.resize(inst.nbtypes);
+    nbins.resize(inst.nbtypes);
     for (int t = 0; t < inst.nbtypes; t++) {
         sols[t] = extract_solution(&dem, Ts[t]);
-        if (validate && !is_valid(sols[t], t)) {
+        if (!is_valid(sols[t], t)) {
             throw_error("Invalid solution! (capacity)");
         }
 
@@ -57,20 +56,18 @@ ArcflowSol::ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow,
         }
     }
 
-    if (validate) {
-        for (int i = 0; i < inst.m; i++) {
-            if (dem[i] > 0) {
-                throw_error("Invalid solution! (demand)");
-            }
+    for (int i = 0; i < inst.m; i++) {
+        if (dem[i] > 0) {
+            throw_error("Invalid solution! (demand)");
         }
+    }
 
-        int fs = 0;
-        for (const auto &kvpair : flow) {
-            fs += kvpair.second;
-        }
-        if (fs != 0) {
-            throw_error("Invalid solution! (flow)");
-        }
+    int fs = 0;
+    for (const auto &kvpair : flow) {
+        fs += kvpair.second;
+    }
+    if (fs != 0) {
+        throw_error("Invalid solution! (flow)");
     }
 }
 
@@ -193,7 +190,7 @@ bool ArcflowSol::is_valid(const vector<pattern_pair> &sol, int btype) const {
             }
             const Item &it = inst.items[itpair.first];
             for (int i = 0; i < inst.ndims; i++) {
-                w[i] += it[i];
+                w[i] += it[i] * itpair.second;
             }
         }
         for (int i = 0; i < inst.ndims; i++) {
@@ -242,27 +239,7 @@ void ArcflowSol::print_solution(bool print_inst = true, bool pyout = false) {
     }
 
     if (print_inst) {
-        printf("Instance:\n");
-        int p = 0;
-        vector<int> rid(inst.nsizes);
-        for (int it = 0; it < inst.nsizes; it++) {
-            rid[inst.items[it].id] = it;
-        }
-        for (int i = 0; i < inst.m; i++) {
-            printf("i=%d (nopts: %d, demand: %d)\n", i+1, inst.nopts[i],
-                   inst.demands[i]);
-            for (int q = 0; q < inst.nopts[i]; q++) {
-                printf("  opt=%d: (", q+1);
-                for (int j = 0; j < inst.ndims; j++) {
-                    if (j) {
-                        printf(", ");
-                    }
-                    printf("%d", inst.items[rid[p]][j]);
-                }
-                printf(")\n");
-                p++;
-            }
-        }
+        inst.print();
     }
 
     if (pyout) {

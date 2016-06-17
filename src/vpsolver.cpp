@@ -152,7 +152,7 @@ void solve(const Instance &inst, bool print_inst = false, bool pyout = false) {
                 flow[a] = rx;
             }
         }
-        ArcflowSol solution(inst, flow, afg.S, afg.Ts, afg.LOSS, true);
+        ArcflowSol solution(inst, flow, afg.S, afg.Ts, afg.LOSS);
         solution.print_solution(print_inst, pyout);
     }
 }

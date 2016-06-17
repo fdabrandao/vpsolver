@@ -51,7 +51,8 @@ void Arcflow::init(const Instance &_inst) {
     inst = _inst;
     LOSS = inst.nsizes;
     label_size = inst.ndims;
-    maxW.resize(inst.ndims, 0);
+    sitems = inst.sorted_items();
+    maxW.resize(label_size, 0);
     for (int d = 0; d < inst.ndims; d++) {
         for (int t = 0; t < inst.nbtypes; t++) {
             maxW[d] = max(maxW[d], inst.Ws[t][d]);
@@ -69,14 +70,14 @@ void Arcflow::init(const Instance &_inst) {
     if (!inst.binary) {
         int maxb = 0;
         for (int it = 0; it < inst.nsizes; it++) {
-            maxb = max(maxb, inst.items[it].demand);
+            maxb = max(maxb, sitems[it].demand);
         }
         max_state.push_back(maxb);
     }
 
     weights.resize(inst.nsizes);
     for (int i = 0; i < inst.nsizes; i++) {
-        weights[i] = inst.items[i].w;
+        weights[i] = sitems[i].w;
     }
     weights.push_back(vector<int>(inst.ndims, 0));  // loss arcs
 
@@ -160,9 +161,9 @@ vector<int> Arcflow::count_max_rep(const vector<int> &space, int i0 = 0,
                                    int sub_i0 = 0) const {
     vector<int> r(inst.nsizes);
     for (int i = i0; i < inst.nsizes; i++) {
-        int dem = inst.binary ? 1 : inst.items[i].demand;
+        int dem = inst.binary ? 1 : sitems[i].demand;
         r[i] = i != i0 ? dem : max(0, dem-sub_i0);
-        for (int d : inst.items[i].nonzero) {
+        for (int d : sitems[i].nonzero) {
             r[i] = min(r[i], space[d]/weights[i][d]);
             if (!r[i]) {
                 break;
@@ -334,7 +335,7 @@ int Arcflow::go(vector<int> su) {
     if (it < inst.nsizes && ic < max_rep[it]) {
         vector<int> sv(su);
         const vector<int> &w = weights[it];
-        for (int d : inst.items[it].nonzero) {
+        for (int d : sitems[it].nonzero) {
             sv[d] += w[d];
             if (sv[d] > maxw[d]) {  // if invalid
                 return dp[key] = NS.get_index(mu);
@@ -440,7 +441,7 @@ void Arcflow::reduce_redundancy() {
     // remove redundant parallel arcs
     vector<int> types;
     for (int i = 0; i < inst.nsizes; i++) {
-        types.push_back(inst.items[i].type);
+        types.push_back(sitems[i].type);
     }
     types.push_back(-1);
     auto comp_less = [&types](const Arc &a, const Arc &b) {
@@ -535,6 +536,11 @@ void Arcflow::finalize() {
     reduce_redundancy();
     NV = NS.size()+Ts.size();
     NA = A.size();
+    for (Arc &a : A) {
+        if (a.label != LOSS) {
+            a.label = sitems[a.label].id;
+        }
+    }
     ready = true;
 }
 
@@ -570,7 +576,11 @@ void Arcflow::write(FILE *fout) {
             } else if (i == 0 && (a.u == iS || a.v > lastv)) {
                 continue;
             }
-            fprintf(fout, "%d %d %d\n", a.u, a.v, a.label);
+            if (a.label == LOSS) {
+                fprintf(fout, "%d %d %d\n", a.u, a.v, LOSS);
+            } else {
+                fprintf(fout, "%d %d %d\n", a.u, a.v, a.label);
+            }
         }
     }
     fprintf(fout, "};\n");
