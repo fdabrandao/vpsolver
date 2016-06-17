@@ -59,7 +59,6 @@ int &Item::operator[](int i) {
 void Instance::init() {
     relax_domains = false;
     binary = false;
-    sort = true;
     method = -3;
     vtype = 'I';
     ndims = 0;

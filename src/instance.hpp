@@ -64,7 +64,6 @@ class Instance {
     vector<int> Qs;  // quantities
     vector<Item> items;
     int method;
-    bool sort;
     bool binary;
     bool relax_domains;
 
