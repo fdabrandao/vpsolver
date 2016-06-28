@@ -63,12 +63,33 @@ def main():
         for k, v in sorted(varvalues.items()) if not k.startswith("_")
     ])
     print("")
-    assert varvalues["Z"] == 15  # check the solution objective value
+    assert varvalues["Z"] == 11  # check the solution objective value
 
-    parser["VBP_FLOW"].extract(
+    exctacted_solution = parser["VBP_FLOW"].extract(
         lambda name: varvalues.get(name, 0),
         verbose=True
     )
+
+    solution = {}
+    for zvar, value, sol in exctacted_solution:
+        solution[zvar] = []
+        for r, pattern in sol:
+            solution[zvar] += [pattern]*r
+        assert value == len(solution[zvar])
+
+    def pop_pattern(zvar):
+        pattern = []
+        for it in solution[zvar].pop():
+            if it not in solution:
+                pattern.append(it)
+            else:
+                pattern.append((it, pop_pattern(it)))
+        return pattern
+
+    print("\n\nSolution:")
+    for i in range(varvalues["Z"]):
+        pattern = pop_pattern("Z")
+        print("Sheet {}: {}".format(i+1, pattern))
 
 
 if __name__ == "__main__":
