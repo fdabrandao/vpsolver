@@ -34,7 +34,7 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
       
 #### Optional
 
-For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and [Web App](#vpsolver-web-app):
+For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and Web App:
 
 * `python-2.7` or `python-3.x`
 * `python-pip`
@@ -71,7 +71,6 @@ Or simply install from the [repository](https://pypi.python.org/pypi/pyvpsolver)
 ```
 $ pip install pyvpsolver
 ```
-Note: use `pip install pyvpsolver --pre` if you want to install the latest pre-release.
 
 ## Python interface
 
@@ -132,15 +131,6 @@ URL: http://172.17.0.60:5555/
 ```
 
 For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki/docker).
-
-## VPSolver Web App
-VPSolver includes a Web App that can be started as follows:
-
-```
-$ python -m pyvpsolver.webapp.app
-```
-
-The Web App can then be accessed on a web browser at `http://127.0.0.1:5555/`.
 
 ## VPSolver binaries
 
@@ -232,4 +222,4 @@ http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/
 
 
 ***
-Copyright © 2013-2016 [Filipe Brandão](http://www.dcc.fc.up.pt/~fdabrandao/) <[fdabrandao@dcc.fc.up.pt](mailto:fdabrandao@dcc.fc.up.pt)>. All rights reserved.
+Copyright © 2013-2016 [Filipe Brandão](http://www.dcc.fc.up.pt/~fdabrandao/) < [fdabrandao@dcc.fc.up.pt](mailto:fdabrandao@dcc.fc.up.pt) >. All rights reserved.

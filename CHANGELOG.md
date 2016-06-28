@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.2] - 2016-06-28
+
+### Changed
+- Simplified the .afg format.
+
+### Fixed
+- Fixed crash on Windows x64.
+
+
 ## [3.1.1] - 2016-05-12
 
 ### Changed
@@ -76,7 +85,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - First official release of the C++ implementation of VPSolver.
 
-[Unreleased]: https://github.com/fdabrandao/vpsolver/compare/v3.1.1...H
+[Unreleased]: https://github.com/fdabrandao/vpsolver/compare/v3.1.2...H
+[3.1.2]: https://github.com/fdabrandao/vpsolver/compare/v3.1.1...v3.1.2
 [3.1.1]: https://github.com/fdabrandao/vpsolver/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/fdabrandao/vpsolver/compare/v3.0.1...v3.1.0
 [3.0.1]: https://github.com/fdabrandao/vpsolver/compare/v3.0.0...v3.0.1
