@@ -24,7 +24,7 @@ import os
 
 
 def main():
-    """Examples: how to use VBP, MVP, AFG, MPS, LP and VPSolver"""
+    """Example: how to use VBP, MVP, AFG, MPS, LP and VPSolver."""
     from pyvpsolver import VPSolver, VBP, MVP, AFG, MPS, LP
     from pyvpsolver.solvers import vbpsolver, mvpsolver
     os.chdir(os.path.dirname(__file__) or os.curdir)

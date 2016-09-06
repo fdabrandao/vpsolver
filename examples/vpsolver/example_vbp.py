@@ -24,7 +24,7 @@ import os
 
 
 def main():
-    """Example: solve a vector packing instance using 'solvers.vbpsolver'"""
+    """Example: solve a vector packing instance using 'solvers.vbpsolver'."""
     from pyvpsolver.solvers import vbpsolver
     os.chdir(os.path.dirname(__file__) or os.curdir)
 

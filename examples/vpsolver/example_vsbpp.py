@@ -24,7 +24,7 @@ import os
 
 
 def main():
-    """ Variable-sized Bin Packing Example """
+    """Example: Variable-sized Bin Packing."""
     from pyvpsolver.solvers import mvpsolver
     os.chdir(os.path.dirname(__file__) or os.curdir)
 

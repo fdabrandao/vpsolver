@@ -24,7 +24,7 @@ import os
 
 
 def main():
-    """Examples: Multiple-choice Vector Bin Packing"""
+    """Examples: Multiple-choice Vector Bin Packing."""
     from pyvpsolver.solvers import mvpsolver
     os.chdir(os.path.dirname(__file__) or os.curdir)
 
