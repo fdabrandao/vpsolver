@@ -52,8 +52,8 @@ class VBP(object):
                 row = list(w[i])+[b[i]]
                 assert len(row) == len(W)+1
                 print(" ".join(map(str, row)), file=fdst)
-            print("BINARY{{{:d}}};".format(binary), file=fdst)
-            print("VTYPE{{{}}};".format(vtype), file=fdst)
+            print("$BINARY{{{:d}}};".format(binary), file=fdst)
+            print("$VTYPE{{{}}};".format(vtype), file=fdst)
         if verbose:
             print(utils.get_content(self.vbp_file))
         self.m = len(b)
@@ -130,8 +130,8 @@ class MVP(object):
                 for j, w in enumerate(ws[i]):
                     assert len(w) == ndims
                     print(" ".join(map(str, w)), file=fdst)
-            print("BINARY{{{:d}}};".format(binary), file=fdst)
-            print("VTYPE{{{}}};".format(vtype), file=fdst)
+            print("$BINARY{{{:d}}};".format(binary), file=fdst)
+            print("$VTYPE{{{}}};".format(vtype), file=fdst)
         if verbose:
             print(utils.get_content(self.mvp_file))
         self.m = len(b)
