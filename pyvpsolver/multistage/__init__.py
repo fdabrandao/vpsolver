@@ -19,8 +19,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from . import vbpsolver
-from . import multistage
-from . import mvpsolver2013
-from . import mvpsolver2016
-from . import mvpsolver2016 as mvpsolver
+from . import models
+from . import utils
+from . import draw
