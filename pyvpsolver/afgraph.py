@@ -18,11 +18,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from builtins import zip
-from builtins import map
-from builtins import range
-from builtins import sorted
-from builtins import object
+from __future__ import print_function
+from __future__ import division
+from builtins import str, map, object, range, zip, sorted
 
 from .utils import inf, relabel_graph, sort_vertices, sort_arcs, draw_graph
 

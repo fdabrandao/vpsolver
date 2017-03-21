@@ -19,7 +19,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
-from builtins import range, zip, sorted
+from __future__ import division
+from builtins import str, map, object, range, zip, sorted
 
 import svgwrite
 from random import *
@@ -51,9 +52,8 @@ class HsvColorGenerator(object):
     def __call__(self):
         """Returns a random color based on configured functions."""
         hsv = self.h_func(), self.s_func(), self.v_func()
-        return tuple(map(
-            lambda value: int(round(value * 255)), colorsys.hsv_to_rgb(*hsv)
-        ))
+        return tuple(
+            [int(round(value * 255)) for value in colorsys.hsv_to_rgb(*hsv)])
 
     def _channel_picker(self, value, scale=1):
         """Returns a function to create (restricted) random values."""
@@ -106,7 +106,10 @@ def draw_solution(sheet_types, solution, dimension, demand, fprefix):
     )
 
     colors = [generator() for i in range(100)]
-    colors = map(lambda (r, g, b): "#%x%x%x" % (r, g, b), colors)
+    colors = [
+        "#{:x}{:x}{:x}".format(r_g_b[0], r_g_b[1], r_g_b[2])
+        for r_g_b in colors
+    ]
 
     line_colors = ["red", "blue", "green", "orange", "yellow"]
 

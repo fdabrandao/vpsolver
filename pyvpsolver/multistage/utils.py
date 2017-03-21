@@ -19,7 +19,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
-from builtins import range, zip, sorted
+from __future__ import division
+from builtins import str, map, object, range, zip, sorted
 
 
 def raster_points(W, demands):
@@ -63,7 +64,7 @@ def item_label(it, dim, rotated=False):
         return "I{}[{}]^".format(it, ",".join(map(str, dim)))
 
 
-class MultiStage:
+class MultiStage(object):
     """Multi-stage cutting stock."""
     def __init__(self, bins, cost):
         self.problems_at = {}

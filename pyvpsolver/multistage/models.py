@@ -19,7 +19,8 @@ You should have received a copy of the GNU Affero General Public License
 along wih this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
-from builtins import range, zip, sorted
+from __future__ import division
+from builtins import str, map, object, range, zip, sorted
 
 from time import time
 from ..multistage.utils import MultiStage
@@ -51,9 +52,9 @@ def multistage_simple(prob, verbose=None):
                 print("Graph: %d/%d" % (count, total_count))
             W, tmp = prob.subproblem[curbin]
             subp = [
-                (it, w, min(W/w, prob.demand[it]))
+                (it, w, min(W//w, prob.demand[it]))
                 for it, w, noslack in tmp
-                if min(W/w, prob.demand.get(it, 0)) > 0
+                if min(W//w, prob.demand.get(it, 0)) > 0
             ]
             items = [it for it, w, b in subp]
             itw = [(w,) for it, w, b in subp]

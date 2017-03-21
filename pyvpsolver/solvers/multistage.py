@@ -19,7 +19,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
-from builtins import range, zip, sorted
+from __future__ import division
+from builtins import str, map, object, range, zip, sorted
 
 import os
 from glob import glob
@@ -127,7 +128,7 @@ def solve(W, H, w, h, b, stage3=False, exact=False, allow_rotation=False,
     graph.set_labels(labels)
 
     solution = {}
-    for stage in xrange(prob.nstages):
+    for stage in range(prob.nstages):
         print("Stage: %d" % stage)
         for curbin in prob.problems_at[stage]:
             f = varvalues.get(vnames[zflow[curbin]], 0)
