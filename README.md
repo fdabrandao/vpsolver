@@ -1,6 +1,6 @@
 ## Arc-flow Vector Packing Solver (VPSolver)
 
-Copyright (C) 2013-2016, Filipe Brandão  
+Copyright (C) 2013-2017, Filipe Brandão  
 Faculdade de Ciências, Universidade do Porto  
 Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
 
@@ -222,4 +222,4 @@ http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/
 
 
 ***
-Copyright © 2013-2016 [Filipe Brandão](http://www.dcc.fc.up.pt/~fdabrandao/) < [fdabrandao@dcc.fc.up.pt](mailto:fdabrandao@dcc.fc.up.pt) >. All rights reserved.
+Copyright © 2013-2017 [Filipe Brandão](http://www.dcc.fc.up.pt/~fdabrandao/) < [fdabrandao@dcc.fc.up.pt](mailto:fdabrandao@dcc.fc.up.pt) >. All rights reserved.
