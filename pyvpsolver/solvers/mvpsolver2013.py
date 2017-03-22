@@ -170,7 +170,7 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
                 for j in dominatedby[i]:
                     try:
                         tgts.remove(j)
-                    except:
+                    except KeyError:
                         pass
             for t in tgts:
                 A.add((v, Ts[t], LOSS))
@@ -181,7 +181,7 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
                 for t in dominatedby[j]:
                     try:
                         tgts.remove(t)
-                    except:
+                    except KeyError:
                         pass
             for t in tgts:
                 A.add((Ts[i], Ts[t], LOSS))

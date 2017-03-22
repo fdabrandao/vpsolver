@@ -23,8 +23,9 @@ from __future__ import division
 from builtins import str, map, object, range, zip, sorted
 
 import svgwrite
-from random import *
 import colorsys
+from random import random
+
 
 SPACE_SIZE = 3
 CSS_STYLES = """
@@ -74,6 +75,7 @@ class HsvColorGenerator(object):
 
 
 def draw_solution(sheet_types, solution, dimension, demand, fprefix):
+    """Generate .svg files with the solution."""
 
     def get_dims(name, scale):
         w, h = dimension[name]
@@ -95,11 +97,6 @@ def draw_solution(sheet_types, solution, dimension, demand, fprefix):
     SCALE = 500.0/maxW
     maxW *= SCALE
     maxH *= SCALE
-
-    totalH = sum(
-        len(solution[sheet])*get_dims(sheet, SCALE)[1]+SPACE_SIZE
-        for sheet in sheet_types if sheet in solution
-    )
 
     generator = HsvColorGenerator(
         hue=(0/3.0*255, 3/3.0*255), value=(0.7, 0.9), saturation=(0.4, 0.6)
@@ -130,9 +127,7 @@ def draw_solution(sheet_types, solution, dimension, demand, fprefix):
         lines = group("line")
         rects = group("rect")
         sheets = group("sheet")
-        headers = group("header")
         labels = group("label")
-        labels2 = group("label2")
 
         sheets.add(dwg.rect(insert=(SPACE_SIZE, SPACE_SIZE), size=(W, H)))
 
@@ -143,7 +138,6 @@ def draw_solution(sheet_types, solution, dimension, demand, fprefix):
                 if it not in solution:
                     if it.startswith("I"):
                         name = get_name(it)
-                        # print(it, name)
                         if demand[name] > 0:
                             demand[name] -= 1
                             ind = get_number(it)
@@ -191,10 +185,3 @@ def draw_solution(sheet_types, solution, dimension, demand, fprefix):
         if demand[name] != 0:
             print(name, demand[name])
         assert demand[name] == 0
-
-
-def main():
-    draw_solution(sheets1, solution1, "sol")
-
-if __name__ == "__main__":
-    main()

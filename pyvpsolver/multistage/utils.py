@@ -24,6 +24,7 @@ from builtins import str, map, object, range, zip, sorted
 
 
 def raster_points(W, demands):
+    """Compute raster-points."""
     V = set([0])
     for w in sorted(demands, reverse=True):
         T = set()
@@ -40,9 +41,9 @@ def raster_points(W, demands):
 
 
 def raster_points_org(W, demands):
-    """Algorithms for two-dimensional cutting stock and strip
-    packing problems using dynamic programming
-    and column generation
+    """Compute raster-points using the method proposed in:
+    Algorithms for two-dimensional cutting stock and strip packing problems
+    using dynamic programming and column generation
     http://www.ime.usp.br/~yw/papers/accepted/2D-CuttingStock.DPCG2008.pdf
     """
     dp = [0]*(W+1)
@@ -54,10 +55,12 @@ def raster_points_org(W, demands):
 
 
 def subprob_label(prefix, dim):
+    """Compute sub-problem labels."""
     return "{}[{}]".format(prefix, ",".join(map(str, dim)))
 
 
 def item_label(it, dim, rotated=False):
+    """Compute item labels."""
     if not rotated:
         return "I{}[{}]".format(it, ",".join(map(str, dim)))
     else:
@@ -65,7 +68,10 @@ def item_label(it, dim, rotated=False):
 
 
 class MultiStage(object):
-    """Multi-stage cutting stock."""
+    """
+    Multi-stage cutting stock.
+    """
+
     def __init__(self, bins, cost):
         self.problems_at = {}
         self.groups = {}
@@ -84,6 +90,7 @@ class MultiStage(object):
         self.ready = False
 
     def add_stage(self, stage_function, args=None):
+        """Add a new stage to the problem."""
         assert not self.ready
         self.nstages += 1
         stage = self.nstages
@@ -107,12 +114,14 @@ class MultiStage(object):
                     self.add_to_group(group_id, newprob)
 
     def add_to_group(self, group_id, prob):
+        """Add a problem to a group."""
         if group_id not in self.groups:
             self.groups[group_id] = set([prob])
         else:
             self.groups[group_id].add(prob)
 
     def set_group_demands(self, b):
+        """Set demands."""
         assert not self.ready
         for group_id in b:
             self.group_demand[group_id] = b[group_id]
@@ -122,6 +131,7 @@ class MultiStage(object):
         self.ready = True
 
     def propagate_demands(self):
+        """Propagate demands."""
         removelst = []
         for stage in sorted(self.problems_at, reverse=True):
             for prob in self.problems_at[stage]:
@@ -140,6 +150,7 @@ class MultiStage(object):
         self.remove_problems(removelst)
 
     def remove_problems(self, removelst):
+        """Remove problems with no demand."""
         for prob in removelst:
             # print("remove", prob)
             for stage in self.problems_at:
@@ -164,6 +175,7 @@ class MultiStage(object):
 
 
 def guillotine_cut(obj, parent_dim, args):
+    """Generate sub-problems by applying guillotine cuts."""
     label, cutdim, cuts = args
     stage = obj.nstages
     parent_group = (stage-1, cutdim)+tuple([
@@ -174,14 +186,17 @@ def guillotine_cut(obj, parent_dim, args):
         if cutsize <= parent_dim[cutdim]:
             dim = parent_dim[:cutdim] + (cutsize,) + parent_dim[cutdim+1:]
             tmp.append((subprob_label(label, dim), dim, cutsize, None))
-    newitems = [(lbl, dim, group_id) for lbl, dim, weigth, group_id in tmp]
+    newitems = [
+        (_lbl, _dim, _group_id) for _lbl, _dim, _weigth, _group_id in tmp
+    ]
     subprob = (parent_dim[cutdim], [
-        (lbl, weight, True) for lbl, dim, weight, group_id in tmp
+        (_lbl, _weight, True) for _lbl, _dim, _weight, _group_id in tmp
     ])
     return parent_group, newitems, subprob
 
 
 def cut_items(obj, parent_dim, args):
+    """Generate items that fit on the sheet."""
     itdims, cutdim, exact, allow_rotation, allow_slack = args
     from itertools import permutations
     parent_group = (obj.nstages-1, cutdim)+tuple([

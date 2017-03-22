@@ -23,7 +23,6 @@ from __future__ import division
 from builtins import str, map, object, range, zip, sorted
 
 from time import time
-from ..multistage.utils import MultiStage
 from .. import VBP, MVP, AFG, AFGraph
 from pympl import Model
 
@@ -31,6 +30,7 @@ LOSS = "L"
 
 
 def multistage_simple(prob, verbose=None):
+    """Model multi-stage cutting stock problems using arc-flow models."""
     assert prob.ready
     V, A = [], []
     zflow = {}
@@ -42,14 +42,14 @@ def multistage_simple(prob, verbose=None):
     )
     print("#Groups:", len(prob.groups)-len(prob.group_demand))
     for stage in sorted(prob.problems_at)[:-1]:
-        print("Stage %d:" % (stage+1), len(prob.problems_at[stage]))
+        print("Stage {}: {}".format(stage+1, len(prob.problems_at[stage])))
     for stage in sorted(prob.problems_at):
         for curbin in sorted(prob.problems_at[stage]):
             if curbin not in prob.subproblem:
                 continue
             count += 1
             if count % 100 == 0:
-                print("Graph: %d/%d" % (count, total_count))
+                print("Graph: {}/{}".format(count, total_count))
             W, tmp = prob.subproblem[curbin]
             subp = [
                 (it, w, min(W//w, prob.demand[it]))
@@ -62,7 +62,7 @@ def multistage_simple(prob, verbose=None):
             instance = VBP((W,), itw, itb, verbose=False)
             graph = AFG(instance, verbose=False).graph()
             graph.relabel(
-                lambda v: "%s:%s" % (curbin, v),
+                lambda v: "{}:{}".format(curbin, v),
                 lambda it: ("IT", items[it]) if it < len(items) else LOSS
             )
             feedback = (graph.Ts[0], graph.S, LOSS)
@@ -119,19 +119,17 @@ def multistage_simple(prob, verbose=None):
 
 
 def multistage_groups(prob, verbose=None):
+    """Model multi-stage cutting stock problems using arc-flow models
+    and grouping compatible cutting-stock sub-problems into
+    variable-sized cutting-stock problems.
+    """
     assert prob.ready
     t0 = time()
     V, A = set(), set()
     zflow = {}
-    count = 0
-    total_count = sum(
-        1 for stage in sorted(prob.problems_at)
-        for curbin in sorted(prob.problems_at[stage])
-        if curbin in prob.subproblem
-    )
     print("#Groups:", len(prob.groups)-len(prob.group_demand))
     for stage in sorted(prob.problems_at)[:-1]:
-        print("Stage %d:" % (stage+1), len(prob.problems_at[stage]))
+        print("Stage {}: {}".fomat(stage+1, len(prob.problems_at[stage])))
     gi = 1
     print("---")
 
@@ -184,7 +182,7 @@ def multistage_groups(prob, verbose=None):
             )
             Ts = graph.Ts
         else:
-            mvp_graph = MVBPGraph(
+            mvp_graph = MVBPGraph(  # FIXME
                 ws, bs, Ws, labels,
                 iterative=True,
                 verbose=False
@@ -192,29 +190,23 @@ def multistage_groups(prob, verbose=None):
             Ts = mvp_graph.Ts
             graph = mvp_graph.graph
 
-        graph.relabel(lambda v: "G%s:%s" % (gi, v))
-        svg_file = "graphs/{}".format(
-            str(key).strip("()").replace(" ", "").replace(",", "_")+".svg"
-        )
-        # print(len(graph.V), len(graph.A))
-        # graph.draw(
-        #     svg_file,
-        #     ignore=[("G%s:%s" % (gi, t), ("G%s:S" % (gi))) for t in Ts]
-        # )
+        graph.relabel(lambda v: "G{}:{}".format(gi, v))
 
         assert V & set(graph.V) == set()
         assert A & set(graph.A) == set()
         V |= set(graph.V)
         A |= set(graph.A)
         for i, name in enumerate(probnames):
-            zflow[name] = ("G%s:%s" % (gi, Ts[i]), "G%s:S" % (gi), LOSS)
+            zflow[name] = (
+                "G{}:{}".format(gi, Ts[i]), "G{}:S".format(gi), LOSS
+            )
         gi += 1
 
     V = list(set(V))
     A = list(set(A))
     print("#V:", len(V))
     print("#A:", len(A))
-    print("time: %.2f" % (time()-t0))
+    print("time: {:.2f}".format(time()-t0))
 
     graph = AFGraph(V, A, None, None, LOSS=LOSS)
     vnames = {}
@@ -260,8 +252,12 @@ def multistage_groups(prob, verbose=None):
 
 
 def onecut_model(W, H, w, h, b, stage3=False, exact=False, rotation=False):
+    """Model two- and three-stage cutting stock problems using the mothod
+    proposed in: "Silva et al. (2010). An integer programming model for
+    two- and three-stage two-dimensional cutting stock problems.
+    """
     def vname(i, j):
-        return "x[%d,%d]" % (i, j)
+        return "x[{},{}]".format(i, j)
 
     def cut_stage1(pw, ph, wi, hi):
         return [(pw, ph-hi, 1), (pw-wi, hi, 2)]
@@ -352,7 +348,6 @@ def onecut_model(W, H, w, h, b, stage3=False, exact=False, rotation=False):
         varl += prod_it
         cons.append((prod_it, ">=", b[it]))
 
-    tmp = set()
     for k in assocs_pr:
         if k in assocs_pi:
             prod_k = [vname(it, pi) for it, pi in assocs_pr[k]]

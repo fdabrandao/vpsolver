@@ -36,6 +36,7 @@ from ..multistage.draw import draw_solution
 def solve(W, H, w, h, b, stage3=False, exact=False, allow_rotation=False,
           restricted=True, simple=False, script=None, script_options=None,
           verbose=None):
+    """Solve muti-stage cutting stock problems using the arc-flow model."""
     from collections import Counter
     if verbose is None:
         verbose = VPSolver.VERBOSE
@@ -129,7 +130,7 @@ def solve(W, H, w, h, b, stage3=False, exact=False, allow_rotation=False,
 
     solution = {}
     for stage in range(prob.nstages):
-        print("Stage: %d" % stage)
+        print("Stage: {}".format(stage))
         for curbin in prob.problems_at[stage]:
             f = varvalues.get(vnames[zflow[curbin]], 0)
             if f > 0:
@@ -156,6 +157,7 @@ def solve(W, H, w, h, b, stage3=False, exact=False, allow_rotation=False,
 
 def onecut(W, H, w, h, b, stage3=False, exact=False, allow_rotation=False,
            restricted=True, script=None, script_options=None, verbose=None):
+    """Solve muti-stage cutting stock problems using Elsa's onecut model."""
     if verbose is None:
         verbose = VPSolver.VERBOSE
     assert restricted is True

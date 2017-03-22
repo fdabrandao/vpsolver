@@ -229,7 +229,7 @@ class IterativeOutput(object):
             print("TERMINATE {0}!".format(self.proc.pid))
             os.kill(self.proc.pid, signal.SIGTERM)
             # self.proc.terminate()
-        except:
+        except OSError:
             pass
 
 

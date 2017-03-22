@@ -97,7 +97,7 @@ class VBP(object):
     def __del__(self):
         try:
             os.remove(self.vbp_file)
-        except:
+        except KeyError:
             pass
 
 
@@ -193,7 +193,7 @@ class MVP(object):
     def __del__(self):
         try:
             os.remove(self.mvp_file)
-        except:
+        except KeyError:
             pass
 
 
@@ -264,7 +264,7 @@ class AFG(object):
     def __del__(self):
         try:
             os.remove(self.afg_file)
-        except:
+        except KeyError:
             pass
 
 
@@ -289,7 +289,7 @@ class MPS(object):
     def __del__(self):
         try:
             os.remove(self.mps_file)
-        except:
+        except KeyError:
             pass
 
 
@@ -314,7 +314,7 @@ class LP(object):
     def __del__(self):
         try:
             os.remove(self.lp_file)
-        except:
+        except KeyError:
             pass
 
 
@@ -358,11 +358,11 @@ class VPSolver(object):
         for p in VPSolver.PLIST:
             try:
                 os.killpg(p.pid, signal.SIGTERM)
-            except:
+            except OSError:
                 pass
         try:
             shutil.rmtree(VPSolver.TMP_DIR)
-        except:
+        except OSError:
             pass
 
     @staticmethod
@@ -588,6 +588,7 @@ def signal_handler(signal_, frame):
     print("signal received: {}".format(signal_))
     VPSolver.clear()
     sys.exit(1)
+
 
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGHUP, signal_handler)
