@@ -24,6 +24,7 @@ from builtins import str, map, object, range, zip, sorted
 
 import sys
 from .. import VPSolver, MVP, AFG, MPS
+from .mvputils import print_solution
 
 
 def solve(Ws, Cs, Qs, ws, b,
@@ -63,25 +64,3 @@ def solve(Ws, Cs, Qs, ws, b,
             script, mps_model, afg, options=script_options, verbose=verbose
         )
     return obj, sol
-
-
-def print_solution(solution, arg2=None, i0=1, fout=sys.stdout):
-    """Pretty-print a multiple-choice vector packing solution."""
-    if arg2 is None:
-        obj, lst_sol = solution
-    else:
-        obj, lst_sol = solution, arg2
-    if obj is not None:
-        print("Objective:", obj, file=fout)
-    print("Solution:", file=fout)
-    for i, sol in enumerate(lst_sol):
-        cnt = sum(m for m, p in sol)
-        print("Bins of type {0}: {1} {2}".format(
-            i+i0, cnt, ["bins", "bin"][cnt == 1]
-        ), file=fout)
-        for mult, patt in sol:
-            print("{0} x [{1}]".format(
-                mult, ", ".join(
-                    ["i={0} opt={1}".format(it+i0, opt+i0) for it, opt in patt]
-                )
-            ), file=fout)

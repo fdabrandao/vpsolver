@@ -27,6 +27,7 @@ import sys
 from .. import VPSolver, VBP, AFG
 from .. import AFGraph
 from pympl import Model
+from .mvputils import validate_solution, print_solution
 
 
 def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
@@ -294,7 +295,7 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
     for i in range(nbtypes):
         lst_sol.append(graph.extract_solution(S, "<-", Ts[i]))
 
-    validate_solution(lst_sol, nbtypes, ndims, Ws, ws, b)
+    assert validate_solution(lst_sol, nbtypes, ndims, Ws, ws, b)
 
     c1 = sum(sum(r for r, patt in lst_sol[i])*Cs[i] for i in range(nbtypes))
     c2 = sum(
@@ -304,45 +305,3 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
     assert c1 == c2
 
     return c1, lst_sol
-
-
-def validate_solution(lst_solutions, nbtypes, ndims, Ws, ws, b):
-    """Validate multiple-choice vector packing solutions."""
-    if any(
-        sum(ws[it][t][d] for (it, t) in pat) > Ws[i][d]
-        for i in range(nbtypes)
-        for d in range(ndims)
-        for r, pat in lst_solutions[i]
-    ):
-        return False
-
-    aggsol = sum([sol for sol in lst_solutions], [])
-
-    c = [0] * len(b)
-    for (r, p) in aggsol:
-        for i, t in p:
-            c[i] += r
-
-    return all(c[i] >= b[i] for i in range(len(b)))
-
-
-def print_solution(solution, arg2=None, i0=1, fout=sys.stdout):
-    """Pretty-print a multiple-choice vector packing solution."""
-    if arg2 is None:
-        obj, lst_sol = solution
-    else:
-        obj, lst_sol = solution, arg2
-    if obj is not None:
-        print("Objective:", obj, file=fout)
-    print("Solution:", file=fout)
-    for i, sol in enumerate(lst_sol):
-        cnt = sum(m for m, p in sol)
-        print("Bins of type {0}: {1} {2}".format(
-            i+i0, cnt, ["bins", "bin"][cnt == 1]
-        ), file=fout)
-        for mult, patt in sol:
-            print("{0} x [{1}]".format(
-                mult, ", ".join(
-                    ["i={0} opt={1}".format(it+i0, opt+i0) for it, opt in patt]
-                )
-            ), file=fout)
