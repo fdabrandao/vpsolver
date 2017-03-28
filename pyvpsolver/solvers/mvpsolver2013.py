@@ -271,7 +271,9 @@ def solve(Ws, Cs, Qs, ws, b, transitive_reduction=True,
     if mps_file.endswith(".mps"):
         model.write(mps_file)
         VPSolver.log(".MPS model successfully generated!", verbose)
-    out, varvalues = VPSolver.script_wsol(script, model_file, verbose=verbose)
+    out, varvalues = VPSolver.script_wsol(
+        script, model_file, options=script_options, verbose=verbose
+    )
     os.remove(model_file)
 
     VPSolver.log("#V1: {0} #A1: {1}".format(nv1, na1), verbose)

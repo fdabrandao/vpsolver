@@ -119,7 +119,9 @@ def solve(bins, items, maxbins=-1, svg_file="", lp_file="", mps_file="",
     # Solve the model
     model_file = VPSolver.new_tmp_file(".lp")
     model.write(model_file)
-    out, varvalues = VPSolver.script_wsol(script, model_file, verbose=verbose)
+    out, varvalues = VPSolver.script_wsol(
+        script, model_file, options=script_options, verbose=verbose
+    )
     os.remove(model_file)
 
     # Extract the solution
