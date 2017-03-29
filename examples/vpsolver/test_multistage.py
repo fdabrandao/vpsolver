@@ -69,14 +69,6 @@ def main():
         lst = readall(path+folder)
         print(">>", folder)
         for name, instance in lst:
-            # if name != "A2.txt": continue
-            # if name != "OF2.txt": continue
-            # if name != "ATP33.txt": continue
-            # if name != "CU1.txt": continue
-            # if name != "ATP49.txt":
-            # if name != "A2.txt":
-            # if name != "CW1.txt":
-            #    continue
             print(">>>", folder, name)
             W, H, w, h, b = instance
 
@@ -97,9 +89,8 @@ def main():
                 stage3=stage3, exact=exact, allow_rotation=allow_rotation,
                 script="vpsolver_gurobi.sh",
                 script_options="""
-                Threads=1
-                Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0
-                MIPGapAbs=0.99999 Seed=1234 TimeLimit=600
+                Threads=1 Presolve=1 Method=2
+                MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=600
                 """,
             )
 
@@ -113,7 +104,7 @@ def main():
                 script="vpsolver_gurobi.sh",
                 script_options="""
                 Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0
-                MIPGapAbs=0.99999 Seed=1234 TimeLimit=600
+                MIPGapAbs=0.99999 Seed=1234 TimeLimit=1800
                 """,
             )
 
