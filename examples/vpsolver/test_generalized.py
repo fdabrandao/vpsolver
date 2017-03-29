@@ -34,6 +34,12 @@ def read_generalized(fname):
             lst.pop(0)
         lst.pop(0)
 
+    def increase_key(dic, key):
+        if key not in dic:
+            dic[key] = 1
+        else:
+            dic[key] += 1
+
     discard_until("BINTYPES")
     nbtypes = int(lst.pop(0))
 
@@ -42,29 +48,45 @@ def read_generalized(fname):
 
     bins = []
     discard_until("BINS_SECTIONS")
+    Ws, Cs, Ls, Us = [], [], [], []
     for i in range(nbtypes):
         _bid, _capacity, _cost, _l, _u = map(int, lst[:5])
-        bins.append((tuple([_capacity]), _cost, _l, _u))
+        Ws.append(tuple([_capacity]))
+        Cs.append(_cost)
+        Ls.append(_l)
+        Us.append(_u)
         assert _bid == i
         lst = lst[5:]
+    U = -1  # unlimited number of bins
 
-    items = []
+    groups = {}
     discard_until("ITEMS_SECTIONS")
     for i in range(nitems):
         _iid, _volume, _profit, _forced = map(int, lst[:4])
-        items.append(
-            (
-                [tuple([_volume])], _profit,
-                1 if _forced else 0,  # mandatory demand
-                0 if _forced else 1   # optional demand
-            )
-        )
+        if _volume not in groups:
+            groups[_volume] = []
+        groups[_volume].append((_profit, _forced))
         assert _iid == i
         lst = lst[4:]
 
-    maxbins = -1  # unlimited number of bins
+    grps = list(groups.keys())
 
-    return bins, items, maxbins
+    ws, req, opt, prof, dem = [], {}, {}, {}, {}
+    I, J = [], {}
+    for i, _volume in enumerate(grps):
+        I.append(i)
+        J[i] = [0]  # only one incarnation per type
+        ws.append([(_volume,)])
+        req[i], opt[i] = [], []
+        for l, (_profit, _forced) in enumerate(groups[_volume]):
+            if _forced:
+                req[i].append(l)
+            else:
+                opt[i].append(l)
+            prof[i, l] = _profit
+            dem[i, l] = 1
+
+    return (Ws, Cs, Ls, Us, U, ws, I, J, dem, prof, req, opt)
 
 
 def main():
@@ -82,16 +104,16 @@ def main():
         print(">", folder)
         for instance in sorted(glob(path+folder+"/prob_*.txt")):
             print(">>", folder, instance)
-            bins, items, maxbins = read_generalized(instance)
+            geninst = read_generalized(instance)
             stdout_org = sys.stdout
             fname = instance[instance.rfind("/")+1:]
             with open("tmp/logs/{}/{}".format(folder, fname), "w") as f:
                 sys.stdout = f
                 t0 = time()
                 obj, lst_sol = genvpsolver.solve(
-                    bins, items, maxbins, script="vpsolver_gurobi.sh",
+                    geninst, script="vpsolver_gurobi.sh",
                     script_options="""
-                    Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1
+                    Threads=1 Presolve=1 Method=2
                     MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=600
                     """,
                     verbose=True

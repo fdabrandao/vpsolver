@@ -29,7 +29,7 @@ from .mvputils import validate_solution, print_solution
 from pympl import Model
 
 
-def solve(bins, items, maxbins=-1, svg_file="", lp_file="", mps_file="",
+def solve(genvbp_instance, svg_file="", lp_file="", mps_file="",
           script=None, script_options=None, stats=None, verbose=None):
     """Solve generalized vector packing problems."""
     assert script is not None
@@ -37,17 +37,13 @@ def solve(bins, items, maxbins=-1, svg_file="", lp_file="", mps_file="",
     if stats is None and verbose is not None:
         stats = verbose
 
-    Ws = [_capacity for _capacity, _cost, _l, _u in bins]
-    Cs = [_cost for _capacity, _cost, _l, _u in bins]
-    Ls = [_l for _capacity, _cost, _l, _u in bins]
-    Us = [_u for _capacity, _cost, _l, _u in bins]
-    ws = [_volumes for _volumes, _profit, _d, _dopt in items]
-    profit = [_profit for _volumes, _profit, _d, _dopt in items]
-    b = [_d + _dopt for _volumes, _profit, _d, _dopt in items]
-    d = [_d for _volumes, _profit, _d, _dopt in items]
-    dopt = [_dopt for _volumes, _profit, _d, _dopt in items]
-    nbtypes, ndims = len(Ws), len(Ws[0])
+    (Ws, Cs, Ls, Us, U, ws, I, J, dem, prof, req, opt) = genvbp_instance
+    b = [
+        sum(dem[i, l] for l in req[i])+sum(dem[i, l] for l in opt[i])
+        for i in I
+    ]
 
+    nbtypes, ndims = len(Ws), len(Ws[0])
     instance = MVP(Ws, Cs, Us, ws, b, verbose=False)
     afg = AFG(instance, verbose=stats)
     if svg_file.endswith(".svg"):
@@ -67,11 +63,6 @@ def solve(bins, items, maxbins=-1, svg_file="", lp_file="", mps_file="",
     assocs = graph.get_assocs()
 
     lb, ub = {}, {}
-    for lbl in assocs:
-        if lbl != LOSS:
-            for var in assocs[lbl]:
-                ub[var] = b[lbl[0]]
-
     for i in range(nbtypes):
         var = graph.vname(Ts[i], S, LOSS)
         if Ls[i] != -1:
@@ -79,18 +70,24 @@ def solve(bins, items, maxbins=-1, svg_file="", lp_file="", mps_file="",
         if Us[i] != -1:
             ub[var] = Us[i]
 
-    extra = ["extra{}".format(i) for i in range(len(b))]
-    varl += extra
+    delta = {(i, l): "delta_{}_{}".format(i, l) for i in I for l in opt[i]}
+    varl += delta.values()
 
-    for i in range(len(b)):
-        lincomb = [(var, 1) for var in assocs[i, 0]]
-        cons.append((lincomb, "=", [d[i], extra[i]]))
-        ub[extra[i]] = dopt[i]  # optional demand
+    for i in I:
+        lincomb = [(var, 1) for j in J[i] for var in assocs[i, j]]
+        cons.append((lincomb, "=", [
+                sum(dem[i, l] for l in req[i])  # required demand
+            ] + [
+                delta[i, l] for l in opt[i]  # optional demand
+            ]
+        ))
+        for l in opt[i]:
+            ub[delta[i, l]] = dem[i, l]
 
-    if maxbins != -1:
+    if U != -1:
         cons.append((
             [(graph.vname(Ts[i], S, LOSS), 1) for i in range(nbtypes)],
-            "<=", maxbins
+            "<=", U
         ))
 
     # Generate the model
@@ -104,7 +101,7 @@ def solve(bins, items, maxbins=-1, svg_file="", lp_file="", mps_file="",
     obj_lincomb = [
         (graph.vname(Ts[i], S, LOSS), Cs[i]) for i in range(nbtypes)
     ] + [
-        (extra[i], -profit[i]) for i in range(len(b))
+        (delta[i, l], -prof[i, l]) for i in I for l in opt[i]
     ]
     model.set_obj("min", obj_lincomb)
 
@@ -132,7 +129,8 @@ def solve(bins, items, maxbins=-1, svg_file="", lp_file="", mps_file="",
         lst_sol.append(graph.extract_solution(S, "<-", Ts[i]))
 
     # Validate the solution
-    assert validate_solution(lst_sol, nbtypes, ndims, Ws, ws, d)
+    dmin = [sum(dem[i, l] for l in req[i]) for i in I]
+    assert validate_solution(lst_sol, nbtypes, ndims, Ws, ws, dmin)
     c1 = sum(sum(r for r, patt in lst_sol[i])*Cs[i] for i in range(nbtypes))
     c2 = sum(
         varvalues.get(graph.vname(Ts[i], S, LOSS), 0) * Cs[i]
