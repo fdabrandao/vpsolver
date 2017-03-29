@@ -129,7 +129,7 @@ def multistage_groups(prob, verbose=None):
     zflow = {}
     print("#Groups:", len(prob.groups)-len(prob.group_demand))
     for stage in sorted(prob.problems_at)[:-1]:
-        print("Stage {}: {}".fomat(stage+1, len(prob.problems_at[stage])))
+        print("Stage {}: {}".format(stage+1, len(prob.problems_at[stage])))
     gi = 1
     print("---")
 
