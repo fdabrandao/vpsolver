@@ -114,7 +114,7 @@ def main():
                     geninst, script="vpsolver_gurobi.sh",
                     script_options="""
                     Threads=1 Presolve=1 Method=2
-                    MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=600
+                    MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=300
                     """,
                     verbose=True
                 )

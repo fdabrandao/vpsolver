@@ -39,7 +39,7 @@ def solve(genvbp_instance, svg_file="", lp_file="", mps_file="",
 
     (Ws, Cs, Ls, Us, U, ws, I, J, dem, prof, req, opt) = genvbp_instance
     b = [
-        sum(dem[i, l] for l in req[i])+sum(dem[i, l] for l in opt[i])
+        sum(dem[i, l] for l in req[i]) + sum(dem[i, l] for l in opt[i])
         for i in I
     ]
 
@@ -73,6 +73,12 @@ def solve(genvbp_instance, svg_file="", lp_file="", mps_file="",
     delta = {(i, l): "delta_{}_{}".format(i, l) for i in I for l in opt[i]}
     varl += delta.values()
 
+    const_profit = "const_profit"
+    varl.append(const_profit)
+    lb[const_profit] = ub[const_profit] = sum(
+        dem[i, l] * prof[i, l] for l in req[i]
+    )
+
     for i in I:
         lincomb = [(var, 1) for j in J[i] for var in assocs[i, j]]
         cons.append((lincomb, "=", [
@@ -102,7 +108,7 @@ def solve(genvbp_instance, svg_file="", lp_file="", mps_file="",
         (graph.vname(Ts[i], S, LOSS), Cs[i]) for i in range(nbtypes)
     ] + [
         (delta[i, l], -prof[i, l]) for i in I for l in opt[i]
-    ]
+    ] + [(const_profit, -1)]
     model.set_obj("min", obj_lincomb)
 
     # Generate .lp/.mps models if requested
@@ -129,14 +135,12 @@ def solve(genvbp_instance, svg_file="", lp_file="", mps_file="",
         lst_sol.append(graph.extract_solution(S, "<-", Ts[i]))
 
     # Validate the solution
-    dmin = [sum(dem[i, l] for l in req[i]) for i in I]
-    assert validate_solution(lst_sol, nbtypes, ndims, Ws, ws, dmin)
-    c1 = sum(sum(r for r, patt in lst_sol[i])*Cs[i] for i in range(nbtypes))
-    c2 = sum(
-        varvalues.get(graph.vname(Ts[i], S, LOSS), 0) * Cs[i]
-        for i in range(nbtypes)
-    )
-    assert c1 == c2
+    demand = [
+        sum(dem[i, l] for l in req[i]) +
+        sum(varvalues.get(delta[i, l], 0) for l in opt[i])
+        for i in I
+    ]
+    assert validate_solution(lst_sol, nbtypes, ndims, Ws, ws, demand)
 
     obj = sum(varvalues.get(var, 0)*coef for var, coef in obj_lincomb)
     return obj, lst_sol
