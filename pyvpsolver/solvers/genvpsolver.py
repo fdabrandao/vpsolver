@@ -141,6 +141,10 @@ def solve(genvbp_instance, svg_file="", lp_file="", mps_file="",
         for i in I
     ]
     assert validate_solution(lst_sol, nbtypes, ndims, Ws, ws, demand)
+    for i in range(nbtypes):
+        cnt1 = sum(r for r, patt in lst_sol[i])
+        cnt2 = varvalues.get(graph.vname(Ts[i], S, LOSS), 0)
+        assert cnt1 == cnt2
 
     obj = sum(varvalues.get(var, 0)*coef for var, coef in obj_lincomb)
     return obj, lst_sol
