@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import print_function
 from pyvpsolver.solvers import multistage
 import os
+import sys
 
 
 def read2d(fname):
@@ -60,9 +61,22 @@ def main():
     """Example: Multi-stage Cutting Stock."""
     from pyvpsolver.solvers.multistage import onecut, solve
     os.chdir(os.path.dirname(__file__) or os.curdir)
+    from time import time
+
+    assert len(sys.argv) >= 2
+    test = sys.argv[1]
+    assert test in ("arcflow", "onecut")
+    exact = "exact" in sys.argv
+    stage3 = "stage3" in sys.argv
+    rotation = "rotation" in sys.argv
 
     path = "instances/2D/"
     folders = ["set_c", "set_d"]
+    log_folder = "tmp/logs/multistage/{}".format(test)
+    try:
+        os.makedirs(log_folder)
+    except OSError:
+        pass
     # set_c: Hifi (2001)
     # set_d: Alvarez-Valdes (2002)
     for folder in folders:
@@ -72,44 +86,41 @@ def main():
             print(">>>", folder, name)
             W, H, w, h, b = instance
 
-            """
-            W, H = 6, 6
-            w = [4,2]
-            h = [3,2]
-            b = [5,5]
-            """
-            stage3 = True
-            exact = False
-            allow_rotation = False
-
-            obj1, obj2 = None, None
-
-            obj1 = onecut(
-                W, H, w, h, b,
-                stage3=stage3, exact=exact, allow_rotation=allow_rotation,
-                script="vpsolver_gurobi.sh",
-                script_options="""
-                Threads=1 Presolve=1 Method=2
-                MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=600
-                """,
+            stdout_org = sys.stdout
+            probtype = "{}{}{}".format(
+                "3" if stage3 else "2",
+                "E" if exact else "NE",
+                "R" if rotation else "",
             )
+            log_file = "{}/{}_{}_{}".format(log_folder, folder, probtype, name)
+            with open(log_file, "w") as f:
+                sys.stdout = f
+                t0 = time()
+                if test == "onecut":
+                    obj1 = onecut(
+                        W, H, w, h, b,
+                        stage3=stage3, exact=exact, allow_rotation=rotation,
+                        script="vpsolver_gurobi.sh",
+                        script_options="""
+                        Threads=1 Presolve=1 Method=2
+                        MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=300
+                        """,
+                    )
 
-            print("W: {}, H: {}".format(W, H))
-            print("items: {}".format(zip(range(1, len(w)+1), w, h, b)))
-
-            obj2 = solve(
-                W, H, w, h, b,
-                stage3=stage3, exact=exact, allow_rotation=allow_rotation,
-                restricted=True, simple=False,
-                script="vpsolver_gurobi.sh",
-                script_options="""
-                Threads=1 Presolve=1 Method=2 MIPFocus=1 Heuristics=1 MIPGap=0
-                MIPGapAbs=0.99999 Seed=1234 TimeLimit=1800
-                """,
-            )
-
-            print(">>", obj1, obj2)
-            assert obj1 == obj2 or obj1 == obj2+1
+                elif test == "arcflow":
+                    obj2 = solve(
+                        W, H, w, h, b,
+                        stage3=stage3, exact=exact, allow_rotation=rotation,
+                        restricted=True, simple=False,
+                        script="vpsolver_gurobi.sh",
+                        script_options="""
+                        Threads=1 Presolve=1 Method=2
+                        MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=300
+                        """,
+                    )
+                t1 = time()
+            sys.stdout = stdout_org
+            print("### {} {} {} ({})".format(folder, name, t1-t0, log_file))
 
 
 if __name__ == "__main__":

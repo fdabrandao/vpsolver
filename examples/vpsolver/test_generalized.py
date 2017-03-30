@@ -102,12 +102,18 @@ def main():
     # folders = ["TIPO3"]
     for folder in folders:
         print(">", folder)
+        log_folder = "tmp/logs/{}".format(folder)
+        try:
+            os.makedirs(log_folder)
+        except OSError:
+            pass
         for instance in sorted(glob(path+folder+"/prob_*.txt")):
             print(">>", folder, instance)
             geninst = read_generalized(instance)
             stdout_org = sys.stdout
             fname = instance[instance.rfind("/")+1:]
-            with open("tmp/logs/{}/{}".format(folder, fname), "w") as f:
+            log_file = "{}/{}".format(log_folder, fname)
+            with open(log_file, "w") as f:
                 sys.stdout = f
                 t0 = time()
                 obj, lst_sol = genvpsolver.solve(
@@ -121,7 +127,7 @@ def main():
                 genvpsolver.print_solution(obj, lst_sol, fout=f)
                 t1 = time()
             sys.stdout = stdout_org
-            print("###", folder, fname, t1-t0)
+            print("### {} {} {} ({})".format(folder, fname, t1-t0, log_file))
 
 
 if __name__ == "__main__":
