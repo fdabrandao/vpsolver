@@ -35,7 +35,7 @@ from ..multistage.draw import draw_solution
 
 def solve(W, H, w, h, b, stage3=False, exact=False, allow_rotation=False,
           restricted=True, simple=False, script=None, script_options=None,
-          verbose=None):
+          solution_folder=None, verbose=None):
     """Solve muti-stage cutting stock problems using the arc-flow model."""
     from collections import Counter
     if verbose is None:
@@ -146,12 +146,13 @@ def solve(W, H, w, h, b, stage3=False, exact=False, allow_rotation=False,
                             solution[curbin].append(list(patt))
         print()
 
-    for f in glob("tmp/*.svg"):
-        os.remove(f)
-    draw_solution(
-        prob.problems_at[0], solution,
-        prob.dimension, prob.group_demand, "tmp/sol"
-    )
+    if solution_folder:
+        for f in glob("{}/*.svg".format(solution_folder)):
+            os.remove(f)
+        draw_solution(
+            prob.problems_at[0], solution,
+            prob.dimension, prob.group_demand, "{}/sol".format(solution_folder)
+        )
     return obj
 
 
