@@ -23,6 +23,7 @@ from __future__ import print_function
 from pyvpsolver.solvers import multistage
 import os
 import sys
+import re
 
 
 def read2d(fname):
@@ -57,6 +58,46 @@ def readall(path):
     return instances
 
 
+p_ptime = re.compile("time: (\d*\.?\d*)")
+p_nvars = re.compile("NVARS: (\d*)")
+p_ncons = re.compile("NCONS: (\d*)")
+p_relaxation = re.compile("Root relaxation: objective ([^,]*)")
+p_performance = re.compile(
+    "Explored (\d*) nodes \(\d* simplex iterations\) in (\d*\.?\d*) seconds"
+)
+p_solution = re.compile(
+    "Best objective ([^,]*), best bound ([^,]*), gap ([^%]*)"
+)
+
+
+def display_results(name, instance, log_file):
+    W, H, w, h, b = instance
+    with open(log_file) as f:
+        log = f.read()
+    ptime = float(p_ptime.findall(log)[0])
+    nvars = int(p_nvars.findall(log)[0])
+    ncons = int(p_ncons.findall(log)[0])
+    performance = p_performance.findall(log)[0]
+    nodes = int(performance[0])
+    gurobitime = float(performance[1])
+    try:
+        lp = float(p_relaxation.findall(log)[0])
+    except IndexError:
+        lp = None
+    solution = p_solution.findall(log)[0]
+    bestobj = float(solution[0])
+    bestbnd = float(solution[1])
+    gap = float(solution[2])
+    absgap = bestobj-bestbnd
+    row = [
+        name, "{:,}".format(nvars), "{:,}".format(ncons),
+        "{:,.2f}".format(lp) if lp else "-",
+        "{:,.0f} ({:,.0f})".format(bestobj, absgap),
+        "{:,}".format(nodes), "{:,.2f}".format(ptime+gurobitime)
+    ]
+    print("\t".join(map(str, row)))
+
+
 def main():
     """Example: Multi-stage Cutting Stock."""
     from pyvpsolver.solvers.multistage import onecut, solve
@@ -69,6 +110,13 @@ def main():
     exact = "exact" in sys.argv
     stage3 = "stage3" in sys.argv
     rotation = "rotation" in sys.argv
+    summary = "summary" in sys.argv
+    probtype = "{}{}{}".format(
+        "3" if stage3 else "2",
+        "E" if exact else "NE",
+        "R" if rotation else "",
+    )
+    print(probtype)
 
     path = "instances/2D/"
     folders = ["set_c", "set_d"]
@@ -81,46 +129,49 @@ def main():
     # set_d: Alvarez-Valdes (2002)
     for folder in folders:
         lst = readall(path+folder)
+        if rotation and folder == "set_d":
+            continue  # set_d is too dificult with rotation
         print(">>", folder)
         for name, instance in lst:
-            print(">>>", folder, name)
             W, H, w, h, b = instance
 
             stdout_org = sys.stdout
-            probtype = "{}{}{}".format(
-                "3" if stage3 else "2",
-                "E" if exact else "NE",
-                "R" if rotation else "",
-            )
             log_file = "{}/{}_{}_{}".format(log_folder, folder, probtype, name)
-            with open(log_file, "w") as f:
-                sys.stdout = f
-                t0 = time()
-                if test == "onecut":
-                    obj1 = onecut(
-                        W, H, w, h, b,
-                        stage3=stage3, exact=exact, allow_rotation=rotation,
-                        script="vpsolver_gurobi.sh",
-                        script_options="""
-                        Threads=1 Presolve=1 Method=2
-                        MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=300
-                        """,
-                    )
+            if summary is False:
+                print(">>>", folder, name)
+                with open(log_file, "w") as f:
+                    sys.stdout = f
+                    t0 = time()
+                    if test == "onecut":
+                        obj1 = onecut(
+                            W, H, w, h, b,
+                            stage3=stage3, exact=exact,
+                            allow_rotation=rotation,
+                            script="vpsolver_gurobi.sh",
+                            script_options="""
+                            Threads=1 Presolve=1 Method=2
+                            MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=300
+                            """,
+                        )
 
-                elif test == "arcflow":
-                    obj2 = solve(
-                        W, H, w, h, b,
-                        stage3=stage3, exact=exact, allow_rotation=rotation,
-                        restricted=True, simple=False,
-                        script="vpsolver_gurobi.sh",
-                        script_options="""
-                        Threads=1 Presolve=1 Method=2
-                        MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=300
-                        """,
-                    )
-                t1 = time()
-            sys.stdout = stdout_org
-            print("### {} {} {} ({})".format(folder, name, t1-t0, log_file))
+                    elif test == "arcflow":
+                        obj2 = solve(
+                            W, H, w, h, b,
+                            stage3=stage3, exact=exact,
+                            allow_rotation=rotation,
+                            restricted=True, simple=False,
+                            script="vpsolver_gurobi.sh",
+                            script_options="""
+                            Threads=1 Presolve=1 Method=2
+                            MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=300
+                            """,
+                        )
+                    t1 = time()
+                sys.stdout = stdout_org
+                print("### {} {} {} ({})".format(
+                    folder, name, t1-t0, log_file)
+                )
+            display_results(name.replace(".txt", ""), instance, log_file)
 
 
 if __name__ == "__main__":
