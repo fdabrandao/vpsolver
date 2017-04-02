@@ -117,6 +117,8 @@ def extract_results(folder, name, instance, log_file):
     solution = p_solution.findall(log)[0]
     bestobj = float(solution[0])
     bestbnd = float(solution[1])
+    if float(solution[2]) != 0:
+        print("gap:", solution[2], bestobj-bestbnd)
     if folder != "TIPO3":
         key = (instance["nbtypes"], instance["nitems"])
     else:
@@ -125,13 +127,14 @@ def extract_results(folder, name, instance, log_file):
     return key, row
 
 
-def aggregate_results(results):
+def aggregate_results(folder, results):
     for key in sorted(results):
         nrows = len(results[key])
         optcnt = sum(row[0] for row in results[key])
         avgtime = sum(row[1] for row in results[key])/nrows
         print(
-            "{}\t{}\t{}".format(
+            "{}\t{}\t{}\t{}".format(
+                folder,
                 "\t".join(map(str, key)),
                 "{}/{}".format(optcnt, nrows),
                 "{:,.2f}".format(avgtime)
@@ -188,7 +191,7 @@ def main():
             if key not in results:
                 results[key] = []
             results[key].append(row)
-        aggregate_results(results)
+        aggregate_results(folder, results)
 
 
 if __name__ == "__main__":
