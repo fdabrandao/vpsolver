@@ -37,7 +37,14 @@ def solve(genvbp_instance, svg_file="", lp_file="", mps_file="",
     if stats is None and verbose is not None:
         stats = verbose
 
-    (Ws, Cs, Ls, Us, U, ws, I, J, dem, prof, req, opt) = genvbp_instance
+    Ws, Cs = genvbp_instance["Ws"], genvbp_instance["Cs"]
+    Ls, Us = genvbp_instance["Ls"], genvbp_instance["Us"]
+    U = genvbp_instance["U"]
+    ws = genvbp_instance["ws"]
+    I, J = genvbp_instance["I"], genvbp_instance["J"]
+    dem, prof = genvbp_instance["dem"], genvbp_instance["prof"]
+    req, opt = genvbp_instance["req"], genvbp_instance["opt"]
+
     b = [
         sum(dem[i, l] for l in req[i]) + sum(dem[i, l] for l in opt[i])
         for i in I

@@ -20,9 +20,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
+from __future__ import division
 from builtins import str, map, object, range, zip, sorted
 import os
 import sys
+import re
 
 
 def read_generalized(fname):
@@ -61,8 +63,11 @@ def read_generalized(fname):
 
     groups = {}
     discard_until("ITEMS_SECTIONS")
+    nforced = 0
     for i in range(nitems):
         _iid, _volume, _profit, _forced = map(int, lst[:4])
+        if _forced:
+            nforced += 1
         if _volume not in groups:
             groups[_volume] = []
         groups[_volume].append((_profit, _forced))
@@ -86,7 +91,52 @@ def read_generalized(fname):
             prof[i, l] = _profit
             dem[i, l] = 1
 
-    return (Ws, Cs, Ls, Us, U, ws, I, J, dem, prof, req, opt)
+    return {
+        "Ws": Ws, "Cs": Cs, "Ls": Ls, "Us": Us, "U": U, "ws": ws,
+        "I": I, "J": J, "dem": dem, "prof": prof, "req": req, "opt": opt,
+        "nitems": nitems, "nbtypes": nbtypes, "nforced": nforced
+    }
+
+
+p_performance = re.compile(
+    "Explored (\d*) nodes \(\d* simplex iterations\) in (\d*\.?\d*) seconds"
+)
+p_solution = re.compile(
+    "Best objective ([^,]*), best bound ([^,]*), gap ([^%]*)"
+)
+
+
+def extract_results(folder, name, instance, log_file):
+    with open(log_file) as f:
+        log = f.read()
+    nforced = instance["nforced"]
+    nitems = instance["nitems"]
+    performance = p_performance.findall(log)[0]
+    nodes = int(performance[0])
+    solvertime = float(performance[1])
+    solution = p_solution.findall(log)[0]
+    bestobj = float(solution[0])
+    bestbnd = float(solution[1])
+    if folder != "TIPO3":
+        key = (instance["nbtypes"], instance["nitems"])
+    else:
+        key = (nforced/nitems,)
+    row = (int(bestobj == bestbnd), solvertime)
+    return key, row
+
+
+def aggregate_results(results):
+    for key in sorted(results):
+        nrows = len(results[key])
+        optcnt = sum(row[0] for row in results[key])
+        avgtime = sum(row[1] for row in results[key])/nrows
+        print(
+            "{}\t{}\t{}".format(
+                "\t".join(map(str, key)),
+                "{}/{}".format(optcnt, nrows),
+                "{:,.2f}".format(avgtime)
+            )
+        )
 
 
 def main():
@@ -96,38 +146,49 @@ def main():
     from glob import glob
     from time import time
 
+    assert len(sys.argv) >= 2
+    log_folder = sys.argv[1]
+    solve_instances = "solve" in sys.argv
     path = "instances/MAUROBALDI/"
     folders = ["TIPO0", "TIPO1", "TIPO2", "TIPO3"]
-    # folders = ["TIPO0", "TIPO0FORZATI", "TIPO1", "TIPO2", "TIPO3", "TIPO4"]
-    # folders = ["TIPO3"]
     for folder in folders:
         print(">", folder)
-        log_folder = "tmp/logs/{}".format(folder)
         try:
-            os.makedirs(log_folder)
+            os.makedirs(os.path.join(log_folder, folder))
         except OSError:
             pass
+        results = {}
         for instance in sorted(glob(path+folder+"/prob_*.txt")):
-            print(">>", folder, instance)
             geninst = read_generalized(instance)
-            stdout_org = sys.stdout
             fname = instance[instance.rfind("/")+1:]
-            log_file = "{}/{}".format(log_folder, fname)
-            with open(log_file, "w") as f:
-                sys.stdout = f
-                t0 = time()
-                obj, lst_sol = genvpsolver.solve(
-                    geninst, script="vpsolver_gurobi.sh",
-                    script_options="""
-                    Threads=1 Presolve=1 Method=2
-                    MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=300
-                    """,
-                    verbose=True
+            log_file = os.path.join(log_folder, folder, fname)
+            if solve_instances:
+                print(">>", folder, instance)
+                stdout_org = sys.stdout
+                with open(log_file, "w") as f:
+                    sys.stdout = f
+                    t0 = time()
+                    obj, lst_sol = genvpsolver.solve(
+                        geninst, script="vpsolver_gurobi.sh",
+                        script_options="""
+                        Threads=1 Presolve=1 Method=2
+                        MIPGap=0 MIPGapAbs=0.99999 Seed=1234 TimeLimit=300
+                        """,
+                        verbose=True
+                    )
+                    genvpsolver.print_solution(obj, lst_sol, fout=f)
+                    t1 = time()
+                sys.stdout = stdout_org
+                print(
+                    "### {} {} {} ({})".format(folder, fname, t1-t0, log_file)
                 )
-                genvpsolver.print_solution(obj, lst_sol, fout=f)
-                t1 = time()
-            sys.stdout = stdout_org
-            print("### {} {} {} ({})".format(folder, fname, t1-t0, log_file))
+            key, row = extract_results(
+                folder, fname.replace(".txt", ""), geninst, log_file
+            )
+            if key not in results:
+                results[key] = []
+            results[key].append(row)
+        aggregate_results(results)
 
 
 if __name__ == "__main__":

@@ -69,8 +69,69 @@ p_solution = re.compile(
     "Best objective ([^,]*), best bound ([^,]*), gap ([^%]*)"
 )
 
+inf = float("inf")
+elsa_results = {
+  # instance: (2E, 2NE, 3E, 3NE)
+  "2": (3.0, 2.0, 2.0, 2.0),
+  "3": (24.0, 23.0, 23.0, 23.0),
+  "A1": (27.0, 23.0, 23.0, 23.0),
+  "A2": (15.0, 12.0, 12.0, 12.0),
+  "A3": (10.0, 8.0, 8.0, 8.0),
+  "A4": (8.0, 5.0, 5.0, 5.0),
+  "A5": (8.0, 5.0, 4.0, 4.0),
+  "CHL1": (11.0, 6.0, 6.0, 6.0),
+  "CHL2": (4.0, 3.0, 3.0, 3.0),
+  "CHL5": (5.0, 4.0, 3.0, 3.0),
+  "CHL6": (9.0, 6.0, 6.0, 5.0),
+  "CHL7": (9.0, 6.0, 6.0, 6.0),
+  "CU1": (15.0, 12.0, 12.0, 12.0),
+  "CU2": (20.0, 15.0, 14.0, 14.0),
+  "CW1": (13.0, 10.0, 10.0, 10.0),
+  "CW2": (17.0, 12.0, 12.0, 12.0),
+  "CW3": (22.0, 16.0, 16.0, 16.0),
+  "Hchl2": (9.0, 6.0, 6.0, 6.0),
+  "Hchl3s": (4.0, 3.0, 3.0, 3.0),
+  "Hchl4s": (3.0, 2.0, 2.0, 2.0),
+  "Hchl6s": (7.0, 5.0, 5.0, 5.0),
+  "Hchl7s": (11.0, 7.0, 7.0, 7.0),
+  "Hchl8s": (3.0, 2.0, 2.0, 2.0),
+  "Hchl9": (14.0, 10.0, 10.0, 10.0),
+  "HH": (2.0, 2.0, 2.0, 2.0),
+  "OF1": (5.0, 4.0, 4.0, 4.0),
+  "OF2": (6.0, 5.0, 4.0, 4.0),
+  "STS2": (17.0, 12.0, 12.0, 12.0),
+  "STS4": (6.0, 5.0, 5.0, 5.0),
+  "W": (31.0, 24.0, 24.0, 24.0),
+  "ATP30": (12.0, 9.0, 9.0, inf),
+  "ATP31": (19.0, 15.0, inf, 15.0),
+  "ATP32": (16.0, 13.0, 14.0, 14.0),
+  "ATP33": (18.0, 13.0, 13.0, 13.0),
+  "ATP34": (9.0, 6.0, 6.0, 6.0),
+  "ATP35": (10.0, 8.0, 8.0, 8.0),
+  "ATP36": (11.0, 8.0, 8.0, 8.0),
+  "ATP37": (16.0, 12.0, 15.0, 12.0),
+  "ATP38": (15.0, 11.0, 12.0, 11.0),
+  "ATP39": (16.0, 12.0, 12.0, 12.0),
+  "ATP40": (20.0, 16.0, inf, inf),
+  "ATP41": (16.0, 12.0, 12.0, 12.0),
+  "ATP42": (21.0, 16.0, 17.0, 16.0),
+  "ATP43": (18.0, 14.0, 15.0, 14.0),
+  "ATP44": (14.0, 9.0, 9.0, 10.0),
+  "ATP45": (11.0, 8.0, 8.0, 8.0),
+  "ATP46": (16.0, 12.0, 12.0, 12.0),
+  "ATP47": (18.0, 13.0, 14.0, 13.0),
+  "ATP48": (11.0, 9.0, 9.0, 9.0),
+  "ATP49": (8.0, 5.0, 6.0, 6.0),
+}
+elsa_obj = {
+    "2E": {k: v[0] for k, v in elsa_results.items()},
+    "2NE": {k: v[1] for k, v in elsa_results.items()},
+    "3E": {k: v[2] for k, v in elsa_results.items()},
+    "3NE": {k: v[3] for k, v in elsa_results.items()}
+}
 
-def display_results(name, instance, log_file):
+
+def display_results(name, instance, probtype, log_file):
     W, H, w, h, b = instance
     with open(log_file) as f:
         log = f.read()
@@ -92,9 +153,13 @@ def display_results(name, instance, log_file):
     row = [
         name, "{:,}".format(nvars), "{:,}".format(ncons),
         "{:,.2f}".format(lp) if lp else "-",
-        "{:,.0f} ({:,.0f})".format(bestobj, absgap),
+        "{:,.0f}{}".format(
+            bestobj, " ({:,.0f})".format(absgap) if absgap != 0 else ""
+        ),
         "{:,}".format(nodes), "{:,.2f}".format(ptime+gurobitime)
     ]
+    if probtype in elsa_obj:
+        row.append(bestobj <= elsa_obj.get(probtype)[name])
     print("\t".join(map(str, row)))
 
 
@@ -104,27 +169,30 @@ def main():
     os.chdir(os.path.dirname(__file__) or os.curdir)
     from time import time
 
-    assert len(sys.argv) >= 2
-    test = sys.argv[1]
+    assert len(sys.argv) >= 3
+    log_folder = sys.argv[1]
+    try:
+        os.makedirs(log_folder)
+    except OSError:
+        pass
+
+    solve_instances = "solve" in sys.argv
+    test = sys.argv[2]
     assert test in ("arcflow", "onecut")
+
     exact = "exact" in sys.argv
     stage3 = "stage3" in sys.argv
     rotation = "rotation" in sys.argv
-    summary = "summary" in sys.argv
+    solve_instances = "solve" in sys.argv
     probtype = "{}{}{}".format(
         "3" if stage3 else "2",
         "E" if exact else "NE",
         "R" if rotation else "",
     )
-    print(probtype)
+    print(probtype, test)
 
     path = "instances/2D/"
     folders = ["set_c", "set_d"]
-    log_folder = "tmp/logs/multistage/{}".format(test)
-    try:
-        os.makedirs(log_folder)
-    except OSError:
-        pass
     # set_c: Hifi (2001)
     # set_d: Alvarez-Valdes (2002)
     for folder in folders:
@@ -134,10 +202,9 @@ def main():
         print(">>", folder)
         for name, instance in lst:
             W, H, w, h, b = instance
-
             stdout_org = sys.stdout
             log_file = "{}/{}_{}_{}".format(log_folder, folder, probtype, name)
-            if summary is False:
+            if solve_instances:
                 print(">>>", folder, name)
                 with open(log_file, "w") as f:
                     sys.stdout = f
@@ -171,7 +238,9 @@ def main():
                 print("### {} {} {} ({})".format(
                     folder, name, t1-t0, log_file)
                 )
-            display_results(name.replace(".txt", ""), instance, log_file)
+            display_results(
+                name.replace(".txt", ""), instance, probtype, log_file
+            )
 
 
 if __name__ == "__main__":
