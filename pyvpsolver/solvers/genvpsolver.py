@@ -83,7 +83,7 @@ def solve(genvbp_instance, svg_file="", lp_file="", mps_file="",
     const_profit = "const_profit"
     varl.append(const_profit)
     lb[const_profit] = ub[const_profit] = sum(
-        dem[i, l] * prof[i, l] for l in req[i]
+        dem[i, l] * prof[i, l] for i in I for l in req[i]
     )
 
     for i in I:
