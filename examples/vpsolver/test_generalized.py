@@ -98,6 +98,7 @@ def read_generalized(fname):
     }
 
 
+p_msize = re.compile("Optimize a model with (\d*) rows, (\d*) columns")
 p_performance = re.compile(
     "Explored (\d*) nodes \(\d* simplex iterations\) in (\d*\.?\d*) seconds"
 )
@@ -111,6 +112,8 @@ def extract_results(folder, name, instance, log_file):
         log = f.read()
     nforced = instance["nforced"]
     nitems = instance["nitems"]
+    msize = p_msize.findall(log)[0]
+    ncons, nvars = int(msize[0]), int(msize[1])
     performance = p_performance.findall(log)[0]
     nodes = int(performance[0])
     solvertime = float(performance[1])
@@ -123,22 +126,28 @@ def extract_results(folder, name, instance, log_file):
         key = (instance["nbtypes"], instance["nitems"])
     else:
         key = (nforced/nitems,)
-    row = (int(bestobj == bestbnd), solvertime)
+    row = (nvars, ncons, int(bestobj == bestbnd), nodes, solvertime)
     return key, row
 
 
 def aggregate_results(folder, results):
     for key in sorted(results):
         nrows = len(results[key])
-        optcnt = sum(row[0] for row in results[key])
-        avgtime = sum(row[1] for row in results[key])/nrows
+        nvars = sum(row[0] for row in results[key])/nrows
+        ncons = sum(row[1] for row in results[key])/nrows
+        optcnt = sum(row[2] for row in results[key])
+        avgnodes = sum(row[3] for row in results[key])/nrows
+        avgtime = sum(row[4] for row in results[key])/nrows
         print(
-            "{}\t{}\t{}\t{}".format(
+            "\t".join([
                 folder,
                 "\t".join(map(str, key)),
+                "{:,.2f}".format(nvars),
+                "{:,.2f}".format(ncons),
+                "{:,.2f}".format(avgnodes),
+                "{:,.2f}".format(avgtime),
                 "{}/{}".format(optcnt, nrows),
-                "{:,.2f}".format(avgtime)
-            )
+            ])
         )
 
 

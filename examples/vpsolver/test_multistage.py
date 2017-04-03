@@ -61,6 +61,7 @@ def readall(path):
 p_ptime = re.compile("time: (\d*\.?\d*)")
 p_nvars = re.compile("NVARS: (\d*)")
 p_ncons = re.compile("NCONS: (\d*)")
+p_ngroups = re.compile("#Groups: (\d*)")
 p_relaxation = re.compile("Root relaxation: objective ([^,]*)")
 p_performance = re.compile(
     "Explored (\d*) nodes \(\d* simplex iterations\) in (\d*\.?\d*) seconds"
@@ -136,6 +137,7 @@ def display_results(name, instance, probtype, log_file):
     with open(log_file) as f:
         log = f.read()
     ptime = float(p_ptime.findall(log)[0])
+    ngroups = int(p_ngroups.findall(log)[0])
     nvars = int(p_nvars.findall(log)[0])
     ncons = int(p_ncons.findall(log)[0])
     performance = p_performance.findall(log)[0]
@@ -151,7 +153,10 @@ def display_results(name, instance, probtype, log_file):
     gap = float(solution[2])
     absgap = bestobj-bestbnd
     row = [
-        name, "{:,}".format(nvars), "{:,}".format(ncons),
+        name,
+        "{:,}".format(ngroups),
+        "{:,}".format(nvars),
+        "{:,}".format(ncons),
         "{:,.2f}".format(lp) if lp else "-",
         "{:,.0f}{}".format(
             bestobj, " ({:,.0f})".format(absgap) if absgap != 0 else ""
@@ -159,7 +164,7 @@ def display_results(name, instance, probtype, log_file):
         "{:,}".format(nodes), "{:,.2f}".format(ptime+gurobitime)
     ]
     if probtype in elsa_obj:
-        row.append(bestobj <= elsa_obj.get(probtype)[name])
+        row.append("{:,.0f}".format(elsa_obj.get(probtype)[name]-bestobj))
     print("\t".join(map(str, row)))
 
 
@@ -197,8 +202,8 @@ def main():
     # set_d: Alvarez-Valdes (2002)
     for folder in folders:
         lst = readall(path+folder)
-        if rotation and folder == "set_d":
-            continue  # set_d is too dificult with rotation
+        # if rotation and folder == "set_d":
+        #     continue  # set_d is too dificult with rotation
         print(">>", folder)
         for name, instance in lst:
             W, H, w, h, b = instance
