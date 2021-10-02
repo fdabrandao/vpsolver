@@ -31,7 +31,13 @@ Links
 import os
 import re
 import ast
+import platform
 from distutils.core import setup, Extension
+
+
+OSTYPE = platform.system()
+ARCH = platform.processor()
+x64 = platform.architecture()[0] == '64bit'
 
 
 def ls_dir(base_dir):
@@ -47,48 +53,68 @@ def ls_dir(base_dir):
         )
     ]
 
+
+def compile_args():
+    if OSTYPE == 'Windows':
+        return ['/TP', '/EHsc', '/O2']
+    elif OSTYPE == 'Linux':
+        ignore_warnings = [
+            '-Wno-stringop-truncation',
+            '-Wno-catch-value',
+            '-Wno-unused-variable',
+        ]
+        return ['-std=c++11', '-O2'] + ignore_warnings
+    elif OSTYPE == 'Darwin':
+        ignore_warnings = [
+            '-Wno-unused-variable',
+        ]
+        return ['-std=c++11', '-O2', '-mmacosx-version-min=10.9'] + ignore_warnings
+    else:
+        return []
+
+
 _vbp2afg = Extension(
     "_vbp2afg",
     sources=[
-        "src/vbp2afg_wrap.cxx", "src/vbp2afg.cpp",
+        "swig/vbp2afg_wrap.cxx", "src/vbp2afg.cpp",
         "src/instance.cpp", "src/graph.cpp",
         "src/arcflow.cpp", "src/common.cpp"
     ],
-    extra_compile_args=["-std=c++11", "-Wall", "-O2"],
+    extra_compile_args=compile_args(),
     undef_macros=['NDEBUG'],
 )
 
 _afg2lp = Extension(
     "_afg2lp",
     sources=[
-        "src/afg2lp_wrap.cxx", "src/afg2lp.cpp",
+        "swig/afg2lp_wrap.cxx", "src/afg2lp.cpp",
         "src/instance.cpp", "src/graph.cpp",
         "src/arcflow.cpp", "src/common.cpp"
     ],
-    extra_compile_args=["-std=c++11", "-Wall", "-O2"],
+    extra_compile_args=compile_args(),
     undef_macros=['NDEBUG'],
 )
 
 _afg2mps = Extension(
     "_afg2mps",
     sources=[
-        "src/afg2mps_wrap.cxx", "src/afg2mps.cpp",
+        "swig/afg2mps_wrap.cxx", "src/afg2mps.cpp",
         "src/instance.cpp", "src/graph.cpp",
         "src/arcflow.cpp", "src/common.cpp"
     ],
-    extra_compile_args=["-std=c++11", "-Wall", "-O2"],
+    extra_compile_args=compile_args(),
     undef_macros=['NDEBUG'],
 )
 
 _vbpsol = Extension(
     "_vbpsol",
     sources=[
-        "src/vbpsol_wrap.cxx", "src/vbpsol.cpp",
+        "swig/vbpsol_wrap.cxx", "src/vbpsol.cpp",
         "src/instance.cpp", "src/graph.cpp",
         "src/arcflow.cpp", "src/arcflowsol.cpp",
         "src/common.cpp"
     ],
-    extra_compile_args=["-std=c++11", "-Wall", "-O2"],
+    extra_compile_args=compile_args(),
     undef_macros=['NDEBUG'],
 )
 
@@ -103,6 +129,8 @@ setup(
     license="AGPLv3+",
     author="Filipe Brandao",
     author_email="fdabrandao@dcc.fc.up.pt",
+    maintainer='Filipe Brandao',
+    maintainer_email='fdabrandao@gmail.com',
     url="https://github.com/fdabrandao/vpsolver",
     description="Arc-flow Vector Packing Solver (VPSolver)",
     long_description=__doc__,

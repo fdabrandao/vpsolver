@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "arcflowsol.hpp"
 using namespace std;
 
-int swig_main(int argc, char *argv[]) {
+int swig_main(int argc, char **argv) {
     printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if (argc < 3 || argc > 5) {

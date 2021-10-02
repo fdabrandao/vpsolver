@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.3] - 2021-10-02
+
+### Added
+- Basic CMake support.
+- Binary wheels for all platforms.
+
 ## [3.1.2] - 2016-06-28
 
 ### Changed

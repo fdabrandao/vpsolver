@@ -1,0 +1,55 @@
+jobs:
+- job: sdist
+  pool: {vmImage: 'Ubuntu-20.04'}
+  steps:
+    - task: UsePythonVersion@0
+    - bash: |
+        set -ex
+        python -m pip install --upgrade pip
+        python setup.py sdist -d upload
+      displayName: Build documentation
+    - task: PublishBuildArtifacts@1
+      inputs: {pathtoPublish: 'upload'}
+- job: manylinux
+  pool: {vmImage: 'Ubuntu-20.04'}
+  strategy:
+    matrix:
+      x86:
+        CIBW_SKIP: 'pp*'
+        CIBW_BUILD: '*-manylinux*_i686'
+      x64:
+        CIBW_SKIP: 'pp* *-manylinux*_i686'
+  steps:
+    - task: UsePythonVersion@0
+    - bash: |
+        set -ex
+        python -m pip install --upgrade pip
+        python -m pip install cibuildwheel==1.11.1
+        cibuildwheel --platform linux --output-dir wheelhouse .
+      displayName: Build wheels
+    - task: PublishBuildArtifacts@1
+      inputs: {pathtoPublish: 'wheelhouse'}
+- job: macos
+  pool: {vmImage: 'macOS-10.15'}
+  steps:
+    - task: UsePythonVersion@0
+    - bash: |
+        set -ex
+        python -m pip install --upgrade pip
+        python -m pip install cibuildwheel==1.11.1
+        CIBW_SKIP='pp*' cibuildwheel --platform macos --output-dir wheelhouse .
+      displayName: Build wheels
+    - task: PublishBuildArtifacts@1
+      inputs: {pathtoPublish: 'wheelhouse'}
+- job: windows
+  pool: {vmImage: 'vs2017-win2016'}
+  steps:
+    - task: UsePythonVersion@0
+    - bash: |
+        set -ex
+        python -m pip install --upgrade pip
+        python -m pip install cibuildwheel==1.11.1
+        CIBW_SKIP='pp* cp27-*' cibuildwheel --platform windows --output-dir wheelhouse .
+      displayName: Build wheels
+    - task: PublishBuildArtifacts@1
+      inputs: {pathtoPublish: 'wheelhouse'}

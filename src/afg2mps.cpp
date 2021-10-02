@@ -82,7 +82,7 @@ class MPS {
     }
 };
 
-int swig_main(int argc, char *argv[]) {
+int swig_main(int argc, char **argv) {
     printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");
     setvbuf(stdout, NULL, _IONBF, 0);
     if (argc != 3) {
