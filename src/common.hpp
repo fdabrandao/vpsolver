@@ -26,22 +26,22 @@ bool check_ext(const char *name, const char *extension);
 
 bool prefix(const char *pre, const char *str);
 
-extern char _error_msg_[MAX_LEN];
-
 #define throw_error(error) \
-{ \
+{                          \
+    char _error_msg_[MAX_LEN]; \
     snprintf(_error_msg_, MAX_LEN, \
             "Error: `%s` in \"%s\" line %d", \
             error, __FILE__, __LINE__); \
-    throw _error_msg_; \
+    throw std::runtime_error(_error_msg_); \
 }
 
 #define throw_assert(condition) \
-{ if (!(condition)) { \
+{ if (!(condition)) {           \
+	char _error_msg_[MAX_LEN]; \
     snprintf(_error_msg_, MAX_LEN, \
             "AssertionError: assertion `%s` failed in \"%s\" line %d", \
             #condition, __FILE__, __LINE__); \
-    throw _error_msg_; \
+    throw std::runtime_error(_error_msg_); \
 } }
 
 #endif  // SRC_COMMON_HPP_

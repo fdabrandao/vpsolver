@@ -6,8 +6,6 @@ Copyright (C) 2013-2021, Filipe Brandao <fdabrandao@gmail.com>
 #include <cstring>
 #include "common.hpp"
 
-char _error_msg_[MAX_LEN];
-
 bool check_ext(const char *name, const char *extension) {
 	const char *end = strrchr(name, '.');
 	return strcmp(end, extension) == 0;

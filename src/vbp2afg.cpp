@@ -48,11 +48,11 @@ int swig_main(int argc, char **argv) {
 
 		fclose(fout);
 		return 0;
-	} catch (const char *e) {
+	} catch (const std::runtime_error &e) {
 		if (fout != NULL) {
 			fclose(fout);
 		}
-		printf("%s\n", e);
+		printf("%s\n", e.what());
 		return 1;
 	} catch (...) {
 		if (fout != NULL) {

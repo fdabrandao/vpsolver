@@ -64,11 +64,11 @@ int swig_main(int argc, char **argv) {
 		ArcflowSol sol(inst, flow, afg.S, afg.Ts, afg.LOSS);
 		sol.print_solution(print_inst, pyout);
 		return 0;
-	} catch (const char *e) {
+	} catch (const std::runtime_error &e) {
 		if (fsol != NULL) {
 			fclose(fsol);
 		}
-		printf("%s\n", e);
+		printf("%s\n", e.what());
 		return 1;
 	} catch (...) {
 		if (fsol != NULL) {

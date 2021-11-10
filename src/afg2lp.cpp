@@ -152,8 +152,8 @@ int swig_main(int argc, char **argv) {
 		fclose(fout);
 		printf("DONE!\n");
 		return 0;
-	} catch (const char *e) {
-		printf("%s\n", e);
+	} catch (const std::runtime_error &e) {
+		printf("%s\n", e.what());
 		return 1;
 	} catch (...) {
 		printf("UnknownError\n");

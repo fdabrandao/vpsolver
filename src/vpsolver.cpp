@@ -181,8 +181,8 @@ int main(int argc, char *argv[]) {
 		printf("Error code = %d\n", e.getErrorCode());
 		printf("GurobiError: %s\n", e.getMessage().c_str());
 		return 1;
-	} catch (const char *e) {
-		printf("%s\n", e);
+	} catch (const std::runtime_error &e) {
+		printf("%s\n", e.what());
 		return 1;
 	} catch (...) {
 		printf("UnknownError\n");

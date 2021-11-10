@@ -21,7 +21,7 @@ Columns:  2-3        5-12      15-22     25-36     40-47     50-61
 #define BUF_LEN 80
 #define NFIELDS 7
 
-int field_start[NFIELDS] = {0, 1, 4, 14, 24, 39, 49};
+const int field_start[NFIELDS] = {0, 1, 4, 14, 24, 39, 49};
 
 class MPS {
 private:
@@ -182,8 +182,8 @@ int swig_main(int argc, char **argv) {
 		fclose(fout);
 		printf("DONE!\n");
 		return 0;
-	} catch (const char *e) {
-		printf("%s\n", e);
+	} catch (const std::runtime_error &e) {
+		printf("%s\n", e.what());
 		return 1;
 	} catch (...) {
 		printf("UnknownError\n");
