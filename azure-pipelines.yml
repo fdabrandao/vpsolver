@@ -42,7 +42,7 @@ jobs:
     - task: PublishBuildArtifacts@1
       inputs: {pathtoPublish: 'wheelhouse'}
 - job: windows
-  pool: {vmImage: 'vs2017-win2019'}
+  pool: {vmImage: 'windows-2019'}
   steps:
     - task: UsePythonVersion@0
     - bash: |
