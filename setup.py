@@ -126,9 +126,9 @@ with open("pyvpsolver/__init__.py", "rb") as f:
 setup(
     name="pyvpsolver",
     version=version,
-    license="AGPLv3+",
+    license="BSD-3",
     author="Filipe Brandao",
-    author_email="fdabrandao@dcc.fc.up.pt",
+    author_email="fdabrandao@gmail.com",
     maintainer='Filipe Brandao',
     maintainer_email='fdabrandao@gmail.com',
     url="https://github.com/fdabrandao/vpsolver",
@@ -144,7 +144,7 @@ setup(
         "Intended Audience :: Science/Research",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+        "License :: OSI Approved :: BSD License",
         "Topic :: Scientific/Engineering"
     ],
     ext_modules=[_vbp2afg, _afg2lp, _afg2mps, _vbpsol],

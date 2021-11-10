@@ -1,8 +1,8 @@
 ## Arc-flow Vector Packing Solver (VPSolver)
 
-Copyright (C) 2013-2016, Filipe Brandão  
+Copyright (C) 2013-2021, Filipe Brandão <fdabrandao@gmail.com>
 Faculdade de Ciências, Universidade do Porto  
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
+Porto, Portugal. All rights reserved.
 
 ---
 [VPSolver](https://github.com/fdabrandao/vpsolver) is a multiple-choice vector packing solver based on an arc-flow formulation with graph compression (see, e.g., [\[1\]](#references)). VPSolver generates very strong models (equivalent to Gilmore and Gomory's) that can be solved using general-purpose mixed-integer programming
@@ -10,7 +10,7 @@ solvers such as Gurobi and GLPK (see, e.g., [\[2\]](#references) and [\[3\]](#re
 solver in particular, though a good  MIP solver may be necessary for solving
 large models.
 
-![](https://img.shields.io/badge/license-AGPLv3+-blue.svg)
+![](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)
 [![](https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master)](https://travis-ci.org/fdabrandao/vpsolver)
 [![Coverage Status](https://coveralls.io/repos/github/fdabrandao/vpsolver/badge.svg?branch=develop)](https://coveralls.io/github/fdabrandao/vpsolver)
 
@@ -19,7 +19,7 @@ For modelling other problems easily, VPSolver includes a [Python API](https://gi
 For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki) or to the [manual](https://github.com/fdabrandao/vpsolver/tree/master/docs/vpsolver_manual.pdf).
 
 #### Repositories
-* Project Homepage: <http://vpsolver.dcc.fc.up.pt>
+* Project Homepage: <http://vpsolver.fdabrandao.pt>
 * GiHub repository: <https://github.com/fdabrandao/vpsolver>
 * BitBucket repository: <https://bitbucket.org/fdabrandao/vpsolver>
 * Docker repository: <https://hub.docker.com/r/fdabrandao/vpsolver>
@@ -218,8 +218,8 @@ Faculdade de Ciências da Universidade do Porto, Universidade do Porto, Portugal
 Master’s thesis, Faculdade de Ciências da Universidade do Porto, Portugal.
 
 * [7] Computational results on several benchmark test data sets:  
-http://www.dcc.fc.up.pt/~fdabrandao/research/vpsolver/results/
+https://research.fdabrandao.pt/research/vpsolver/results/
 
 
 ***
-Copyright © 2013-2016 [Filipe Brandão](http://www.dcc.fc.up.pt/~fdabrandao/) < [fdabrandao@dcc.fc.up.pt](mailto:fdabrandao@dcc.fc.up.pt) >. All rights reserved.
+Copyright © 2013-2021 [Filipe Brandão](https://fdabrandao.pt) < [fdabrandao@gmail.com](mailto:fdabrandao@gmail.com) >. All rights reserved.
