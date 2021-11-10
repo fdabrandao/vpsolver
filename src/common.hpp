@@ -19,6 +19,8 @@ Copyright (C) 2013-2021, Filipe Brandao <fdabrandao@gmail.com>
 #define TIMEDIF(t0) (static_cast<double>(clock()-t0)/CLOCKS_PER_SEC)
 
 #include <utility>
+#include <exception>
+#include <stdexcept>
 
 typedef std::pair<int, int> int_pair;
 
