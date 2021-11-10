@@ -5,8 +5,6 @@ Copyright (C) 2013-2021, Filipe Brandao <fdabrandao@gmail.com>
 **/
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
-#include <cstdarg>
 #include <map>
 #include <vector>
 #include "config.hpp"
