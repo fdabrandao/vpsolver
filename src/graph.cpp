@@ -25,11 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include "graph.hpp"
 #include "common.hpp"
-using namespace std;
 
 /* Class NodeSet */
 
-int NodeSet::get_index(const vector<int> &lbl) {
+int NodeSet::get_index(const std::vector<int> &lbl) {
     if (index.count(lbl)) {
         return index[lbl];
     } else {
@@ -40,7 +39,7 @@ int NodeSet::get_index(const vector<int> &lbl) {
     }
 }
 
-vector<int> NodeSet::get_label(int ind) const {
+std::vector<int> NodeSet::get_label(int ind) const {
     throw_assert(ind < static_cast<int>(labels.size()));
     return labels[ind];
 }
@@ -56,15 +55,15 @@ void NodeSet::clear() {
 
 void NodeSet::sort() {
     index.clear();
-    ::sort(all(labels));
+    std::sort(all(labels));
     int pos = 0;
-    for (const vector<int> &lbl : labels) {
+    for (const std::vector<int> &lbl : labels) {
         index[lbl] = pos++;
     }
 }
 
-vector<int> NodeSet::topological_order() const {
-    vector<int> ord(index.size());
+std::vector<int> NodeSet::topological_order() const {
+    std::vector<int> ord(index.size());
     int pos = 0;
     for (const auto &kvpair : index) {
         ord[kvpair.second] = pos++;
@@ -88,7 +87,7 @@ bool Arc::operator==(const Arc &o) const {
 
 /* Additional Functions  */
 
-adj_list get_adj(int nv, const vector<Arc> &arcs, bool transpose) {
+adj_list get_adj(int nv, const std::vector<Arc> &arcs, bool transpose) {
     adj_list adj(nv);
     for (const Arc &a : arcs) {
         throw_assert(a.u < nv && a.v < nv);

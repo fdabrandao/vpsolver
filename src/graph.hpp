@@ -26,21 +26,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include <vector>
 #include "common.hpp"
-using namespace std;
 
-typedef vector<vector<int_pair>> adj_list;
+typedef std::vector<std::vector<int_pair>> adj_list;
 
 class NodeSet {
  private:
-    map<vector<int>, int> index;
-    vector<vector<int>> labels;
+    std::map<std::vector<int>, int> index;
+    std::vector<std::vector<int>> labels;
  public:
-    int get_index(const vector<int> &lbl);
-    vector<int> get_label(int ind) const;
+    int get_index(const std::vector<int> &lbl);
+    std::vector<int> get_label(int ind) const;
     int size() const;
     void clear();
     void sort();
-    vector<int> topological_order() const;
+    std::vector<int> topological_order() const;
 };
 
 class Arc {
@@ -54,6 +53,6 @@ class Arc {
     bool operator==(const Arc &o) const;
 };
 
-adj_list get_adj(int nv, const vector<Arc> &arcs, bool transpose = false);
+adj_list get_adj(int nv, const std::vector<Arc> &arcs, bool transpose = false);
 
 #endif  // SRC_GRAPH_HPP_

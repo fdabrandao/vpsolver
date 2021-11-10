@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include "common.hpp"
 #include "instance.hpp"
-using namespace std;
 
 #define NORM_PRECISION 10000
 
@@ -79,10 +78,10 @@ Instance::Instance(const char *fname) {
     read(fname);
 }
 
-vector<Item> Instance::sorted_items() {
-    vector<Item> sitems(items);
-    stable_sort(all(sitems));
-    reverse(all(sitems));
+std::vector<Item> Instance::sorted_items() {
+    std::vector<Item> sitems(items);
+    std::stable_sort(all(sitems));
+    std::reverse(all(sitems));
     return sitems;
 }
 
@@ -200,10 +199,10 @@ void Instance::read(FILE *fin, ftype type) {
             item.demand = bi;
 
             int S = 0;
-            vector<int> maxW(ndims, 0);
+            std::vector<int> maxW(ndims, 0);
             for (int d = 0; d < ndims; d++) {
                 for (int t = 0; t < nbtypes; t++) {
-                    maxW[d] = max(maxW[d], Ws[t][d]);
+                    maxW[d] = std::max(maxW[d], Ws[t][d]);
                 }
             }
             for (int d = 0; d < ndims; d++) {
@@ -311,7 +310,7 @@ void Instance::write(FILE *fout) const {
 
     fprintf(fout, "%d\n", m);
     int p = 0;
-    vector<int> rid(items.size());
+    std::vector<int> rid(items.size());
     for (int it = 0; it < static_cast<int>(items.size()); it++) {
         rid[items[it].id] = it;
     }

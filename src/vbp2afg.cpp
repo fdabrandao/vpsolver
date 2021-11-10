@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.hpp"
 #include "arcflow.hpp"
 #include "instance.hpp"
-using namespace std;
 
 int swig_main(int argc, char **argv) {
     printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");

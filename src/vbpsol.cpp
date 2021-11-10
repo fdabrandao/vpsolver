@@ -28,7 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "arcflow.hpp"
 #include "instance.hpp"
 #include "arcflowsol.hpp"
-using namespace std;
 
 int swig_main(int argc, char **argv) {
     printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");
@@ -62,7 +61,7 @@ int swig_main(int argc, char **argv) {
         int ind;
         double x;
         char buf[MAX_LEN];
-        map<Arc, int> flow;
+        std::map<Arc, int> flow;
         while (fscanf(fsol, "%s %lf", buf, &x) != EOF) {
             if (strlen(buf) <= 1) {
                 continue;

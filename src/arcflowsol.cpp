@@ -29,14 +29,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.hpp"
 #include "instance.hpp"
 #include "arcflowsol.hpp"
-using namespace std;
 
 /* Class ArcflowSol */
 
-ArcflowSol::ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow,
-                       int _S, const vector<int> &_Ts, int _LOSS):
+ArcflowSol::ArcflowSol(const Instance &_inst, const std::map<Arc, int> &_flow,
+                       int _S, const std::vector<int> &_Ts, int _LOSS):
         inst(_inst), flow(_flow), S(_S), Ts(_Ts), LOSS(_LOSS) {
-    vector<int> dem(inst.m);
+    std::vector<int> dem(inst.m);
     for (int i = 0; i < inst.m; i++) {
         dem[i] = inst.demands[i];
     }
@@ -71,22 +70,22 @@ ArcflowSol::ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow,
     }
 }
 
-vector<pattern_pair> ArcflowSol::remove_excess(const vector<pattern_int> &sol,
-                                               vector<int> *_dem) const {
-    vector<int> &dem = *_dem;
-    vector<pattern_pair> tmp;
+std::vector<pattern_pair> ArcflowSol::remove_excess(const std::vector<pattern_int> &sol,
+                                               std::vector<int> *_dem) const {
+    std::vector<int> &dem = *_dem;
+    std::vector<pattern_pair> tmp;
     for (const pattern_int &pat : sol) {
-        map<int, int> count;
+        std::map<int, int> count;
         for (const int &it : pat.second) {
             count[it] += 1;
         }
-        vector<int> rm;
+        std::vector<int> rm;
         int rep = pat.first;
         while (rep > 0) {
             rm.clear();
             for (auto &kvpair : count) {
                 int type = inst.items[kvpair.first].type;
-                kvpair.second = min(kvpair.second, dem[type]);
+                kvpair.second = std::min(kvpair.second, dem[type]);
                 if (kvpair.second == 0) {
                     rm.push_back(kvpair.first);
                 }
@@ -98,11 +97,11 @@ vector<pattern_pair> ArcflowSol::remove_excess(const vector<pattern_int> &sol,
             int f = rep;
             for (const auto &kvpair : count) {
                 int type = inst.items[kvpair.first].type;
-                f = min(f, dem[type]/kvpair.second);
+                f = std::min(f, dem[type]/kvpair.second);
             }
             rep -= f;
 
-            tmp.push_back(MP(f, vector<int_pair>(all(count))));
+            tmp.push_back(MP(f, std::vector<int_pair>(all(count))));
             for (const auto &kvpair : count) {
                 int type = inst.items[kvpair.first].type;
                 dem[type] -= f * kvpair.second;
@@ -110,23 +109,23 @@ vector<pattern_pair> ArcflowSol::remove_excess(const vector<pattern_int> &sol,
         }
     }
 
-    map<vector<int_pair>, int> mp;
+    std::map<std::vector<int_pair>, int> mp;
     for (pattern_pair &pp : tmp) {
         sort(all(pp.second));
         mp[pp.second] += pp.first;
     }
 
-    vector<pattern_pair> finalsol;
+    std::vector<pattern_pair> finalsol;
     for (const auto &kvpair : mp) {
         finalsol.push_back(MP(kvpair.second, kvpair.first));
     }
     return finalsol;
 }
 
-vector<pattern_pair> ArcflowSol::extract_solution(vector<int> *_dem, int T) {
-    vector<int> &dem = *_dem;
-    set<int> nodes;
-    map<int, vector<Arc>> adj;
+std::vector<pattern_pair> ArcflowSol::extract_solution(std::vector<int> *_dem, int T) {
+    std::vector<int> &dem = *_dem;
+    std::set<int> nodes;
+    std::map<int, std::vector<Arc>> adj;
     for (const auto &kvpair : flow) {
         int u = kvpair.first.u;
         int v = kvpair.first.v;
@@ -139,19 +138,19 @@ vector<pattern_pair> ArcflowSol::extract_solution(vector<int> *_dem, int T) {
 
     int &zflow = flow[Arc(T, S, LOSS)];
 
-    vector<int> lst(all(nodes));
+    std::vector<int> lst(all(nodes));
 
-    vector<pattern_int> sol;
+    std::vector<pattern_int> sol;
     while (true) {
-        map<int, Arc> pred;
-        map<int, int> dp;
+        std::map<int, Arc> pred;
+        std::map<int, int> dp;
         dp[S] = zflow;
         for (const int &v : lst) {
             int &val = dp[v];
             Arc &p = pred[v];
             for (const Arc &a : adj[v]) {
                 throw_assert(dp.count(a.u) != 0);
-                int mf = min(dp[a.u], flow[a]);
+                int mf = std::min(dp[a.u], flow[a]);
                 if (mf > val) {
                     p = a;
                     val = mf;
@@ -181,9 +180,9 @@ vector<pattern_pair> ArcflowSol::extract_solution(vector<int> *_dem, int T) {
     return remove_excess(sol, &dem);
 }
 
-bool ArcflowSol::is_valid(const vector<pattern_pair> &sol, int btype) const {
+bool ArcflowSol::is_valid(const std::vector<pattern_pair> &sol, int btype) const {
     for (const pattern_pair &pat : sol) {
-        vector<int> w(inst.ndims);
+        std::vector<int> w(inst.ndims);
         for (const auto &itpair : pat.second) {
             if (inst.binary && itpair.second > 1) {
                 return false;
@@ -209,9 +208,9 @@ void ArcflowSol::print_solution(bool print_inst = true, bool pyout = false) {
         if (inst.nbtypes > 1) {
             printf("Bins of type %d: %d\n", t+1, nbins[t]);
         }
-        vector<pattern_pair> &sol = sols[t];
+        std::vector<pattern_pair> &sol = sols[t];
         for (const pattern_pair &pat : sol) {
-            vector<int_pair> tmp;
+            std::vector<int_pair> tmp;
             for (const int_pair &itpair : pat.second) {
                 int t = inst.items[itpair.first].type;
                 int opt = inst.items[itpair.first].opt;
@@ -246,9 +245,9 @@ void ArcflowSol::print_solution(bool print_inst = true, bool pyout = false) {
         printf("PYSOL=(%d,[", objvalue);
         for (int t = 0; t < inst.nbtypes; t++) {
             printf("[");
-            vector<pattern_pair> &sol = sols[t];
+            std::vector<pattern_pair> &sol = sols[t];
             for (const pattern_pair &pat : sol) {
-                vector<int_pair> tmp;
+                std::vector<int_pair> tmp;
                 for (const int_pair &itpair : pat.second) {
                     int t = inst.items[itpair.first].type;
                     int opt = inst.items[itpair.first].opt;

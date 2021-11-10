@@ -29,32 +29,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "graph.hpp"
 #include "common.hpp"
 #include "instance.hpp"
-using namespace std;
 
-typedef pair<int, vector<int>> pattern_int;
-typedef pair<int, vector<int_pair>> pattern_pair;
+typedef std::pair<int, std::vector<int>> pattern_int;
+typedef std::pair<int, std::vector<int_pair>> pattern_pair;
 
 class ArcflowSol {
  private:
     Instance inst;
-    map<Arc, int> flow;
+    std::map<Arc, int> flow;
     int S;
-    vector<int> Ts;
+    std::vector<int> Ts;
     int LOSS;
     int objvalue;
-    vector<int> nbins;
-    vector<vector<pattern_pair>> sols;
+    std::vector<int> nbins;
+    std::vector<std::vector<pattern_pair>> sols;
 
-    vector<pattern_pair> extract_solution(vector<int> *_dem, int T);
+    std::vector<pattern_pair> extract_solution(std::vector<int> *_dem, int T);
 
-    vector<pattern_pair> remove_excess(const vector<pattern_int> &sol,
-                                       vector<int> *_dem) const;
+    std::vector<pattern_pair> remove_excess(const std::vector<pattern_int> &sol,
+                                       std::vector<int> *_dem) const;
 
-    bool is_valid(const vector<pattern_pair> &sol, int btype) const;
+    bool is_valid(const std::vector<pattern_pair> &sol, int btype) const;
 
  public:
-    ArcflowSol(const Instance &_inst, const map<Arc, int> &_flow, int _S,
-               const vector<int> &_Ts, int _LOSS);
+    ArcflowSol(const Instance &_inst, const std::map<Arc, int> &_flow, int _S,
+               const std::vector<int> &_Ts, int _LOSS);
 
     void print_solution(bool print_inst, bool pyout);
 };

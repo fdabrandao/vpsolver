@@ -23,14 +23,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <vector>
 #include <cstdio>
-using namespace std;
 
 enum ftype {VBP, MVP};
 
 class Item {
  public:
-    vector<int> w;
-    vector<int> nonzero;
+    std::vector<int> w;
+    std::vector<int> nonzero;
     int id;
     int type;
     int opt;
@@ -39,7 +38,7 @@ class Item {
     int key;
 
     explicit Item(int _ndims): ndims(_ndims) {
-        w = vector<int>(_ndims);
+        w = std::vector<int>(_ndims);
     }
     void add_dim(int dw) {
         ndims++;
@@ -59,24 +58,24 @@ class Instance {
     int nbtypes;
     int nsizes;
     int m, n;
-    vector<vector<int>> Ws;  // bin types
-    vector<int> Cs;  // costs
-    vector<int> Qs;  // quantities
-    vector<Item> items;
+    std::vector<std::vector<int>> Ws;  // bin types
+    std::vector<int> Cs;  // costs
+    std::vector<int> Qs;  // quantities
+    std::vector<Item> items;
     int method;
     bool binary;
     bool relax_domains;
 
     char vtype;
-    vector<char> ctypes;
-    vector<int> nopts;
-    vector<int> demands;
+    std::vector<char> ctypes;
+    std::vector<int> nopts;
+    std::vector<int> demands;
 
     Instance();
     explicit Instance(const char *fname);
     explicit Instance(FILE *fin, ftype type = MVP);
 
-    vector<Item> sorted_items();
+    std::vector<Item> sorted_items();
     void print() const;
     void read(const char *fname);
     void read(FILE *fin, ftype type = MVP);

@@ -28,7 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "graph.hpp"
 #include "common.hpp"
 #include "arcflow.hpp"
-using namespace std;
 
 /* Class Arcflow */
 
@@ -55,7 +54,7 @@ void Arcflow::init(const Instance &_inst) {
     maxW.resize(label_size, 0);
     for (int d = 0; d < inst.ndims; d++) {
         for (int t = 0; t < inst.nbtypes; t++) {
-            maxW[d] = max(maxW[d], inst.Ws[t][d]);
+            maxW[d] = std::max(maxW[d], inst.Ws[t][d]);
         }
     }
 
@@ -65,12 +64,12 @@ void Arcflow::init(const Instance &_inst) {
         max_label.push_back(INT_MAX);
     }
 
-    vector<int> max_state = maxW;
+    std::vector<int> max_state = maxW;
     max_state.push_back(inst.nsizes);
     if (!inst.binary) {
         int maxb = 0;
         for (int it = 0; it < inst.nsizes; it++) {
-            maxb = max(maxb, sitems[it].demand);
+            maxb = std::max(maxb, sitems[it].demand);
         }
         max_state.push_back(maxb);
     }
@@ -79,7 +78,7 @@ void Arcflow::init(const Instance &_inst) {
     for (int i = 0; i < inst.nsizes; i++) {
         weights[i] = sitems[i].w;
     }
-    weights.push_back(vector<int>(inst.ndims, 0));  // loss arcs
+    weights.push_back(std::vector<int>(inst.ndims, 0));  // loss arcs
 
     max_rep = count_max_rep(maxW, 0, 0);
 
@@ -127,7 +126,7 @@ void Arcflow::init(const char *fname) {
     throw_assert(ready == true);
 }
 
-bool Arcflow::is_valid(const vector<int> &u, const vector<int> &W) const {
+bool Arcflow::is_valid(const std::vector<int> &u, const std::vector<int> &W) const {
     for (int i = 0; i < inst.ndims; i++) {
         if (u[i] > W[i]) {
             return false;
@@ -136,7 +135,7 @@ bool Arcflow::is_valid(const vector<int> &u, const vector<int> &W) const {
     return true;
 }
 
-bool Arcflow::is_full(const vector<int> &u, const vector<int> &W) const {
+bool Arcflow::is_full(const std::vector<int> &u, const std::vector<int> &W) const {
     for (int i = 0; i < inst.ndims; i++) {
         if (u[i] != W[i]) {
             return false;
@@ -145,8 +144,8 @@ bool Arcflow::is_full(const vector<int> &u, const vector<int> &W) const {
     return true;
 }
 
-void Arcflow::relabel_graph(const vector<int> &labels) {
-    set<Arc> arcs;
+void Arcflow::relabel_graph(const std::vector<int> &labels) {
+    std::set<Arc> arcs;
     for (const Arc &a : A) {
         int u = labels[a.u];
         int v = labels[a.v];
@@ -157,14 +156,14 @@ void Arcflow::relabel_graph(const vector<int> &labels) {
     A.assign(all(arcs));
 }
 
-vector<int> Arcflow::count_max_rep(const vector<int> &space, int i0 = 0,
+std::vector<int> Arcflow::count_max_rep(const std::vector<int> &space, int i0 = 0,
                                    int sub_i0 = 0) const {
-    vector<int> r(inst.nsizes);
+    std::vector<int> r(inst.nsizes);
     for (int i = i0; i < inst.nsizes; i++) {
         int dem = inst.binary ? 1 : sitems[i].demand;
-        r[i] = i != i0 ? dem : max(0, dem-sub_i0);
+        r[i] = i != i0 ? dem : std::max(0, dem-sub_i0);
         for (int d : sitems[i].nonzero) {
-            r[i] = min(r[i], space[d]/weights[i][d]);
+            r[i] = std::min(r[i], space[d]/weights[i][d]);
             if (!r[i]) {
                 break;
             }
@@ -173,14 +172,14 @@ vector<int> Arcflow::count_max_rep(const vector<int> &space, int i0 = 0,
     return r;
 }
 
-int Arcflow::min_slack(const vector<int> &b, int i0, int d,
-                       const vector<int> &caps) const {
+int Arcflow::min_slack(const std::vector<int> &b, int i0, int d,
+                       const std::vector<int> &caps) const {
     int C = caps.back();
     if (C == 0) {
         return 0;
     }
-    vector<int> Q;
-    vector<bool> vis(C+1);
+    std::vector<int> Q;
+    std::vector<bool> vis(C+1);
     vis[0] = true;
     Q.push_back(0);
     int res = 0;
@@ -202,7 +201,7 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d,
                 } else if (vis[v]) {
                     break;
                 }
-                res = max(res, v);
+                res = std::max(res, v);
                 Q.push_back(v);
             }
         }
@@ -219,26 +218,26 @@ int Arcflow::min_slack(const vector<int> &b, int i0, int d,
             while (!vis[p] && cap-p <= mslack) {
                 p--;
             }
-            mslack = min(mslack, cap-p);
+            mslack = std::min(mslack, cap-p);
         }
         return mslack;
     }
 }
 
-void Arcflow::lift_state(const vector<int> &valid_opts, vector<int> &u, int it,
+void Arcflow::lift_state(const std::vector<int> &valid_opts, std::vector<int> &u, int it,
                          int ic) const {
     if (it >= inst.nsizes) {
         return;
     }
-    vector<int> space(inst.ndims);
+    std::vector<int> space(inst.ndims);
     for (int d = 0; d < inst.ndims; d++) {
         space[d] = maxW[d]-u[d];
     }
-    const vector<int> &r = count_max_rep(space, it, ic);
+    const std::vector<int> &r = count_max_rep(space, it, ic);
     for (int d = 0; d < inst.ndims; d++) {
         int minw = maxW[d];
         for (int t : valid_opts) {
-            minw = min(minw, inst.Ws[t][d]);
+            minw = std::min(minw, inst.Ws[t][d]);
         }
         if (u[d] != minw) {
             // lift method 1
@@ -250,7 +249,7 @@ void Arcflow::lift_state(const vector<int> &valid_opts, vector<int> &u, int it,
                 u[d] = maxpos;
             } else {
                 // lift method 2
-                vector<int> caps;
+                std::vector<int> caps;
                 for (int t : valid_opts) {
                     caps.push_back(inst.Ws[t][d]-u[d]);
                 }
@@ -264,9 +263,9 @@ void Arcflow::lift_state(const vector<int> &valid_opts, vector<int> &u, int it,
     }
 }
 
-inline vector<int> Arcflow::hash(const vector<int> &su) {
+inline std::vector<int> Arcflow::hash(const std::vector<int> &su) {
     static int last_size = 1;
-    vector<int> h;
+    std::vector<int> h;
     h.reserve(last_size);
     int *p = NULL, dst_bits = 0;
     for (int i = 0; i < static_cast<int>(su.size()); i++) {
@@ -278,7 +277,7 @@ inline vector<int> Arcflow::hash(const vector<int> &su) {
                 p = &h.back();
                 dst_bits = sizeof(int)*8;
             }
-            int window_width = min(src_bits, dst_bits);
+            int window_width = std::min(src_bits, dst_bits);
             *p <<= window_width;
             *p |= x & ((1u << window_width)-1);
             x >>= window_width;
@@ -290,18 +289,18 @@ inline vector<int> Arcflow::hash(const vector<int> &su) {
     return h;
 }
 
-int Arcflow::go(vector<int> su) {
+int Arcflow::go(std::vector<int> su) {
     int it = su[inst.ndims];
     int ic = inst.binary ? 0 : su[inst.ndims+1];
-    vector<int> valid_opts;
-    vector<int> mu(max_label);
-    vector<int> maxw(inst.ndims, 0);
+    std::vector<int> valid_opts;
+    std::vector<int> mu(max_label);
+    std::vector<int> maxw(inst.ndims, 0);
     for (int t = 0; t < inst.nbtypes; t++) {
         if (is_valid(su, inst.Ws[t])) {
             valid_opts.push_back(t);
             for (int d = 0; d < inst.ndims; d++) {
-                mu[d] = min(mu[d], inst.Ws[t][d]);
-                maxw[d] = max(maxw[d], inst.Ws[t][d]);
+                mu[d] = std::min(mu[d], inst.Ws[t][d]);
+                maxw[d] = std::max(maxw[d], inst.Ws[t][d]);
             }
         }
     }
@@ -314,15 +313,15 @@ int Arcflow::go(vector<int> su) {
     }
 
     // const vector<int> key(su);
-    const vector<int> key(hash(su));
-    map<vector<int>, int>::iterator itr = dp.find(key);
+    const std::vector<int> key(hash(su));
+    std::map<std::vector<int>, int>::iterator itr = dp.find(key);
     if (itr != dp.end()) {
         return itr->second;
     }
 
     int up = -1;
     if (it+1 < inst.nsizes) {
-        vector<int> sv(su);
+        std::vector<int> sv(su);
         sv[inst.ndims] = it+1;
         if (!inst.binary) {
             sv[inst.ndims+1] = 0;
@@ -333,8 +332,8 @@ int Arcflow::go(vector<int> su) {
     }
 
     if (it < inst.nsizes && ic < max_rep[it]) {
-        vector<int> sv(su);
-        const vector<int> &w = weights[it];
+        std::vector<int> sv(su);
+        const std::vector<int> &w = weights[it];
         for (int d : sitems[it].nonzero) {
             sv[d] += w[d];
             if (sv[d] > maxw[d]) {  // if invalid
@@ -357,12 +356,12 @@ int Arcflow::go(vector<int> su) {
         int iv = go(sv);
 
         if (iv != -1) {
-            const vector<int> &v = NS.get_label(iv);
+            const std::vector<int> &v = NS.get_label(iv);
             for (int d = 0; d < inst.ndims; d++) {
-                mu[d] = min(mu[d], v[d]-w[d]);
+                mu[d] = std::min(mu[d], v[d]-w[d]);
             }
             if (inst.binary) {
-                mu[inst.ndims] = min(mu[inst.ndims], it+1);
+                mu[inst.ndims] = std::min(mu[inst.ndims], it+1);
             }
             int iu = NS.get_index(mu);
             AS.insert(Arc(iu, iv, it));
@@ -382,9 +381,9 @@ void Arcflow::build() {
     NS.clear();
 
     if (inst.binary) {
-        go(vector<int>(label_size, 0));
+        go(std::vector<int>(label_size, 0));
     } else {
-        go(vector<int>(label_size+2, 0));
+        go(std::vector<int>(label_size+2, 0));
     }
 
     printf("  #dp: %d\n", static_cast<int>(dp.size()));
@@ -400,27 +399,27 @@ void Arcflow::build() {
 void Arcflow::final_compression_step() {
     throw_assert(ready == false);
     int nv = NS.size();
-    vector<int> labels(nv);
-    vector<vector<int_pair>> adj = get_adj(nv, A, TRANSPOSE);
+    std::vector<int> labels(nv);
+    std::vector<std::vector<int_pair>> adj = get_adj(nv, A, TRANSPOSE);
 
     NodeSet NStmp;
     for (int u = 0; u < NS.size(); u++) {
-        vector<int> lbl(label_size, 0);
+        std::vector<int> lbl(label_size, 0);
         for (const auto &pa : adj[u]) {
             throw_assert(pa.first < u);
             int v = labels[pa.first];
             int it = pa.second;
-            const vector<int> &lv = NStmp.get_label(v);
+            const std::vector<int> &lv = NStmp.get_label(v);
             for (int d = 0; d < inst.ndims; d++) {
-                lbl[d] = max(lbl[d], lv[d]+weights[it][d]);
+                lbl[d] = std::max(lbl[d], lv[d]+weights[it][d]);
             }
             if (inst.binary) {
                 if (it == LOSS) {
-                    lbl[inst.ndims] = max(lbl[inst.ndims],
+                    lbl[inst.ndims] = std::max(lbl[inst.ndims],
                                           lv[inst.ndims]);
                 } else {
-                    lbl[inst.ndims] = max(lbl[inst.ndims],
-                                          max(lv[inst.ndims], it));
+                    lbl[inst.ndims] = std::max(lbl[inst.ndims],
+                                          std::max(lv[inst.ndims], it));
                 }
             }
         }
@@ -428,7 +427,7 @@ void Arcflow::final_compression_step() {
     }
 
     NS = NStmp;
-    vector<int> order = NS.topological_order();
+    std::vector<int> order = NS.topological_order();
     for (int &v : labels) {
         v = order[v];
     }
@@ -439,7 +438,7 @@ void Arcflow::final_compression_step() {
 void Arcflow::reduce_redundancy() {
     throw_assert(ready == false);
     // remove redundant parallel arcs
-    vector<int> types;
+    std::vector<int> types;
     for (int i = 0; i < inst.nsizes; i++) {
         types.push_back(sitems[i].type);
     }
@@ -467,7 +466,7 @@ void Arcflow::finalize() {
         }
     } else {
         S = 0;
-        vector<int> torder;
+        std::vector<int> torder;
         for(int i = 0; i < inst.nbtypes; i++){
             torder.push_back(i);
         }
@@ -482,7 +481,7 @@ void Arcflow::finalize() {
             A.push_back(Arc(Ts[i], S, LOSS));
         }
 
-        vector<vector<int>> bigger_than(inst.nbtypes);
+        std::vector<std::vector<int>> bigger_than(inst.nbtypes);
         for (int t1 = 0; t1 < inst.nbtypes; t1++) {
             for (int t2 = 0; t2 < inst.nbtypes; t2++) {
                 if (t1 != t2 && is_valid(inst.Ws[t1], inst.Ws[t2])) {
@@ -494,9 +493,9 @@ void Arcflow::finalize() {
             }
         }
 
-        vector<bool> valid_tgts(inst.nbtypes);
+        std::vector<bool> valid_tgts(inst.nbtypes);
         for (int i = 1; i < static_cast<int>(NS.size()); i++) {
-            const vector<int> &u = NS.get_label(i);
+            const std::vector<int> &u = NS.get_label(i);
             for (int t = 0; t < inst.nbtypes; t++) {
                 valid_tgts[t] = is_valid(u, inst.Ws[t]);
             }

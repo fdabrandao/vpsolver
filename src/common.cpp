@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdlib>
 #include <cstring>
 #include "common.hpp"
-using namespace std;
 
 char _error_msg_[MAX_LEN];
 

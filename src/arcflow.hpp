@@ -28,33 +28,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "graph.hpp"
 #include "common.hpp"
 #include "instance.hpp"
-using namespace std;
 
 class Arcflow {
  private:
     bool ready;
-    set<Arc> AS;
+    std::set<Arc> AS;
     NodeSet NS;
-    vector<int> maxW;
-    map<vector<int>, int> dp;
-    int go(vector<int> su);
-    inline vector<int> hash(const vector<int> &su);
-    vector<int> max_label;
-    vector<int> hash_bits;
-    vector<int> max_rep;
-    vector<Item> sitems;
-    vector<vector<int>> weights;
+    std::vector<int> maxW;
+    std::map<std::vector<int>, int> dp;
+    int go(std::vector<int> su);
+    inline std::vector<int> hash(const std::vector<int> &su);
+    std::vector<int> max_label;
+    std::vector<int> hash_bits;
+    std::vector<int> max_rep;
+    std::vector<Item> sitems;
+    std::vector<std::vector<int>> weights;
     int label_size;
 
-    vector<int> count_max_rep(const vector<int> &space, int i0,
+    std::vector<int> count_max_rep(const std::vector<int> &space, int i0,
                               int sub_i0) const;
-    void lift_state(const vector<int> &valid_opts, vector<int> &u, int it,
+    void lift_state(const std::vector<int> &valid_opts, std::vector<int> &u, int it,
                     int ic) const;
-    int min_slack(const vector<int> &b, int i0, int d,
-                  const vector<int> &caps) const;
-    bool is_valid(const vector<int> &u, const vector<int> &W) const;
-    bool is_full(const vector<int> &u, const vector<int> &W) const;
-    void relabel_graph(const vector<int> &labels);
+    int min_slack(const std::vector<int> &b, int i0, int d,
+                  const std::vector<int> &caps) const;
+    bool is_valid(const std::vector<int> &u, const std::vector<int> &W) const;
+    bool is_full(const std::vector<int> &u, const std::vector<int> &W) const;
+    void relabel_graph(const std::vector<int> &labels);
     void init(const Instance &_inst);
     void init(const char *fname);
     void read(const char *fname);
@@ -70,8 +69,8 @@ class Arcflow {
     int NV;
     int NA;
     int S;
-    vector<int> Ts;
-    vector<Arc> A;
+    std::vector<int> Ts;
+    std::vector<Arc> A;
     int LOSS;
     explicit Arcflow(const Instance &_inst);
     explicit Arcflow(const char *fname);

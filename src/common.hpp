@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_LEN 256
 #define TRANSPOSE (1)
 #define all(x) (x).begin(),(x).end()
-#define MP(x,y) make_pair(x,y)
+#define MP(x,y) std::make_pair(x,y)
 
 #define MIN_METHOD -3
 #define MAX_METHOD -3

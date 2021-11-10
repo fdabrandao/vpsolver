@@ -30,7 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "instance.hpp"
 #include "arcflow.hpp"
 #include "arcflowsol.hpp"
-using namespace std;
 
 void solve(const Instance &inst, bool print_inst = false, bool pyout = false) {
     Arcflow afg(inst);

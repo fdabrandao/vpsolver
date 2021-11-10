@@ -26,7 +26,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.hpp"
 #include "arcflow.hpp"
 #include "instance.hpp"
-using namespace std;
 
 /*
 MPS format
@@ -139,8 +138,8 @@ int swig_main(int argc, char **argv) {
             mps.write(6, "", "", "MARKER", "'MARKER'", "", "'INTORG'");
         }
 
-        vector<int> labels;
-        vector<int> ub(afg.NA);
+        std::vector<int> labels;
+        std::vector<int> ub(afg.NA);
         for (int i = 0; i < afg.NA; i++) {
             const Arc &a = afg.A[i];
             labels.push_back(a.label);
