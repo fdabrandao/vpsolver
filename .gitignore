@@ -21,10 +21,5 @@ coverage_html
 /git_fetch.sh
 /update_submodules.sh
 /workspace_private
-/src/.deps/
-/src/stamp-h1
-/src/.dirstamp
-/config.status
-/autom4te.cache/
 /Makefile
 /MANIFEST
