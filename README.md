@@ -1,20 +1,18 @@
 ## Arc-flow Vector Packing Solver (VPSolver)
 
-Copyright (C) 2013-2021, Filipe Brandão <fdabrandao@gmail.com>
+Copyright (C) 2013-2022, Filipe Brandão <fdabrandao@gmail.com>
 Faculdade de Ciências, Universidade do Porto  
 Porto, Portugal. All rights reserved.
 
 ---
 [VPSolver](https://github.com/fdabrandao/vpsolver) is a multiple-choice vector packing solver based on an arc-flow formulation with graph compression (see, e.g., [\[1\]](#references)). VPSolver generates very strong models (equivalent to Gilmore and Gomory's) that can be solved using general-purpose mixed-integer programming
-solvers such as Gurobi and GLPK (see, e.g., [\[2\]](#references) and [\[3\]](#references)). VPSolver does not explicitly require any MIP
-solver in particular, though a good  MIP solver may be necessary for solving
-large models.
+solvers such as Gurobi and GLPK (see, e.g., [\[2\]](#references) and [\[3\]](#references)). VPSolver does not explicitly require any MIP solver in particular, though a good  MIP solver may be necessary for solving large models.
 
 ![](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)
 [![](https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master)](https://travis-ci.org/fdabrandao/vpsolver)
 [![Coverage Status](https://coveralls.io/repos/github/fdabrandao/vpsolver/badge.svg?branch=develop)](https://coveralls.io/github/fdabrandao/vpsolver)
 
-For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling toolbox ([PyMPL](https://github.com/fdabrandao/pympl/)), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux and Mac OS X. VPSolver also runs on a large variety of platforms including Windows using a [Docker container](#docker).
+For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling toolbox ([PyMPL](https://github.com/fdabrandao/pympl/)), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux, macOS, and Windows. VPSolver can also be used in [Docker containers](#docker).
 
 For more details, please refer to the [project wiki](https://github.com/fdabrandao/vpsolver/wiki) or to the [manual](https://github.com/fdabrandao/vpsolver/tree/master/docs/vpsolver_manual.pdf).
 
@@ -28,12 +26,16 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 ## Requirements
 #### Mandatory
 
-* MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...  
-* UNIX-like operating system or a UNIX-like environment such as [Cygwin](https://www.cygwin.com/)
-* `g++ >= 4.8`; `cmake >= 3.3`; `bash >= 3.0`
+- To use vpsolver scripts for various solvers:
+  * MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...
+  * UNIX-like operating system or a UNIX-like environment such as [Cygwin](https://www.cygwin.com/) on Windows
+  * `g++`, `clang`, or `Visual Studio`; `cmake >= 3.3`; `bash >= 3.0`
+
+- To build the vpsolver executable linked to Gurobi:
+  * `gurobi`
+  * `cmake >= 3.3`
 
 #### Optional
-
 For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and Web App:
 
 * `python-2.7` or `python-3.x`
@@ -45,9 +47,8 @@ For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and
 It has been successfully compiled and run on the following platforms:
 
 * **Linux**
-* **Mac OS X**
-* On a large variety of platforms including **Windows** using a [Docker container](#docker)
-* It also runs on **Windows** using [Cygwin](https://www.cygwin.com/) (a Unix-like environment and command-line interface)
+* **macOS**
+* **Windows** (note that vpsolver scripts require bash)
 
 ## Setup
 Without the python interface: 
@@ -56,9 +57,9 @@ Without the python interface:
 $ mkdir build
 $ cd build/
 $ cmake ..
-$ cmake --build .
+$ cmake --build . --config Release
 ```
-Note: In order to compile the components that require Gurobi, you need to have set the environment variable `GUROBI_HOME` or specify the location of the Gurobi installation in the third step (e.g., `cmake .. -DGUROBI_DIR=/Library/gurobi952/macos_universal2/`).
+Note: In order to compile the components that require Gurobi, you need to have set the environment variable `GUROBI_HOME` or specify the location of the Gurobi installation in the third step (e.g., `cmake .. -DGUROBI_DIR=/opt/gurobi952/linux64/` (Linux), `cmake .. -DGUROBI_DIR=/Library/gurobi952/macos_universal2/` (macOS) or `cmake .. -DGUROBI_DIR=C:\\gurobi952\\win64` (Windows)).
 
 With the python interface: 
 
@@ -223,4 +224,4 @@ https://research.fdabrandao.pt/research/vpsolver/results/
 
 
 ***
-Copyright © 2013-2021 [Filipe Brandão](https://fdabrandao.pt) < [fdabrandao@gmail.com](mailto:fdabrandao@gmail.com) >. All rights reserved.
+Copyright © 2013-2022 [Filipe Brandão](https://fdabrandao.pt) < [fdabrandao@gmail.com](mailto:fdabrandao@gmail.com) >. All rights reserved.

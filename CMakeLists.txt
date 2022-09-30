@@ -38,9 +38,7 @@ add_executable(afg2mps src/afg2mps.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(afg2lp src/afg2lp.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(vbpsol src/vbpsol.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 install(TARGETS vbp2afg afg2mps afg2lp vbpsol DESTINATION bin)
-install(DIRECTORY
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/
-    DESTINATION scripts)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/ DESTINATION scripts)
 
 # CPack
 set(CPACK_GENERATOR ZIP)
