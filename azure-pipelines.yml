@@ -47,7 +47,7 @@ jobs:
     - bash: |
         set -ex
         mkdir -p build/{,upload} && cd build
-        cmake .. && cmake --build . -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
+        cmake .. -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 && cmake --build .
         cpack && cp vpsolver.zip upload/vpsolver-macos64.zip
       displayName: Build binaries
     - task: PublishBuildArtifacts@1
