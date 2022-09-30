@@ -59,7 +59,10 @@ $ cd build/
 $ cmake ..
 $ cmake --build . --config Release
 ```
-Note: In order to compile the components that require Gurobi, you need to have set the environment variable `GUROBI_HOME` or specify the location of the Gurobi installation in the third step (e.g., `cmake .. -DGUROBI_DIR=/opt/gurobi952/linux64/` (Linux), `cmake .. -DGUROBI_DIR=/Library/gurobi952/macos_universal2/` (macOS) or `cmake .. -DGUROBI_DIR=C:\\gurobi952\\win64` (Windows)).
+Note: In order to compile the components that require Gurobi, you need to have set the environment variable `GUROBI_HOME` or specify the location of the Gurobi installation in the third step:
+- Linux: `cmake .. -DGUROBI_DIR=/opt/gurobi952/linux64/`
+- macOS: `cmake .. -DGUROBI_DIR=/Library/gurobi952/macos_universal2/`
+- Windows: `cmake .. -DGUROBI_DIR=C:\\gurobi952\\win64`
 
 With the python interface: 
 
