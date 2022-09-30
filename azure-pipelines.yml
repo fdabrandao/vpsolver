@@ -9,18 +9,27 @@ jobs:
         python setup.py sdist -d upload
       displayName: Build documentation
     - task: PublishBuildArtifacts@1
-      inputs: {pathtoPublish: 'upload'}
+      inputs:
+        pathtoPublish: 'wheelhouse'
+        artifactName: 'wheels'
 - job: manylinux
   pool: {vmImage: 'Ubuntu-20.04'}
   strategy:
     matrix:
-      x86:
-        CIBW_SKIP: 'pp*'
-        CIBW_BUILD: '*-manylinux*_i686'
       x64:
         CIBW_SKIP: 'pp* *-manylinux*_i686'
   steps:
     - task: UsePythonVersion@0
+    - bash: |
+        set -ex
+        mkdir -p build/{,upload} && cd build
+        cmake .. && cmake --build . --config Release
+        cpack && cp vpsolver.zip upload/vpsolver-linux64.zip
+      displayName: Build binaries
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: 'build/upload'
+        artifactName: 'binaries'
     - bash: |
         set -ex
         python -m pip install --upgrade pip
@@ -28,11 +37,23 @@ jobs:
         cibuildwheel --platform linux --output-dir wheelhouse .
       displayName: Build wheels
     - task: PublishBuildArtifacts@1
-      inputs: {pathtoPublish: 'wheelhouse'}
+      inputs:
+        pathtoPublish: 'wheelhouse'
+        artifactName: 'wheels'
 - job: macos
   pool: {vmImage: 'macOS-10.15'}
   steps:
     - task: UsePythonVersion@0
+    - bash: |
+        set -ex
+        mkdir -p build/{,upload} && cd build
+        cmake .. && cmake --build . --config Release
+        cpack && cp vpsolver.zip upload/vpsolver-macos64.zip
+      displayName: Build binaries
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: 'build/upload'
+        artifactName: 'binaries'
     - bash: |
         set -ex
         python -m pip install --upgrade pip
@@ -47,9 +68,21 @@ jobs:
     - task: UsePythonVersion@0
     - bash: |
         set -ex
+        mkdir -p build/{,upload} && cd build
+        cmake .. && cmake --build . --config Release
+        cpack && cp vpsolver.zip upload/vpsolver-mswin64.zip
+      displayName: Build binaries
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: 'build/upload'
+        artifactName: 'binaries'
+    - bash: |
+        set -ex
         python -m pip install --upgrade pip
         python -m pip install cibuildwheel==1.11.1
         CIBW_SKIP='pp* cp27-*' cibuildwheel --platform windows --output-dir wheelhouse .
       displayName: Build wheels
     - task: PublishBuildArtifacts@1
-      inputs: {pathtoPublish: 'wheelhouse'}
+      inputs:
+        pathtoPublish: 'wheelhouse'
+        artifactName: 'wheels'
