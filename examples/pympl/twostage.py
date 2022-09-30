@@ -2,22 +2,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2016, Filipe Brandao
-Faculdade de Ciencias, Universidade do Porto
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright (C) 2013-2016, Filipe Brandao <fdabrandao@gmail.com>
 """
 from __future__ import print_function
 from builtins import range
@@ -43,6 +28,7 @@ def read_twostage(fname):
 def main():
     """Parses 'twostage.mod'."""
     from pympl import PyMPL, Tools, glpkutils
+
     os.chdir(os.path.dirname(__file__) or os.curdir)
 
     mod_in = "twostage.mod"
@@ -53,28 +39,25 @@ def main():
     lp_out = "tmp/twostage.lp"
     glpkutils.mod2lp(mod_out, lp_out, True)
 
-    out, varvalues = Tools.script(
-        "glpk_wrapper.sh", lp_out, verbose=True
-    )
+    out, varvalues = Tools.script("glpk_wrapper.sh", lp_out, verbose=True)
 
     print("")
-    print("varvalues:", [
-        (k, v)
-        for k, v in sorted(varvalues.items()) if not k.startswith("_")
-    ])
+    print(
+        "varvalues:",
+        [(k, v) for k, v in sorted(varvalues.items()) if not k.startswith("_")],
+    )
     print("")
     assert varvalues["Z"] == 11  # check the solution objective value
 
     exctacted_solution = parser["VBP_FLOW"].extract(
-        lambda name: varvalues.get(name, 0),
-        verbose=True
+        lambda name: varvalues.get(name, 0), verbose=True
     )
 
     solution = {}
     for zvar, value, sol in exctacted_solution:
         solution[zvar] = []
         for r, pattern in sol:
-            solution[zvar] += [pattern]*r
+            solution[zvar] += [pattern] * r
         assert value == len(solution[zvar])
 
     def pop_pattern(zvar):
@@ -89,7 +72,7 @@ def main():
     print("\n\nSolution:")
     for i in range(varvalues["Z"]):
         pattern = pop_pattern("Z")
-        print("Sheet {}: {}".format(i+1, pattern))
+        print("Sheet {}: {}".format(i + 1, pattern))
 
 
 if __name__ == "__main__":

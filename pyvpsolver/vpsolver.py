@@ -1,22 +1,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2016, Filipe Brandao
-Faculdade de Ciencias, Universidade do Porto
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright (C) 2013-2016, Filipe Brandao <fdabrandao@gmail.com>
 """
 from __future__ import print_function
 from builtins import zip
@@ -49,8 +34,8 @@ class VBP(object):
             print(" ".join(map(str, W)), file=fdst)  # W
             print(len(w), file=fdst)  # m
             for i in range(len(w)):  # items
-                row = list(w[i])+[b[i]]
-                assert len(row) == len(W)+1
+                row = list(w[i]) + [b[i]]
+                assert len(row) == len(W) + 1
                 print(" ".join(map(str, row)), file=fdst)
             print("BINARY{{{:d}}};".format(binary), file=fdst)
             print("VTYPE{{{}}};".format(vtype), file=fdst)
@@ -109,8 +94,7 @@ class MVP(object):
     Wrapper for .mvp files.
     """
 
-    def __init__(
-            self, Ws, Cs, Qs, ws, b, binary=False, vtype="I", verbose=False):
+    def __init__(self, Ws, Cs, Qs, ws, b, binary=False, vtype="I", verbose=False):
         self.mvp_file = VPSolver.new_tmp_file(".mvp")
         with open(self.mvp_file, "w") as fdst:
             ndims = len(Ws[0])
@@ -122,7 +106,7 @@ class MVP(object):
                 assert len(Wi) == ndims
                 if Qi == utils.inf:
                     Qi = -1
-                print(" ".join(map(str, list(Wi)+[Ci]+[Qi])), file=fdst)
+                print(" ".join(map(str, list(Wi) + [Ci] + [Qi])), file=fdst)
             assert len(ws) == len(b)
             print(len(ws), file=fdst)  # m
             for i in range(len(ws)):  # items
@@ -141,9 +125,7 @@ class MVP(object):
         self.Ws, self.Cs, self.Qs = Ws, Cs, Qs
         self.ws, self.b = ws, b
         self.labels = [
-            (i, j)
-            for i in range(len(self.ws))
-            for j in range(len(self.ws[i]))
+            (i, j) for i in range(len(self.ws)) for j in range(len(self.ws[i]))
         ]
 
     @classmethod
@@ -210,9 +192,7 @@ class AFG(object):
             assert isinstance(instance, (VBP, MVP))
             self.instance = instance
             self.afg_file = VPSolver.new_tmp_file(".afg")
-            self.output = VPSolver.vbp2afg(
-                instance, self.filename, verbose=verbose
-            )
+            self.output = VPSolver.vbp2afg(instance, self.filename, verbose=verbose)
 
     @classmethod
     def from_file(cls, afg_file, verbose=None):
@@ -232,7 +212,7 @@ class AFG(object):
         LOSS = int(utils.get_opt("LOSS", content))
         V, A = set([]), []
         for i in range(0, len(arcs), 3):
-            u, v, i = arcs[i:i+3]
+            u, v, i = arcs[i : i + 3]
             V.add(u)
             V.add(v)
             A.append((u, v, labels[i] if i != LOSS else LOSS))
@@ -241,7 +221,7 @@ class AFG(object):
         if len(Ts) == 1:
             lbls[Ts[0]] = "T"
         else:
-            for t, new in zip(Ts, ["T{}".format(i+1) for i in range(len(Ts))]):
+            for t, new in zip(Ts, ["T{}".format(i + 1) for i in range(len(Ts))]):
                 lbls[t] = new
         graph.relabel(lambda u: lbls.get(u, u))
         return graph
@@ -255,8 +235,12 @@ class AFG(object):
             weights = None
             capacities = None
         self.graph().draw(
-            svg_file, weights=weights, capacities=capacities, lpaths=lpaths,
-            graph_attrs=graph_attrs, verbose=verbose
+            svg_file,
+            weights=weights,
+            capacities=capacities,
+            lpaths=lpaths,
+            graph_attrs=graph_attrs,
+            verbose=verbose,
         )
 
     @property
@@ -280,9 +264,7 @@ class MPS(object):
         assert isinstance(graph, AFG)
         self.afg_graph = graph
         self.mps_file = VPSolver.new_tmp_file(".mps")
-        self.output = VPSolver.afg2mps(
-            graph.filename, self.filename, verbose=verbose
-        )
+        self.output = VPSolver.afg2mps(graph.filename, self.filename, verbose=verbose)
 
     @property
     def filename(self):
@@ -305,9 +287,7 @@ class LP(object):
         assert isinstance(graph, AFG)
         self.afg_graph = graph
         self.lp_file = VPSolver.new_tmp_file(".lp")
-        self.output = VPSolver.afg2lp(
-            graph.filename, self.filename, verbose=verbose
-        )
+        self.output = VPSolver.afg2lp(graph.filename, self.filename, verbose=verbose)
 
     @property
     def filename(self):
@@ -383,10 +363,11 @@ class VPSolver(object):
             verbose = VPSolver.VERBOSE
 
         proc = subprocess.Popen(
-            cmd, shell=True,
+            cmd,
+            shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            preexec_fn=os.setsid
+            preexec_fn=os.setsid,
         )
         VPSolver.PLIST.append(proc)
 
@@ -425,8 +406,8 @@ class VPSolver(object):
         """Transform 'vbpsol' solutions into python data."""
         marker = "PYSOL="
         if marker in vpsol_output:
-            vpsol_output = vpsol_output[vpsol_output.find(marker)+len(marker):]
-            vpsol_output = vpsol_output[:vpsol_output.find("\n")]
+            vpsol_output = vpsol_output[vpsol_output.find(marker) + len(marker) :]
+            vpsol_output = vpsol_output[: vpsol_output.find("\n")]
             obj, sol = eval(vpsol_output)
             return obj, sol
         else:
@@ -438,15 +419,11 @@ class VPSolver(object):
         if isinstance(afg_file, AFG):
             afg_file = afg_file.filename
         out_file = VPSolver.new_tmp_file()
-        opts = "{print_inst:d} {pyout:d}".format(
-            print_inst=print_inst, pyout=pyout
-        )
+        opts = "{print_inst:d} {pyout:d}".format(print_inst=print_inst, pyout=pyout)
         VPSolver.run(
-            "{} {} {} {}".format(
-                VPSolver.VBPSOL_EXEC, afg_file, sol_file, opts
-            ),
+            "{} {} {} {}".format(VPSolver.VBPSOL_EXEC, afg_file, sol_file, opts),
             tee=out_file,
-            verbose=verbose
+            verbose=verbose,
         )
         output = utils.get_content(out_file)
         os.remove(out_file)
@@ -463,13 +440,16 @@ class VPSolver(object):
         vtype = utils.get_opt("VTYPE", content, "I")
         out_file = VPSolver.new_tmp_file()
         opts = "{method:d} {binary:d} {vtype} {print_inst:d} {pyout:d}".format(
-            method=method, binary=binary, vtype=vtype,
-            print_inst=print_inst, pyout=pyout
+            method=method,
+            binary=binary,
+            vtype=vtype,
+            print_inst=print_inst,
+            pyout=pyout,
         )
         VPSolver.run(
             "{} {} {}".format(VPSolver.VPSOLVER_EXEC, instance_file, opts),
             tee=out_file,
-            verbose=verbose
+            verbose=verbose,
         )
         output = utils.get_content(out_file)
         os.remove(out_file)
@@ -482,11 +462,9 @@ class VPSolver(object):
             instance_file = instance_file.filename
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
-            "{} {} {} {}".format(
-                VPSolver.VBP2AFG_EXEC, instance_file, afg_file, opts
-            ),
+            "{} {} {} {}".format(VPSolver.VBP2AFG_EXEC, instance_file, afg_file, opts),
             tee=out_file,
-            verbose=verbose
+            verbose=verbose,
         )
         output = utils.get_content(out_file)
         os.remove(out_file)
@@ -499,11 +477,9 @@ class VPSolver(object):
             afg_file = afg_file.filename
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
-            "{} {} {} {}".format(
-                VPSolver.AFG2MPS_EXEC, afg_file, mps_file, opts
-            ),
+            "{} {} {} {}".format(VPSolver.AFG2MPS_EXEC, afg_file, mps_file, opts),
             tee=out_file,
-            verbose=verbose
+            verbose=verbose,
         )
         output = utils.get_content(out_file)
         os.remove(out_file)
@@ -516,11 +492,9 @@ class VPSolver(object):
             afg_file = afg_file.filename
         out_file = VPSolver.new_tmp_file()
         VPSolver.run(
-            "{} {} {} {}".format(
-                VPSolver.AFG2LP_EXEC, afg_file, lp_file, opts
-            ),
+            "{} {} {} {}".format(VPSolver.AFG2LP_EXEC, afg_file, lp_file, opts),
             tee=out_file,
-            verbose=verbose
+            verbose=verbose,
         )
         output = utils.get_content(out_file)
         os.remove(out_file)
@@ -534,8 +508,9 @@ class VPSolver(object):
         AFG.from_file(afg_file).draw(svg_file)
 
     @staticmethod
-    def script(script_name, arg1=None, arg2=None, options=None, pyout=True,
-               verbose=None):
+    def script(
+        script_name, arg1=None, arg2=None, options=None, pyout=True, verbose=None
+    ):
         """Call a VPSolver script and return a vector packing solution."""
         cmd = script_name
         for arg in [arg1, arg2]:
@@ -563,7 +538,7 @@ class VPSolver(object):
                 else:
                     raise Exception("Invalid file extension!")
         if options is not None:
-            cmd += " --options \"{}\"".format(options)
+            cmd += ' --options "{}"'.format(options)
         if pyout is True:
             cmd += " --pyout"
         out_file = VPSolver.new_tmp_file()
@@ -576,13 +551,13 @@ class VPSolver(object):
     def script_wsol(script_name, model, options=None, verbose=None):
         """Call a solver script and return the solution."""
         from pympl import Tools
+
         if verbose is None:
             verbose = VPSolver.VERBOSE
         if isinstance(model, (LP, MPS)):
             model = model.filename
         return Tools.script(
-            script_name=script_name, model=model, options=options,
-            verbose=verbose
+            script_name=script_name, model=model, options=options, verbose=verbose
         )
 
 
@@ -591,6 +566,7 @@ def signal_handler(signal_, frame):
     print("signal received: {}".format(signal_))
     VPSolver.clear()
     sys.exit(1)
+
 
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGHUP, signal_handler)

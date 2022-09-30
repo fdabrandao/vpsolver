@@ -2,22 +2,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2016, Filipe Brandao
-Faculdade de Ciencias, Universidade do Porto
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright (C) 2013-2016, Filipe Brandao <fdabrandao@gmail.com>
 """
 from __future__ import print_function
 from builtins import str
@@ -62,7 +47,8 @@ def favicon():
     """Favicon route."""
     return flask.send_from_directory(
         os.path.join(app.root_path, "static"),
-        "favicon.ico", mimetype='image/vnd.microsoft.icon'
+        "favicon.ico",
+        mimetype="image/vnd.microsoft.icon",
     )
 
 
@@ -84,9 +70,7 @@ def vbp(example):
     """Render the input page for VBP."""
     title = "Vector Packing"
 
-    example_folder = os.path.join(
-        os.path.dirname(__file__), "data", "examples", "vbp"
-    )
+    example_folder = os.path.join(os.path.dirname(__file__), "data", "examples", "vbp")
     examples = [
         ("/vbp/", "", None),
         ("/vbp/bpp", "BPP", "bpp.vbp"),
@@ -126,9 +110,7 @@ def mvp(example):
     """Render the input page for MVP."""
     title = "Multiple-choice Vector Packing"
 
-    example_folder = os.path.join(
-        os.path.dirname(__file__), "data", "examples", "mvp"
-    )
+    example_folder = os.path.join(os.path.dirname(__file__), "data", "examples", "mvp")
     examples = [
         ("/mvp/", "", None),
         ("/mvp/vsbpp", "VSBPP", "vsbpp.mvp"),
@@ -173,6 +155,7 @@ def solve_worker(app_name, method, form, args, output=sys.stdout):
             except Exception as e:
                 pass
         sys.exit(0)
+
     signal.signal(signal.SIGTERM, signal_handler)
 
     sys.stdout = output
@@ -238,9 +221,7 @@ def solve(app_name):
     """Render the solver page."""
     try:
         args = (app_name, request.method, request.form, request.args)
-        return Response(
-            IterativeOutput(solve_worker, args), mimetype="text/plain"
-        )
+        return Response(IterativeOutput(solve_worker, args), mimetype="text/plain")
     except Exception as e:
         return json.dumps({"error": str(e)})
     finally:
@@ -250,6 +231,7 @@ def solve(app_name):
 def get_ip_address():
     """Return the ip address of 'eth0'."""
     import socket
+
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
     return s.getsockname()[0]

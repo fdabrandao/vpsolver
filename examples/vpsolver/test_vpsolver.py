@@ -2,22 +2,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2016, Filipe Brandao
-Faculdade de Ciencias, Universidade do Porto
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright (C) 2013-2016, Filipe Brandao <fdabrandao@gmail.com>
 """
 from __future__ import print_function
 
@@ -28,6 +13,7 @@ def test_vbpsolver():
     """Test vbpsolver."""
     from pyvpsolver import VPSolver
     from pyvpsolver.solvers import vbpsolver
+
     W, w, b = (1,), [(1,)], [1]
     lp_file = VPSolver.new_tmp_file(".lp")
     mps_file = VPSolver.new_tmp_file(".mps")
@@ -39,8 +25,13 @@ def test_vbpsolver():
     assert obj == 1
 
     solution = vbpsolver.solve(
-        W, w, b, lp_file=lp_file, mps_file=mps_file, svg_file=svg_file,
-        script="vpsolver_glpk.sh"
+        W,
+        w,
+        b,
+        lp_file=lp_file,
+        mps_file=mps_file,
+        svg_file=svg_file,
+        script="vpsolver_glpk.sh",
     )
     vbpsolver.print_solution(solution)
     obj, patterns = solution
@@ -52,15 +43,14 @@ def test_mvpsolvers():
     """Test mvpsolvers."""
     from pyvpsolver import VPSolver
     from pyvpsolver.solvers import mvpsolver2013, mvpsolver2016
+
     Ws = [(100, 75), (75, 50), (75, 50), (100, 100)]
     Cs = [3, 2, 3, 100]
     Qs = [inf, -1, -1, -1]
     ws = [[(75, 50)], [(40, 75), (25, 25)]]
     b = [2, 1]
     for mvpsolver in [mvpsolver2013, mvpsolver2016]:
-        solution = mvpsolver.solve(
-            Ws, Cs, Qs, ws, b, script="vpsolver_glpk.sh"
-        )
+        solution = mvpsolver.solve(Ws, Cs, Qs, ws, b, script="vpsolver_glpk.sh")
         mvpsolver.print_solution(solution)
         obj, patterns = solution
         assert obj == 5
@@ -70,8 +60,16 @@ def test_mvpsolvers():
         svg_file = VPSolver.new_tmp_file(".svg")
 
         solution = mvpsolver.solve(
-            Ws, Cs, Qs, ws, b, lp_file=lp_file, mps_file=mps_file,
-            svg_file=svg_file, script="vpsolver_glpk.sh", verbose=True
+            Ws,
+            Cs,
+            Qs,
+            ws,
+            b,
+            lp_file=lp_file,
+            mps_file=mps_file,
+            svg_file=svg_file,
+            script="vpsolver_glpk.sh",
+            verbose=True,
         )
         mvpsolver.print_solution(solution)
         obj, patterns = solution
@@ -82,6 +80,7 @@ def test_mvpsolvers():
 def test_scripts():
     """Test scripts."""
     from pyvpsolver import VPSolver, VBP, MVP, AFG, LP, MPS
+
     VPSolver.clear()
     vbp = VBP(W=(1,), w=[(1,)], b=[1], verbose=True)
     mvp = MVP(Ws=[(1,)], Cs=[1], Qs=[inf], ws=[[(1,)]], b=[1], verbose=True)
@@ -119,6 +118,7 @@ def test_scripts():
 def test_vbpsol():
     """Test vbpsol."""
     from pyvpsolver import VPSolver, VBP, MVP, AFG, LP, MPS
+
     vbp = VBP(W=(1,), w=[(1,)], b=[1], verbose=True)
     afg = AFG(vbp, verbose=True)
     lp = LP(afg, verbose=True)
@@ -138,15 +138,14 @@ def test_vbpsol():
 def test_draw():
     """Test scripts."""
     from pyvpsolver import VPSolver, VBP, MVP, AFG
+
     vbp = VBP(W=(1,), w=[(1,)], b=[1])
     mvp = MVP(Ws=[(1,)], Cs=[1], Qs=[inf], ws=[[(1,)]], b=[1])
     svg_file = VPSolver.new_tmp_file(".svg")
     for instance in [vbp, mvp]:
         afg = AFG(instance)
         try:
-            afg.draw(
-                svg_file, lpaths=True, graph_attrs={"size": "8,8"}
-            )
+            afg.draw(svg_file, lpaths=True, graph_attrs={"size": "8,8"})
         except Exception as e:
             print(repr(e))
         try:
@@ -162,6 +161,7 @@ def test_draw():
 def test_lowlevel():
     """Test low-level API."""
     from pyvpsolver import VPSolver, VBP, MVP, AFG
+
     vbp = VBP(W=(1,), w=[(1,)], b=[1])
     mvp = MVP(Ws=[(1,)], Cs=[1], Qs=[inf], ws=[[(1,)]], b=[1])
     afg_file = VPSolver.new_tmp_file(".afg")

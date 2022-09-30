@@ -1,22 +1,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2016, Filipe Brandao
-Faculdade de Ciencias, Universidade do Porto
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright (C) 2013-2016, Filipe Brandao <fdabrandao@gmail.com>
 """
 from builtins import zip
 from builtins import map
@@ -49,9 +34,19 @@ class AFGraph(object):
         if self.Ts is not None:
             self.Ts = [fv(t) for t in self.Ts]
 
-    def draw(self, svg_file, show_labels=False, ignore=None, back=None,
-             loss=None, weights=None, capacities=None, lpaths=False,
-             graph_attrs=None, verbose=False):
+    def draw(
+        self,
+        svg_file,
+        show_labels=False,
+        ignore=None,
+        back=None,
+        loss=None,
+        weights=None,
+        capacities=None,
+        lpaths=False,
+        graph_attrs=None,
+        verbose=False,
+    ):
         """Draw the arc-flow graph in .svg format."""
         V, A = self.V, self.A
         if loss is None:
@@ -68,26 +63,28 @@ class AFGraph(object):
                 v: "{}:\nL({})\nU({})".format(
                     str(v),
                     ",".join(map(str, lp_source[v])),
-                    ",".join(map(str, lp_targets[v]))
+                    ",".join(map(str, lp_targets[v])),
                 )
                 for v in V
             }
             if ignore is not None:
                 ignore = [
-                    (newlabels.get(u, u), newlabels.get(v, v))
-                    for (u, v) in ignore
+                    (newlabels.get(u, u), newlabels.get(v, v)) for (u, v) in ignore
                 ]
             if back is not None:
-                back = [
-                    (newlabels.get(u, u), newlabels.get(v, v))
-                    for (u, v) in back
-                ]
+                back = [(newlabels.get(u, u), newlabels.get(v, v)) for (u, v) in back]
             V, A = relabel_graph(V, A, lambda v: newlabels.get(v, v))
 
         draw_graph(
-            svg_file, sort_vertices(V), sort_arcs(A),
-            show_labels=show_labels, ignore=ignore, back=back, loss=loss,
-            graph_attrs=graph_attrs, verbose=verbose
+            svg_file,
+            sort_vertices(V),
+            sort_arcs(A),
+            show_labels=show_labels,
+            ignore=ignore,
+            back=back,
+            loss=loss,
+            graph_attrs=graph_attrs,
+            verbose=verbose,
         )
 
     def vname(self, u, v, i, vnames=None):
@@ -108,8 +105,8 @@ class AFGraph(object):
             if v != self.S:
                 radj[v].append((u, lbl))
 
-        zero = tuple([0]*ndims)
-        minlabel = tuple([0]*ndims)
+        zero = tuple([0] * ndims)
+        minlabel = tuple([0] * ndims)
 
         def lp_source(u, labels):
             if u in labels:
@@ -118,7 +115,7 @@ class AFGraph(object):
             for v, it in radj[u]:
                 wi = weights.get(it, zero)
                 vlbl = lp_source(v, labels)
-                lbl = tuple(max(lbl[d], vlbl[d]+wi[d]) for d in range(ndims))
+                lbl = tuple(max(lbl[d], vlbl[d] + wi[d]) for d in range(ndims))
             labels[u] = lbl
             return lbl
 
@@ -135,8 +132,8 @@ class AFGraph(object):
             if v != self.S:
                 adj[u].append((v, lbl))
 
-        zero = tuple([0]*ndims)
-        maxlabel = tuple([inf]*ndims)
+        zero = tuple([0] * ndims)
+        maxlabel = tuple([inf] * ndims)
 
         def lp_targets(u, labels):
             if u in labels:
@@ -145,7 +142,7 @@ class AFGraph(object):
             for v, it in adj[u]:
                 wi = weights.get(it, zero)
                 vlbl = lp_targets(v, labels)
-                lbl = tuple(min(lbl[d], vlbl[d]-wi[d]) for d in range(ndims))
+                lbl = tuple(min(lbl[d], vlbl[d] - wi[d]) for d in range(ndims))
             labels[u] = lbl
             return lbl
 
@@ -245,7 +242,7 @@ class AFGraph(object):
                     # v != node_a to avoid cycles
                     if v != node_a and flow[arc] > 0:
                         ff = min(f, flow[arc])
-                        go(v, ff, path+[arc])
+                        go(v, ff, path + [arc])
                         f -= ff
 
         go(node_a, flow_limit, [])

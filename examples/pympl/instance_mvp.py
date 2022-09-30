@@ -2,22 +2,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2016, Filipe Brandao
-Faculdade de Ciencias, Universidade do Porto
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright (C) 2013-2016, Filipe Brandao <fdabrandao@gmail.com>
 """
 from __future__ import print_function
 import os
@@ -26,6 +11,7 @@ import os
 def main():
     """Parses 'instance_mvp.mod'"""
     from pympl import PyMPL, Tools, glpkutils
+
     os.chdir(os.path.dirname(__file__) or os.curdir)
 
     mod_in = "instance_mvp.mod"
@@ -35,12 +21,9 @@ def main():
 
     lp_out = "tmp/instance_mvp.lp"
     glpkutils.mod2lp(mod_out, lp_out, True)
-    out, varvalues = Tools.script(
-        "glpk_wrapper.sh", lp_out, verbose=True
-    )
+    out, varvalues = Tools.script("glpk_wrapper.sh", lp_out, verbose=True)
     sol = parser["MVP_FLOW"].extract(
-        lambda varname: varvalues.get(varname, 0),
-        verbose=True
+        lambda varname: varvalues.get(varname, 0), verbose=True
     )
 
     print("")

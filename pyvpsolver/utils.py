@@ -1,22 +1,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2016, Filipe Brandao
-Faculdade de Ciencias, Universidade do Porto
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright (C) 2013-2016, Filipe Brandao <fdabrandao@gmail.com>
 """
 from __future__ import print_function
 from __future__ import division
@@ -78,10 +63,20 @@ def sort_arcs(A, reverse=False):
     )
 
 
-def draw_graph(svg_file, V, A, show_labels=False, ignore=None, back=None,
-               loss=None, graph_attrs=None, verbose=False):
+def draw_graph(
+    svg_file,
+    V,
+    A,
+    show_labels=False,
+    ignore=None,
+    back=None,
+    loss=None,
+    graph_attrs=None,
+    verbose=False,
+):
     """Draw an arc-flow graph in .svg format."""
     from pygraphviz.agraph import AGraph
+
     if ignore is None:
         ignore = []
     if back is None:
@@ -91,9 +86,12 @@ def draw_graph(svg_file, V, A, show_labels=False, ignore=None, back=None,
     elif not isinstance(loss, (tuple, list)):
         loss = [loss]
     g = AGraph(
-        rankdir="LR", directed=True, bgcolor="white",
-        ranksep="1.0", nodesep="0.10",
-        strict=False
+        rankdir="LR",
+        directed=True,
+        bgcolor="white",
+        ranksep="1.0",
+        nodesep="0.10",
+        strict=False,
     )
     if graph_attrs is not None:
         for attr, value in graph_attrs.items():
@@ -105,10 +103,10 @@ def draw_graph(svg_file, V, A, show_labels=False, ignore=None, back=None,
 
     lbls = sorted(
         set(i for (u, v, i) in A if i not in loss),
-        key=lambda lbl: (repr(type(lbl)), lbl)
+        key=lambda lbl: (repr(type(lbl)), lbl),
     )
 
-    colors = Colors.uniquecolors(len(lbls)+1, v=0.5, p=0.0)
+    colors = Colors.uniquecolors(len(lbls) + 1, v=0.5, p=0.0)
 
     used = set()
     for (u, v, i) in A:
@@ -147,15 +145,14 @@ class Colors(object):
     def rgbcode(t):
         """Convert (r, g, b) tuples to hexadecimal."""
         r, g, b = t
-        r = int(r*255)
-        g = int(g*255)
-        b = int(b*255)
+        r = int(r * 255)
+        g = int(g * 255)
+        b = int(b * 255)
         return "#{0:0>2x}{1:0>2x}{2:0>2x}".format(r, g, b)
 
     @staticmethod
     def rgbcolor(h, f, v, p):
-        """Convert colors specified by h-value and f-value to RGB three-tuples.
-        """
+        """Convert colors specified by h-value and f-value to RGB three-tuples."""
         # q = 1 - f
         # t = f
         if h == 0:
@@ -176,10 +173,8 @@ class Colors(object):
         """Generate a list of distinct colors, each of which is
         represented as an RGB three-tuple."""
         import math
-        hues = list(360.0/n*i for i in range(n))
-        hs = list(math.floor(hue/60) % 6 for hue in hues)
-        fs = list((hue/60) % 1 for hue in hues)
-        return [
-            Colors.rgbcode(Colors.rgbcolor(h, f, v, p))
-            for h, f in zip(hs, fs)
-        ]
+
+        hues = list(360.0 / n * i for i in range(n))
+        hs = list(math.floor(hue / 60) % 6 for hue in hues)
+        fs = list((hue / 60) % 1 for hue in hues)
+        return [Colors.rgbcode(Colors.rgbcolor(h, f, v, p)) for h, f in zip(hs, fs)]

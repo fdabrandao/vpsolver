@@ -1,22 +1,7 @@
 """
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 
-Copyright (C) 2013-2016, Filipe Brandao
-Faculdade de Ciencias, Universidade do Porto
-Porto, Portugal. All rights reserved. E-mail: <fdabrandao@dcc.fc.up.pt>.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright (C) 2013-2016, Filipe Brandao <fdabrandao@gmail.com>
 """
 from __future__ import print_function
 
@@ -24,9 +9,18 @@ import sys
 from .. import VPSolver, VBP, AFG, MPS
 
 
-def solve(W, w, b,
-          svg_file="", lp_file="", mps_file="",
-          script=None, script_options=None, stats=None, verbose=None):
+def solve(
+    W,
+    w,
+    b,
+    svg_file="",
+    lp_file="",
+    mps_file="",
+    script=None,
+    script_options=None,
+    stats=None,
+    verbose=None,
+):
     """
     Solve vector packing instances using the method proposed in:
     Brandao, F. and Pedroso, J. P. (2013). Bin Packing and Related
@@ -39,8 +33,7 @@ def solve(W, w, b,
     if stats is None and verbose is not None:
         stats = verbose
     instance = VBP(W, w, b, verbose=False)
-    if (stats == verbose and svg_file == "" and
-            lp_file == "" and mps_file == ""):
+    if stats == verbose and svg_file == "" and lp_file == "" and mps_file == "":
         out, (obj, sol) = VPSolver.script(script, instance, verbose=verbose)
     else:
         afg = AFG(instance, verbose=stats)
@@ -76,8 +69,9 @@ def print_solution(solution, arg2=None, i0=1, fout=sys.stdout):
     print("Solution:", file=fout)
     for mult, patt in sol:
         assert all(opt == 0 for it, opt in patt)
-        print("{0} x [{1}]".format(
-            mult, ", ".join(
-                ["i={0}".format(it+i0) for it, opt in patt]
-            )
-        ), file=fout)
+        print(
+            "{0} x [{1}]".format(
+                mult, ", ".join(["i={0}".format(it + i0) for it, opt in patt])
+            ),
+            file=fout,
+        )
