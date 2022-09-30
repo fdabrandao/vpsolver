@@ -8,7 +8,6 @@ Copyright (C) 2013-2021, Filipe Brandao <fdabrandao@gmail.com>
 #include <map>
 #include <vector>
 #include <algorithm>
-#include "gurobi_c.h"
 #include "gurobi_c++.h"
 #include "config.hpp"
 #include "common.hpp"
@@ -36,12 +35,12 @@ void solve(const Instance &inst, bool print_inst = false, bool pyout = false) {
 	// model.getEnv().set(GRB_DoubleParam_ImproveStartTime, 60);
 	// model.getEnv().set(GRB_DoubleParam_ImproveStartGap, 1);
 
-	vector <Arc> As(afg.A);
-	sort(all(As));
-	map <Arc, GRBVar> va;
+	std::vector <Arc> As(afg.A);
+	std::sort(all(As));
+	std::map <Arc, GRBVar> va;
 	int lastv = afg.Ts[0] - 1;
 	for (int i = 0; i < inst.nbtypes; i++) {
-		lastv = min(lastv, afg.Ts[i] - 1);
+		lastv = std::min(lastv, afg.Ts[i] - 1);
 	}
 	for (int i = 0; i < 3; i++) {
 		for (const Arc &a : As) {
@@ -72,9 +71,9 @@ void solve(const Instance &inst, bool print_inst = false, bool pyout = false) {
 		}
 	}
 
-	vector <vector<Arc>> Al(inst.nsizes);
-	vector <vector<Arc>> in(afg.NV);
-	vector <vector<Arc>> out(afg.NV);
+	std::vector <std::vector<Arc>> Al(inst.nsizes);
+	std::vector <std::vector<Arc>> in(afg.NV);
+	std::vector <std::vector<Arc>> out(afg.NV);
 
 	for (const Arc &a : As) {
 		if (a.label != afg.LOSS) {
@@ -123,7 +122,7 @@ void solve(const Instance &inst, bool print_inst = false, bool pyout = false) {
 	printf("Total run time: %.2f seconds\n", tg + pre);
 
 	if (inst.vtype == 'I') {
-		map<Arc, int> flow;
+		std::map<Arc, int> flow;
 		for (const auto &a : va) {
 			double x = a.second.get(GRB_DoubleAttr_X);
 			int rx = static_cast<int>(round(x));

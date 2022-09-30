@@ -30,8 +30,8 @@ For more details, please refer to the [project wiki](https://github.com/fdabrand
 
 * MIP solver: Gurobi, CPLEX, GLPK, COIN-OR, SCIP, lp_solve, ...  
 * UNIX-like operating system or a UNIX-like environment such as [Cygwin](https://www.cygwin.com/)
-* `g++ >= 4.8`; `make >= 3.0`; `bash >= 3.0`
-      
+* `g++ >= 4.8`; `cmake >= 3.3`; `bash >= 3.0`
+
 #### Optional
 
 For the [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API) and Web App:
@@ -53,11 +53,12 @@ It has been successfully compiled and run on the following platforms:
 Without the python interface: 
 
 ```bash
-$ ./configure CXXFLAGS="" LDFLAGS=""
-$ make
-$ sudo make install
+$ mkdir build
+$ cd build/
+$ cmake ..
+$ cmake --build .
 ```
-Note: In order to compile only the components that do not require Gurobi, use `./configure GUROBI_HOME=""`. In order to link the optional components that require Gurobi, the environment variable `$GUROBI_HOME` must be set, and some additional flags may also need to be set (e.g., `./configure LDFLAGS="-L${GUROBI_HOME}/lib/ -lgurobi_stdc++"`).
+Note: In order to compile the components that require Gurobi, you need to have set the environment variable `GUROBI_HOME` or specify the location of the Gurobi installation in the third step (e.g., `cmake .. -DGUROBI_DIR=/Library/gurobi952/macos_universal2/`).
 
 With the python interface: 
 

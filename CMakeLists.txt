@@ -1,22 +1,38 @@
-cmake_minimum_required(VERSION 3.1...3.19)
+cmake_minimum_required(VERSION 3.3...3.19)
 
 project(
     VPSolver
     VERSION 3.0
     LANGUAGES CXX)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_CXX_STANDARD 11)
+
+# Visual Studio compiler with static runtime libraries
+if(MSVC AND MT)
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
+endif()
+
+find_package(GUROBI REQUIRED)
 
 add_library(vpsolver-lib OBJECT
     src/instance.cpp src/instance.hpp 
     src/graph.cpp src/graph.hpp
     src/arcflow.cpp src/arcflow.hpp
+    src/arcflowsol.cpp src/arcflowsol.hpp
     src/common.cpp src/common.hpp)
+
+add_executable(vpsolver src/vpsolver.cpp $<TARGET_OBJECTS:vpsolver-lib>)
+target_include_directories(vpsolver PRIVATE ${GUROBI_INCLUDE_DIRS})
+target_link_libraries(vpsolver ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARY})
 
 add_executable(vbp2afg src/vbp2afg.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(afg2mps src/afg2mps.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(afg2lp src/afg2lp.cpp $<TARGET_OBJECTS:vpsolver-lib>)
-add_executable(vbpsol src/vbpsol.cpp src/arcflowsol.cpp src/arcflowsol.hpp $<TARGET_OBJECTS:vpsolver-lib>)
+add_executable(vbpsol src/vbpsol.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 
 # CPack
 set(CPACK_GENERATOR ZIP)
