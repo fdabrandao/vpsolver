@@ -11,7 +11,7 @@ jobs:
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: 'wheelhouse'
-        artifactName: 'wheels'
+        artifactName: 'upload'
 - job: manylinux
   pool: {vmImage: 'Ubuntu-20.04'}
   strategy:
