@@ -16,8 +16,6 @@ if(MSVC AND MT)
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
 endif()
 
-find_package(GUROBI REQUIRED)
-
 add_library(vpsolver-lib OBJECT
     src/instance.cpp src/instance.hpp 
     src/graph.cpp src/graph.hpp
@@ -25,14 +23,24 @@ add_library(vpsolver-lib OBJECT
     src/arcflowsol.cpp src/arcflowsol.hpp
     src/common.cpp src/common.hpp)
 
-add_executable(vpsolver src/vpsolver.cpp $<TARGET_OBJECTS:vpsolver-lib>)
-target_include_directories(vpsolver PRIVATE ${GUROBI_INCLUDE_DIRS})
-target_link_libraries(vpsolver ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARY})
+# VPSolver executable
+find_package(GUROBI)
+if(GUROBI_CXX_LIBRARY AND GUROBI_LIBRARY AND GUROBI_INCLUDE_DIRS)
+    add_executable(vpsolver src/vpsolver.cpp $<TARGET_OBJECTS:vpsolver-lib>)
+    target_include_directories(vpsolver PRIVATE ${GUROBI_INCLUDE_DIRS})
+    target_link_libraries(vpsolver ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARY})
+    install(TARGETS vpsolver DESTINATION bin)
+endif()
 
+# Auxiliary executables
 add_executable(vbp2afg src/vbp2afg.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(afg2mps src/afg2mps.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(afg2lp src/afg2lp.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(vbpsol src/vbpsol.cpp $<TARGET_OBJECTS:vpsolver-lib>)
+install(TARGETS vbp2afg afg2mps afg2lp vbpsol DESTINATION bin)
+install(DIRECTORY
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/
+    DESTINATION scripts)
 
 # CPack
 set(CPACK_GENERATOR ZIP)
