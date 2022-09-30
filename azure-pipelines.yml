@@ -10,8 +10,8 @@ jobs:
       displayName: Build documentation
     - task: PublishBuildArtifacts@1
       inputs:
-        pathtoPublish: 'wheelhouse'
-        artifactName: 'upload'
+        pathtoPublish: 'upload'
+        artifactName: 'wheels'
 - job: manylinux
   pool: {vmImage: 'Ubuntu-20.04'}
   strategy:
@@ -23,7 +23,7 @@ jobs:
     - bash: |
         set -ex
         mkdir -p build/{,upload} && cd build
-        cmake .. && cmake --build . --config Release
+        cmake .. && cmake --build .
         cpack && cp vpsolver.zip upload/vpsolver-linux64.zip
       displayName: Build binaries
     - task: PublishBuildArtifacts@1
@@ -41,13 +41,13 @@ jobs:
         pathtoPublish: 'wheelhouse'
         artifactName: 'wheels'
 - job: macos
-  pool: {vmImage: 'macOS-10.15'}
+  pool: {vmImage: 'macos-latest'}
   steps:
     - task: UsePythonVersion@0
     - bash: |
         set -ex
         mkdir -p build/{,upload} && cd build
-        cmake .. && cmake --build . --config Release
+        cmake .. && cmake --build . -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
         cpack && cp vpsolver.zip upload/vpsolver-macos64.zip
       displayName: Build binaries
     - task: PublishBuildArtifacts@1
@@ -61,7 +61,9 @@ jobs:
         CIBW_SKIP='pp*' cibuildwheel --platform macos --output-dir wheelhouse .
       displayName: Build wheels
     - task: PublishBuildArtifacts@1
-      inputs: {pathtoPublish: 'wheelhouse'}
+      inputs:
+        pathtoPublish: 'wheelhouse'
+        artifactName: 'wheels'
 - job: windows
   pool: {vmImage: 'windows-2019'}
   steps:
