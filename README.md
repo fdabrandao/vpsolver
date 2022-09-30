@@ -1,8 +1,6 @@
 ## Arc-flow Vector Packing Solver (VPSolver)
 
 Copyright (C) 2013-2022, Filipe Brandão <fdabrandao@gmail.com>
-Faculdade de Ciências, Universidade do Porto  
-Porto, Portugal. All rights reserved.
 
 ---
 [VPSolver](https://github.com/fdabrandao/vpsolver) is a multiple-choice vector packing solver based on an arc-flow formulation with graph compression (see, e.g., [\[1\]](#references)). VPSolver generates very strong models (equivalent to Gilmore and Gomory's) that can be solved using general-purpose mixed-integer programming
