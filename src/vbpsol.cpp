@@ -1,7 +1,5 @@
 /**
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
-
-Copyright (C) 2013-2021, Filipe Brandao <fdabrandao@gmail.com>
 **/
 #include <cstdio>
 #include <cstdlib>
@@ -15,7 +13,7 @@ Copyright (C) 2013-2021, Filipe Brandao <fdabrandao@gmail.com>
 #include "arcflowsol.hpp"
 
 int swig_main(int argc, char **argv) {
-	printf(PACKAGE_STRING", Copyright (C) 2013-2016, Filipe Brandao\n");
+	printf(PACKAGE_STRING", Copyright (C) 2013-2022, Filipe Brandao\n");
 	setvbuf(stdout, NULL, _IONBF, 0);
 	if (argc < 3 || argc > 5) {
 		printf("Usage: vbpsol graph.afg vars.sol "
