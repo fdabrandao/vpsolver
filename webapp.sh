@@ -1,8 +1,5 @@
 #!/bin/bash
-# This code is part of the Arc-flow Vector Packing Solver (VPSolver).
-#
-# Copyright (C) 2013-2021, Filipe Brandao <fdabrandao@gmail.com>
-BASEDIR=`dirname $0`
+BASEDIR=`dirname "$0"`
 cd $BASEDIR
 CMD="$0 $*"
 

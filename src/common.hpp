@@ -1,7 +1,5 @@
 /**
 This code is part of the Arc-flow Vector Packing Solver (VPSolver).
-
-Copyright (C) 2013-2021, Filipe Brandao <fdabrandao@gmail.com>
 **/
 #ifndef SRC_COMMON_HPP_
 #define SRC_COMMON_HPP_
