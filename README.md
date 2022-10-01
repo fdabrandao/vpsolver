@@ -7,8 +7,7 @@ Copyright (C) 2013-2022, Filipe Brandão <fdabrandao@gmail.com>
 solvers such as Gurobi and GLPK (see, e.g., [\[2\]](#references) and [\[3\]](#references)). VPSolver does not explicitly require any MIP solver in particular, though a good  MIP solver may be necessary for solving large models.
 
 ![](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)
-[![](https://travis-ci.org/fdabrandao/vpsolver.svg?branch=master)](https://travis-ci.org/fdabrandao/vpsolver)
-[![Coverage Status](https://coveralls.io/repos/github/fdabrandao/vpsolver/badge.svg?branch=develop)](https://coveralls.io/github/fdabrandao/vpsolver)
+[![Build Status](https://dev.azure.com/fdabrandao0236/vpsolver/_apis/build/status/fdabrandao.vpsolver?branchName=master)](https://dev.azure.com/fdabrandao0236/vpsolver/_build/latest?definitionId=1&branchName=master)
 
 For modelling other problems easily, VPSolver includes a [Python API](https://github.com/fdabrandao/vpsolver/wiki/Python-API), a modelling toolbox ([PyMPL](https://github.com/fdabrandao/pympl/)), and a [Web App](#vpsolver-web-app). VPSolver has been successfully compiled and run on Linux, macOS, and Windows. VPSolver can also be used in [Docker containers](#docker).
 
