@@ -34,6 +34,7 @@ endif()
 
 # Auxiliary executables
 add_executable(vbp2afg src/vbp2afg.cpp $<TARGET_OBJECTS:vpsolver-lib>)
+add_executable(afg2ampl src/afg2ampl.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(afg2mps src/afg2mps.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(afg2lp src/afg2lp.cpp $<TARGET_OBJECTS:vpsolver-lib>)
 add_executable(vbpsol src/vbpsol.cpp $<TARGET_OBJECTS:vpsolver-lib>)

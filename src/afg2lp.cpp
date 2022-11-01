@@ -10,8 +10,6 @@ This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 #include "arcflow.hpp"
 #include "instance.hpp"
 
-using namespace std;
-
 /*
     LP format example:
 

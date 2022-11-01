@@ -7,6 +7,8 @@
 *.egg-info
 .ipynb_checkpoints
 .coverage
+.vscode
+.idea
 docker.sh
 coverage_html
 /bin/

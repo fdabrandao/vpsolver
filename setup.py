@@ -84,6 +84,17 @@ _vbp2afg = Extension(
     undef_macros=['NDEBUG'],
 )
 
+_afg2ampl = Extension(
+    "_afg2ampl",
+    sources=[
+        "swig/afg2ampl_wrap.cxx", "src/afg2ampl.cpp",
+        "src/instance.cpp", "src/graph.cpp",
+        "src/arcflow.cpp", "src/common.cpp"
+    ],
+    extra_compile_args=compile_args(),
+    undef_macros=['NDEBUG'],
+)
+
 _afg2lp = Extension(
     "_afg2lp",
     sources=[
@@ -147,5 +158,5 @@ setup(
         "License :: OSI Approved :: BSD License",
         "Topic :: Scientific/Engineering"
     ],
-    ext_modules=[_vbp2afg, _afg2lp, _afg2mps, _vbpsol],
+    ext_modules=[_vbp2afg, _afg2ampl, _afg2lp, _afg2mps, _vbpsol],
 )

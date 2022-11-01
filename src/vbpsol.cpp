@@ -49,7 +49,11 @@ int swig_main(int argc, char **argv) {
 			if (strlen(buf) <= 1) {
 				continue;
 			}
-			sscanf(&buf[1], "%x", &ind);
+			if (buf[0] == 'X') {
+				sscanf(&buf[1], "%x", &ind);
+			} else {
+				sscanf(&buf[0], "%d", &ind);
+			}
 			throw_assert(ind < afg.NA);
 			int rx = static_cast<int>(round(x));
 			throw_assert(x - rx <= EPS);

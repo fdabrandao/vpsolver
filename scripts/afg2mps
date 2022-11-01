@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 import sys
-from pyvpsolver.swig import afg2mps
+from _afg2mps import swig_main
 
-sys.exit(afg2mps.swig_main(len(sys.argv), [x.encode("ascii") for x in sys.argv]))
+sys.exit(swig_main(len(sys.argv), [x.encode("ascii") for x in sys.argv]))
