@@ -47,14 +47,14 @@ int swig_main(int argc, char **argv) {
 
 		printf("Generating the .LP model...");
 
-		map<int, vector<int>> Ai;
-		map<int, vector<int>> in;
-		map<int, vector<int>> out;
+		std::map<int, std::vector<int>> Ai;
+		std::map<int, std::vector<int>> in;
+		std::map<int, std::vector<int>> out;
 
 		/* objective */
 
 		fprintf(fout, "Minimize");
-		vector<int> ub(afg.NA);
+		std::vector<int> ub(afg.NA);
 		for (int i = 0; i < afg.NA; i++) {
 			const Arc &a = afg.A[i];
 			Ai[a.label].push_back(i);
