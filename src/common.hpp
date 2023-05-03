@@ -17,6 +17,7 @@ This code is part of the Arc-flow Vector Packing Solver (VPSolver).
 #define TIMEDIF(t0) (static_cast<double>(clock()-t0)/CLOCKS_PER_SEC)
 
 #include <utility>
+#include <cstdio>
 #include <exception>
 #include <stdexcept>
 
