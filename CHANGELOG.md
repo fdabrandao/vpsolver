@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.4] - 2023-05-03
+
+### Added
+- Wheels for Python up to 3.11.
+
+### Fixed
+- Fixed compilation error on Linux.
+
 ## [3.1.3] - 2021-10-02
 
 ### Added
