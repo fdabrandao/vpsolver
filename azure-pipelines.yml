@@ -1,3 +1,6 @@
+variables:
+  CIBW_SKIP: pp* cp27-* *_i686 *-win32 *musllinux* *-manylinux*_i686
+
 jobs:
 - job: sdist
   pool: {vmImage: 'Ubuntu-20.04'}
@@ -14,10 +17,6 @@ jobs:
         artifactName: 'wheels'
 - job: manylinux
   pool: {vmImage: 'Ubuntu-20.04'}
-  strategy:
-    matrix:
-      x64:
-        CIBW_SKIP: 'pp* *-manylinux*_i686'
   steps:
     - task: UsePythonVersion@0
     - bash: |
@@ -32,8 +31,9 @@ jobs:
         artifactName: 'binaries'
     - bash: |
         set -ex
-        python -m pip install --upgrade pip
-        python -m pip install cibuildwheel==1.11.1
+        python -m pip install --upgrade cibuildwheel==1.12.0
+        CIBW_BUILD="cp35-*" cibuildwheel --platform linux --output-dir wheelhouse .
+        python -m pip install --upgrade cibuildwheel==2.12.0
         cibuildwheel --platform linux --output-dir wheelhouse .
       displayName: Build wheels
     - task: PublishBuildArtifacts@1
@@ -56,9 +56,8 @@ jobs:
         artifactName: 'binaries'
     - bash: |
         set -ex
-        python -m pip install --upgrade pip
-        python -m pip install cibuildwheel==1.11.1
-        CIBW_SKIP='pp*' cibuildwheel --platform macos --output-dir wheelhouse .
+        python -m pip install --upgrade cibuildwheel==2.12.0
+        cibuildwheel --platform macos --output-dir wheelhouse .
       displayName: Build wheels
     - task: PublishBuildArtifacts@1
       inputs:
@@ -80,9 +79,10 @@ jobs:
         artifactName: 'binaries'
     - bash: |
         set -ex
-        python -m pip install --upgrade pip
-        python -m pip install cibuildwheel==1.11.1
-        CIBW_SKIP='pp* cp27-*' cibuildwheel --platform windows --output-dir wheelhouse .
+        python -m pip install --upgrade cibuildwheel==1.12.0
+        CIBW_BUILD="cp35-*" cibuildwheel --platform windows --output-dir wheelhouse .
+        python -m pip install --upgrade cibuildwheel==2.12.0
+        cibuildwheel --platform windows --output-dir wheelhouse .
       displayName: Build wheels
     - task: PublishBuildArtifacts@1
       inputs:
