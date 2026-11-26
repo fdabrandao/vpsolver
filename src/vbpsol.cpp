@@ -41,7 +41,7 @@ int swig_main(int argc, char **argv) {
 			pyout = atoi(argv[4]) != 0;
 		}
 
-		int ind;
+		int ind = 0;
 		double x;
 		char buf[MAX_LEN];
 		std::map<Arc, int> flow;
