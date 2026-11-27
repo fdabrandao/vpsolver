@@ -44,8 +44,13 @@ int swig_main(int argc, char **argv) {
 		int ind = 0;
 		double x;
 		char buf[MAX_LEN];
+		char line[MAX_LEN];
 		std::map<Arc, int> flow;
-		while (fscanf(fsol, "%s %lf", buf, &x) != EOF) {
+		while (!feof(fsol) {
+			fgets(line, MAX_LEN, fsol);
+			if (strlen(line) <= 2 || line[0] == '#')//Skip commentaries
+				continue;
+			sscanf(line, "%s %lf", buf, &x)
 			if (strlen(buf) <= 1) {
 				continue;
 			}
